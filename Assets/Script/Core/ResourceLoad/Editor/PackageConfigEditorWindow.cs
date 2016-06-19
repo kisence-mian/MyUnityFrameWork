@@ -6,22 +6,22 @@ using System.IO;
 
 public class PackageConfigEditorWindow : EditorWindow
 {
-    [MenuItem("Window/打包设置编辑器")]
-
-    public static void ShowWindow()
-    {
-        EditorWindow.GetWindow(typeof(PackageConfigEditorWindow));
-    }
-
     //所有依赖包
     List<EditPackageConfig> relyPackages = new List<EditPackageConfig>();
     //所有普通包
     List<EditPackageConfig> bundles = new List<EditPackageConfig>();
 
+    #region 初始化
+
     void OnEnable()
     {
         Debug.Log("初始化");
+
+        LoadAndAnalysisJson();
+        UpdateRelyPackageNames();
     }
+
+    #endregion
 
     #region GUI
 
@@ -47,8 +47,6 @@ public class PackageConfigEditorWindow : EditorWindow
     void OnGUI()
     {
         titleContent.text = "打包设置编辑器";
-        //title.tooltip = "HaHa";
-        //title.image = new Texture();
 
         errorMsg.normal.textColor = Color.red;
         warnMsg.normal.textColor = Color.yellow;
@@ -215,13 +213,13 @@ public class PackageConfigEditorWindow : EditorWindow
 
             for (int k = 0; k < selects.Length; k++)
             {
-                if (!isExist_EditorList(pack.objects, selects[k]))
+                EditorObject tmp = new EditorObject();
+
+                tmp.obj = selects[k];
+                tmp.path = GetObjectPath(selects[k]);
+
+                if (!isExist_EditorList(pack.objects, tmp))
                 {
-                    EditorObject tmp = new EditorObject();
-
-                    tmp.obj = selects[k];
-                    tmp.path = GetObjectPath(selects[k]);
-
                     pack.objects.Add(tmp);
                 }
                 else
@@ -279,7 +277,8 @@ public class PackageConfigEditorWindow : EditorWindow
             {
                 //名称
                 EditorGUI.indentLevel = 4;
-                if (bundles[i].mainObject != null)
+                if (bundles[i].mainObject != null 
+                    &&bundles[i].mainObject.obj!= null)
                 {
                     bundles[i].name = bundles[i].mainObject.obj.name;
                 }
@@ -359,7 +358,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
     #endregion
 
-    #region 支持函数
+    #region 工具函数
 
     void UpdateRelyPackageNames()
     {
@@ -385,11 +384,11 @@ public class PackageConfigEditorWindow : EditorWindow
     /// </summary>
     /// <param name="obj">资源对象</param>
     /// <returns>是否存在</returns>
-    bool isExist_AllBundle(Object obj)
+    bool isExist_AllBundle(EditorObject obj)
     {
         for (int i = 0; i < bundles.Count; i++)
         {
-            if (bundles[i].mainObject.obj.Equals(obj))
+            if (EqualsEditorObject(bundles[i].mainObject,obj))
             {
                 return true;
             }
@@ -410,16 +409,22 @@ public class PackageConfigEditorWindow : EditorWindow
         return false;
     }
 
-    bool isExist_Bundle(Object obj, EditPackageConfig package)
+    bool isExist_Bundle(EditorObject obj, EditPackageConfig package)
     {
         return isExist_EditorList(package.objects, obj);
     }
 
-    bool isExist_List(List<Object> list, Object obj)
+    bool isExist_EditorList(List<EditorObject> list, EditorObject obj)
     {
         for (int i = 0; i < list.Count; i++)
         {
-            if (list[i].Equals(obj))
+            if (list[i] == null
+                || list[i].obj == null)
+            {
+                continue;
+            }
+
+            if (EqualsEditorObject(list[i],obj))
             {
                 return true;
             }
@@ -428,17 +433,18 @@ public class PackageConfigEditorWindow : EditorWindow
         return false;
     }
 
-    bool isExist_EditorList(List<EditorObject> list, Object obj)
+    //比较两个EditorObject是否相等
+    bool EqualsEditorObject(EditorObject obj_a, EditorObject obj_b)
     {
-        for (int i = 0; i < list.Count; i++)
+        //只比较加载路径，如果加载路径相等则认为是一个
+        if (obj_a.path.Equals(obj_b.path))
         {
-            if (list[i].obj.Equals(obj))
-            {
-                return true;
-            }
+            return true;
         }
-
-        return false;
+        else
+        {
+            return false;
+        }
     }
 
     #endregion
@@ -504,6 +510,11 @@ public class PackageConfigEditorWindow : EditorWindow
     //自定义TosString()方法
     string CustomToString(Object obj)
     {
+        if (obj == null)
+        {
+            return "Null";
+        }
+
         if ((obj as MonoScript) != null)
         {
             return obj.name + " (MonoScript)";
@@ -516,7 +527,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
     #endregion
 
-    #region 按钮回调函数
+    #region 添加菜单按钮
 
     [MenuItem("Tool/显示选中对象所有相关资源")]
     public static void ShowAllCorrelationResource()
@@ -524,6 +535,14 @@ public class PackageConfigEditorWindow : EditorWindow
         Object[] roots = Selection.GetFiltered(typeof(Object), SelectionMode.Unfiltered);
         Selection.objects = EditorUtility.CollectDependencies(roots);
     }
+
+    [MenuItem("Window/打包设置编辑器")]
+
+    public static void ShowWindow()
+    {
+        EditorWindow.GetWindow(typeof(PackageConfigEditorWindow));
+    }
+    #endregion
 
     #region 自动添加Resource目录下的所有资源
 
@@ -580,7 +599,11 @@ public class PackageConfigEditorWindow : EditorWindow
 
     void AddAssetBundle(Object obj, string path)
     {
-        if (isExist_AllBundle(obj))
+        EditorObject objTmp = new EditorObject();
+        objTmp.obj = obj;
+        objTmp.path = GetObjectPath(obj);
+
+        if (isExist_AllBundle(objTmp))
         {
             Debug.Log(obj.name + " 已经存在！");
         }
@@ -607,11 +630,21 @@ public class PackageConfigEditorWindow : EditorWindow
                     continue;
                 }
 
+                //过滤掉一些不必要加载进去的组件
+                if (ComponentFilter(res[j]))
+                {
+                    continue;
+                }
+
+                EditorObject tmp = new EditorObject();
+                tmp.obj = res[j];
+                tmp.path = GetObjectPath(res[j]);
+
                 bool isExistRelyPackage = false;
 
                 for (int i = 0; i < relyPackages.Count; i++)
                 {
-                    if (isExist_Bundle(res[j], relyPackages[i]))
+                    if (isExist_Bundle(tmp, relyPackages[i]))
                     {
                         //在依赖包选项中添加此依赖包
                         EditPackageConfigTmp.relyPackagesMask = EditPackageConfigTmp.relyPackagesMask | 1 << i;
@@ -622,11 +655,10 @@ public class PackageConfigEditorWindow : EditorWindow
 
                 //该资源不在依赖包中，并且也与主资源不同时，放入包中
                 if (isExistRelyPackage == false
-                    && !EditPackageConfigTmp.mainObject.obj.Equals(res[j]))
+                    &&!EqualsEditorObject(EditPackageConfigTmp.mainObject,tmp)
+                    )
                 {
-                    EditorObject tmp = new EditorObject();
-                    tmp.obj = res[j];
-                    tmp.path = GetObjectPath(res[j]);
+                    
                     EditPackageConfigTmp.objects.Add(tmp);
                 }
             }
@@ -635,11 +667,30 @@ public class PackageConfigEditorWindow : EditorWindow
         }
     }
 
+    Dictionary<string, Shader> shaderFilter = new Dictionary<string, Shader>();
+    //组件过滤器
+    bool ComponentFilter(Object comp)
+    {
+        //过滤掉所有shander
+        if (comp as Shader != null)
+        {
+            if (!shaderFilter.ContainsKey(comp.ToString()))
+            {
+                shaderFilter.Add(comp.ToString(), (Shader)comp);
+                Debug.LogWarning("包含 Shader! :" + comp.ToString());
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
     #endregion
 
     #region  依赖包检查相关
 
-    Dictionary<string, List<Object>> checkDict = new Dictionary<string, List<Object>>();
+    Dictionary<string, List<EditorObject>> checkDict = new Dictionary<string, List<EditorObject>>();
     Dictionary<string, int> bundleName = new Dictionary<string, int>();
     int errorCount = 0;
     int warnCount = 0;
@@ -649,7 +700,7 @@ public class PackageConfigEditorWindow : EditorWindow
     void CheckPackage()
     {
         ClearCheckLog();
-        checkDict = new Dictionary<string, List< Object>>();
+        checkDict = new Dictionary<string, List<EditorObject>>();
         bundleName = new Dictionary<string, int>();
 
         //包名重复检查
@@ -696,20 +747,20 @@ public class PackageConfigEditorWindow : EditorWindow
 
             if (checkDict.ContainsKey(resNameTmp))
             {
-                if (isExist_List(checkDict[resNameTmp], pack.mainObject.obj))
+                if (isExist_EditorList(checkDict[resNameTmp], pack.mainObject))
                 {
                     pack.warnMsg.Add("MainObject 重复! " + resNameTmp);
                     warnCount++;
                 }
                 else
                 {
-                    checkDict[resNameTmp].Add(pack.mainObject.obj);
+                    checkDict[resNameTmp].Add(pack.mainObject);
                 }
             }
             else
             {
-                checkDict.Add(resNameTmp,new List<Object>());
-                checkDict[resNameTmp].Add(pack.mainObject.obj);
+                checkDict.Add(resNameTmp,new List<EditorObject>());
+                checkDict[resNameTmp].Add(pack.mainObject);
             }
         }
 
@@ -719,20 +770,20 @@ public class PackageConfigEditorWindow : EditorWindow
 
             if (checkDict.ContainsKey(resNameTmp))
             {
-                if (isExist_List(checkDict[resNameTmp], pack.objects[i].obj))
+                if (isExist_EditorList(checkDict[resNameTmp], pack.objects[i]))
                 {
                     pack.warnMsg.Add("Objects存在重复资源 ! " + resNameTmp);
                     warnCount++;
                 }
                 else
                 {
-                    checkDict[resNameTmp].Add(pack.objects[i].obj);
+                    checkDict[resNameTmp].Add(pack.objects[i]);
                 }
             }
             else
             {
-                checkDict.Add(resNameTmp, new List<Object>());
-                checkDict[resNameTmp].Add(pack.objects[i].obj);
+                checkDict.Add(resNameTmp, new List<EditorObject>());
+                checkDict[resNameTmp].Add(pack.objects[i]);
             }
         }
     }
@@ -743,7 +794,18 @@ public class PackageConfigEditorWindow : EditorWindow
     /// <param name="pack"></param>
     void checkMissRes(EditPackageConfig pack)
     {
-        if(pack.mainObject == null)
+        for (int i = 0; i < pack.objects.Count;i++ )
+        {
+            if (pack.objects[i].obj == null)
+            {
+                pack.errorMsg.Add(i + "号资源丢失！");
+                errorCount++;
+            }
+        }
+
+        //将来加入资源缺失检测
+
+        if (pack.mainObject == null)
         {
             pack.errorMsg.Add("没有主资源！");
             errorCount++;
@@ -756,12 +818,16 @@ public class PackageConfigEditorWindow : EditorWindow
         {
             if (res[i] == null)
             {
-                pack.warnMsg.Add("有丢失的资源或者组件！");
+                pack.warnMsg.Add("有丢失的脚本！");
                 warnCount++;
                 continue;
             }
 
-            if (!GetResIsUse(pack, res[i]))
+            EditorObject tmp = new EditorObject();
+            tmp.obj = res[i];
+            tmp.path = GetObjectPath(res[i]);
+
+            if (!GetResIsUse(pack, tmp) && !ComponentFilter(res[i]))
             {
                 pack.errorMsg.Add( CustomToString(res[i]) + " 资源丢失依赖！");
                 errorCount++;
@@ -793,9 +859,9 @@ public class PackageConfigEditorWindow : EditorWindow
     /// <summary>
     /// 检查单个资源是否全都被引用
     /// </summary>
-    bool GetResIsUse(EditPackageConfig pack,Object res)
+    bool GetResIsUse(EditPackageConfig pack,EditorObject res)
     {
-        if (pack.mainObject.obj.Equals(res))
+        if (EqualsEditorObject(pack.mainObject,res))
         {
             return true;
         }
@@ -821,14 +887,110 @@ public class PackageConfigEditorWindow : EditorWindow
 
     #endregion
 
+    #region 生成配置文件与解析配置文件
     void CreatPackageFile()
     {
         //Debug.Log(JsonUtility.ToJson(relyPackages[0]));
-
-
         Debug.Log(bundles.Count);
         Debug.Log(JsonUtility.ToJson( bundles[0]));
+
+        Dictionary<string, object> final = new Dictionary<string, object>();
+
+        //依赖包
+        List<object> relyBundles = new List<object>();
+        for (int i = 0; i < relyPackages.Count;i++ )
+        {
+            relyBundles.Add(JsonUtility.ToJson(relyPackages[i]));
+        }
+
+        //Bundle包
+        List<object> AssetsBundles = new List<object>();
+        for (int i = 0; i < bundles.Count; i++)
+        {
+            AssetsBundles.Add(JsonUtility.ToJson(bundles[i]));
+        }
+
+        final.Add("relyBundles", relyBundles);
+        final.Add("AssetsBundles", AssetsBundles);
+
+        string finalJson =  MiniJSON.Json.Serialize(final);
+
+        Debug.Log(finalJson);
+
+        stringTmp = finalJson;
+
+        LoadAndAnalysisJson();
     }
+
+    string stringTmp = "";
+
+    /// <summary>
+    /// 读取并且解析Json
+    /// </summary>
+    void LoadAndAnalysisJson()
+    {
+        string JsonString = stringTmp;
+
+        if(JsonString == "")
+        {
+            return;
+        }
+
+        Dictionary<string, object> final = (Dictionary<string, object>)MiniJSON.Json.Deserialize(JsonString);
+
+        //依赖包
+        List<object> relyBundles = (List<object>)final["relyBundles"];
+
+        relyPackages = new List<EditPackageConfig>();
+        for (int i = 0; i < relyBundles.Count; i++)
+        {
+            EditPackageConfig tmp = JsonUtility.FromJson<EditPackageConfig>((string)relyBundles[i]);
+            
+            //重新加载Object
+            ReLoadGameObject(tmp);
+
+            relyPackages.Add(tmp);
+        }
+
+        //Bundle包
+        List<object> AssetsBundles = (List<object>)final["AssetsBundles"];
+
+        bundles = new List<EditPackageConfig>();
+        for (int i = 0; i < AssetsBundles.Count; i++)
+        {
+            EditPackageConfig tmp = JsonUtility.FromJson<EditPackageConfig>((string)AssetsBundles[i]);
+
+            //重新加载Object
+            ReLoadGameObject(tmp);
+
+            bundles.Add(tmp);
+        }
+
+    }
+
+    //重新加载Object
+
+    void ReLoadGameObject(EditPackageConfig pack)
+    {
+        if (pack.mainObject != null)
+        {
+            ReLoadEditObject(pack.mainObject);
+        }
+
+        for (int i = 0; i < pack.objects.Count;i++ )
+        {
+            ReLoadEditObject(pack.objects[i]);
+        }
+    }
+
+    void ReLoadEditObject(EditorObject editObj)
+    {
+        editObj.obj = AssetDatabase.LoadAssetAtPath<Object>(editObj.path);
+    }
+
+    #endregion
+
+    #region 打包
 
     void Package()
     {
