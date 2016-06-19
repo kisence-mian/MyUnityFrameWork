@@ -1,11 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEditor;
 using System.Collections.Generic;
 
-/// <summary>
-/// 打包设置管理器
-/// </summary>
-public static class PackageConfigManager
+public static class PackageConfigManager 
 {
     static Dictionary<string, PackageConfig> PackageConfigs = new Dictionary<string, PackageConfig>();
 
@@ -16,14 +14,13 @@ public static class PackageConfigManager
 
     public static PackageConfig GetPackageConfig(string bundleName)
     {
-        if (!PackageConfigs.ContainsKey(bundleName))
+        if (PackageConfigs.ContainsKey(bundleName) )
         {
-            Debug.LogError("Can't find " + bundleName + " packageConfig !");
-            return new PackageConfig();
+            return PackageConfigs[bundleName];
         }
         else
         {
-            return PackageConfigs[bundleName];
+            return new PackageConfig();
         }
     }
 }
@@ -33,3 +30,4 @@ public struct PackageConfig
     public string path;
     public List<string> relyPackages;
 }
+
