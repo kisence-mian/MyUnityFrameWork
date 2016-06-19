@@ -6,6 +6,8 @@ using System.IO;
 
 public class PackageConfigEditorWindow : EditorWindow
 {
+    string ConfigName = "PackageConfigEditor";
+
     //所有依赖包
     List<EditPackageConfig> relyPackages = new List<EditPackageConfig>();
     //所有普通包
@@ -15,7 +17,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        Debug.Log("初始化");
+        //Debug.Log("初始化");
 
         LoadAndAnalysisJson();
         UpdateRelyPackageNames();
@@ -27,8 +29,8 @@ public class PackageConfigEditorWindow : EditorWindow
 
     int RelyMaskFilter = -1; //依赖包过滤器
 
-    bool isFoldRelyPackages = false; //是否展开依赖包
-    bool isFoldBundles = false;      //是否展开普通包
+    bool isFoldRelyPackages = true; //是否展开依赖包
+    bool isFoldBundles = true;      //是否展开普通包
 
     Vector2 scrollPos = new Vector2();
 
@@ -809,7 +811,7 @@ public class PackageConfigEditorWindow : EditorWindow
         {
             pack.errorMsg.Add("没有主资源！");
             errorCount++;
-            return;
+            return; 
         }
 
         Object[] res = GetCorrelationResource(pack.mainObject.obj);
@@ -890,10 +892,6 @@ public class PackageConfigEditorWindow : EditorWindow
     #region 生成配置文件与解析配置文件
     void CreatPackageFile()
     {
-        //Debug.Log(JsonUtility.ToJson(relyPackages[0]));
-        Debug.Log(bundles.Count);
-        Debug.Log(JsonUtility.ToJson( bundles[0]));
-
         Dictionary<string, object> final = new Dictionary<string, object>();
 
         //依赖包
@@ -913,13 +911,16 @@ public class PackageConfigEditorWindow : EditorWindow
         final.Add("relyBundles", relyBundles);
         final.Add("AssetsBundles", AssetsBundles);
 
-        string finalJson =  MiniJSON.Json.Serialize(final);
+        ConfigManager.SaveEditorConfigData(ConfigName,final);
 
-        Debug.Log(finalJson);
 
-        stringTmp = finalJson;
+        //string finalJson =  MiniJSON.Json.Serialize(final);
 
-        LoadAndAnalysisJson();
+        //Debug.Log(finalJson);
+
+        //stringTmp = finalJson;
+
+        //LoadAndAnalysisJson();
     }
 
     string stringTmp = "";
@@ -929,14 +930,13 @@ public class PackageConfigEditorWindow : EditorWindow
     /// </summary>
     void LoadAndAnalysisJson()
     {
-        string JsonString = stringTmp;
+        Dictionary<string, object> final = ConfigManager.GetEditorConfigData(ConfigName);
 
-        if(JsonString == "")
+        if (final == null)
         {
+            Debug.Log(ConfigName + " ConfigData dont Exits");
             return;
         }
-
-        Dictionary<string, object> final = (Dictionary<string, object>)MiniJSON.Json.Deserialize(JsonString);
 
         //依赖包
         List<object> relyBundles = (List<object>)final["relyBundles"];

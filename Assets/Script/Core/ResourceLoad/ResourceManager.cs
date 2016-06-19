@@ -15,7 +15,7 @@ public static class ResourceManager
         {
             //资源读取器不能使用默认设置
             loadType = value;
-            if (loadType == ResLoadType.useGameSetting)
+            if (loadType == ResLoadType.UseGameSetting)
             {
                 loadType = ResLoadType.ResourcePath;
 
@@ -30,9 +30,9 @@ public static class ResourceManager
         {
             case ResLoadType.ResourcePath:
                 return "";
-            case ResLoadType.streamingAssetsPath:
+            case ResLoadType.StreamingAssetsPath:
                 return Application.streamingAssetsPath;
-            case ResLoadType.persistentDataPath:
+            case ResLoadType.PersistentDataPath:
                 return Application.persistentDataPath;
             default:
                 return "";
@@ -42,10 +42,10 @@ public static class ResourceManager
 
 public enum ResLoadType
 {
-    useGameSetting,
+    UseGameSetting,
     ResourcePath,
-    streamingAssetsPath,
-    persistentDataPath
+    StreamingAssetsPath,
+    PersistentDataPath,
 }
 
 public delegate void ResourceLoadCallBack<T>(T resObject);
