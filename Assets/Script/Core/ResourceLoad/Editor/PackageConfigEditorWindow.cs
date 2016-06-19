@@ -15,9 +15,13 @@ public class PackageConfigEditorWindow : EditorWindow
 
     //所有依赖包
     List<EditPackageConfig> relyPackages = new List<EditPackageConfig>();
-
     //所有普通包
     List<EditPackageConfig> bundles = new List<EditPackageConfig>();
+
+    void OnEnable()
+    {
+        Debug.Log("初始化");
+    }
 
     #region GUI
 
@@ -33,8 +37,6 @@ public class PackageConfigEditorWindow : EditorWindow
     GUIStyle errorMsg = new GUIStyle();
     GUIStyle warnMsg = new GUIStyle();
 
-    GUIContent title = new GUIContent();
-
     bool isProgress = false;
     float progress = 0;
     string progressContent = "";
@@ -44,11 +46,9 @@ public class PackageConfigEditorWindow : EditorWindow
 
     void OnGUI()
     {
-        title.text = "打包设置编辑器";
+        titleContent.text = "打包设置编辑器";
         //title.tooltip = "HaHa";
         //title.image = new Texture();
-
-        base.titleContent = title;
 
         errorMsg.normal.textColor = Color.red;
         warnMsg.normal.textColor = Color.yellow;
@@ -165,10 +165,10 @@ public class PackageConfigEditorWindow : EditorWindow
                 EditorGUI.indentLevel = 5;
                 if (relyPackages[i].isFold_objects)
                 {
-                    ObjectListView(relyPackages[i].objects);
+                    ObjectListView(relyPackages[i]);
                 }
             }
-
+            EditorGUI.indentLevel = 2;
             //消息视图
             MessageView(relyPackages[i]);
         }
@@ -188,20 +188,22 @@ public class PackageConfigEditorWindow : EditorWindow
         EditorGUILayout.EndHorizontal();
     }
 
-    void ObjectListView(List<Object> objects)
+    void ObjectListView(EditPackageConfig pack)
     {
-        EditorGUILayout.LabelField("Size: " + objects.Count);
-        for (int j = 0; j < objects.Count; j++)
+        EditorGUILayout.LabelField("Size: " + pack.objects.Count);
+        for (int j = 0; j < pack.objects.Count; j++)
         {
+
+            EditorGUILayout.LabelField("Path:", pack.objects[j].path);
             EditorGUILayout.BeginHorizontal();
-            objects[j] = EditorGUILayout.ObjectField(objects[j], typeof(Object));
+            EditorGUILayout.ObjectField(pack.objects[j].obj,typeof(Object),false);
 
             if (GUILayout.Button("删除"))
             {
-                objects.RemoveAt(j);
+                pack.objects.RemoveAt(j);
             }
-
             EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space();
         }
 
         EditorGUILayout.BeginHorizontal();
@@ -213,9 +215,14 @@ public class PackageConfigEditorWindow : EditorWindow
 
             for (int k = 0; k < selects.Length; k++)
             {
-                if (!isExists(objects, selects[k]))
+                if (!isExist_EditorList(pack.objects, selects[k]))
                 {
-                    objects.Add(selects[k]);
+                    EditorObject tmp = new EditorObject();
+
+                    tmp.obj = selects[k];
+                    tmp.path = GetObjectPath(selects[k]);
+
+                    pack.objects.Add(tmp);
                 }
                 else
                 {
@@ -243,6 +250,7 @@ public class PackageConfigEditorWindow : EditorWindow
         }
     }
 
+    //Bundle包视图
     void BundlesView()
     {
         for (int i = 0; i < bundles.Count; i++)
@@ -273,7 +281,7 @@ public class PackageConfigEditorWindow : EditorWindow
                 EditorGUI.indentLevel = 4;
                 if (bundles[i].mainObject != null)
                 {
-                    bundles[i].name = bundles[i].mainObject.name;
+                    bundles[i].name = bundles[i].mainObject.obj.name;
                 }
                 else
                 {
@@ -283,7 +291,7 @@ public class PackageConfigEditorWindow : EditorWindow
                 //主资源
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.LabelField("主资源:");
-                EditorGUILayout.ObjectField(bundles[i].mainObject, typeof(Object));
+                EditorGUILayout.ObjectField(bundles[i].mainObject.obj, typeof(Object),false);
                 EditorGUILayout.EndHorizontal();
 
                 //依赖包
@@ -302,9 +310,10 @@ public class PackageConfigEditorWindow : EditorWindow
                 EditorGUI.indentLevel = 5;
                 if (bundles[i].isFold_objects)
                 {
-                    ObjectListView(bundles[i].objects);
+                    ObjectListView(bundles[i]);
                 }
             }
+            EditorGUI.indentLevel = 2;
             //消息视图
             MessageView(bundles[i]);
         }
@@ -352,19 +361,6 @@ public class PackageConfigEditorWindow : EditorWindow
 
     #region 支持函数
 
-    bool isExists(List<Object> objects, Object obj)
-    {
-        foreach (Object tmp in objects)
-        {
-            if (tmp.Equals(obj))
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     void UpdateRelyPackageNames()
     {
         RelyPackageNames = new string[relyPackages.Count];
@@ -375,55 +371,14 @@ public class PackageConfigEditorWindow : EditorWindow
     }
 
 
-    string GetObjectPath()
+    string GetObjectPath(Object obj)
     {
-        return "";
+         string path =  AssetDatabase.GetAssetPath(obj);
+
+         return path;
     }
 
-    void AddAssetBundle(Object obj,string path)
-    {
-        if (isExist_AllBundle(obj))
-        {
-            Debug.Log(obj.name + " 已经存在！");
-        }
-        else
-        {
-            EditPackageConfig EditPackageConfigTmp = new EditPackageConfig();
-            EditPackageConfigTmp.name = obj.name;
-            EditPackageConfigTmp.mainObject = obj;
-            EditPackageConfigTmp.path = path;
-
-            Object[] res = GetCorrelationResource(obj);
-
-            //判断依赖包中含不含有该资源，如果有，则不将此资源放入bundle中
-            for (int j = 0; j < res.Length; j++)
-            {
-                bool isExistRelyPackage = false;
-
-                for (int i = 0; i < relyPackages.Count; i++)
-                {
-                    if (isExist_Bundle(res[j], relyPackages[i]))
-                    {
-                        //在依赖包选项中添加此依赖包
-                        EditPackageConfigTmp.relyPackagesMask = EditPackageConfigTmp.relyPackagesMask | 1 << i;
-                        isExistRelyPackage = true;
-                        break;
-                    }
-                }
-
-                //该资源不在依赖包中，并且也与主资源不同时，放入包中
-                if (isExistRelyPackage == false
-                    && !EditPackageConfigTmp.mainObject.Equals(res[j]))
-                {
-                    EditPackageConfigTmp.objects.Add(res[j]);
-                }
-
-               
-            }
-
-            bundles.Add(EditPackageConfigTmp);
-        }
-    }
+    #region 各种判断存在
 
     /// <summary>
     /// 判断一个资源是否已经在bundle列表中
@@ -434,7 +389,7 @@ public class PackageConfigEditorWindow : EditorWindow
     {
         for (int i = 0; i < bundles.Count; i++)
         {
-            if (bundles[i].mainObject.Equals(obj))
+            if (bundles[i].mainObject.obj.Equals(obj))
             {
                 return true;
             }
@@ -457,7 +412,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
     bool isExist_Bundle(Object obj, EditPackageConfig package)
     {
-        return isExist_List(package.objects, obj);
+        return isExist_EditorList(package.objects, obj);
     }
 
     bool isExist_List(List<Object> list, Object obj)
@@ -472,6 +427,21 @@ public class PackageConfigEditorWindow : EditorWindow
 
         return false;
     }
+
+    bool isExist_EditorList(List<EditorObject> list, Object obj)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].obj.Equals(obj))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    #endregion
 
     /// <summary>
     /// 获取所有相关资源
@@ -542,8 +512,6 @@ public class PackageConfigEditorWindow : EditorWindow
         {
             return obj.ToString();
         }
-
-        return "";
     }
 
     #endregion
@@ -557,10 +525,11 @@ public class PackageConfigEditorWindow : EditorWindow
         Selection.objects = EditorUtility.CollectDependencies(roots);
     }
 
-    int direIndex = 0;
+    #region 自动添加Resource目录下的所有资源
 
+    int direIndex = 0;
     string resourceParentPath = "/Resources/";
-    //自动将Resource下所有资源打包
+    //自动添加Resource目录下的所有资源
     void AddAllResourceBundle()
     {
         string resourcePath = Application.dataPath +resourceParentPath;
@@ -601,12 +570,74 @@ public class PackageConfigEditorWindow : EditorWindow
                 || relativePath.EndsWith(".xml")
                 )
             {
+                //Debug.Log(relativePath);
                 relativePath = relativePath.Remove(relativePath.LastIndexOf("."));
                 Object tmp = Resources.Load(relativePath);
                 AddAssetBundle(tmp,relativePath);
             }
         }
     }
+
+    void AddAssetBundle(Object obj, string path)
+    {
+        if (isExist_AllBundle(obj))
+        {
+            Debug.Log(obj.name + " 已经存在！");
+        }
+        else
+        {
+            EditPackageConfig EditPackageConfigTmp = new EditPackageConfig();
+            EditPackageConfigTmp.name = obj.name;
+
+            EditorObject mainObjTmp = new EditorObject();
+            mainObjTmp.obj = obj;
+            mainObjTmp.path = GetObjectPath(obj);
+
+            EditPackageConfigTmp.mainObject = mainObjTmp;
+            EditPackageConfigTmp.path = GetObjectPath(obj);
+
+            Object[] res = GetCorrelationResource(obj);
+
+            //判断依赖包中含不含有该资源，如果有，则不将此资源放入bundle中
+            for (int j = 0; j < res.Length; j++)
+            {
+                if (res[j] == null)
+                {
+                    Debug.LogWarning(obj + "　有资源丢失！");
+                    continue;
+                }
+
+                bool isExistRelyPackage = false;
+
+                for (int i = 0; i < relyPackages.Count; i++)
+                {
+                    if (isExist_Bundle(res[j], relyPackages[i]))
+                    {
+                        //在依赖包选项中添加此依赖包
+                        EditPackageConfigTmp.relyPackagesMask = EditPackageConfigTmp.relyPackagesMask | 1 << i;
+                        isExistRelyPackage = true;
+                        break;
+                    }
+                }
+
+                //该资源不在依赖包中，并且也与主资源不同时，放入包中
+                if (isExistRelyPackage == false
+                    && !EditPackageConfigTmp.mainObject.obj.Equals(res[j]))
+                {
+                    EditorObject tmp = new EditorObject();
+                    tmp.obj = res[j];
+                    tmp.path = GetObjectPath(res[j]);
+                    EditPackageConfigTmp.objects.Add(tmp);
+                }
+            }
+
+            bundles.Add(EditPackageConfigTmp);
+        }
+    }
+
+    #endregion
+
+    #region  依赖包检查相关
 
     Dictionary<string, List<Object>> checkDict = new Dictionary<string, List<Object>>();
     Dictionary<string, int> bundleName = new Dictionary<string, int>();
@@ -661,47 +692,47 @@ public class PackageConfigEditorWindow : EditorWindow
 
         if (pack.mainObject != null)
         {
-            string resNameTmp = CustomToString(pack.mainObject);
+            string resNameTmp = CustomToString(pack.mainObject.obj);
 
             if (checkDict.ContainsKey(resNameTmp))
             {
-                if (isExist_List(checkDict[resNameTmp], pack.mainObject))
+                if (isExist_List(checkDict[resNameTmp], pack.mainObject.obj))
                 {
                     pack.warnMsg.Add("MainObject 重复! " + resNameTmp);
                     warnCount++;
                 }
                 else
                 {
-                    checkDict[resNameTmp].Add(pack.mainObject);
+                    checkDict[resNameTmp].Add(pack.mainObject.obj);
                 }
             }
             else
             {
                 checkDict.Add(resNameTmp,new List<Object>());
-                checkDict[resNameTmp].Add(pack.mainObject);
+                checkDict[resNameTmp].Add(pack.mainObject.obj);
             }
         }
 
         for (int i = 0; i < pack.objects.Count; i++)
         {
-            string resNameTmp = CustomToString(pack.objects[i]);
+            string resNameTmp = CustomToString(pack.objects[i].obj);
 
             if (checkDict.ContainsKey(resNameTmp))
             {
-                if (isExist_List(checkDict[resNameTmp], pack.objects[i]))
+                if (isExist_List(checkDict[resNameTmp], pack.objects[i].obj))
                 {
                     pack.warnMsg.Add("Objects存在重复资源 ! " + resNameTmp);
                     warnCount++;
                 }
                 else
                 {
-                    checkDict[resNameTmp].Add(pack.objects[i]);
+                    checkDict[resNameTmp].Add(pack.objects[i].obj);
                 }
             }
             else
             {
                 checkDict.Add(resNameTmp, new List<Object>());
-                checkDict[resNameTmp].Add(pack.objects[i]);
+                checkDict[resNameTmp].Add(pack.objects[i].obj);
             }
         }
     }
@@ -719,13 +750,20 @@ public class PackageConfigEditorWindow : EditorWindow
             return;
         }
 
-        Object[] res = GetCorrelationResource(pack.mainObject);
+        Object[] res = GetCorrelationResource(pack.mainObject.obj);
 
         for (int i = 0; i < res.Length; i++)
         {
+            if (res[i] == null)
+            {
+                pack.warnMsg.Add("有丢失的资源或者组件！");
+                warnCount++;
+                continue;
+            }
+
             if (!GetResIsUse(pack, res[i]))
             {
-                pack.errorMsg.Add( CustomToString(res[i]) + " 资源丢失！");
+                pack.errorMsg.Add( CustomToString(res[i]) + " 资源丢失依赖！");
                 errorCount++;
             }
         }
@@ -757,7 +795,7 @@ public class PackageConfigEditorWindow : EditorWindow
     /// </summary>
     bool GetResIsUse(EditPackageConfig pack,Object res)
     {
-        if (pack.mainObject.Equals(res))
+        if (pack.mainObject.obj.Equals(res))
         {
             return true;
         }
@@ -781,9 +819,15 @@ public class PackageConfigEditorWindow : EditorWindow
        return false;
     }
 
+    #endregion
+
     void CreatPackageFile()
     {
+        //Debug.Log(JsonUtility.ToJson(relyPackages[0]));
 
+
+        Debug.Log(bundles.Count);
+        Debug.Log(JsonUtility.ToJson( bundles[0]));
     }
 
     void Package()
@@ -801,15 +845,22 @@ public class EditPackageConfig
     public string name = "";
     public string path = "";    //存放路径
 
-    public List<Object> objects = new List<Object>();  //所有子资源
+    public List<EditorObject> objects = new List<EditorObject>();  //所有子资源
     public bool isFold_objects = false; //子资源是否折叠
 
     //bundle独有
-    public Object mainObject;     //主资源
-    public int relyPackagesMask;
-    public List<string> relyPackages = new List<string>(); //所有依赖包
+    public EditorObject mainObject;     //主资源
+    public int relyPackagesMask;        //依赖包mask
+    //public List<string> relyPackages = new List<string>(); //所有依赖包
 
     public List<string> warnMsg = new List<string>();  //错误日志
     public List<string> errorMsg = new List<string>(); //警告日志
+}
 
+[System.Serializable]
+public class EditorObject
+{
+    [System.NonSerialized]
+    public Object obj;
+    public string path;
 }
