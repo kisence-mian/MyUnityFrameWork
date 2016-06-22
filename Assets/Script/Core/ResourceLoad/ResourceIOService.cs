@@ -65,6 +65,8 @@ public static class ResourceIOService
         CreateFile(path, dataByte);
     }
 
+    //web Player 不支持该函数
+#if !UNITY_WEBPLAYER
     public static void CreateFile(string path, byte[] byt)
     {
         try
@@ -78,9 +80,10 @@ public static class ResourceIOService
         }
         catch (Exception e)
         {
-            Debug.LogError("file creat fail! \n" + e.Message);
+            Debug.LogError("File Create Fail! \n" + e.Message);
         }
     }
+#endif
 
     #endregion
 }
