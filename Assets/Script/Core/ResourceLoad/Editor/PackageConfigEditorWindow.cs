@@ -7,6 +7,7 @@ using System.IO;
 public class PackageConfigEditorWindow : EditorWindow
 {
     string ConfigName = "PackageConfigEditor";
+    string GameConfigName = "PackageConfig";
 
     //所有依赖包
     List<EditPackageConfig> relyPackages = new List<EditPackageConfig>();
@@ -471,13 +472,25 @@ public class PackageConfigEditorWindow : EditorWindow
             if ((mask & 1<<i) != 0)
             {
                 result.Add(relyPackages[i]);
-
-                Debug.Log(relyPackages[i].name);
             }
         }
 
 
         return result;
+    }
+
+    List<string> GetRelyPackNames(int mask)
+    {
+        List<string> names = new List<string>();
+
+        List<EditPackageConfig> tmp = GetRelyPackListByMask(mask);
+
+        for (int i = 0; i < tmp.Count; i++)
+        {
+            names.Add(tmp[i].name);
+        }
+
+        return names;
     }
 
     bool GetIsShowByRelyMask(EditPackageConfig package)
@@ -825,6 +838,12 @@ public class PackageConfigEditorWindow : EditorWindow
                 continue;
             }
 
+            List<string> resLostList = FindLostRes(res[i]);
+            for (int j = 0; j < resLostList.Count;j++ )
+            {
+                pack.warnMsg.Add(resLostList[j]);
+            }
+
             EditorObject tmp = new EditorObject();
             tmp.obj = res[i];
             tmp.path = GetObjectPath(res[i]);
@@ -835,6 +854,76 @@ public class PackageConfigEditorWindow : EditorWindow
                 errorCount++;
             }
         }
+    }
+
+    //检查丢失的其他资源
+    List<string> FindLostRes( Object obj)
+    {
+        List<string> result = new List<string>();
+
+        GameObject go = obj as GameObject;
+
+        if (go)
+        {
+            HandleObject(go, result);
+            RecursionChilds(go.transform,result);
+        }
+
+        return result;
+    }
+
+    //递归所有子节点
+    void RecursionChilds(Transform treeSource,List<string> list)
+    {
+        if (treeSource.childCount > 0)
+        {
+            int i;
+            for (i = 0; i < treeSource.childCount; i++)
+            {
+                HandleObject(treeSource.GetChild(i).gameObject,list);
+                RecursionChilds(treeSource.GetChild(i),list);
+            }
+        }
+    }
+
+    void HandleObject(GameObject go, List<string> list)
+    {
+        //检查是否掉材质球
+        Renderer render = go.GetComponent<Renderer>();
+
+        if (render != null)
+        {
+            if (render.sharedMaterials != null)
+            {
+                for (int i = 0; i < render.sharedMaterials.Length;i++ )
+                {
+                    if (render.sharedMaterials[i]!=null)
+                    {
+                        try
+                        { 
+                            if (render.sharedMaterials[i].GetTexture(0) == null)
+                            {
+                                list.Add("贴图丢失: name: " + go.name + " (Materials Index: " + i + ")");
+                            }
+                         }
+                        catch(System.Exception e)
+                        {
+                            list.Add("贴图丢失: name: " + go.name + " (Materials Index: " + i + ")");
+                        }
+                    }
+                    else
+                    {
+                        list.Add("材质球丢失 : name: " + go.name + " (Materials Index: " + i + ")");
+                    }
+                } 
+            }
+            else
+            {
+                list.Add("材质球丢失 : name:" + go.name);
+            }
+        }
+
+        //这里可以添加其他检查
     }
 
     /// <summary>
@@ -892,35 +981,49 @@ public class PackageConfigEditorWindow : EditorWindow
     #region 生成配置文件与解析配置文件
     void CreatPackageFile()
     {
-        Dictionary<string, object> final = new Dictionary<string, object>();
+        //生成编辑器配置文件
+        Dictionary<string, object> editorConfig = new Dictionary<string, object>();
+        Dictionary<string, object> gameConfig = new Dictionary<string, object>();
 
         //依赖包
         List<object> relyBundles = new List<object>();
+        List<object> gameRelyBundles = new List<object>();
         for (int i = 0; i < relyPackages.Count;i++ )
         {
             relyBundles.Add(JsonUtility.ToJson(relyPackages[i]));
+
+            //生成游戏中使用的依赖包数据
+            PackageConfig pack = new PackageConfig();
+            pack.path = relyPackages[i].path;
+            pack.relyPackages = new List<string>();
+            gameRelyBundles.Add(JsonUtility.ToJson(pack));
         }
 
         //Bundle包
         List<object> AssetsBundles = new List<object>();
+        List<object> gameAssetsBundles = new List<object>();
         for (int i = 0; i < bundles.Count; i++)
         {
             AssetsBundles.Add(JsonUtility.ToJson(bundles[i]));
+
+            //生成游戏中使用的bundle包数据
+            PackageConfig pack = new PackageConfig();
+            pack.path = bundles[i].path;
+            pack.relyPackages = GetRelyPackNames(bundles[i].relyPackagesMask); //获取依赖包的名字
+            gameAssetsBundles.Add(JsonUtility.ToJson(pack));
         }
 
-        final.Add("relyBundles", relyBundles);
-        final.Add("AssetsBundles", AssetsBundles);
+        editorConfig.Add("relyBundles", relyBundles);
+        editorConfig.Add("AssetsBundles", AssetsBundles);
 
-        ConfigManager.SaveEditorConfigData(ConfigName,final);
+        gameConfig.Add("relyBundles", gameRelyBundles);
+        gameConfig.Add("AssetsBundles", gameRelyBundles);
 
+        //保存编辑器配置文件
+        ConfigManager.SaveEditorConfigData(ConfigName,editorConfig);
+        //保存游戏中读取的配置文件
+        ConfigManager.SaveConfigData(GameConfigName,gameConfig);
 
-        //string finalJson =  MiniJSON.Json.Serialize(final);
-
-        //Debug.Log(finalJson);
-
-        //stringTmp = finalJson;
-
-        //LoadAndAnalysisJson();
     }
 
     string stringTmp = "";

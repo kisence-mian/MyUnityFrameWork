@@ -38,6 +38,28 @@ public static class ResourceManager
                 return "";
         }
     }
+
+    //读取一个文本
+    public static string LoadTextFile(string path,ResLoadType type = ResLoadType.UseGameSetting)
+    {
+
+
+
+        return "";
+    }
+
+    //保存一个文本
+    public static void SaveTextFile(string path,string content ,ResLoadType type = ResLoadType.UseGameSetting)
+    {
+
+    }
+
+    //public static T GetResource<T>(string path)
+    //{
+    //    T resouce = new T();
+
+    //    return resouce;
+    //}
 }
 
 public enum ResLoadType
