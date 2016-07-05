@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public static class PackageConfigManager 
 {
+    static Dictionary<string, PackageConfig> relyPackageConfigs = new Dictionary<string, PackageConfig>();
+
     static Dictionary<string, PackageConfig> PackageConfigs = new Dictionary<string, PackageConfig>();
 
     static PackageConfigManager()

@@ -71,10 +71,7 @@ public static class ResourceIOService
     {
         try
         {
-            string newPathDir = Path.GetDirectoryName(path);
-
-            if (!Directory.Exists(newPathDir))
-                Directory.CreateDirectory(newPathDir);
+            FileTool.CreatFilePath(path);
 
             File.WriteAllBytes(path, byt);
         }

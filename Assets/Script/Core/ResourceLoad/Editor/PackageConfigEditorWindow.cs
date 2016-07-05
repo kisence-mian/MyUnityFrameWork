@@ -3,11 +3,14 @@ using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 
 public class PackageConfigEditorWindow : EditorWindow
 {
     string ConfigName = "PackageConfigEditor";
     string GameConfigName = "PackageConfig";
+
+    string relyAssetsBundlePath = "RelyBundle"; //所有依赖包放在此目录下
 
     //所有依赖包
     List<EditPackageConfig> relyPackages = new List<EditPackageConfig>();
@@ -158,7 +161,7 @@ public class PackageConfigEditorWindow : EditorWindow
                 relyPackages[i].name = EditorGUILayout.TextField("name:", relyPackages[i].name);
 
                 //加载路径
-                relyPackages[i].path = "RelyAssetsBundlePath/" + relyPackages[i].name;
+                relyPackages[i].path = relyAssetsBundlePath + "/" + relyPackages[i].name;
                 EditorGUILayout.LabelField("Path: ", relyPackages[i].path);
 
                 //子资源视图
@@ -363,6 +366,22 @@ public class PackageConfigEditorWindow : EditorWindow
 
     #region 工具函数
 
+    static BuildTarget getTargetPlatform
+    {
+        get
+        {
+            BuildTarget target = BuildTarget.StandaloneWindows;
+
+#if UNITY_ANDROID //安卓
+                target = BuildTarget.Android;
+#elif UNITY_IOS //iPhone
+                target = BuildTarget.iOS;
+#endif
+
+            return target;
+        }
+    }
+
     void UpdateRelyPackageNames()
     {
         RelyPackageNames = new string[relyPackages.Count];
@@ -372,12 +391,42 @@ public class PackageConfigEditorWindow : EditorWindow
         }
     }
 
-
     string GetObjectPath(Object obj)
     {
          string path =  AssetDatabase.GetAssetPath(obj);
 
          return path;
+    }
+
+    string GetRelativePath(string path)
+    {
+        //Debug.Log(path);
+        int direIndexTmp = path.LastIndexOf(resourceParentPath);
+        //Debug.Log(direIndexTmp);
+        if (direIndexTmp != -1)
+        {
+            direIndexTmp += resourceParentPath.Length;
+            return path.Substring(direIndexTmp);
+        }
+        else
+        {
+            return path;
+        }
+    }
+
+    //移除拓展名
+    string RemoveExpandName(string name)
+    {
+        int dirIndex = name.LastIndexOf(".");
+
+        if (dirIndex != -1)
+        {
+            return name.Remove(dirIndex);
+        }
+        else
+        {
+            return name;
+        }
     }
 
     #region 各种判断存在
@@ -605,7 +654,7 @@ public class PackageConfigEditorWindow : EditorWindow
                 )
             {
                 //Debug.Log(relativePath);
-                relativePath = relativePath.Remove(relativePath.LastIndexOf("."));
+                relativePath = RemoveExpandName(relativePath);
                 Object tmp = Resources.Load(relativePath);
                 AddAssetBundle(tmp,relativePath);
             }
@@ -632,7 +681,7 @@ public class PackageConfigEditorWindow : EditorWindow
             mainObjTmp.path = GetObjectPath(obj);
 
             EditPackageConfigTmp.mainObject = mainObjTmp;
-            EditPackageConfigTmp.path = GetObjectPath(obj);
+            EditPackageConfigTmp.path =  GetRelativePath(RemoveExpandName(GetObjectPath(obj)));
 
             Object[] res = GetCorrelationResource(obj);
 
@@ -1095,10 +1144,183 @@ public class PackageConfigEditorWindow : EditorWindow
 
     #region 打包
 
+    BuildAssetBundleOptions relyBuildOption; //依赖包打包设置
+
     void Package()
     {
+        relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle
+            | BuildAssetBundleOptions.UncompressedAssetBundle
+            | BuildAssetBundleOptions.CollectDependencies;//去重
 
+        //BuildPipeline.PushAssetDependencies();
+        //先打依赖包
+        for (int i = 0; i < relyPackages.Count;i++ )
+        {
+            PackageRelyPackage(relyPackages[i]);
+        }
+
+        //再打普通包
+        for(int i = 0;i<bundles.Count;i++)
+        {
+            PackageBundle(bundles[i]);
+        }
+
+        //BuildPipeline.PopAssetDependencies();
+
+        AssetDatabase.Refresh();
     }
+
+    void PackageRelyPackage(EditPackageConfig package)
+    {
+        //BuildPipeline.PushAssetDependencies();
+
+        if (package.objects.Count == 0)
+        {
+            Debug.LogWarning(package.name +  " 没有资源！");
+            return;
+        }
+
+        Object[] res = new Object[package.objects.Count];
+
+        for (int i = 0; i < package.objects.Count;i++ )
+        {
+            res[i] = package.objects[i].obj;
+        }
+
+        string path = GetExportPath(package.path,package.name);
+
+        FileTool.CreatFilePath(path);
+
+        BuildPipeline.BuildAssetBundle(null, res, path, relyBuildOption, getTargetPlatform);
+
+        //BuildPipeline.PopAssetDependencies();
+    }
+
+    void PackageBundle(EditPackageConfig package)
+    {
+        Debug.Log("PackageBundle " + package.name);
+        //导入资源包
+        //BuildPipeline.PushAssetDependencies();
+
+        //打包
+        Object[] res = new Object[package.objects.Count];
+
+        for (int i = 0; i < package.objects.Count; i++)
+        {
+            res[i] = package.objects[i].obj;
+        }
+
+        string path = GetExportPath(package.path, package.name);
+
+        FileTool.CreatFilePath(path);
+
+        BuildPipeline.BuildAssetBundle(package.mainObject.obj, res, path, relyBuildOption, getTargetPlatform);
+
+        //BuildPipeline.PopAssetDependencies();
+    }
+
+    string GetExportPath(string path,string name)
+    {
+        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(RemoveExpandName(path)) + ".assetBundle";
+    }
+
+    #endregion
+
+    #region 生成MD5文件和版本号文件
+
+    //public static void creatVersionMD5()
+    //{
+    //    string path = Application.dataPath + "/StreamingAssets/";
+    //    string fileName = Config.versionFileName;
+    //    string MD5fileName = Config.MD5InfoDataFileName;
+
+    //    int Version_large = 1;
+    //    int Version_tiny = 1;
+    //    //List<object> FilesData = new List<object>();
+
+    //    //取出旧数据
+    //    string oldJson = Util.readTextFile(path + fileName);
+
+    //    Debug.Log(oldJson);
+
+    //    if (!oldJson.Equals(""))
+    //    {
+    //        // Dictionary<string, object> data = Json.Deserialize(oldJson) as Dictionary<string, object>;
+    //        List<VersionData> persVD = AssetDataUtils.ChangeTextToListClassData<VersionData>(oldJson);
+    //        Version_large = persVD[0].Version_large;// int.Parse(data["Version_large"].ToString());
+    //        Version_tiny = persVD[0].Version_tiny + 1;// int.Parse(data["Version_tiny"].ToString()) + 1; //自动把小版本加1
+    //    }
+    //    //FilesMd5Data = new List<object>();
+    //    VersionData ver = new VersionData();
+    //    ver.Version_large = Version_large;
+    //    ver.Version_tiny = Version_tiny;
+    //    AssetDataUtils.SaveAssetDataToJsonFile(ver, fileName, AssetsLoadSaveType.StreamingAssets);
+    //    ////生成MD5文件
+    //    List<FileMD5Data> lsitMd5 = recursionDirectoryMD5(path);
+
+    //    AssetDataUtils.SaveAssetDataToJsonFile(lsitMd5, MD5fileName, AssetsLoadSaveType.StreamingAssets);
+    //    AssetDataUtils.SaveAssetDataToJsonFile(lsitMd5, MD5fileName, AssetsLoadSaveType.StreamingAssets);
+
+    //    AssetDatabase.Refresh();
+    //}
+
+
+    ////  static List<object> FilesMd5Data = new List<object>();
+    //static List<FileMD5Data> lists = new List<FileMD5Data>();
+    ////遍历所有子目录，所有prefab都打包,所有目录都展开
+    //static List<FileMD5Data> recursionDirectoryMD5(string path)
+    //{
+    //    string[] directorys = Directory.GetDirectories(path);
+
+    //    //int ids = Application.dataPath.IndexOf("Assets");
+
+    //    //所有目录继续遍历
+    //    for (int i = 0; i < directorys.Length; i++)
+    //    {
+    //        string pathTmp = directorys[i];
+
+    //        if (Directory.Exists(pathTmp))
+    //        {
+    //            recursionDirectoryMD5(pathTmp);
+    //        }
+    //    }
+
+    //    //所有prefab打包
+    //    string[] files = Directory.GetFiles(path);
+
+    //    for (int i = 0; i < files.Length; i++)
+    //    {
+    //        string pathTmp = files[i];
+    //        if (!pathTmp.EndsWith(".meta"))
+    //        {
+    //            lists.Add(creatMD5Info(pathTmp));
+    //        }
+    //    }
+
+    //    return lists;
+    //}
+
+    //static FileMD5Data creatMD5Info(string path)
+    //{
+    //    // Dictionary<string, object> fileInfo = new Dictionary<string, object>();
+    //    FileMD5Data data = new FileMD5Data();
+    //    string subPath = "/StreamingAssets/";
+
+    //    int streamIndex = path.IndexOf(subPath) + subPath.Length;
+
+    //    //FileInfo fileTmp = new FileInfo(path);
+
+    //    //string MD5String = getFileMD5(path);
+
+    //    data.filePath = path.Substring(streamIndex).Replace("\\", "/");
+    //    data.fileMD5 = MD5String;
+    //    //fileInfo.Add("fileName", fileTmp.Name);
+    //    //fileInfo.Add("filePath", path.Substring(streamIndex).Replace("\\","/"));
+    //    //fileInfo.Add("fileMD5", MD5String);
+
+    //    // FilesMd5Data.Add(fileInfo);
+    //    return data;
+    //}
 
     #endregion
 
