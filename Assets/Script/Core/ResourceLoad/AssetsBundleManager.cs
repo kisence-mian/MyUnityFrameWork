@@ -38,8 +38,10 @@ public static class AssetsBundleManager
     /// <returns></returns>
     public static string getBundlePath(string bundleName)
     {
+        PackageConfig configTmp = PackageConfigManager.GetPackageConfig(bundleName);
         //加载路径由 加载根目录 和 相对路径 合并而成
-        return ResourceManager.GetLoadPath() + PackageConfigManager.GetPackageConfig(bundleName).path;
+        //加载根目录由配置决定
+        return ResourceManager.GetPath(configTmp.path,configTmp.loadType);
     }
 }
 

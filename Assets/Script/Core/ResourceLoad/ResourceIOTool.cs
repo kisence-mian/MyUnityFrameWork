@@ -7,10 +7,10 @@ using System.Text;
 /// <summary>
 /// 资源读取器，负责从不同路径读取资源
 /// </summary>
-public static class ResourceIOService
+public static class ResourceIOTool
 {
     #region 读操作
-    public static string LoadStringByFile(string path)
+    public static string ReadStringByFile(string path)
     {
         string content = "";
 
@@ -40,7 +40,7 @@ public static class ResourceIOService
         return content;
     }
 
-    public static string LoadStringByResource(string path)
+    public static string ReadStringByResource(string path)
     {
         TextAsset text = (TextAsset)Resources.Load(path);
 
@@ -58,7 +58,7 @@ public static class ResourceIOService
 
     #region 写操作
 
-    public static void SaveStringByFile(string path, string content)
+    public static void WriteStringByFile(string path, string content)
     {
         byte[] dataByte = Encoding.GetEncoding("UTF-8").GetBytes(content);
 

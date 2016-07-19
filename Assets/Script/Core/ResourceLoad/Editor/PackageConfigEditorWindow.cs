@@ -7,15 +7,20 @@ using System.Security.Cryptography;
 
 public class PackageConfigEditorWindow : EditorWindow
 {
-    string ConfigName = "PackageConfigEditor";
-    string GameConfigName = "PackageConfig";
+    const string configFileName = "PackageConfigEditor";
 
-    string relyAssetsBundlePath = "RelyBundle"; //所有依赖包放在此目录下
+    const string relyAssetsBundlePath = "RelyBundle"; //所有依赖包放在此目录下
+
+    const string key_relyPackages = "relyBundles";
+    const string key_bundles      = "AssetsBundles";
+
+    int largeVersion = 1;  //大版本号 
+    int smallVersion = 1; //小版本号
 
     //所有依赖包
     List<EditPackageConfig> relyPackages = new List<EditPackageConfig>();
     //所有普通包
-    List<EditPackageConfig> bundles = new List<EditPackageConfig>();
+    List<EditPackageConfig> bundles      = new List<EditPackageConfig>();
 
     #region 初始化
 
@@ -24,6 +29,7 @@ public class PackageConfigEditorWindow : EditorWindow
         //Debug.Log("初始化");
 
         LoadAndAnalysisJson();
+        AnalysisVersionFile();
         UpdateRelyPackageNames();
     }
 
@@ -34,17 +40,17 @@ public class PackageConfigEditorWindow : EditorWindow
     int RelyMaskFilter = -1; //依赖包过滤器
 
     bool isFoldRelyPackages = true; //是否展开依赖包
-    bool isFoldBundles = true;      //是否展开普通包
+    bool isFoldBundles      = true; //是否展开普通包
 
     Vector2 scrollPos = new Vector2();
 
     string[] RelyPackageNames = new string[1];
 
     GUIStyle errorMsg = new GUIStyle();
-    GUIStyle warnMsg = new GUIStyle();
+    GUIStyle warnMsg  = new GUIStyle();
 
-    bool isProgress = false;
-    float progress = 0;
+    bool isProgress        = false;
+    float progress         = 0;
     string progressContent = "";
 
     bool isContent = false;
@@ -96,20 +102,43 @@ public class PackageConfigEditorWindow : EditorWindow
             CreatPackageFile();
         }
 
-        if (GUILayout.Button("打包"))
+        if (GUILayout.Button("打包 并生成MD5文件"))
         {
-            Package();
+            CheckAndPackage();
         }
+
+        GUILayout.BeginHorizontal();
+
+        largeVersion = EditorGUILayout.IntField("large", largeVersion);
+        smallVersion = EditorGUILayout.IntField("small", smallVersion);
+
+        if (GUILayout.Button("保存版本文件"))
+        {
+            CreatVersionFile();
+        }
+
+        GUILayout.EndHorizontal();
 
         if (isContent)
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField(messageContent);
 
-            if(GUILayout.Button("清除"))
+            if (GUILayout.Button("关闭"))
             {
                 isContent = false;
                 messageContent = "";
+            }
+
+            if (errorCount != 0|| warnCount != 0)
+            {
+                if (GUILayout.Button("清除"))
+                {
+                    isContent = false;
+                    messageContent = "";
+
+                    ClearCheckLog();
+                }
             }
             EditorGUILayout.EndHorizontal();
         }
@@ -230,7 +259,7 @@ public class PackageConfigEditorWindow : EditorWindow
                 }
                 else
                 {
-                    Debug.Log(selects[k].ToString() + " has Exists");
+                    Debug.Log(CustomToString(selects[k])+ " has Exists");
                 }
             }
         }
@@ -359,6 +388,20 @@ public class PackageConfigEditorWindow : EditorWindow
     {
         isContent = true;
         messageContent = msg;
+    }
+
+    void ShowProgress(float p,string content)
+    {
+        isProgress = true;
+        progress = p;
+        progressContent = content;
+    }
+
+    void EndProgress()
+    {
+        isProgress = false;
+        progress = 0;
+        progressContent = "";
     }
 
 
@@ -528,7 +571,7 @@ public class PackageConfigEditorWindow : EditorWindow
         return result;
     }
 
-    List<string> GetRelyPackNames(int mask)
+    string[] GetRelyPackNames(int mask)
     {
         List<string> names = new List<string>();
 
@@ -539,7 +582,7 @@ public class PackageConfigEditorWindow : EditorWindow
             names.Add(tmp[i].name);
         }
 
-        return names;
+        return names.ToArray();
     }
 
     bool GetIsShowByRelyMask(EditPackageConfig package)
@@ -579,14 +622,42 @@ public class PackageConfigEditorWindow : EditorWindow
             return "Null";
         }
 
-        if ((obj as MonoScript) != null)
+        if ((obj is MonoScript) )
         {
             return obj.name + " (MonoScript)";
+        }
+        if ((obj is TextAsset) )
+        {
+            return obj.name + " (TextAsset)";
         }
         else
         {
             return obj.ToString();
         }
+    }
+
+    //重新加载Object
+    void ReLoadGameObject(EditPackageConfig pack)
+    {
+        if (pack.mainObject != null)
+        {
+            ReLoadEditObject(pack.mainObject);
+        }
+
+        for (int i = 0; i < pack.objects.Count; i++)
+        {
+            ReLoadEditObject(pack.objects[i]);
+        }
+    }
+
+    void ReLoadEditObject(EditorObject editObj)
+    {
+        editObj.obj = AssetDatabase.LoadAssetAtPath<Object>(editObj.path);
+    }
+
+    string GetExportPath(string path, string name)
+    {
+        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(RemoveExpandName(path)) + ".assetBundle";
     }
 
     #endregion
@@ -771,18 +842,19 @@ public class PackageConfigEditorWindow : EditorWindow
         //资源重复检查
         for (int i = 0; i < relyPackages.Count; i++)
         {
-            checkPackage(relyPackages[i]);
+            CheckPackage(relyPackages[i]);
+            CheckRelyPackagesEmptyRes(relyPackages[i]);
         }
 
         for (int i = 0; i < bundles.Count; i++)
         {
-            checkPackage(bundles[i]);
+            CheckPackage(bundles[i]);
         }
 
         //资源丢失检查
         for (int i = 0; i < bundles.Count; i++)
         {
-            checkMissRes(bundles[i]);
+            CheckMissRes(bundles[i]);
         }
 
         ShowMessage("检查完毕!  错误：" + errorCount + " 警告： "+ warnCount);
@@ -793,7 +865,7 @@ public class PackageConfigEditorWindow : EditorWindow
     /// </summary>
     /// <param name="pack"></param>
 
-    void checkPackage(EditPackageConfig pack)
+    void CheckPackage(EditPackageConfig pack)
     {
         if (bundleName.ContainsKey(pack.name))
         {
@@ -856,7 +928,7 @@ public class PackageConfigEditorWindow : EditorWindow
     /// 检查单个包有没有丢失资源
     /// </summary>
     /// <param name="pack"></param>
-    void checkMissRes(EditPackageConfig pack)
+    void CheckMissRes(EditPackageConfig pack)
     {
         for (int i = 0; i < pack.objects.Count;i++ )
         {
@@ -891,6 +963,7 @@ public class PackageConfigEditorWindow : EditorWindow
             for (int j = 0; j < resLostList.Count;j++ )
             {
                 pack.warnMsg.Add(resLostList[j]);
+                warnCount++;
             }
 
             EditorObject tmp = new EditorObject();
@@ -902,6 +975,18 @@ public class PackageConfigEditorWindow : EditorWindow
                 pack.errorMsg.Add( CustomToString(res[i]) + " 资源丢失依赖！");
                 errorCount++;
             }
+        }
+    }
+
+    /// <summary>
+    /// 检查依赖包是否是无资源
+    /// </summary>
+    void CheckRelyPackagesEmptyRes(EditPackageConfig pack)
+    {
+        if(pack.objects.Count == 0)
+        {
+            pack.errorMsg.Add(pack.name + " 依赖包无资源 ！");
+            errorCount++;
         }
     }
 
@@ -957,6 +1042,7 @@ public class PackageConfigEditorWindow : EditorWindow
                          }
                         catch(System.Exception e)
                         {
+                            e.ToString();
                             list.Add("贴图丢失: name: " + go.name + " (Materials Index: " + i + ")");
                         }
                     }
@@ -1032,143 +1118,115 @@ public class PackageConfigEditorWindow : EditorWindow
     {
         //生成编辑器配置文件
         Dictionary<string, object> editorConfig = new Dictionary<string, object>();
-        Dictionary<string, object> gameConfig = new Dictionary<string, object>();
 
-        //依赖包
-        List<object> relyBundles = new List<object>();
-        List<object> gameRelyBundles = new List<object>();
-        for (int i = 0; i < relyPackages.Count;i++ )
-        {
-            relyBundles.Add(JsonUtility.ToJson(relyPackages[i]));
-
-            //生成游戏中使用的依赖包数据
-            PackageConfig pack = new PackageConfig();
-            pack.path = relyPackages[i].path;
-            pack.relyPackages = new List<string>();
-            gameRelyBundles.Add(JsonUtility.ToJson(pack));
-        }
-
-        //Bundle包
-        List<object> AssetsBundles = new List<object>();
-        List<object> gameAssetsBundles = new List<object>();
-        for (int i = 0; i < bundles.Count; i++)
-        {
-            AssetsBundles.Add(JsonUtility.ToJson(bundles[i]));
-
-            //生成游戏中使用的bundle包数据
-            PackageConfig pack = new PackageConfig();
-            pack.path = bundles[i].path;
-            pack.relyPackages = GetRelyPackNames(bundles[i].relyPackagesMask); //获取依赖包的名字
-            gameAssetsBundles.Add(JsonUtility.ToJson(pack));
-        }
-
-        editorConfig.Add("relyBundles", relyBundles);
-        editorConfig.Add("AssetsBundles", AssetsBundles);
-
-        gameConfig.Add("relyBundles", gameRelyBundles);
-        gameConfig.Add("AssetsBundles", gameRelyBundles);
+        editorConfig.Add(key_relyPackages, JsonTool.List2Json<EditPackageConfig>(relyPackages)); //依赖包
+        editorConfig.Add(key_bundles     , JsonTool.List2Json<EditPackageConfig>(bundles));    //Bundle包
 
         //保存编辑器配置文件
-        ConfigManager.SaveEditorConfigData(ConfigName,editorConfig);
-        //保存游戏中读取的配置文件
-        ConfigManager.SaveConfigData(GameConfigName,gameConfig);
-
+        ConfigManager.SaveEditorConfigData(configFileName,editorConfig);
     }
-
-    string stringTmp = "";
 
     /// <summary>
     /// 读取并且解析Json
     /// </summary>
     void LoadAndAnalysisJson()
     {
-        Dictionary<string, object> final = ConfigManager.GetEditorConfigData(ConfigName);
+        Dictionary<string, object> final = ConfigManager.GetEditorConfigData(configFileName);
 
         if (final == null)
         {
-            Debug.Log(ConfigName + " ConfigData dont Exits");
+            Debug.Log(configFileName + " ConfigData dont Exits");
             return;
         }
 
         //依赖包
-        List<object> relyBundles = (List<object>)final["relyBundles"];
+        relyPackages = JsonTool.Json2List<EditPackageConfig>((string)final["relyBundles"]);
 
-        relyPackages = new List<EditPackageConfig>();
-        for (int i = 0; i < relyBundles.Count; i++)
+        for (int i = 0; i < relyPackages.Count; i++)
         {
-            EditPackageConfig tmp = JsonUtility.FromJson<EditPackageConfig>((string)relyBundles[i]);
-            
             //重新加载Object
-            ReLoadGameObject(tmp);
-
-            relyPackages.Add(tmp);
+            ReLoadGameObject(relyPackages[i]);
         }
 
         //Bundle包
-        List<object> AssetsBundles = (List<object>)final["AssetsBundles"];
+        bundles = JsonTool.Json2List<EditPackageConfig>((string)final["AssetsBundles"]);
 
-        bundles = new List<EditPackageConfig>();
-        for (int i = 0; i < AssetsBundles.Count; i++)
+        for (int i = 0; i < bundles.Count; i++)
         {
-            EditPackageConfig tmp = JsonUtility.FromJson<EditPackageConfig>((string)AssetsBundles[i]);
-
             //重新加载Object
-            ReLoadGameObject(tmp);
-
-            bundles.Add(tmp);
+            ReLoadGameObject(bundles[i]);
         }
 
     }
-
-    //重新加载Object
-
-    void ReLoadGameObject(EditPackageConfig pack)
-    {
-        if (pack.mainObject != null)
-        {
-            ReLoadEditObject(pack.mainObject);
-        }
-
-        for (int i = 0; i < pack.objects.Count;i++ )
-        {
-            ReLoadEditObject(pack.objects[i]);
-        }
-    }
-
-    void ReLoadEditObject(EditorObject editObj)
-    {
-        editObj.obj = AssetDatabase.LoadAssetAtPath<Object>(editObj.path);
-    }
-
     #endregion
 
     #region 打包
 
     BuildAssetBundleOptions relyBuildOption; //依赖包打包设置
 
-    void Package()
+    void CheckAndPackage()
+    {
+        CheckPackage();
+
+        if (errorCount == 0)
+        {
+            EditorCoroutineRunner.StartEditorCoroutine( Package());
+           
+        }
+        else
+        {
+            if(EditorUtility.DisplayDialog("失败","打包设置有错误，请先修复错误！","好的","仍要打包")== false)
+            {
+                EditorCoroutineRunner.StartEditorCoroutine( Package());
+            }
+        }
+    }
+
+    IEnumerator Package()
     {
         relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle
-            | BuildAssetBundleOptions.UncompressedAssetBundle
-            | BuildAssetBundleOptions.CollectDependencies;//去重
+               | BuildAssetBundleOptions.UncompressedAssetBundle
+               | BuildAssetBundleOptions.CollectDependencies;//去重
 
-        //BuildPipeline.PushAssetDependencies();
+        BuildPipeline.PushAssetDependencies();
+
+        float sumCount = relyPackages.Count + bundles.Count;
+        float currentCount = 0;
+
+        ShowProgress(0,"开始打包");
+
         //先打依赖包
-        for (int i = 0; i < relyPackages.Count;i++ )
+        for (int i = 0; i < relyPackages.Count; i++)
         {
             PackageRelyPackage(relyPackages[i]);
+
+            currentCount++;
+            ShowProgress(currentCount / sumCount, "打包依赖包 第" + i + "个 共" + relyPackages.Count+"个");
+
+            yield return 0;
         }
 
         //再打普通包
-        for(int i = 0;i<bundles.Count;i++)
+        for (int i = 0; i < bundles.Count; i++)
         {
             PackageBundle(bundles[i]);
+
+            currentCount++;
+            ShowProgress(currentCount / sumCount, "打包普通包 第" + i + "个 共" + bundles.Count + "个");
+            yield return 0;
         }
 
-        //BuildPipeline.PopAssetDependencies();
+        EndProgress();
+
+        BuildPipeline.PopAssetDependencies();
 
         AssetDatabase.Refresh();
+
+        CreatBundelPackageConfig();
+        Repaint();
     }
+
+
 
     void PackageRelyPackage(EditPackageConfig package)
     {
@@ -1176,8 +1234,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
         if (package.objects.Count == 0)
         {
-            Debug.LogWarning(package.name +  " 没有资源！");
-            return;
+            Debug.LogError(package.name +  " 没有资源！");
         }
 
         Object[] res = new Object[package.objects.Count];
@@ -1200,7 +1257,7 @@ public class PackageConfigEditorWindow : EditorWindow
     {
         Debug.Log("PackageBundle " + package.name);
         //导入资源包
-        //BuildPipeline.PushAssetDependencies();
+        BuildPipeline.PushAssetDependencies();
 
         //打包
         Object[] res = new Object[package.objects.Count];
@@ -1216,112 +1273,116 @@ public class PackageConfigEditorWindow : EditorWindow
 
         BuildPipeline.BuildAssetBundle(package.mainObject.obj, res, path, relyBuildOption, getTargetPlatform);
 
-        //BuildPipeline.PopAssetDependencies();
+        BuildPipeline.PopAssetDependencies();
     }
-
-    string GetExportPath(string path,string name)
-    {
-        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(RemoveExpandName(path)) + ".assetBundle";
-    }
-
     #endregion
 
-    #region 生成MD5文件和版本号文件
+    #region 生成游戏中使用的配置文件
 
-    //public static void creatVersionMD5()
-    //{
-    //    string path = Application.dataPath + "/StreamingAssets/";
-    //    string fileName = Config.versionFileName;
-    //    string MD5fileName = Config.MD5InfoDataFileName;
+    //生成游戏中使用的配置文件
+    public void CreatBundelPackageConfig()
+    {
+        Dictionary<string, object> gameConfig = new Dictionary<string, object>();
 
-    //    int Version_large = 1;
-    //    int Version_tiny = 1;
-    //    //List<object> FilesData = new List<object>();
+        Dictionary<string,PackageConfig> gameRelyBundles = new Dictionary<string,PackageConfig>();
+        for (int i = 0; i < relyPackages.Count; i++)
+        {
+            //生成游戏中使用的依赖包数据
+            PackageConfig pack = new PackageConfig();
+            pack.name          = relyPackages[i].name;
+            pack.path          = relyPackages[i].path;
+            pack.relyPackages  = new string[0];
+            pack.md5           = MD5Tool.GetFileMD5(GetExportPath(pack.path, pack.name)); //获取bundle包的md5
+            pack.loadType      = ResLoadType.Streaming;  //默认放在沙盒路径下
 
-    //    //取出旧数据
-    //    string oldJson = Util.readTextFile(path + fileName);
+            gameRelyBundles.Add(pack.name,pack);
+        }
 
-    //    Debug.Log(oldJson);
+        Dictionary<string,PackageConfig> gameAssetsBundles = new Dictionary<string,PackageConfig>();
+        for (int i = 0; i < bundles.Count; i++)
+        {
+            //生成游戏中使用的bundle包数据
+            PackageConfig pack = new PackageConfig();
+            pack.name          = bundles[i].name;
+            pack.path          = bundles[i].path;
+            pack.relyPackages  = GetRelyPackNames(bundles[i].relyPackagesMask); //获取依赖包的名字
+            pack.md5           = MD5Tool.GetFileMD5(GetExportPath(pack.path, pack.name)); //获取bundle包的md5
+            pack.loadType      = ResLoadType.Streaming;  //默认放在沙盒路径下
 
-    //    if (!oldJson.Equals(""))
-    //    {
-    //        // Dictionary<string, object> data = Json.Deserialize(oldJson) as Dictionary<string, object>;
-    //        List<VersionData> persVD = AssetDataUtils.ChangeTextToListClassData<VersionData>(oldJson);
-    //        Version_large = persVD[0].Version_large;// int.Parse(data["Version_large"].ToString());
-    //        Version_tiny = persVD[0].Version_tiny + 1;// int.Parse(data["Version_tiny"].ToString()) + 1; //自动把小版本加1
-    //    }
-    //    //FilesMd5Data = new List<object>();
-    //    VersionData ver = new VersionData();
-    //    ver.Version_large = Version_large;
-    //    ver.Version_tiny = Version_tiny;
-    //    AssetDataUtils.SaveAssetDataToJsonFile(ver, fileName, AssetsLoadSaveType.StreamingAssets);
-    //    ////生成MD5文件
-    //    List<FileMD5Data> lsitMd5 = recursionDirectoryMD5(path);
+            gameAssetsBundles.Add(pack.name,pack);
+        }
 
-    //    AssetDataUtils.SaveAssetDataToJsonFile(lsitMd5, MD5fileName, AssetsLoadSaveType.StreamingAssets);
-    //    AssetDataUtils.SaveAssetDataToJsonFile(lsitMd5, MD5fileName, AssetsLoadSaveType.StreamingAssets);
+        gameConfig.Add(PackageConfigManager.key_relyPackages, JsonTool.Dictionary2Json<PackageConfig>(gameRelyBundles));
+        gameConfig.Add(PackageConfigManager.key_bundles     , JsonTool.Dictionary2Json<PackageConfig>(gameAssetsBundles));
 
-    //    AssetDatabase.Refresh();
-    //}
+        //保存游戏中读取的配置文件
+        ConfigManager.SaveConfigData(PackageConfigManager.configFileName, gameConfig);
+        AssetDatabase.Refresh();
+    }
 
+    //生成版本文件
+    public void CreatVersionFile()
+    {
+        Dictionary<string, object> VersionData = ConfigManager.GetConfigData(UpdateManager.versionFileName);
 
-    ////  static List<object> FilesMd5Data = new List<object>();
-    //static List<FileMD5Data> lists = new List<FileMD5Data>();
-    ////遍历所有子目录，所有prefab都打包,所有目录都展开
-    //static List<FileMD5Data> recursionDirectoryMD5(string path)
-    //{
-    //    string[] directorys = Directory.GetDirectories(path);
+        if (VersionData == null)
+        {
+            VersionData = new Dictionary<string, object>();
+        }
 
-    //    //int ids = Application.dataPath.IndexOf("Assets");
+        if (VersionData.ContainsKey(UpdateManager.key_largeVersion))
+        {
+            VersionData[UpdateManager.key_largeVersion] = largeVersion.ToString();
+        }
+        else
+        {
+            VersionData.Add(UpdateManager.key_largeVersion, largeVersion.ToString());
+        }
 
-    //    //所有目录继续遍历
-    //    for (int i = 0; i < directorys.Length; i++)
-    //    {
-    //        string pathTmp = directorys[i];
+        if (VersionData.ContainsKey(UpdateManager.key_smallVerson))
+        {
+            VersionData[UpdateManager.key_smallVerson] = smallVersion.ToString();
+        }
+        else
+        {
+            VersionData.Add(UpdateManager.key_smallVerson, smallVersion.ToString());
+        }
 
-    //        if (Directory.Exists(pathTmp))
-    //        {
-    //            recursionDirectoryMD5(pathTmp);
-    //        }
-    //    }
+        ConfigManager.SaveConfigData(UpdateManager.versionFileName, VersionData);
+        AssetDatabase.Refresh();
+    }
 
-    //    //所有prefab打包
-    //    string[] files = Directory.GetFiles(path);
+    //解析版本号文件
+    public void AnalysisVersionFile()
+    {
+        Dictionary<string, object> VersionData = ConfigManager.GetConfigData(UpdateManager.versionFileName);
 
-    //    for (int i = 0; i < files.Length; i++)
-    //    {
-    //        string pathTmp = files[i];
-    //        if (!pathTmp.EndsWith(".meta"))
-    //        {
-    //            lists.Add(creatMD5Info(pathTmp));
-    //        }
-    //    }
+        if (VersionData == null)
+        {
+            largeVersion = -1;
+            smallVersion = -1;
 
-    //    return lists;
-    //}
+            return;
+        }
 
-    //static FileMD5Data creatMD5Info(string path)
-    //{
-    //    // Dictionary<string, object> fileInfo = new Dictionary<string, object>();
-    //    FileMD5Data data = new FileMD5Data();
-    //    string subPath = "/StreamingAssets/";
+        if (VersionData.ContainsKey(UpdateManager.key_largeVersion))
+        {
+            largeVersion = int.Parse( VersionData[UpdateManager.key_largeVersion].ToString());
+        }
+        else
+        {
+            largeVersion = -1;
+        }
 
-    //    int streamIndex = path.IndexOf(subPath) + subPath.Length;
-
-    //    //FileInfo fileTmp = new FileInfo(path);
-
-    //    //string MD5String = getFileMD5(path);
-
-    //    data.filePath = path.Substring(streamIndex).Replace("\\", "/");
-    //    data.fileMD5 = MD5String;
-    //    //fileInfo.Add("fileName", fileTmp.Name);
-    //    //fileInfo.Add("filePath", path.Substring(streamIndex).Replace("\\","/"));
-    //    //fileInfo.Add("fileMD5", MD5String);
-
-    //    // FilesMd5Data.Add(fileInfo);
-    //    return data;
-    //}
-
+        if (VersionData.ContainsKey(UpdateManager.key_smallVerson))
+        {
+            smallVersion = int.Parse(VersionData[UpdateManager.key_smallVerson].ToString());
+        }
+        else
+        {
+            smallVersion = -1;
+        }
+    }
     #endregion
 
 }
@@ -1338,7 +1399,6 @@ public class EditPackageConfig
     //bundle独有
     public EditorObject mainObject;     //主资源
     public int relyPackagesMask;        //依赖包mask
-    //public List<string> relyPackages = new List<string>(); //所有依赖包
 
     public List<string> warnMsg = new List<string>();  //错误日志
     public List<string> errorMsg = new List<string>(); //警告日志

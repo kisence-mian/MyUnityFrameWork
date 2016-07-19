@@ -29,6 +29,17 @@ public class MD5Tool
         }
     }
 
+    public static string GetObjectMD5(object obj)
+    {
+        if(obj == null)
+        {
+            Debug.LogError("obj is Null !");
+            return "";
+        }
+
+        return GetMD5(ByteTool.Object2Bytes(obj));
+    }
+
     public static string GetMD5(byte[] data)
     {
         MD5 md5 = new MD5CryptoServiceProvider();
