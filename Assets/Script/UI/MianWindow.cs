@@ -16,6 +16,6 @@ public class MianWindow : UIWindowBase
 
     public void OnClickStart()
     {
-        AnimSystem.uguiAlpha(gameObject, 1, 0, 1, InteType.linear, null, true);
+        AnimSystem.uguiAlpha(gameObject, 1, 0, 1, InteType.Linear, true);
     }
 }

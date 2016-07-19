@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System;
 
-public class AnimData  :MonoBehaviour
+public class AnimData
 {
     public AnimType animType;
     public InteType interpolationType;
@@ -30,24 +31,34 @@ public class AnimData  :MonoBehaviour
 
         switch (animType)
         {
-            case AnimType.UGUI_alpha: UguiAlpha();break;
+            case AnimType.UGUI_alpha: UguiAlpha(); break;
             case AnimType.UGUI_anchoredPosition: UguiPosition(); break;
+            case AnimType.Position: Position(); break;
+            case AnimType.LocalPosition: LocalPosition(); break;
         }
     }
 
     public void executeCallBack()
     {
-        if(callBack != null)
+        try
         {
-            callBack(parameter);
+            if (callBack != null)
+            {
+                callBack(parameter);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.ToString());
         }
     }
 
-    float getInterpolation(float oldValue,float aimValue)
+    float getInterpolation(float oldValue, float aimValue)
     {
         switch (interpolationType)
         {
-            case InteType.linear: return Mathf.Lerp(oldValue, aimValue,currentTime/totalTime);
+            case InteType.Linear: return Mathf.Lerp(oldValue, aimValue, currentTime / totalTime);
+            case InteType.InBack: return InBack(oldValue, aimValue, currentTime, totalTime);
         }
 
         return 0;
@@ -82,9 +93,9 @@ public class AnimData  :MonoBehaviour
     public void UguiAlphaInit(bool isChild)
     {
         animObjectList_Image = new List<Image>();
-        oldColor       = new List<Color>();
+        oldColor = new List<Color>();
 
-        if(isChild)
+        if (isChild)
         {
             Image[] images = animGameObejct.GetComponentsInChildren<Image>();
 
@@ -107,19 +118,26 @@ public class AnimData  :MonoBehaviour
             animObjectList_Image.Add(animGameObejct.GetComponent<Image>());
             oldColor.Add(animGameObejct.GetComponent<Image>().color);
         }
+
+        setUGUIAlpha(formAlpha);
     }
 
     void UguiAlpha()
     {
         //Debug.Log("UguiAlpha " + currentTime +"  " + totalTime);
 
+        setUGUIAlpha(getInterpolation(formAlpha, toAlpha));
+    }
+
+    public void setUGUIAlpha(float a)
+    {
         Color newColor = new Color();
 
         int index = 0;
         for (int i = 0; i < animObjectList_Image.Count; i++)
         {
             newColor = oldColor[index];
-            newColor.a = getInterpolation(formAlpha,toAlpha);
+            newColor.a = a;
             animObjectList_Image[i].color = newColor;
 
             index++;
@@ -128,7 +146,7 @@ public class AnimData  :MonoBehaviour
         for (int i = 0; i < animObjectList_Text.Count; i++)
         {
             newColor = oldColor[index];
-            newColor.a = getInterpolation(formAlpha, toAlpha);
+            newColor.a = a;
             animObjectList_Text[i].color = newColor;
 
             index++;
@@ -153,12 +171,41 @@ public class AnimData  :MonoBehaviour
         rectRransform.anchoredPosition3D = getInterpolationV3(formPos, toPos);
     }
 
+
+
     #endregion
+    #endregion
+
+    #region Transfrom
+    Transform transform;
+
+    public void TransfromInit()
+    {
+        transform = animGameObejct.transform;
+    }
+
+    void Position()
+    {
+        transform.position = getInterpolationV3(formPos, toPos);
+    }
+
+    void LocalPosition()
+    {
+        transform.localPosition = getInterpolationV3(formPos, toPos);
+    }
+
     #endregion
 
     #region 插值算法
 
+    public float InBack(float b, float to, float t, float d)
+    {
+        float s = 1.70158f;
+        float c = to - b;
+        t = t / d;
 
+        return c * t * t * ((s + 1) * t - s) + b;
+    }
 
     #endregion
 }
