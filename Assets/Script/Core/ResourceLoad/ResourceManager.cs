@@ -17,7 +17,7 @@ public static class ResourceManager
             case ResLoadType.Resource: 
                 #if UNITY_EDITOR
                     path.Append( Application.dataPath);
-                    path.Append("/Resourse/");
+                    path.Append("/Resources/");
                     break;
                 #endif
             case ResLoadType.Streaming:
