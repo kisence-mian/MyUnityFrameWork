@@ -42,7 +42,7 @@ public static class ResourceManager
                 break;
 
             default:
-                Debug.LogError("Type Error !" + type);
+                Debug.LogError("Type Error !" + loadType);
                 break;
         }
 
