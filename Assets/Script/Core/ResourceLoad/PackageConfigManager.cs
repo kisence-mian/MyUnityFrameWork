@@ -13,12 +13,13 @@ public static class PackageConfigManager
     static Dictionary<string, PackageConfig> relyPackageConfigs = new Dictionary<string, PackageConfig>();
     static Dictionary<string, PackageConfig> PackageConfigs = new Dictionary<string, PackageConfig>();
 
-    static PackageConfigManager()
+
+    public static void Initialize()
     {
-        Dictionary<string, object> data = DataManager.GetData(configFileName);
+        Dictionary<string, object> data = ConfigManager.GetData(configFileName);
 
         relyPackageConfigs = JsonTool.Json2Dictionary<PackageConfig>(data[key_relyPackages].ToString());
-        relyPackageConfigs = JsonTool.Json2Dictionary<PackageConfig>(data[key_relyPackages].ToString());
+        PackageConfigs     = JsonTool.Json2Dictionary<PackageConfig>(data[key_bundles     ].ToString());
     }
 
     public static PackageConfig GetPackageConfig(string bundleName)
@@ -40,6 +41,7 @@ public class PackageConfig
     public string path;               //加载相对路径
     public string[] relyPackages;     //依赖包
     public string md5;                //md5
+    //[System.NonSerialized]
     public ResLoadType loadType;      //加载绝对路径
 }
 

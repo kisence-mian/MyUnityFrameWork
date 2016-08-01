@@ -13,15 +13,16 @@ public static class ConfigManager
 {
     public const string directoryName = "Config";
 
-    public static Dictionary<string, object> GetConfigData(string ConfigName)
+    public static Dictionary<string, object> GetData(string ConfigName)
     {
         string dataJson = "";
 
-        dataJson = ResourceManager.ReadTextFile(GetConfigPath(ConfigName));
+        dataJson = ResourceIOTool.ReadStringByFile(GetPath(ConfigName));
 
         if (dataJson == "")
         {
-            return null;
+            Debug.Log(ConfigName + " dont find!");
+            return new Dictionary<string,object>();
         }
         else
         {
@@ -29,21 +30,34 @@ public static class ConfigManager
         }
     }
 
-    public static void SaveConfigData(string ConfigName, Dictionary<string, object> data)
+    public static void SaveData(string ConfigName, Dictionary<string, object> data)
     {
-        //ResourceManager.WriteTextFile(GetConfigPath(ConfigName), Json.Serialize(data)); 
+        ResourceIOTool.WriteStringByFile(GetPath(ConfigName), Json.Serialize(data));
     }
 
-    //获取的是相对路径
-    static string GetConfigPath(string ConfigName)
+    //获取的是绝对路径
+    static string GetPath(string ConfigName)
     {
         StringBuilder builder = new StringBuilder();
-        builder.Append("Config/");
+
+#if UNITY_EDITOR
+
+        builder.Append(Application.dataPath);
+        builder.Append("/Resources/");
+#else
+            builder.Append(Application.persistentDataPath);
+#endif
+
+        //Application.temporaryCachePath;
+
+        builder.Append(directoryName);
+        builder.Append("/");
         builder.Append(ConfigName);
         builder.Append(".json");
 
         return builder.ToString();
     }
+
 
 //只在编辑器下能够使用
 #if UNITY_EDITOR
@@ -76,7 +90,9 @@ public static class ConfigManager
     {
         StringBuilder builder = new StringBuilder();
         builder.Append(Application.dataPath);
-        builder.Append("/EditorConfig/");
+        builder.Append("/Editor");
+        builder.Append(directoryName);
+        builder.Append("/");
         builder.Append(ConfigName);
         builder.Append(".json");
 

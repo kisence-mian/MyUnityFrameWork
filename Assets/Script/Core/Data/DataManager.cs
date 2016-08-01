@@ -55,15 +55,16 @@ public class DataManager
     /// 读取编辑器数据
     /// </summary>
     /// <param name="ConfigName">数据名称</param>
-    public static Dictionary<string, object> GetEditorData(string ConfigName)
+    public static Dictionary<string, object> GetEditorData(string dataName)
     {
         UnityEditor.AssetDatabase.Refresh();
 
-        string dataJson = ResourceIOTool.ReadStringByFile(GetEditorPath(ConfigName,true));
+        string dataJson = ResourceIOTool.ReadStringByFile(GetEditorPath(dataName, true));
 
         if (dataJson == "")
         {
-            return null;
+            Debug.Log(dataName + " dont find!");
+            return new Dictionary<string,object>();
         }
         else
         {

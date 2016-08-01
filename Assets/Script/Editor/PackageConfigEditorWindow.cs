@@ -102,6 +102,11 @@ public class PackageConfigEditorWindow : EditorWindow
             CreatPackageFile();
         }
 
+        if (GUILayout.Button("不打包只生成资源路径文件"))
+        {
+            CreatBundelPackageConfig();
+        }
+
         if (GUILayout.Button("打包 并生成MD5文件"))
         {
             CheckAndPackage();
@@ -1123,7 +1128,7 @@ public class PackageConfigEditorWindow : EditorWindow
         editorConfig.Add(key_bundles     , JsonTool.List2Json<EditPackageConfig>(bundles));    //Bundle包
 
         //保存编辑器配置文件
-        DataManager.SaveEditorData(configFileName,editorConfig);
+        ConfigManager.SaveEditorConfigData(configFileName,editorConfig);
     }
 
     /// <summary>
@@ -1131,7 +1136,7 @@ public class PackageConfigEditorWindow : EditorWindow
     /// </summary>
     void LoadAndAnalysisJson()
     {
-        Dictionary<string, object> final = DataManager.GetEditorData(configFileName);
+        Dictionary<string, object> final = ConfigManager.GetEditorConfigData(configFileName);
 
         if (final == null)
         {
@@ -1316,7 +1321,7 @@ public class PackageConfigEditorWindow : EditorWindow
         gameConfig.Add(PackageConfigManager.key_bundles     , JsonTool.Dictionary2Json<PackageConfig>(gameAssetsBundles));
 
         //保存游戏中读取的配置文件
-        DataManager.SaveData(PackageConfigManager.configFileName, gameConfig);
+        ConfigManager.SaveData(PackageConfigManager.configFileName, gameConfig);
         AssetDatabase.Refresh();
     }
 
@@ -1348,7 +1353,7 @@ public class PackageConfigEditorWindow : EditorWindow
             VersionData.Add(UpdateManager.key_smallVerson, smallVersion.ToString());
         }
 
-        DataManager.SaveData(UpdateManager.versionFileName, VersionData);
+        ConfigManager.SaveData(UpdateManager.versionFileName, VersionData);
         AssetDatabase.Refresh();
     }
 
