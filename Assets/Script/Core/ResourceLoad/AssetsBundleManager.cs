@@ -31,6 +31,15 @@ public static class AssetsBundleManager
 
     }
 
+    public static object Load(string name)
+    {
+        return null;
+    }
+
+    public static void LoadAsync(string name, LoadCallBack callBack)
+    {
+    }
+
     /// <summary>
     /// 根据bundleName获取加载路径
     /// </summary>

@@ -5,7 +5,8 @@ using MiniJSON;
 using System.Text;
 
 /// <summary>
-/// 设置管理器
+/// 配置管理器，可读可写，可同步，有默认值
+/// 不通过ResourceManager加载
 /// </summary>
 public static class ConfigManager 
 {
@@ -13,7 +14,7 @@ public static class ConfigManager
     {
         string dataJson = "";
 #if UNITY_EDITOR
-        dataJson = ResourceManager.ReadTextFile(GetConfigPath(ConfigName), ResLoadType.Resource);
+        dataJson = ResourceManager.ReadTextFile(GetConfigPath(ConfigName));
 #else
         dataJson = ResourceManager.LoadTextFile(GetConfigPath(ConfigName));
 #endif
@@ -30,13 +31,7 @@ public static class ConfigManager
 
     public static void SaveConfigData(string ConfigName, Dictionary<string, object> data)
     {
-        string configDataJson = Json.Serialize(data);
-
-#if UNITY_EDITOR
-        ResourceManager.WriteTextFile(GetConfigPath(ConfigName), configDataJson,ResLoadType.Resource); //编辑器下保存到Resources路径下
-#else
-        ResourceManager.SaveTextFile(GetConfigPath(ConfigName), configDataJson);
-#endif
+        ResourceManager.WriteTextFile(GetConfigPath(ConfigName), Json.Serialize(data)); 
     }
 
     //获取的是相对路径

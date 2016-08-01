@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Text;
-
+/*
+ * gameLoadType 为 Resource 时 ，所有资源从Resource读取
+ * gameLoadType 不为 Resource时，资源读取方式从配置中读取
+ * */
 public static class ResourceManager 
 {
     /// <summary>
@@ -47,20 +50,69 @@ public static class ResourceManager
         }
 
         path.Append(localPath);
-
         return path.ToString();
     }
 
-    //读取一个文本
-    public static string ReadTextFile(string path,ResLoadType type = ResLoadType.Default)
+    public static ResLoadType GetLoadType(ResLoadType loadType)
     {
-        return  ResourceIOTool.ReadStringByFile(GetPath(path,type));
+        if (gameLoadType == ResLoadType.Resource)
+        {
+            return ResLoadType.Resource;
+        }
+
+        if (loadType == ResLoadType.Default)
+        {
+            return gameLoadType;
+        }
+
+        return loadType;
+    }
+
+    //读取一个文本
+    public static string ReadTextFile(string path)
+    {
+        TextAsset text = (TextAsset)Load(path);
+        return text.text;
     }
 
     //保存一个文本
     public static void WriteTextFile(string path,string content ,ResLoadType type = ResLoadType.Default)
     {
-        ResourceIOTool.WriteStringByFile(GetPath(path, type),content);
+        #if UNITY_EDITOR
+            ResourceIOTool.WriteStringByFile(GetPath(path, ResLoadType.Resource), content);
+        #else
+            
+        #endif
+
+    }
+
+    public static object Load(string name)
+    {
+        PackageConfig packData  = PackageConfigManager.GetPackageConfig(name);
+        ResLoadType loadTypeTmp = GetLoadType(packData.loadType);
+
+        if (loadTypeTmp == ResLoadType.Resource)
+        {
+            return Resources.Load(packData.path);
+        }
+        else
+        {
+            return AssetsBundleManager.Load(name);
+        }
+    }
+    public static void LoadAsync(string name,LoadCallBack callBack)
+    {
+        PackageConfig packData  = PackageConfigManager.GetPackageConfig(name);
+        ResLoadType loadTypeTmp = GetLoadType(packData.loadType);
+
+        if (loadTypeTmp == ResLoadType.Resource)
+        {
+            ResourceIOTool.ResourceLoadAsync(packData.path, callBack);
+        }
+        else
+        {
+            AssetsBundleManager.LoadAsync(name,callBack);
+        }
     }
 
     //public static T GetResource<T>(string path)
@@ -83,4 +135,4 @@ public enum ResLoadType
     HotUpdate
 }
 
-public delegate void ResourceLoadCallBack<T>(T resObject);
+public delegate void LoadCallBack(object resObject);

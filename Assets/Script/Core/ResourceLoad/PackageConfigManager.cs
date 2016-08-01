@@ -15,7 +15,7 @@ public static class PackageConfigManager
 
     static PackageConfigManager()
     {
-        Dictionary<string, object> data = ConfigManager.GetConfigData(configFileName);
+        Dictionary<string, object> data = DataManager.GetData(configFileName);
 
         relyPackageConfigs = JsonTool.Json2Dictionary<PackageConfig>(data[key_relyPackages].ToString());
         relyPackageConfigs = JsonTool.Json2Dictionary<PackageConfig>(data[key_relyPackages].ToString());

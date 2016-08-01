@@ -1123,7 +1123,7 @@ public class PackageConfigEditorWindow : EditorWindow
         editorConfig.Add(key_bundles     , JsonTool.List2Json<EditPackageConfig>(bundles));    //Bundle包
 
         //保存编辑器配置文件
-        ConfigManager.SaveEditorConfigData(configFileName,editorConfig);
+        DataManager.SaveEditorData(configFileName,editorConfig);
     }
 
     /// <summary>
@@ -1131,7 +1131,7 @@ public class PackageConfigEditorWindow : EditorWindow
     /// </summary>
     void LoadAndAnalysisJson()
     {
-        Dictionary<string, object> final = ConfigManager.GetEditorConfigData(configFileName);
+        Dictionary<string, object> final = DataManager.GetEditorData(configFileName);
 
         if (final == null)
         {
@@ -1316,14 +1316,14 @@ public class PackageConfigEditorWindow : EditorWindow
         gameConfig.Add(PackageConfigManager.key_bundles     , JsonTool.Dictionary2Json<PackageConfig>(gameAssetsBundles));
 
         //保存游戏中读取的配置文件
-        ConfigManager.SaveConfigData(PackageConfigManager.configFileName, gameConfig);
+        DataManager.SaveData(PackageConfigManager.configFileName, gameConfig);
         AssetDatabase.Refresh();
     }
 
     //生成版本文件
     public void CreatVersionFile()
     {
-        Dictionary<string, object> VersionData = ConfigManager.GetConfigData(UpdateManager.versionFileName);
+        Dictionary<string, object> VersionData = DataManager.GetData(UpdateManager.versionFileName);
 
         if (VersionData == null)
         {
@@ -1348,14 +1348,14 @@ public class PackageConfigEditorWindow : EditorWindow
             VersionData.Add(UpdateManager.key_smallVerson, smallVersion.ToString());
         }
 
-        ConfigManager.SaveConfigData(UpdateManager.versionFileName, VersionData);
+        DataManager.SaveData(UpdateManager.versionFileName, VersionData);
         AssetDatabase.Refresh();
     }
 
     //解析版本号文件
     public void AnalysisVersionFile()
     {
-        Dictionary<string, object> VersionData = ConfigManager.GetConfigData(UpdateManager.versionFileName);
+        Dictionary<string, object> VersionData = DataManager.GetData(UpdateManager.versionFileName);
 
         if (VersionData == null)
         {

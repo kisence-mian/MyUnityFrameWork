@@ -7,8 +7,21 @@ using System.Text;
 /// <summary>
 /// 资源读取器，负责从不同路径读取资源
 /// </summary>
-public static class ResourceIOTool
+public class ResourceIOTool :MonoBehaviour
 {
+    static ResourceIOTool instance;
+    public static ResourceIOTool GetInstance()
+    {
+        if (instance == null)
+        {
+            GameObject resourceIOTool = new GameObject();
+            resourceIOTool.name = "resourceIOTool";
+            instance = resourceIOTool.AddComponent<ResourceIOTool>();
+        }
+
+        return instance;
+    }
+
     #region 读操作
     public static string ReadStringByFile(string path)
     {
@@ -52,6 +65,21 @@ public static class ResourceIOTool
         {
             return text.text;
         }
+    }
+
+    public static void ResourceLoadAsync(string path,LoadCallBack callback)
+    {
+        GetInstance().MonoLoadMethod(path, callback);
+    }
+
+    public void MonoLoadMethod(string path, LoadCallBack callback)
+    {
+        StartCoroutine(MonoLoad(path, callback));
+    }
+
+    public IEnumerator MonoLoad(string path, LoadCallBack callback)
+    {
+        return null;
     }
 
     #endregion
