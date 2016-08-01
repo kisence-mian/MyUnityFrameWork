@@ -45,7 +45,7 @@ public class MetaDataManager
             builder.Append(Application.persistentDataPath);
         #endif
 
-            Application.temporaryCachePath;
+            //Application.temporaryCachePath;
 
         builder.Append(directoryName);
         builder.Append("/");
