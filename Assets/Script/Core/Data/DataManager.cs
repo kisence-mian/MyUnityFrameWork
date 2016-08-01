@@ -8,9 +8,9 @@ using System.Text;
  * 数据管理器，只读，可热更新，可使用默认值
  * 通过ResourceManager加载
  * */
-public class DataManager : MonoBehaviour {
-
-    const string directoryName = "Data";
+public class DataManager 
+{
+    public const string directoryName = "Data";
     public static Dictionary<string, object> GetData(string ConfigName)
     {
         string dataJson = "";

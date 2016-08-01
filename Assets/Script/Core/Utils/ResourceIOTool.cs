@@ -15,7 +15,9 @@ public class ResourceIOTool :MonoBehaviour
         if (instance == null)
         {
             GameObject resourceIOTool = new GameObject();
-            resourceIOTool.name = "resourceIOTool";
+            resourceIOTool.name = "ResourceIO";
+            DontDestroyOnLoad(resourceIOTool);
+
             instance = resourceIOTool.AddComponent<ResourceIOTool>();
         }
 
@@ -108,6 +110,7 @@ public class ResourceIOTool :MonoBehaviour
             Debug.LogError("File Create Fail! \n" + e.Message);
         }
     }
+
 #endif
 
     #endregion
