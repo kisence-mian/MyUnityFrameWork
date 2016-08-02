@@ -1317,11 +1317,11 @@ public class PackageConfigEditorWindow : EditorWindow
             gameAssetsBundles.Add(pack.name,pack);
         }
 
-        gameConfig.Add(PackageConfigManager.key_relyPackages, JsonTool.Dictionary2Json<PackageConfig>(gameRelyBundles));
-        gameConfig.Add(PackageConfigManager.key_bundles     , JsonTool.Dictionary2Json<PackageConfig>(gameAssetsBundles));
+        gameConfig.Add(BundleConfigManager.key_relyBundle, JsonTool.Dictionary2Json<PackageConfig>(gameRelyBundles));
+        gameConfig.Add(BundleConfigManager.key_bundles     , JsonTool.Dictionary2Json<PackageConfig>(gameAssetsBundles));
 
         //保存游戏中读取的配置文件
-        ConfigManager.SaveData(PackageConfigManager.configFileName, gameConfig);
+        ConfigManager.SaveData(BundleConfigManager.configFileName, gameConfig);
         AssetDatabase.Refresh();
     }
 

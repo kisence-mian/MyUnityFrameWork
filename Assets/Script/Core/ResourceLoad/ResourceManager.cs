@@ -88,7 +88,7 @@ public static class ResourceManager
 
     public static object Load(string name)
     {
-        PackageConfig packData  = PackageConfigManager.GetPackageConfig(name);
+        PackageConfig packData  = BundleConfigManager.GetBundleConfig(name);
         ResLoadType loadTypeTmp = GetLoadType(packData.loadType);
 
         if (loadTypeTmp == ResLoadType.Resource)
@@ -102,7 +102,7 @@ public static class ResourceManager
     }
     public static void LoadAsync(string name,LoadCallBack callBack)
     {
-        PackageConfig packData  = PackageConfigManager.GetPackageConfig(name);
+        PackageConfig packData  = BundleConfigManager.GetBundleConfig(name);
         ResLoadType loadTypeTmp = GetLoadType(packData.loadType);
 
         if (loadTypeTmp == ResLoadType.Resource)

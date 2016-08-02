@@ -45,10 +45,8 @@ public static class ConfigManager
         builder.Append(Application.dataPath);
         builder.Append("/Resources/");
 #else
-            builder.Append(Application.persistentDataPath);
+        builder.Append(Application.persistentDataPath);
 #endif
-
-        //Application.temporaryCachePath;
 
         builder.Append(directoryName);
         builder.Append("/");
