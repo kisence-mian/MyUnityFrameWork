@@ -57,6 +57,7 @@ public class ResourceIOTool :MonoBehaviour
 
     public static string ReadStringByResource(string path)
     {
+        path = FileTool.RemoveExpandName(path);
         TextAsset text = (TextAsset)Resources.Load(path);
 
         if(text == null)

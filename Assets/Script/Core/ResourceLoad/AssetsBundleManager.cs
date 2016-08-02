@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 /// <summary>
 /// bundle管理器，用来管理所有的bundle
@@ -16,7 +17,7 @@ public static class AssetsBundleManager
     /// <param name="name">bundle名</param>
     public static AssetBundle LoadBundle(string bundleName)
     {
-        PackageConfig configTmp = BundleConfigManager.GetBundleConfig(bundleName);
+        BundleConfig configTmp = BundleConfigManager.GetBundleConfig(bundleName);
 
         string path = GetBundlePath(configTmp);
 
@@ -28,6 +29,11 @@ public static class AssetsBundleManager
 
         AssetBundle bundleTmp = AssetBundle.LoadFromFile(path);
         bundles.Add(bundleName, bundleTmp);
+
+        Debug.Log(bundleTmp.mainAsset);
+        Debug.Log(bundleTmp.mainAsset);
+        Debug.Log(bundleTmp.mainAsset);
+
         return bundleTmp;
     }
 
@@ -44,7 +50,7 @@ public static class AssetsBundleManager
         }
         else
         {
-            PackageConfig configTmp = BundleConfigManager.GetRelyBundleConfig(relyBundleName);
+            BundleConfig configTmp = BundleConfigManager.GetRelyBundleConfig(relyBundleName);
             string path = GetBundlePath(configTmp);
 
             tmp = new RelyBundle();
@@ -70,6 +76,21 @@ public static class AssetsBundleManager
     {
         if(bundles.ContainsKey(name))
         {
+            Debug.Log(bundles[name].mainAsset);
+
+            Debug.Log(bundles[name]);
+            Debug.Log(bundles[name].LoadAllAssets().Length);
+
+            for (int i = 0; i < bundles[name].LoadAllAssets().Length;i++ )
+            {
+                Debug.Log(bundles[name].LoadAllAssets()[i]);
+            }
+
+            if (bundles[name].mainAsset == null)
+            {
+                return bundles[name].LoadAllAssets()[0];
+            }
+
             return bundles[name].mainAsset;
         }
         else
@@ -108,7 +129,7 @@ public static class AssetsBundleManager
     {
         if (bundles.ContainsKey(bundleName))
         {
-            PackageConfig configTmp = BundleConfigManager.GetBundleConfig(bundleName);
+            BundleConfig configTmp = BundleConfigManager.GetBundleConfig(bundleName);
             //卸载依赖包
             for (int i = 0; i < configTmp.relyPackages.Length; i++)
             {
@@ -150,11 +171,38 @@ public static class AssetsBundleManager
     /// </summary>
     /// <param name="bundleName"></param>
     /// <returns></returns>
-    public static string GetBundlePath(PackageConfig config)
+    public static string GetBundlePath(BundleConfig config)
     {
         //加载路径由 加载根目录 和 相对路径 合并而成
         //加载根目录由配置决定
-        return ResourceManager.GetPath(config.path, config.loadType);
+        return GetPath(config.path, config.loadType);
+    }
+
+    public static string GetPath(string localPath, ResLoadType loadType)
+    {
+        StringBuilder path = new StringBuilder();
+        switch (loadType)
+        {
+            case ResLoadType.Streaming:
+#if UNITY_EDITOR
+                path.Append(Application.dataPath);
+                path.Append("/StreamingAssets/");
+                break;
+#else
+                    path.Append(Application.streamingAssetsPath);
+                    path.Append("/");
+                    break;
+#endif
+
+            case ResLoadType.Persistent:
+                path.Append(Application.persistentDataPath);
+                path.Append("/");
+                break;
+        }
+
+        path.Append(localPath);
+        path.Append(".assetBundle");
+        return path.ToString();
     }
 }
 

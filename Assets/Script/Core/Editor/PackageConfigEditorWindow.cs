@@ -92,6 +92,12 @@ public class PackageConfigEditorWindow : EditorWindow
 
         GUILayout.EndScrollView();
 
+        GUILayout.BeginHorizontal();
+
+        checkMaterial = EditorGUILayout.Toggle("检查材质球和贴图", checkMaterial);
+
+        GUILayout.EndHorizontal();
+
         if (GUILayout.Button("检查依赖关系"))
         {
             CheckPackage();
@@ -462,21 +468,6 @@ public class PackageConfigEditorWindow : EditorWindow
         }
     }
 
-    //移除拓展名
-    string RemoveExpandName(string name)
-    {
-        int dirIndex = name.LastIndexOf(".");
-
-        if (dirIndex != -1)
-        {
-            return name.Remove(dirIndex);
-        }
-        else
-        {
-            return name;
-        }
-    }
-
     #region 各种判断存在
 
     /// <summary>
@@ -662,7 +653,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
     string GetExportPath(string path, string name)
     {
-        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(RemoveExpandName(path)) + ".assetBundle";
+        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(FileTool.RemoveExpandName(path)) + ".assetBundle";
     }
 
     #endregion
@@ -688,16 +679,13 @@ public class PackageConfigEditorWindow : EditorWindow
 
     int direIndex = 0;
     string resourceParentPath = "/Resources/";
+    string resourcePath;
     //自动添加Resource目录下的所有资源
     void AddAllResourceBundle()
     {
-        string resourcePath = Application.dataPath +resourceParentPath;
-
-        Debug.Log("开始添加~");
-        Debug.Log(resourcePath);
+        resourcePath = Application.dataPath +resourceParentPath;
 
         direIndex = resourcePath.LastIndexOf(resourceParentPath);
-
         direIndex += resourceParentPath.Length;
 
         RecursionDirectory(resourcePath);
@@ -712,7 +700,11 @@ public class PackageConfigEditorWindow : EditorWindow
 
         for (int i = 0; i < dires.Length;i++ )
         {
-            RecursionDirectory(dires[i]);
+            //配置不打包
+            if (!dires[i].Equals(resourcePath + ConfigManager.directoryName))
+            {
+                RecursionDirectory(dires[i]);
+            }
         }
 
         string[] files = Directory.GetFiles(path);
@@ -722,6 +714,8 @@ public class PackageConfigEditorWindow : EditorWindow
             string relativePath = files[i].Substring(direIndex);
 
             if (relativePath.EndsWith(".prefab")
+                || relativePath.EndsWith(".png")
+                || relativePath.EndsWith(".jpg")
                 || relativePath.EndsWith(".mp3")
                 || relativePath.EndsWith(".wav")
                 || relativePath.EndsWith(".txt")
@@ -729,8 +723,7 @@ public class PackageConfigEditorWindow : EditorWindow
                 || relativePath.EndsWith(".xml")
                 )
             {
-                //Debug.Log(relativePath);
-                relativePath = RemoveExpandName(relativePath);
+                relativePath = FileTool.RemoveExpandName(relativePath);
                 Object tmp = Resources.Load(relativePath);
                 AddAssetBundle(tmp,relativePath);
             }
@@ -757,7 +750,7 @@ public class PackageConfigEditorWindow : EditorWindow
             mainObjTmp.path = GetObjectPath(obj);
 
             EditPackageConfigTmp.mainObject = mainObjTmp;
-            EditPackageConfigTmp.path =  GetRelativePath(RemoveExpandName(GetObjectPath(obj)));
+            EditPackageConfigTmp.path = GetRelativePath(FileTool.RemoveExpandName(GetObjectPath(obj)));
 
             Object[] res = GetCorrelationResource(obj);
 
@@ -811,6 +804,13 @@ public class PackageConfigEditorWindow : EditorWindow
     //组件过滤器
     bool ComponentFilter(Object comp)
     {
+        //过滤掉unity自带对象
+        string path = GetObjectPath(comp);
+        if (path.IndexOf("Assets") != 0)
+        {
+            return true;
+        }
+
         //过滤掉所有shander
         if (comp as Shader != null)
         {
@@ -834,6 +834,8 @@ public class PackageConfigEditorWindow : EditorWindow
     Dictionary<string, int> bundleName = new Dictionary<string, int>();
     int errorCount = 0;
     int warnCount = 0;
+
+    bool checkMaterial = false;  //是否检查材质球
     /// <summary>
     /// 依赖包检查
     /// </summary>
@@ -1027,39 +1029,42 @@ public class PackageConfigEditorWindow : EditorWindow
 
     void HandleObject(GameObject go, List<string> list)
     {
-        //检查是否掉材质球
-        Renderer render = go.GetComponent<Renderer>();
-
-        if (render != null)
+        if (checkMaterial)
         {
-            if (render.sharedMaterials != null)
+            //检查是否掉材质球
+            Renderer render = go.GetComponent<Renderer>();
+
+            if (render != null)
             {
-                for (int i = 0; i < render.sharedMaterials.Length;i++ )
+                if (render.sharedMaterials != null)
                 {
-                    if (render.sharedMaterials[i]!=null)
+                    for (int i = 0; i < render.sharedMaterials.Length; i++)
                     {
-                        try
-                        { 
-                            if (render.sharedMaterials[i].GetTexture(0) == null)
+                        if (render.sharedMaterials[i] != null)
+                        {
+                            try
                             {
+                                if (render.sharedMaterials[i].GetTexture(0) == null)
+                                {
+                                    list.Add("贴图丢失: name: " + go.name + " (Materials Index: " + i + ")");
+                                }
+                            }
+                            catch (System.Exception e)
+                            {
+                                e.ToString();
                                 list.Add("贴图丢失: name: " + go.name + " (Materials Index: " + i + ")");
                             }
-                         }
-                        catch(System.Exception e)
+                        }
+                        else
                         {
-                            e.ToString();
-                            list.Add("贴图丢失: name: " + go.name + " (Materials Index: " + i + ")");
+                            list.Add("材质球丢失 : name: " + go.name + " (Materials Index: " + i + ")");
                         }
                     }
-                    else
-                    {
-                        list.Add("材质球丢失 : name: " + go.name + " (Materials Index: " + i + ")");
-                    }
-                } 
-            }
-            else
-            {
-                list.Add("材质球丢失 : name:" + go.name);
+                }
+                else
+                {
+                    list.Add("材质球丢失 : name:" + go.name);
+                }
             }
         }
 
@@ -1189,16 +1194,24 @@ public class PackageConfigEditorWindow : EditorWindow
 
     IEnumerator Package()
     {
-        relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle
-               | BuildAssetBundleOptions.UncompressedAssetBundle
-               | BuildAssetBundleOptions.CollectDependencies;//去重
+        relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
+               | BuildAssetBundleOptions.CollectDependencies;  //收集依赖
+               //| BuildAssetBundleOptions.CompleteAssets;      //完整资源
+                //| BuildAssetBundleOptions.UncompressedAssetBundle //不压缩
 
         BuildPipeline.PushAssetDependencies();
 
         float sumCount = relyPackages.Count + bundles.Count;
         float currentCount = 0;
 
-        ShowProgress(0,"开始打包");
+        ShowProgress(0, "删除旧资源");
+        yield return 0;
+
+        //删除streaming下所有旧资源
+        FileTool.DeleteDirectory(Application.dataPath + "/StreamingAssets");
+
+        ShowProgress(0, "开始打包");
+        yield return 0;
 
         //先打依赖包
         for (int i = 0; i < relyPackages.Count; i++)
@@ -1289,11 +1302,11 @@ public class PackageConfigEditorWindow : EditorWindow
     {
         Dictionary<string, object> gameConfig = new Dictionary<string, object>();
 
-        Dictionary<string,PackageConfig> gameRelyBundles = new Dictionary<string,PackageConfig>();
+        Dictionary<string,BundleConfig> gameRelyBundles = new Dictionary<string,BundleConfig>();
         for (int i = 0; i < relyPackages.Count; i++)
         {
             //生成游戏中使用的依赖包数据
-            PackageConfig pack = new PackageConfig();
+            BundleConfig pack = new BundleConfig();
             pack.name          = relyPackages[i].name;
             pack.path          = relyPackages[i].path;
             pack.relyPackages  = new string[0];
@@ -1303,11 +1316,11 @@ public class PackageConfigEditorWindow : EditorWindow
             gameRelyBundles.Add(pack.name,pack);
         }
 
-        Dictionary<string,PackageConfig> gameAssetsBundles = new Dictionary<string,PackageConfig>();
+        Dictionary<string,BundleConfig> gameAssetsBundles = new Dictionary<string,BundleConfig>();
         for (int i = 0; i < bundles.Count; i++)
         {
             //生成游戏中使用的bundle包数据
-            PackageConfig pack = new PackageConfig();
+            BundleConfig pack = new BundleConfig();
             pack.name          = bundles[i].name;
             pack.path          = bundles[i].path;
             pack.relyPackages  = GetRelyPackNames(bundles[i].relyPackagesMask); //获取依赖包的名字
@@ -1317,8 +1330,8 @@ public class PackageConfigEditorWindow : EditorWindow
             gameAssetsBundles.Add(pack.name,pack);
         }
 
-        gameConfig.Add(BundleConfigManager.key_relyBundle, JsonTool.Dictionary2Json<PackageConfig>(gameRelyBundles));
-        gameConfig.Add(BundleConfigManager.key_bundles     , JsonTool.Dictionary2Json<PackageConfig>(gameAssetsBundles));
+        gameConfig.Add(BundleConfigManager.key_relyBundle  , JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles));
+        gameConfig.Add(BundleConfigManager.key_bundles     , JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles));
 
         //保存游戏中读取的配置文件
         ConfigManager.SaveData(BundleConfigManager.configFileName, gameConfig);

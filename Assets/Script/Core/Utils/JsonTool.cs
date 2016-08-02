@@ -73,9 +73,11 @@ public class JsonTool
         Dictionary<string,T> datas = new Dictionary<string,T>();
         if (!string.IsNullOrEmpty(jsonData))
         {
-            Dictionary<string, T> listData = Json.Deserialize(jsonData) as Dictionary<string, T>;
+            Dictionary<string, object> listData = Json.Deserialize(jsonData) as Dictionary<string, object>;
             if (listData == null)
+            {
                 return datas;
+            }
 
             foreach (string key in listData.Keys)
             {

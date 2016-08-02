@@ -10,19 +10,19 @@ public static class BundleConfigManager
     public static string key_relyBundle = "relyBundles";
     public static string key_bundles      = "AssetsBundles";
 
-    static Dictionary<string, PackageConfig> relyBundleConfigs = new Dictionary<string, PackageConfig>();
-    static Dictionary<string, PackageConfig> bundleConfigs = new Dictionary<string, PackageConfig>();
+    static Dictionary<string, BundleConfig> relyBundleConfigs = new Dictionary<string, BundleConfig>();
+    static Dictionary<string, BundleConfig> bundleConfigs = new Dictionary<string, BundleConfig>();
 
 
     public static void Initialize()
     {
         Dictionary<string, object> data = ConfigManager.GetData(configFileName);
 
-        relyBundleConfigs = JsonTool.Json2Dictionary<PackageConfig>(data[key_relyBundle].ToString());
-        bundleConfigs     = JsonTool.Json2Dictionary<PackageConfig>(data[key_bundles   ].ToString());
+        relyBundleConfigs = JsonTool.Json2Dictionary<BundleConfig>(data[key_relyBundle].ToString());
+        bundleConfigs     = JsonTool.Json2Dictionary<BundleConfig>(data[key_bundles   ].ToString());
     }
 
-    public static PackageConfig GetBundleConfig(string bundleName)
+    public static BundleConfig GetBundleConfig(string bundleName)
     {
         if (bundleConfigs.ContainsKey(bundleName) )
         {
@@ -34,7 +34,7 @@ public static class BundleConfigManager
         }
     }
 
-    public static PackageConfig GetRelyBundleConfig(string bundleName)
+    public static BundleConfig GetRelyBundleConfig(string bundleName)
     {
         if (relyBundleConfigs.ContainsKey(bundleName))
         {
@@ -47,7 +47,7 @@ public static class BundleConfigManager
     }
 }
 
-public class PackageConfig
+public class BundleConfig
 {
     public string name;               //名称
     public string path;               //加载相对路径

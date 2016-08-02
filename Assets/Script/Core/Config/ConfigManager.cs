@@ -17,7 +17,14 @@ public static class ConfigManager
     {
         string dataJson = "";
 
-        dataJson = ResourceIOTool.ReadStringByFile(GetPath(ConfigName));
+        if (ResourceManager.gameLoadType != ResLoadType.Resource)
+        {
+            dataJson = ResourceIOTool.ReadStringByFile(GetAbsolutePath(ConfigName));
+        }
+        else
+        {
+            dataJson = ResourceIOTool.ReadStringByResource(GetRelativelyPath(ConfigName));
+        }
 
         if (dataJson == "")
         {
@@ -32,22 +39,31 @@ public static class ConfigManager
 
     public static void SaveData(string ConfigName, Dictionary<string, object> data)
     {
-        ResourceIOTool.WriteStringByFile(GetPath(ConfigName), Json.Serialize(data));
+        ResourceIOTool.WriteStringByFile(GetAbsolutePath(ConfigName), Json.Serialize(data));
     }
 
     //获取的是绝对路径
-    static string GetPath(string ConfigName)
+    static string GetAbsolutePath(string ConfigName)
     {
         StringBuilder builder = new StringBuilder();
 
 #if UNITY_EDITOR
 
         builder.Append(Application.dataPath);
-        builder.Append("/Resources/");
+        builder.Append("/Resources");
 #else
         builder.Append(Application.persistentDataPath);
 #endif
+        builder.Append("/");
+        builder.Append(GetRelativelyPath(ConfigName));
 
+        return builder.ToString();
+    }
+
+    //获取相对路径
+    static string GetRelativelyPath(string ConfigName)
+    {
+        StringBuilder builder = new StringBuilder();
         builder.Append(directoryName);
         builder.Append("/");
         builder.Append(ConfigName);
