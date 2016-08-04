@@ -147,4 +147,5 @@ public enum ResLoadType
     HotUpdate
 }
 
-public delegate void LoadCallBack(object resObject);
+
+
