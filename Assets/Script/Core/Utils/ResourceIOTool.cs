@@ -30,32 +30,28 @@ public class ResourceIOTool :MonoBehaviour
     #region 读操作
     public static string ReadStringByFile(string path)
     {
-        string content = "";
-
+        StringBuilder line = new StringBuilder();
         try
         {
-            FileInfo t = new FileInfo(path);
-            if (!t.Exists)
+            if (!File.Exists(path))
             {
+                Debug.Log("path dont exists ! : " + path);
                 return "";
             }
 
-            StreamReader sr = null;
-            sr = File.OpenText(path);
-            while ((content += sr.ReadLine()) != null)
-            {
-                break;
-            }
+            StreamReader sr = File.OpenText(path);
+
+            line.Append(sr.ReadToEnd());
 
             sr.Close();
             sr.Dispose();
-
         }
         catch (Exception e)
         {
             Debug.Log("Load text fail ! message:" + e.Message);
         }
-        return content;
+
+        return line.ToString();
     }
 
     public static string ReadStringByResource(string path)

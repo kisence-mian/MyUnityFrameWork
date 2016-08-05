@@ -721,6 +721,7 @@ public class PackageConfigEditorWindow : EditorWindow
                 || relativePath.EndsWith(".txt")
                 || relativePath.EndsWith(".json")
                 || relativePath.EndsWith(".xml")
+                || relativePath.EndsWith(".csv")
                 )
             {
                 relativePath = FileTool.RemoveExpandName(relativePath);
@@ -1399,7 +1400,7 @@ public class PackageConfigEditorWindow : EditorWindow
     //生成版本文件
     public void CreatVersionFile()
     {
-        Dictionary<string, object> VersionData = DataManager.GetData(UpdateManager.versionFileName);
+        Dictionary<string, object> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
 
         if (VersionData == null)
         {
@@ -1431,7 +1432,7 @@ public class PackageConfigEditorWindow : EditorWindow
     //解析版本号文件
     public void AnalysisVersionFile()
     {
-        Dictionary<string, object> VersionData = DataManager.GetData(UpdateManager.versionFileName);
+        Dictionary<string, object> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
 
         if (VersionData == null)
         {
