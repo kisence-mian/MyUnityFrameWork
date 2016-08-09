@@ -8,6 +8,7 @@ public class RuntimeTest : MonoBehaviour
     {
         BundleConfigManager.Initialize();
         ResourceManager.gameLoadType = ResLoadType.Streaming;
+        UIManager.Init();
 	}
 	
 	// Update is called once per frame
@@ -25,6 +26,26 @@ public class RuntimeTest : MonoBehaviour
             GameObject testTmp = (GameObject)ResourceManager.Load("UItest");
 
             Instantiate(testTmp);
+        }
+
+        if (Input.GetKey(KeyCode.U))
+        {
+            UIManager.OpenUIWindow("MianMenu");
+        }
+
+        if (Input.GetKey(KeyCode.I))
+        {
+            UIManager.DestroyUIWindow("MianMenu");
+        }
+
+        if (Input.GetKey(KeyCode.O))
+        {
+            UIManager.ShowUIWindow("MianMenu");
+        }
+
+        if (Input.GetKey(KeyCode.P))
+        {
+            UIManager.HideUIWindow("MianMenu");
         }
 
         if (Input.GetKey(KeyCode.C))

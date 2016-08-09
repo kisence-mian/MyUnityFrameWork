@@ -1332,7 +1332,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
     void PackageBundle(EditPackageConfig package)
     {
-        Debug.Log("PackageBundle " + package.name);
+        //Debug.Log("PackageBundle " + package.name);
         //导入资源包
         BuildPipeline.PushAssetDependencies();
 

@@ -117,12 +117,14 @@ public class DataTable :Dictionary<string ,SingleData>
             SingleData dataTmp = data[k];
             for (int i = 0; i < data.TableKeys.Count; i++)
             {
-                string defauleValueTmp = "";
+                string valueTmp = "";
 
                 if (dataTmp.ContainsKey(data.TableKeys[i]))
                 {
-                    defauleValueTmp = dataTmp[data.TableKeys[i]];
+                    valueTmp = dataTmp[data.TableKeys[i]];
                 }
+
+                build.Append(valueTmp);
                 if (i != data.TableKeys.Count - 1)
                 {
                     build.Append(",");
