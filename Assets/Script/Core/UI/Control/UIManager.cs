@@ -10,13 +10,16 @@ public class UIManager : MonoBehaviour
 {
     static UIManager s_instance;
     public static UILayerManager s_UILayerManager; //UI层级管理器
-    public static UIAnimManager  s_UIAnimManager;  //UI动画管理器
+    public static UIAnimManager s_UIAnimManager;  //UI动画管理器
 
     static public Dictionary<string, List<UIWindowBase>> s_UIs = new Dictionary<string, List<UIWindowBase>>();
 
+    public static Camera s_UIcamera;
+
     public static UIManager s_Instance
     {
-        get {
+        get
+        {
             if (s_instance == null)
             {
                 Init();
@@ -32,11 +35,12 @@ public class UIManager : MonoBehaviour
 
         s_UILayerManager = l_instance.GetComponent<UILayerManager>();
         s_UIAnimManager = l_instance.GetComponent<UIAnimManager>();
+        s_UIcamera = l_instance.GetComponentInChildren<Camera>();
 
         DontDestroyOnLoad(l_instance);
     }
 
-    public static void OpenUIWindow(string l_UIname,UICallBack l_callback = null,params object[] l_objs)
+    public static UIWindowBase OpenUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
     {
         GameObject l_UItmp = GameObjectManager.CreatGameObject(l_UIname, s_Instance.gameObject);
 
@@ -50,7 +54,8 @@ public class UIManager : MonoBehaviour
         l_UIbase.OnOpen();
 
         s_UILayerManager.SetLayer(l_UIbase);      //设置层级
-        s_UIAnimManager.StartEnterAnim(l_UIbase, l_callback,l_objs); //播放动画
+        s_UIAnimManager.StartEnterAnim(l_UIbase, l_callback, l_objs); //播放动画
+        return l_UIbase;
     }
 
     public static void OpenUIWindow<T>() where T : UIWindowBase
@@ -63,7 +68,7 @@ public class UIManager : MonoBehaviour
         RemoveUI(l_UI);        //移除UI引用
 
         //动画播放完毕删除UI
-        if (l_callback!= null)
+        if (l_callback != null)
         {
             l_callback += DestroyUIWindowCallBack;
         }
@@ -85,7 +90,7 @@ public class UIManager : MonoBehaviour
 
     public static void DestroyUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
     {
-        DestroyUIWindow(GetUI(l_UIname), l_callback,l_objs);
+        DestroyUIWindow(GetUI(l_UIname), l_callback, l_objs);
     }
 
     public static void DestroyUIWindow<T>(string l_UIname, UICallBack l_callback = null, params object[] l_objs) where T : UIWindowBase
@@ -93,7 +98,7 @@ public class UIManager : MonoBehaviour
         DestroyUIWindow(typeof(T).Name, l_callback, l_objs);
     }
 
-    public static void ShowUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
+    public static UIWindowBase ShowUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
     {
         UIWindowBase l_UI = GetUI(l_UIname);
         if (l_UI != null)
@@ -106,13 +111,14 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            OpenUIWindow(l_UIname, l_callback, l_objs);
+            return OpenUIWindow(l_UIname, l_callback, l_objs);
         }
+        return l_UI;
     }
 
-    public static void ShowUIWindow<T>( UICallBack l_callback = null, params object[] l_objs) where T:UIWindowBase
+    public static void ShowUIWindow<T>(UICallBack l_callback = null, params object[] l_objs) where T : UIWindowBase
     {
-        ShowUIWindow(typeof(T).Name, l_callback,l_objs);
+        ShowUIWindow(typeof(T).Name, l_callback, l_objs);
     }
 
     public static void HideUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
@@ -153,9 +159,9 @@ public class UIManager : MonoBehaviour
 
     static void AddUI(UIWindowBase l_UI)
     {
-        if(!s_UIs.ContainsKey(l_UI.name) )
+        if (!s_UIs.ContainsKey(l_UI.name))
         {
-            s_UIs.Add(l_UI.name,new List<UIWindowBase>());
+            s_UIs.Add(l_UI.name, new List<UIWindowBase>());
         }
 
         Debug.Log("AddUI: " + l_UI.name);
@@ -207,7 +213,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public static UIWindowBase GetUI<T>() where T:UIWindowBase
+    public static UIWindowBase GetUI<T>() where T : UIWindowBase
     {
         return GetUI(typeof(T).Name);
     }

@@ -39,7 +39,7 @@ public class UIWindowBase : MonoBehaviour
         UISystemEvent.Dispatch(this, UIEvent.OnRefresh);
     }
 
-    public virtual void OnStartEnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack,params object[] objs)
+    public virtual void EnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack,params object[] objs)
     {
         //默认无动画
         l_animComplete(this, l_callBack, objs);
@@ -50,7 +50,7 @@ public class UIWindowBase : MonoBehaviour
 
     }
 
-    public virtual void OnStartExitAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
+    public virtual void ExitAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
     {
         //默认无动画
         l_animComplete(this, l_callBack, objs);
