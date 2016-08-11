@@ -71,6 +71,8 @@ public delegate void UIAnimCallBack(UIWindowBase l_UIbase, UICallBack callBack, 
 
 public enum UIType
 {
+    GameUI,
+
     Fixed,
     Normal,
     TopBar,

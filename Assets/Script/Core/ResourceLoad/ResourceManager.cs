@@ -72,7 +72,16 @@ public static class ResourceManager
     public static string ReadTextFile(string path)
     {
         TextAsset text = (TextAsset)Load(path);
-        return text.text;
+
+        if (text == null)
+        {
+            Debug.LogError("ResourceManager: ReadTextFile Dont find " + path);
+            return "";
+        }
+        else
+        {
+            return text.text;
+        }
     }
 
     //保存一个文本

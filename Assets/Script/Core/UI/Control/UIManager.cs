@@ -34,8 +34,8 @@ public class UIManager : MonoBehaviour
         s_instance = l_instance.GetComponent<UIManager>();
 
         s_UILayerManager = l_instance.GetComponent<UILayerManager>();
-        s_UIAnimManager = l_instance.GetComponent<UIAnimManager>();
-        s_UIcamera = l_instance.GetComponentInChildren<Camera>();
+        s_UIAnimManager  = l_instance.GetComponent<UIAnimManager>();
+        s_UIcamera       = l_instance.GetComponentInChildren<Camera>();
 
         DontDestroyOnLoad(l_instance);
     }
@@ -63,22 +63,29 @@ public class UIManager : MonoBehaviour
         OpenUIWindow(typeof(T).Name);
     }
 
-    public static void DestroyUIWindow(UIWindowBase l_UI, UICallBack l_callback = null, params object[] l_objs)
+    public static void DestroyUIWindow(UIWindowBase l_UI,bool isPlayAnim = true ,UICallBack l_callback = null, params object[] l_objs)
     {
         RemoveUI(l_UI);        //移除UI引用
 
-        //动画播放完毕删除UI
-        if (l_callback != null)
+        if (isPlayAnim)
         {
-            l_callback += DestroyUIWindowCallBack;
+            //动画播放完毕删除UI
+            if (l_callback != null)
+            {
+                l_callback += DestroyUIWindowCallBack;
+            }
+            else
+            {
+                l_callback = DestroyUIWindowCallBack;
+            }
+
+            s_UIAnimManager.StartEnterAnim(l_UI, l_callback, l_objs);
+
         }
         else
         {
-            l_callback = DestroyUIWindowCallBack;
+            DestroyUIWindowCallBack(l_UI, l_objs);
         }
-
-        s_UIAnimManager.StartEnterAnim(l_UI, l_callback, l_objs);
-
     }
 
     public static void DestroyUIWindowCallBack(UIWindowBase l_UI, params object[] l_objs)
@@ -88,14 +95,14 @@ public class UIManager : MonoBehaviour
         Destroy(l_UI.gameObject);
     }
 
-    public static void DestroyUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
+    public static void DestroyUIWindow(string l_UIname, bool isPlayAnim = true, UICallBack l_callback = null, params object[] l_objs)
     {
-        DestroyUIWindow(GetUI(l_UIname), l_callback, l_objs);
+        DestroyUIWindow(GetUI(l_UIname), isPlayAnim, l_callback, l_objs);
     }
 
-    public static void DestroyUIWindow<T>(string l_UIname, UICallBack l_callback = null, params object[] l_objs) where T : UIWindowBase
+    public static void DestroyUIWindow<T>(string l_UIname, bool isPlayAnim = true, UICallBack l_callback = null, params object[] l_objs) where T : UIWindowBase
     {
-        DestroyUIWindow(typeof(T).Name, l_callback, l_objs);
+        DestroyUIWindow(typeof(T).Name, isPlayAnim,l_callback, l_objs);
     }
 
     public static UIWindowBase ShowUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
@@ -121,22 +128,29 @@ public class UIManager : MonoBehaviour
         ShowUIWindow(typeof(T).Name, l_callback, l_objs);
     }
 
-    public static void HideUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
+    public static void HideUIWindow(string l_UIname, bool isPlayAnim = true, UICallBack l_callback = null, params object[] l_objs)
     {
         UIWindowBase l_UI = GetUI(l_UIname);
         if (l_UI != null)
         {
-            //动画播放完毕删除UI
-            if (l_callback != null)
+            if (isPlayAnim)
             {
-                l_callback += HideUIWindowCallBack;
+                //动画播放完毕删除UI
+                if (l_callback != null)
+                {
+                    l_callback += HideUIWindowCallBack;
+                }
+                else
+                {
+                    l_callback = HideUIWindowCallBack;
+                }
+
+                s_UIAnimManager.StartExitAnim(l_UI, l_callback, l_objs); //播放动画
             }
             else
             {
-                l_callback = HideUIWindowCallBack;
+                HideUIWindowCallBack(l_UI, l_objs);
             }
-
-            s_UIAnimManager.StartExitAnim(l_UI, l_callback, l_objs); //播放动画
         }
         else
         {
@@ -151,9 +165,25 @@ public class UIManager : MonoBehaviour
         l_UI.gameObject.SetActive(false);
     }
 
-    public static void HideUIWindow<T>(UICallBack l_callback = null, params object[] l_objs) where T : UIWindowBase
+    public static void HideUIWindow<T>(bool isPlayAnim = true,UICallBack l_callback = null, params object[] l_objs) where T : UIWindowBase
     {
-        HideUIWindow(typeof(T).Name, l_callback, l_objs);
+        HideUIWindow(typeof(T).Name, isPlayAnim, l_callback, l_objs);
+    }
+
+    /// <summary>
+    /// 移除全部UI
+    /// </summary>
+    public static void DestroyAllUI(bool isPlayerAnim = false)
+    {
+        List<string> keys = new List<string>(s_UIs.Keys);
+        for (int i = 0; i < keys.Count; i++)
+        {
+            List<UIWindowBase> list = s_UIs[keys[i]];
+            for(int j = 0;j<list.Count;j++)
+            {
+                DestroyUIWindow(list[i], isPlayerAnim);
+            }
+        }
     }
 
 

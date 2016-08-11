@@ -215,6 +215,21 @@ public class SingleData : Dictionary<string, string>
         throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
     }
 
+    public bool GetBool(string key)
+    {
+        if (this.ContainsKey(key))
+        {
+            return bool.Parse(this[key]);
+        }
+
+        if (data.defaultValue.ContainsKey(key))
+        {
+            return bool.Parse(data.defaultValue[key]);
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+    }
+
     public string GetString(string key)
     {
         if (this.ContainsKey(key))
