@@ -3,11 +3,11 @@ using System.Collections;
 
 public class AudioManager : MonoBehaviour
 {
-    private static AudioManager instance;
-    public static AudioManager Instance
+    private static AudioManager s_instance;
+    public static AudioManager s_Instance
     {
-        get {if (instance == null) Init();
-            return instance;}
+        get {if (s_instance == null) Init();
+            return s_instance;}
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public class AudioManager : MonoBehaviour
 
     public static void Init()
     {
-        instance = new GameObject("AudioManager").AddComponent<AudioManager>();
+        s_instance = new GameObject("AudioManager").AddComponent<AudioManager>();
     }
 
     public static void PlayMusic2D(string l_musicName)
@@ -55,4 +55,4 @@ public class AudioManager : MonoBehaviour
     }
 }
 
-public delegate void AudioCallBack(string AudioName,params object[] objs);
+public delegate void AudioCallBack(string l_AudioName,params object[] l_objs);
