@@ -38,7 +38,7 @@
 ##开发者工具
 　　1.收集关键日志和崩溃日志，发送给开发者(日志在 persistent路径\.Log文件夹下)  
 　　2.同时按下四根手指呼出游戏内控制台,监控帧率与内存使用量  
-　　3.感谢Q框架提供技术借鉴（https://github.com/liangxiegame/QFramework） 
+　　3.感谢Q框架提供技术借鉴(https://github.com/liangxiegame/QFramework) 
 　　
 ##动画系统
 　　1.支持UGUI动画，使用定位更精确  
