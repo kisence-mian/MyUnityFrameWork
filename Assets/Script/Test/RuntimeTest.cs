@@ -6,9 +6,7 @@ public class RuntimeTest : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
-        BundleConfigManager.Initialize();
-        ResourceManager.gameLoadType = ResLoadType.Streaming;
-        UIManager.Init();
+
 	}
 	
 	// Update is called once per frame
