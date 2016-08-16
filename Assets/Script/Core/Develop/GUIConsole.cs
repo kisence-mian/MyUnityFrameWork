@@ -84,7 +84,7 @@ public class GUIConsole
         if (Input.GetKeyUp(KeyCode.F1))
             showGUI = !showGUI;
 #elif UNITY_ANDROID || UNITY_IOS
-			if (!mTouching && Input.touchCount == 4)
+			if (!mTouching && Input.touchCount >= 3)
 			{
 				mTouching = true;
 				showGUI = !showGUI;

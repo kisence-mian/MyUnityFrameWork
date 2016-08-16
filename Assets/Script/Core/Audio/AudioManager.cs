@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
+[RequireComponent(typeof(AudioListener))]
 public class AudioManager : MonoBehaviour
 {
     private static AudioManager s_instance;
