@@ -22,102 +22,36 @@ public class AnimSystem : MonoBehaviour
         return instance;
     }
 
-    public static void uguiAlpha(GameObject animObject, float fromAlpha, float toAlpha, float time, InteType interpolationType = InteType.Default, bool isChild = true, AnimCallBack callBack = null, params object[] parameter)
+    #region 贝塞尔路径方法群
+    public static void BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, PathType bezierMoveType = PathType.Bezier2, Vector3[] t_Bezier_contral = null, AnimCallBack callBack = null, params object[] parameter)
     {
-        AnimData DataTmp = getAnimData(animObject, time, interpolationType, callBack, parameter);
-
-        DataTmp.animType = AnimType.UGUI_alpha;
-        DataTmp.formAlpha = fromAlpha;
-        DataTmp.toAlpha = toAlpha;
-        DataTmp.UguiAlphaInit(isChild);
-
-        getInstance().animList.Add(DataTmp);
-    }
-
-    public static void UguiMove(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
-    {
-        AnimData DataTmp = getAnimData(animObject, time, interpolationType, callBack, parameter);
-
-        DataTmp.animType = AnimType.UGUI_anchoredPosition;
-        DataTmp.formPos = from;
-        DataTmp.toPos = to;
-        DataTmp.UguiPositionInit();
-
-        getInstance().animList.Add(DataTmp);
-    }
-
-
-
-    public static void Move(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, AnimCallBack callBack = null, params object[] parameter)
-    {
-        AnimData DataTmp = getAnimData(animObject, time, interpolationType, callBack, parameter);
-
+        AnimType animType;
         if (isLocal)
         {
-            DataTmp.animType = AnimType.LocalPosition;
+            animType = AnimType.LocalPosition;
         }
         else
         {
-            DataTmp.animType = AnimType.Position;
+            animType = AnimType.Position;
         }
+        AnimParnHash animParnHash = new AnimParnHash(
+            AnimParamType.GameObj, animObject,
+            AnimParamType.AnimType, animType,
+            AnimParamType.FromV3, from,
+            AnimParamType.ToV3, to,
+            AnimParamType.Time, time,
+            AnimParamType.InteType, interpolationType,
+            AnimParamType.IsLocal, isLocal,
+            AnimParamType.PathType, bezierMoveType,
+            AnimParamType.V3Control, t_Bezier_contral
+            );
 
-
-        DataTmp.formPos = from;
-        DataTmp.toPos = to;
-        DataTmp.TransfromInit();
-
-        getInstance().animList.Add(DataTmp);
-    }
-
-    #region 贝塞尔移动方法群
-    public static void BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, BezierType bezierMoveType = BezierType.Bezier2, AnimCallBack callBack = null, Vector3[] t_Bezier_contral = null, params object[] parameter)
-    {
-        AnimData DataTmp = getAnimData(animObject, time, interpolationType, callBack, parameter);
-
-        if (isLocal)
-        {
-            DataTmp.animType = AnimType.LocalPosition;
-        }
-        else
-        {
-            DataTmp.animType = AnimType.Position;
-        }
-        DataTmp.bezierType = bezierMoveType;
-        DataTmp.BezierContral = t_Bezier_contral;
-        DataTmp.formPos = from;
-        DataTmp.toPos = to;
-        DataTmp.TransfromInit();
-
-        getInstance().animList.Add(DataTmp);
+        ValueTo(animParnHash, callBack, parameter);
 
     }
 
-    public static void BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, BezierType bezierMoveType = BezierType.Bezier2, AnimCallBack callBack = null, float[] t_Bezier_contralRadius = null, params object[] parameter)
-    {
-
-        //三阶贝塞尔，两个控制点分别以起点和终点为中心进行随机
-        Vector3[] t_Bezier_contral = new Vector3[3];
-        t_Bezier_contral[0] = UnityEngine.Random.insideUnitSphere * t_Bezier_contralRadius[0] + from;
-        t_Bezier_contral[1] = UnityEngine.Random.insideUnitSphere * t_Bezier_contralRadius[1] + to;
-
-        //二阶贝塞尔，控制点以起点与终点的中间为随机中心
-        if (bezierMoveType == BezierType.Bezier2)
-        {
-            t_Bezier_contral[0] = UnityEngine.Random.insideUnitSphere * t_Bezier_contralRadius[0] + (from + to) * 0.5f;
-        }
-
-        //如果在平面内（z轴相同），控制点也要在该平面内
-        if (from.z == to.z)
-        {
-            t_Bezier_contral[0].z = from.z;
-            t_Bezier_contral[1].z = from.z;
-        }
-
-
-        BezierMove(animObject, from, to, time, interpolationType, isLocal, bezierMoveType, callBack, t_Bezier_contral, parameter);
-
-    }
-    public static void BezierMove(GameObject animObject, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, BezierType bezierMoveType = BezierType.Bezier2, AnimCallBack callBack = null, float[] t_Bezier_contralRadius = null, params object[] parameter)
+    //不传From，传准确控制点
+    public static void BezierMove(GameObject animObject, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, PathType bezierMoveType = PathType.Bezier2, Vector3[] t_Bezier_contral = null, AnimCallBack callBack = null, params object[] parameter)
     {
         Vector3 from;
         if (isLocal)
@@ -129,114 +63,315 @@ public class AnimSystem : MonoBehaviour
             from = animObject.transform.position;
         }
 
-        BezierMove(animObject, from, to, time, interpolationType, isLocal, bezierMoveType, callBack, t_Bezier_contralRadius, parameter);
+        BezierMove(animObject, from, to, time, interpolationType, isLocal, bezierMoveType, t_Bezier_contral, callBack, parameter);
     }
+
+    //传From，传准确控制点随机范围
+    public static void BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, PathType bezierMoveType = PathType.Bezier2, float[] t_Bezier_contralRadius = null, AnimCallBack callBack = null, params object[] parameter)
+    {
+        AnimType animType;
+        if (isLocal)
+        {
+            animType = AnimType.LocalPosition;
+        }
+        else
+        {
+            animType = AnimType.Position;
+        }
+        AnimParnHash animParnHash = new AnimParnHash(
+            AnimParamType.GameObj, animObject,
+            AnimParamType.AnimType, animType,
+            AnimParamType.FromV3, from,
+            AnimParamType.ToV3, to,
+            AnimParamType.Time, time,
+            AnimParamType.InteType, interpolationType,
+            AnimParamType.IsLocal, isLocal,
+            AnimParamType.PathType, bezierMoveType,
+            AnimParamType.floatControl, t_Bezier_contralRadius
+            );
+
+        ValueTo(animParnHash, callBack, parameter);
+
+    }
+
+    //public static void BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, PathType bezierMoveType = PathType.Bezier2, float[] t_Bezier_contralRadius = null, AnimCallBack callBack = null, params object[] parameter)
+    //{
+
+    //    ////三阶贝塞尔，两个控制点分别以起点和终点为中心进行随机
+    //    //Vector3[] t_Bezier_contral = new Vector3[3];
+    //    //t_Bezier_contral[0] = UnityEngine.Random.insideUnitSphere * t_Bezier_contralRadius[0] + from;
+    //    //t_Bezier_contral[1] = UnityEngine.Random.insideUnitSphere * t_Bezier_contralRadius[1] + to;
+
+    //    ////二阶贝塞尔，控制点以起点与终点的中间为随机中心
+    //    //if (bezierMoveType == PathType.Bezier2)
+    //    //{
+    //    //    t_Bezier_contral[0] = UnityEngine.Random.insideUnitSphere * t_Bezier_contralRadius[0] + (from + to) * 0.5f;
+    //    //}
+
+    //    ////如果在平面内（z轴相同），控制点也要在该平面内
+    //    //if (from.z == to.z)
+    //    //{
+    //    //    t_Bezier_contral[0].z = from.z;
+    //    //    t_Bezier_contral[1].z = from.z;
+    //    //}
+
+    //    BezierMove(animObject, from, to, time, interpolationType, isLocal, bezierMoveType, t_Bezier_contralRadius, callBack, parameter);
+
+    //}
+
+    //不传From，传准确控制点随机范围
+    public static void BezierMove(GameObject animObject, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, PathType bezierMoveType = PathType.Bezier2, float[] t_Bezier_contralRadius = null, AnimCallBack callBack = null, params object[] parameter)
+    {
+        Vector3 from;
+        if (isLocal)
+        {
+            from = animObject.transform.localPosition;
+        }
+        else
+        {
+            from = animObject.transform.position;
+        }
+
+        BezierMove(animObject, from, to, time, interpolationType, isLocal, bezierMoveType, t_Bezier_contralRadius, callBack, parameter);
+    }
+
+
 
 
     #endregion
 
-    public static void Scale(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, AnimCallBack callBack = null, params object[] parameter)
+    #region UGUI Alpha
+    public static void uguiAlpha(GameObject animObject, float from, float to, float time, InteType interpolationType = InteType.Default, bool isChild = true, AnimCallBack callBack = null, params object[] parameter)
     {
-        AnimData DataTmp = getAnimData(animObject, time, interpolationType, callBack, parameter);
+        AnimParnHash animParnHash = new AnimParnHash(
+           AnimParamType.GameObj, animObject,
+           AnimParamType.AnimType, AnimType.UGUI_alpha,
+           AnimParamType.FromAlpha, from,
+           AnimParamType.ToAlpha, to,
+           AnimParamType.Time, time,
+           AnimParamType.InteType, interpolationType,
+           AnimParamType.IsChild, isChild
+           );
 
-
-        DataTmp.animType = AnimType.LocalScale;
-
-
-        DataTmp.formPos = from;
-        DataTmp.toPos = to;
-        DataTmp.TransfromInit();
-
-        getInstance().animList.Add(DataTmp);
+        ValueTo(animParnHash, callBack, parameter);
     }
 
-    public static void SizeDelta(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, AnimCallBack callBack = null, params object[] parameter)
+
+
+    #endregion
+
+    #region UGUI Move
+    public static void UguiMove(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
     {
-        AnimData DataTmp = getAnimData(animObject, time, interpolationType, callBack, parameter);
+        AnimParnHash animParnHash = new AnimParnHash(
+          AnimParamType.GameObj, animObject,
+          AnimParamType.AnimType, AnimType.UGUI_anchoredPosition,
+          AnimParamType.FromAlpha, from,
+          AnimParamType.ToAlpha, to,
+          AnimParamType.Time, time,
+          AnimParamType.InteType, interpolationType
+          );
 
+        ValueTo(animParnHash, callBack, parameter);
 
-        DataTmp.animType = AnimType.SizeDetal;
-
-
-        DataTmp.formPos = from;
-        DataTmp.toPos = to;
-        DataTmp.TransfromInit();
-
-        getInstance().animList.Add(DataTmp);
     }
 
-    static AnimData getAnimData(GameObject animObject, float time, InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
-    {
-        AnimData DataTmp = new AnimData();
 
-        if (interpolationType != InteType.Default)
+
+    public static void UguiMove(GameObject animObject, Vector3 to, float time, InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
+    {
+        Vector3 from = animObject.GetComponent<RectTransform>().anchoredPosition;
+
+
+        UguiMove(animObject, from, to, time, interpolationType, callBack, parameter);
+    }
+    #endregion
+
+
+    #region Move方法群
+    public static void Move(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, AnimCallBack callBack = null, params object[] parameter)
+    {
+        AnimType animType;
+        if (isLocal)
         {
-            DataTmp.interpolationType = interpolationType;
+            animType = AnimType.LocalPosition;
         }
         else
         {
-            DataTmp.interpolationType = InteType.Linear;
+            animType = AnimType.Position;
         }
 
-        DataTmp.animGameObejct = animObject;
-        DataTmp.currentTime = 0;
-        DataTmp.totalTime = time;
-        DataTmp.callBack = callBack;
-        DataTmp.parameter = parameter;
+        AnimParnHash animParnHash = new AnimParnHash(
+            AnimParamType.GameObj, animObject,
+            AnimParamType.AnimType, animType,
+            AnimParamType.FromV3, from,
+            AnimParamType.ToV3, to,
+            AnimParamType.Time, time,
+            AnimParamType.InteType, interpolationType,
+            AnimParamType.IsLocal, isLocal
+            );
 
-        return DataTmp;
+        ValueTo(animParnHash, callBack, parameter);
+
+    }
+    //不传From
+    public static void Move(GameObject animObject, Vector3 to, float time, InteType interpolationType = InteType.Default, bool isLocal = true, AnimCallBack callBack = null, params object[] parameter)
+    {
+        Vector3 from;
+        if (isLocal)
+        {
+            from = animObject.transform.localPosition;
+        }
+        else
+        {
+            from = animObject.transform.position;
+        }
+
+
+        Move(animObject, from, to, time, interpolationType, isLocal, callBack, parameter);
+
     }
 
-    public static void ValueTo(GameObject l_gameObject, params object[] l_params)
+    #endregion
+
+
+    #region Scale 变换方法群
+    public static void Scale(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
     {
-        AnimData DataTmp = new AnimData();
+        AnimParnHash animParnHash = new AnimParnHash(
+            AnimParamType.GameObj, animObject,
+            AnimParamType.AnimType, AnimType.LocalScale,
+            AnimParamType.FromV3, from,
+            AnimParamType.ToV3, to,
+            AnimParamType.Time, time,
+            AnimParamType.InteType, interpolationType
 
-        for (int i = 0; i < l_params.Length; i += 2)
+            );
+
+        ValueTo(animParnHash, callBack, parameter);
+    }
+
+    public static void Scale(GameObject animObject, Vector3 to, float time, InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
+    {
+        Vector3 from = animObject.transform.localScale;
+        Scale(animObject, from, to, time, interpolationType, callBack, parameter);
+
+    }
+
+    #endregion
+
+    #region SizeDelta
+    public static void SizeDelta(GameObject animObject, Vector3 from, Vector3 to, float time, InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
+    {
+        AnimParnHash animParnHash = new AnimParnHash(
+            AnimParamType.GameObj, animObject,
+            AnimParamType.AnimType, AnimType.SizeDetal,
+            AnimParamType.FromV3, from,
+            AnimParamType.ToV3, to,
+            AnimParamType.Time, time,
+            AnimParamType.InteType, interpolationType
+
+            );
+
+        ValueTo(animParnHash, callBack, parameter);
+    }
+
+    public static void SizeDelta(GameObject animObject, Vector3 to, float time, InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
+    {
+        Vector3 from = animObject.GetComponent<RectTransform>().sizeDelta;
+        SizeDelta(animObject, from, to, time, interpolationType, callBack, parameter);
+    }
+
+    #endregion
+
+
+
+    public static void ValueTo(AnimParnHash l_animHash, AnimCallBack l_callBack, params object[] l_objs)
+    {
+        l_animHash.Add(AnimParamType.CallBack, l_callBack);
+        l_animHash.Add(AnimParamType.CallBackParams, l_objs);
+
+        AnimData l_tmp = l_animHash.GetAnimData();
+
+        l_tmp.Init();
+
+        getInstance().animList.Add(l_tmp);
+    }
+
+    public class AnimParnHash : Dictionary<AnimParamType, object>
+    {
+        public AnimData DataTmp = new AnimData();
+
+        public AnimParnHash(params object[] l_params)
         {
-            AnimParamType l_ParamType = (AnimParamType)l_params[i];
-            switch (l_ParamType)
+
+            for (int i = 0; i < l_params.Length; i += 2)
             {
-                case AnimParamType.FromV3: DataTmp.formPos = (Vector3)l_params[i + 1]; break;
-                case AnimParamType.FromV2: DataTmp.formPos = (Vector2)l_params[i + 1]; break;
-                case AnimParamType.FromColor: DataTmp.formPos = (Color)l_params[i + 1]; break;
-                case AnimParamType.FromFloat: DataTmp.formPos = (float)l_params[i + 1]; break;
-
-                case AnimParamType.ToV3: DataTmp.formPos = (Vector3)l_params[i + 1]; break;
-                case AnimParamType.ToV2: DataTmp.formPos = (Vector3)l_params[i + 1]; break;
-                case AnimParamType.ToFloat: DataTmp.formPos = (Vector3)l_params[i + 1]; break;
-                case AnimParamType.ToColor: DataTmp.formPos = (Vector3)l_params[i + 1]; break;
-
-                case AnimParamType.AnimType: DataTmp.formPos = (Vector3)l_params[i + 1]; break;
-                case AnimParamType.Time: DataTmp.formPos = (Vector3)l_params[i + 1]; break;
-                case AnimParamType.InteType: DataTmp.formPos = (Vector3)l_params[i + 1]; break;
-                case AnimParamType.RoadType: DataTmp.formPos = (Vector3)l_params[i + 1]; break;
-
-
-
-
-
-
-
+                this[(AnimParamType)l_params[i]] = l_params[i + 1];
             }
+
+        }
+
+        public AnimData GetAnimData()
+        {
+
+            foreach (var hash in this)
+            {
+
+                AnimParamType l_ParamType = hash.Key;
+                switch (l_ParamType)
+                {
+                    case AnimParamType.GameObj: DataTmp.animGameObejct = (GameObject)hash.Value; break;
+                    case AnimParamType.FromV3: DataTmp.formPos = (Vector3)hash.Value; break;
+                    case AnimParamType.FromV2: DataTmp.fromV2 = (Vector2)hash.Value; break;
+                    case AnimParamType.FromColor: DataTmp.fromColor = (Color)hash.Value; break;
+                    case AnimParamType.FromAlpha: DataTmp.formAlpha = (float)hash.Value; break;
+
+                    case AnimParamType.ToV3: DataTmp.toPos = (Vector3)hash.Value; break;
+                    case AnimParamType.ToV2: DataTmp.toV2 = (Vector3)hash.Value; break;
+                    case AnimParamType.ToColor: DataTmp.toColor = (Color)hash.Value; break;
+                    case AnimParamType.ToAlpha: DataTmp.toAlpha = (float)hash.Value; break;
+
+                    case AnimParamType.AnimType: DataTmp.animType = (AnimType)hash.Value; break;
+                    case AnimParamType.Time: DataTmp.totalTime = (float)hash.Value; break;
+                    case AnimParamType.InteType: DataTmp.interpolationType = (InteType)hash.Value; break;
+                    case AnimParamType.PathType: DataTmp.pathType = (PathType)hash.Value; break;
+                    case AnimParamType.V3Control: DataTmp.v3Contral = (Vector3[])hash.Value; break;
+                    case AnimParamType.floatControl: DataTmp.floatContral = (float[])hash.Value; break;
+
+                    case AnimParamType.IsChild: DataTmp.b_isChild = (bool)hash.Value; break;
+                    case AnimParamType.CallBack: DataTmp.callBack = (AnimCallBack)hash.Value; break;
+                    case AnimParamType.CallBackParams: DataTmp.parameter = (object[])hash.Value; break;
+
+
+                }
+            }
+
+            return DataTmp;
         }
     }
 
     public enum AnimParamType
     {
+        GameObj,
+
         FromV3,
         FromV2,
-        FromFloat,
+        FromAlpha,
         FromColor,
 
         ToV3,
         ToV2,
-        ToFloat,
+        ToAlpha,
         ToColor,
 
         AnimType,
         Time,
         InteType,
-        RoadType,
+
+        PathType,
+        V3Control,
+        floatControl,
 
         RepeatType,
 
@@ -324,9 +459,9 @@ public enum InteType
     outInExpo,
 }
 
-public enum BezierType
+public enum PathType
 {
-    Bezier1,
+    Line,
     Bezier2,
     Bezier3,
 

@@ -8,18 +8,34 @@ public class AnimData
 {
     public AnimType animType;
     public InteType interpolationType;
-    public BezierType bezierType = BezierType.Bezier1;
+    public PathType pathType = PathType.Line;
 
     public GameObject animGameObejct;
-
+    public bool b_isChild = false;
     public float currentTime = 0;
     public float totalTime = 0;
-    public Vector3[] BezierContral = new Vector3[3]; //二阶取第一个用，三阶取前两个
+    public Vector3[] v3Contral = null; //二阶取第一个用，三阶取前两个
+    public float[] floatContral = null;
 
     public bool isDone = false;
 
     public object[] parameter;
     public AnimCallBack callBack;
+
+
+
+
+
+    public Vector3 formPos;
+    public Vector3 toPos;
+
+    public Vector2 fromV2;
+    public Vector2 toV2;
+
+    RectTransform rectRransform;
+    Transform transform;
+
+
 
     public void executeUpdate()
     {
@@ -42,9 +58,6 @@ public class AnimData
             case AnimType.SizeDetal: SizeDelta(); break;
         }
 
-
-
-
     }
 
     public void executeCallBack()
@@ -66,6 +79,7 @@ public class AnimData
     {
         switch (interpolationType)
         {
+            case InteType.Default:
             case InteType.Linear: return Mathf.Lerp(oldValue, aimValue, currentTime / totalTime);
             case InteType.InBack: return InBack(oldValue, aimValue, currentTime, totalTime);
             case InteType.outBack: return OutBack(oldValue, aimValue, currentTime, totalTime);
@@ -108,7 +122,7 @@ public class AnimData
             getInterpolation(oldValue.z, aimValue.z)
         );
 
-        if (bezierType != BezierType.Bezier1)
+        if (pathType != PathType.Line)
         {
             result = getBezierInterpolationV3(oldValue, aimValue);
         }
@@ -116,12 +130,43 @@ public class AnimData
         return result;
 
 
-
-
     }
 
+
     /// <summary>
-    /// 贝塞尔专用
+    /// 贝塞尔初始化（根据随机范围进行控制点随机）
+    /// </summary>
+    public void bezierInit()
+    {
+        if (v3Contral == null)
+        {
+            if (floatContral != null)
+            {
+                v3Contral = new Vector3[3];
+                v3Contral[0] = UnityEngine.Random.insideUnitSphere * floatContral[0] + formPos;
+                v3Contral[1] = UnityEngine.Random.insideUnitSphere * floatContral[1] + toPos;
+
+                //二阶贝塞尔，控制点以起点与终点的中间为随机中心
+                if (pathType == PathType.Bezier2)
+                {
+                    v3Contral[0] = UnityEngine.Random.insideUnitSphere * floatContral[0] + (formPos + toPos) * 0.5f;
+                }
+            }
+            else
+            {
+                Debug.LogError("bezierInit(): v3Contral && floatContral == null");
+            }
+        }
+
+        //如果在平面内（z轴相同），控制点也要在该平面内
+        if (formPos.z == toPos.z)
+        {
+            v3Contral[0].z = formPos.z;
+            v3Contral[1].z = toPos.z;
+        }
+    }
+    /// <summary>
+    /// 贝塞尔专用算法
     /// </summary>
     Vector3 getBezierInterpolationV3(Vector3 oldValue, Vector3 aimValue)
     {
@@ -134,16 +179,14 @@ public class AnimData
         float n_finishingRate = (result.x - oldValue.x) / (aimValue.x - oldValue.x);
         n_finishingRate = Mathf.Clamp(n_finishingRate, -1, 2);
 
-        switch (bezierType)
+        switch (pathType)
         {
-            case BezierType.Bezier2: return Bezier2(oldValue, aimValue, n_finishingRate, BezierContral);
-            case BezierType.Bezier3: return Bezier3(oldValue, aimValue, n_finishingRate, BezierContral);
+            case PathType.Bezier2: return Bezier2(oldValue, aimValue, n_finishingRate, v3Contral);
+            case PathType.Bezier3: return Bezier3(oldValue, aimValue, n_finishingRate, v3Contral);
             default: return Vector3.zero;
         }
 
     }
-
-
 
     /// <summary>
     /// 二阶贝塞尔曲线函数
@@ -164,9 +207,31 @@ public class AnimData
     }
 
 
+
+    public void Init()
+    {
+        switch (animType)
+        {
+            case AnimType.UGUI_alpha: UguiAlphaInit(b_isChild); break;
+            case AnimType.UGUI_anchoredPosition: UguiPositionInit(); break;
+            case AnimType.SizeDetal: UguiPositionInit(); break;
+            case AnimType.Position: TransfromInit(); break;
+            case AnimType.LocalPosition: TransfromInit(); break;
+            case AnimType.LocalScale: TransfromInit(); break;
+        }
+
+        if (pathType != PathType.Line)
+        {
+            bezierInit();
+        }
+
+
+
+    }
+
     #region UGUI
 
-    RectTransform rectRransform;
+
 
     #region UGUI_alpha
 
@@ -241,13 +306,21 @@ public class AnimData
         }
     }
 
+
+
+    void SizeDelta()
+    {
+        if (rectRransform == null)
+        {
+            Debug.LogError(transform.name + "缺少RectTransform组件，不能进行sizeDelta变换！！");
+            return;
+        }
+        rectRransform.sizeDelta = getInterpolationV3(fromV2, toV2);
+    }
+
     #endregion
 
     #region UGUI_position
-
-    public Vector3 formPos;
-
-    public Vector3 toPos;
 
     public void UguiPositionInit()
     {
@@ -265,7 +338,7 @@ public class AnimData
     #endregion
 
     #region Transfrom
-    Transform transform;
+
 
     public void TransfromInit()
     {
@@ -289,19 +362,18 @@ public class AnimData
 
 
 
-    RectTransform rectTransform;
-    void SizeDelta()
-    {
-        rectTransform = transform.GetComponent<RectTransform>();
-        if (rectTransform == null)
-        {
-            Debug.LogError(transform.name + "缺少RectTransform组件，不能进行sizeDelta变换！！");
-            return;
-        }
-        rectTransform.sizeDelta = getInterpolationV3(formPos, toPos);
-    }
+
 
     #endregion
+
+    #region color
+    public Color fromColor;
+    public Color toColor;
+
+
+    #endregion
+
+
 
     #region 插值算法
 
