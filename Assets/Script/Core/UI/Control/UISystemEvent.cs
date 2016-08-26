@@ -3,17 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class UISystemEvent : MonoBehaviour 
+public class UISystemEvent 
 {
-    public static UISystemEvent s_instance;
-
-    public static Dictionary<UIEvent, UICallBack> m_allUIEvents = new Dictionary<UIEvent, UICallBack>();
-    public static Dictionary<string, Dictionary<UIEvent, UICallBack>> m_singleUIEvents = new Dictionary<string, Dictionary<UIEvent, UICallBack>>();
-
-    public void Awake()
-    {
-        s_instance = this;
-    }
+    public static Dictionary<UIEvent, UICallBack> s_allUIEvents = new Dictionary<UIEvent, UICallBack>();
+    public static Dictionary<string, Dictionary<UIEvent, UICallBack>> s_singleUIEvents = new Dictionary<string, Dictionary<UIEvent, UICallBack>>();
 
     /// <summary>
     /// 每个UI都会派发的事件
@@ -22,13 +15,13 @@ public class UISystemEvent : MonoBehaviour
     /// <param name="callback">回调函数</param>
     public static void RegisterAllUIEvent(UIEvent l_UIEvent, UICallBack l_CallBack)
     {
-        if (m_allUIEvents.ContainsKey(l_UIEvent))
+        if (s_allUIEvents.ContainsKey(l_UIEvent))
         {
-            m_allUIEvents[l_UIEvent] += l_CallBack;
+            s_allUIEvents[l_UIEvent] += l_CallBack;
         }
         else
         {
-            m_allUIEvents.Add(l_UIEvent,l_CallBack);
+            s_allUIEvents.Add(l_UIEvent,l_CallBack);
         }
     }
 
@@ -39,31 +32,31 @@ public class UISystemEvent : MonoBehaviour
     /// <param name="callback"回调函数></param>
     public static void RegisterEvent(string l_UIName,UIEvent l_UIEvent, UICallBack l_CallBack)
     {
-        if (m_singleUIEvents.ContainsKey(l_UIName))
+        if (s_singleUIEvents.ContainsKey(l_UIName))
         {
-            if (m_singleUIEvents[l_UIName].ContainsKey(l_UIEvent))
+            if (s_singleUIEvents[l_UIName].ContainsKey(l_UIEvent))
             {
-                m_singleUIEvents[l_UIName][l_UIEvent] += l_CallBack;
+                s_singleUIEvents[l_UIName][l_UIEvent] += l_CallBack;
             }
             else
             {
-                m_singleUIEvents[l_UIName].Add(l_UIEvent,l_CallBack);
+                s_singleUIEvents[l_UIName].Add(l_UIEvent,l_CallBack);
             }
         }
         else
         {
-            m_singleUIEvents.Add(l_UIName,new Dictionary<UIEvent,UICallBack>());
-            m_singleUIEvents[l_UIName].Add(l_UIEvent, l_CallBack);
+            s_singleUIEvents.Add(l_UIName,new Dictionary<UIEvent,UICallBack>());
+            s_singleUIEvents[l_UIName].Add(l_UIEvent, l_CallBack);
         }
     }
 
     public static void Dispatch(UIWindowBase l_UI, UIEvent l_UIEvent,params object[] l_objs)
     {
-        if (m_allUIEvents.ContainsKey(l_UIEvent))
+        if (s_allUIEvents.ContainsKey(l_UIEvent))
         {
             try
             {
-                m_allUIEvents[l_UIEvent](l_UI, l_objs);
+                s_allUIEvents[l_UIEvent](l_UI, l_objs);
             }
             catch(Exception e)
             {
@@ -71,13 +64,13 @@ public class UISystemEvent : MonoBehaviour
             }
         }
 
-        if (m_singleUIEvents.ContainsKey(l_UI.name))
+        if (s_singleUIEvents.ContainsKey(l_UI.name))
         {
-            if (m_singleUIEvents[l_UI.name].ContainsKey(l_UIEvent))
+            if (s_singleUIEvents[l_UI.name].ContainsKey(l_UIEvent))
             {
                 try
                 {
-                    m_singleUIEvents[l_UI.name][l_UIEvent](l_UI, l_objs);
+                    s_singleUIEvents[l_UI.name][l_UIEvent](l_UI, l_objs);
                 }
                 catch (Exception e)
                 {
@@ -86,17 +79,4 @@ public class UISystemEvent : MonoBehaviour
             }
         }
     }
-
-
-	// Use this for initialization
-	void Start () 
-    {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () 
-    {
-	
-	}
 }

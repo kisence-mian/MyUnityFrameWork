@@ -24,6 +24,7 @@ public class DataTable : Dictionary<string, SingleData>
     {
         try
         {
+            int lineIndex = 0;
             DataTable data = new DataTable();
             string[] line = stringData.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
 
@@ -38,21 +39,32 @@ public class DataTable : Dictionary<string, SingleData>
                 }
             }
 
-            //第二行作为默认值
-            data.defaultValue = new Dictionary<string, string>();
-            string[] rowDefaultValue = ConvertStringArray(line[1]);
-            for (int i = 0; i < rowDefaultValue.Length; i++)
+            string[] LineData;
+            for (lineIndex = 1;;lineIndex++)
             {
-                if (!rowDefaultValue[i].Equals(""))
+                LineData = ConvertStringArray(line[lineIndex]);
+
+                //注释忽略
+                if (LineData[0].Equals("note"))
                 {
-                    data.defaultValue.Add(data.TableKeys[i], rowDefaultValue[i]);
+                    //nothing
                 }
-            }
+                //默认值
+                else if (LineData[0].Equals("default"))
+                {
+                    AnalysisDefaultValue(data, LineData);
+                }
+                //数据正文
+                else
+                {
+                    break;
+                }
+            }    
 
             data.TableIDs = new List<string>();
 
-            //从第三行开始，解析数据
-            for (int i = 2; i < line.Length; i++)
+            //开始解析数据
+            for (int i = lineIndex; i < line.Length; i++)
             {
                 SingleData dataTmp = new SingleData();
                 dataTmp.data = data;
@@ -68,7 +80,6 @@ public class DataTable : Dictionary<string, SingleData>
 
                 //第一个数据作为这一个记录的Key
                 data.Add(row[0], dataTmp);
-
                 data.TableIDs.Add(row[0]);
             }
 
@@ -77,6 +88,19 @@ public class DataTable : Dictionary<string, SingleData>
         catch (Exception e)
         {
             throw new Exception("Analysis: Don't convert value to DataTable:" + "\n" + e.ToString()); // throw  
+        }
+    }
+
+    public static void AnalysisDefaultValue(DataTable l_data,string[] l_lineData)
+    {
+        l_data.defaultValue = new Dictionary<string, string>();
+
+        for (int i = 0; i < l_lineData.Length; i++)
+        {
+            if (!l_lineData[i].Equals(""))
+            {
+                l_data.defaultValue.Add(l_data.TableKeys[i], l_lineData[i]);
+            }
         }
     }
     public static string Serialize(DataTable data)

@@ -12,11 +12,23 @@ public class ApplicationManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 请把游戏初始化逻辑放在此处
+    /// 程序启动
     /// </summary>
-    void GameStart()
+    public void AppLaunch()
     {
+        SetResourceLoadType();            //设置资源加载类型
+        Log.Init();                       //日志系统启动
+        ApplicationStatusManager.Init();  //游戏流程初始化
 
+        if (m_AppMode != AppMode.Release)
+        {
+            GUIConsole.Init();                                     //运行时Debug开启
+            ApplicationStatusManager.EnterTestModel<GameStatus>(); //可以从此处进入测试流程
+        }
+        else
+        {
+            ApplicationStatusManager.EnterStatus<GameStatus>();
+        }
     }
 
     #region 程序生命周期事件派发
@@ -69,44 +81,6 @@ public class ApplicationManager : MonoBehaviour
             ResourceManager.gameLoadType = ResLoadType.HotUpdate;
         }
     }
-
-    /// <summary>
-    /// 程序启动
-    /// </summary>
-    public void AppLaunch()
-    {
-        SetResourceLoadType();
-        Log.Init(); //日志系统启动
-
-        if(m_AppMode != AppMode.Release)
-        {
-            GUIConsole.Init();
-        }
-
-        //等待热更新
-        HotUpdate();
-    }
-
-    /// <summary>
-    /// 资源热更新
-    /// </summary>
-    public void HotUpdate()
-    {
-        CompleteHotUpdate();
-    }
-
-    /// <summary>
-    /// 热更新完毕再调用这个方法
-    /// </summary>
-    public void CompleteHotUpdate()
-    {
-        BundleConfigManager.Initialize();
-        UIManager.Init();
-
-        //游戏开始逻辑放在此处
-        GameStart();
-    }
-
     #endregion
 }
 
