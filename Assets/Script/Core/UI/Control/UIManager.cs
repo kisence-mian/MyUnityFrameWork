@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-[RequireComponent(typeof(UISystemEvent))]
+//[RequireComponent(typeof(UISystemEvent))]
 [RequireComponent(typeof(UILayerManager))]
 [RequireComponent(typeof(UIAnimManager))]
 public class UIManager : MonoBehaviour

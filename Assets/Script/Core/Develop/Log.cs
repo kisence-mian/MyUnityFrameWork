@@ -32,12 +32,12 @@ public class Log
 
     static void UnityLogCallBack(string log, string track, LogType type)
     {
-        LogInfo l_logInfo = new LogInfo
-        {
-            m_logContent = log,
-            m_logTrack = track,
-            m_logType = type
-        };
+        //LogInfo l_logInfo = new LogInfo
+        //{
+        //    m_logContent = log,
+        //    m_logTrack = track,
+        //    m_logType = type
+        //};
     }
 }
 

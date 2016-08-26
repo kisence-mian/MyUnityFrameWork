@@ -52,7 +52,10 @@ public class GUIConsole
     static Vector2 scrollPos;
     static bool scrollToBottom = true;
     static bool collapse;
-    static bool mTouching = false;
+
+    #if UNITY_ANDROID || UNITY_IOS
+        static bool mTouching = false;
+    #endif
 
     const int margin = 20;
     static Rect windowRect = new Rect(margin + Screen.width * 0.5f, margin, Screen.width * 0.5f - (2 * margin), Screen.height - (2 * margin));
@@ -65,7 +68,10 @@ public class GUIConsole
     public static void Init()
     {
         fpsCounter = new FPSCounter();
+        fpsCounter.Init();
         memoryDetector = new MemoryDetector();
+        memoryDetector.Init();
+
         //        this.showGUI = App.Instance().showLogOnGUI;
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationOnGUI += OnGUI;
@@ -125,7 +131,7 @@ public class GUIConsole
         if (scrollToBottom)
         {
             GUILayout.BeginScrollView(Vector2.up * entries.Count * 100.0f);
-        }
+        } 
         else
         {
             scrollPos = GUILayout.BeginScrollView(scrollPos);

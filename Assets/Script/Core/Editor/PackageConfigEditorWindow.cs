@@ -1248,6 +1248,7 @@ public class PackageConfigEditorWindow : EditorWindow
         }
     }
 
+#pragma warning disable
     IEnumerator Package()
     {
         //自动保存设置文件

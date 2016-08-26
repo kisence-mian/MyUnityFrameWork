@@ -15,11 +15,16 @@ using System.Collections;
 		// 显示帧率
 		private int fps = 0;
 
-		public FPSCounter()
-		{
+        //public FPSCounter()
+        //{
+
+        //}
+
+        public void Init()
+        {
             GUIConsole.onUpdateCallback += Update;
             GUIConsole.onGUICallback += OnGUI;
-		}
+        }
 
 		void Start()
 		{
@@ -44,5 +49,6 @@ using System.Collections;
 		void OnGUI()
 		{
 			GUI.color = Color.black;
-			GUI.Label(new Rect(80, 20, 120, 20),"fps:" + this.fps.ToString());		}
+			GUI.Label(new Rect(80, 20, 120, 20),"fps:" + this.fps.ToString());		
+        }
 	}
