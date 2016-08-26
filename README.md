@@ -4,7 +4,7 @@
 　　1.快速配置开发模式和发布模式  
   　　2.支持快速定位到某一个游戏流程（某游戏场景，结算界面等），方便测试  
   　　3.游戏逻辑入口从某一个游戏流程开始  
-  　　　　　(创建一个流程继承IGameStatus,例如MainMenuStatus,然后再ApplicationManager中选择它作为第一个流程)
+  　　　(创建一个流程继承IGameStatus,例如MainMenuStatus,然后再ApplicationManager中选择它作为第一个流程)
 
 ##资源加载
 　　1.可视化依赖包管理工具，打包进度可视，不再干等着了  
