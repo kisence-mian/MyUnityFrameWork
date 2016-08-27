@@ -22,6 +22,9 @@ public class PackageConfigEditorWindow : EditorWindow
     //所有普通包
     List<EditPackageConfig> bundles      = new List<EditPackageConfig>();
 
+    //所有普通包的层级信息
+    PathPoint allBundlesLayerInfo;
+
     #region 初始化
 
     void OnEnable()
@@ -31,6 +34,8 @@ public class PackageConfigEditorWindow : EditorWindow
         LoadAndAnalysisJson();
         AnalysisVersionFile();
         UpdateRelyPackageNames();
+
+        ArrangeBundlesByLayer();
     }
 
     #endregion
@@ -38,6 +43,7 @@ public class PackageConfigEditorWindow : EditorWindow
     #region GUI
 
     int RelyMaskFilter = -1; //依赖包过滤器
+    string bundleQuery = ""; //查询内容
 
     bool isFoldRelyPackages = true; //是否展开依赖包
     bool isFoldBundles      = true; //是否展开普通包
@@ -68,7 +74,7 @@ public class PackageConfigEditorWindow : EditorWindow
         EditorGUILayout.LabelField("过滤器：");
 
         RelyMaskFilter = EditorGUILayout.MaskField(RelyMaskFilter, RelyPackageNames);
-
+        bundleQuery    = EditorGUILayout.TextField("", bundleQuery);
         EditorGUILayout.EndHorizontal();
 
         scrollPos = GUILayout.BeginScrollView(scrollPos);
@@ -219,8 +225,8 @@ public class PackageConfigEditorWindow : EditorWindow
 
         EditorGUILayout.Space();
         EditorGUI.indentLevel = 1;
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Button:");
+        //EditorGUILayout.BeginHorizontal();
+        //EditorGUILayout.LabelField("Button:");
 
         if (GUILayout.Button("增加一个依赖包"))
         {
@@ -229,7 +235,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
             relyPackages.Add(EditPackageConfigTmp);
         }
-        EditorGUILayout.EndHorizontal();
+        //EditorGUILayout.EndHorizontal();
     }
 
     void ObjectListView(EditPackageConfig pack)
@@ -297,85 +303,29 @@ public class PackageConfigEditorWindow : EditorWindow
     //Bundle包视图
     void BundlesView()
     {
-        for (int i = 0; i < bundles.Count; i++)
+        if(RelyMaskFilter == -1 && bundleQuery == "")
         {
-            if (!GetIsShowByRelyMask(bundles[i]))
-            {
-                continue;
-            }
-
-            //折叠标签
-            EditorGUI.indentLevel = 2;
-            EditorGUILayout.BeginHorizontal();
-            bundles[i].isFold = EditorGUILayout.Foldout(bundles[i].isFold, bundles[i].name);
-
-            //删除视图
-            if (GUILayout.Button("删除"))
-            {
-                bundles.RemoveAt(i);
-                continue;
-            }
-            EditorGUILayout.EndHorizontal();
-
-            //内容
-            EditorGUI.indentLevel = 3;
-            if (bundles[i].isFold)
-            {
-                //名称
-                EditorGUI.indentLevel = 4;
-                if (bundles[i].mainObject != null 
-                    &&bundles[i].mainObject.obj!= null)
-                {
-                    bundles[i].name = bundles[i].mainObject.obj.name;
-                }
-                else
-                {
-                    bundles[i].name = "Null";
-                }
-
-                //主资源
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("主资源:");
-                EditorGUILayout.ObjectField(bundles[i].mainObject.obj, typeof(Object),false);
-                EditorGUILayout.EndHorizontal();
-
-                //依赖包
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("依赖包:");
-                bundles[i].relyPackagesMask = EditorGUILayout.MaskField(bundles[i].relyPackagesMask, RelyPackageNames);
-                EditorGUILayout.EndHorizontal();
-
-                //Debug.Log(" bundles[i].relyPackagesMask:  " + bundles[i].relyPackagesMask);
-
-                //加载路径
-                EditorGUILayout.LabelField("路径: ", bundles[i].path);
-                bundles[i].isFold_objects = EditorGUILayout.Foldout(bundles[i].isFold_objects, "Objects");
-
-                //子资源视图
-                EditorGUI.indentLevel = 5;
-                if (bundles[i].isFold_objects)
-                {
-                    ObjectListView(bundles[i]);
-                }
-            }
-            EditorGUI.indentLevel = 2;
-            //消息视图
-            MessageView(bundles[i]);
+            showBundlesByLayer(bundles);
+        }
+        else
+        {
+            ShowBundleBuMaskFilter();
         }
 
         EditorGUILayout.Space();
 
         //按钮
         EditorGUI.indentLevel = 1;
-        EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("Button:");
+        //EditorGUILayout.BeginHorizontal();
+        //EditorGUILayout.LabelField("Button:");
 
-        if (GUILayout.Button("自动添加所有Resource目录下的资源"))
+        if (GUILayout.Button("自动添加 Resource 目录下的资源"))
         {
             AddAllResourceBundle();
+            ArrangeBundlesByLayer();
         }
 
-        if (GUILayout.Button("增加选中bundle包"))
+        if (GUILayout.Button("增加选中资源"))
         {
             //获取选中的资源
             Object[] selects = Selection.GetFiltered(typeof(Object), SelectionMode.DeepAssets);
@@ -391,8 +341,18 @@ public class PackageConfigEditorWindow : EditorWindow
             {
                 Debug.Log("未选中任何资源！");
             }
+            ArrangeBundlesByLayer();
         }
-        EditorGUILayout.EndHorizontal();
+
+        if (GUILayout.Button("删除全部资源路径数据"))
+        {
+            if (EditorUtility.DisplayDialog("警告", "确定删除所有的资源路径数据？", "是", "否"))
+            {
+                bundles.Clear();
+                ArrangeBundlesByLayer();
+            }
+        }
+        //EditorGUILayout.EndHorizontal();
     }
 
     void ShowMessage(string msg)
@@ -414,6 +374,260 @@ public class PackageConfigEditorWindow : EditorWindow
         progress = 0;
         progressContent = "";
     }
+
+
+    #region 显示Bundle包
+
+    bool b_ok = true;
+    //功能入口
+    private void showBundlesByLayer(List<EditPackageConfig> bundles)
+    {
+        if (b_ok)
+        {
+            b_ok = false;
+            ArrangeBundlesByLayer();
+        }
+        ShowBundlesByFolder(allBundlesLayerInfo, 1);
+    }
+
+    //整理资源路径
+    private void ArrangeBundlesByLayer()
+    {
+        allBundlesLayerInfo = new PathPoint();
+        allBundlesLayerInfo.s_nowPathPoint = "Resourse";
+        allBundlesLayerInfo.lastPathPoint = null;
+        allBundlesLayerInfo.nextPathPoint = new Dictionary<string, PathPoint>();
+        allBundlesLayerInfo.bundles = null;
+
+        for (int i = 0; i < bundles.Count; i++)
+        {
+            EditPackageConfig nowBundle = bundles[i];
+            string s_bundlePath = nowBundle.path;
+            string[] t_pathPoints = s_bundlePath.Split('/');
+            int n_nowPoints = 0;
+
+            PathPoint endPathPoint = allBundlesLayerInfo;
+            while (n_nowPoints < t_pathPoints.Length - 1)
+            {
+                //如果下一个节点中没有需要的节点
+                if (endPathPoint.nextPathPoint.ContainsKey(t_pathPoints[n_nowPoints]) == false)
+                {
+                    PathPoint nextPoint = new PathPoint();
+                    nextPoint.s_nowPathPoint = t_pathPoints[n_nowPoints];
+                    nextPoint.lastPathPoint = endPathPoint;
+                    nextPoint.nextPathPoint = new Dictionary<string, PathPoint>();
+
+                    endPathPoint.nextPathPoint.Add(t_pathPoints[n_nowPoints], nextPoint);
+
+                    endPathPoint = nextPoint;
+                }
+                else
+                {
+                    endPathPoint = endPathPoint.nextPathPoint[t_pathPoints[n_nowPoints]];
+                }
+                n_nowPoints++;
+            };
+
+            if (endPathPoint.bundles == null)
+            {
+                endPathPoint.bundles = new List<EditPackageConfig>();
+            }
+            endPathPoint.bundles.Add(nowBundle);
+        }
+    }
+
+
+
+    //显示到界面上
+    private void ShowBundlesByFolder(PathPoint pathPoint, int n_level)
+    {
+        if (pathPoint.s_nowPathPoint != null)
+        {
+            if (pathPoint.nextPathPoint != null)
+            {
+                foreach (var nextPathPoint in pathPoint.nextPathPoint)
+                {
+                    ShowSubFolderBundle(nextPathPoint.Value, (n_level));
+                }
+            }
+
+            if (pathPoint.bundles != null)
+            {
+                for (int i = 0; i < pathPoint.bundles.Count; i++)
+                {
+                    EditPackageConfig bundle = pathPoint.bundles[i];
+
+                    //bundle节点
+                    EditorGUI.indentLevel = n_level;
+                    EditorGUILayout.BeginHorizontal();
+                    bundle.isFold = EditorGUILayout.Foldout(bundle.isFold, bundle.name);
+                    //删除视图
+                    if (GUILayout.Button("删除"))
+                    {
+                        bundles.Remove(bundle);
+                        pathPoint.bundles.Remove(bundle);
+                        continue;
+                    }
+                    EditorGUILayout.EndHorizontal();
+
+                    if (bundle.isFold)
+                    {
+                        ShowSingleBundleGUI(bundle, n_level);
+                    }
+
+                    EditorGUI.indentLevel = n_level + 1;
+                    //消息视图
+                    MessageView(bundle);
+
+                }
+
+            }
+        }
+    }
+
+    /// <summary>
+    /// 显示Resource子Resources的子目录和子文件
+    /// </summary>
+    /// <param name="pathPoint"></param>
+    /// <param name="n_level"></param>
+    void ShowSubFolderBundle(PathPoint pathPoint, int n_level)
+    {
+        if (pathPoint.s_nowPathPoint != null)
+        {
+            //文件夹节点
+            EditorGUI.indentLevel = n_level;
+            pathPoint.isFold = EditorGUILayout.Foldout(pathPoint.isFold, "<folder> " + pathPoint.s_nowPathPoint);
+
+            if (pathPoint.isFold)
+            {
+                if (pathPoint.nextPathPoint != null)
+                {
+                    foreach (var nextPathPoint in pathPoint.nextPathPoint)
+                    {
+                        ShowSubFolderBundle(nextPathPoint.Value, (n_level + 1));
+                    }
+                }
+
+                if (pathPoint.bundles != null)
+                {
+                    for (int i = 0; i < pathPoint.bundles.Count; i++)
+                    {
+                        EditPackageConfig bundle = pathPoint.bundles[i];
+
+                        //bundle节点
+                        EditorGUI.indentLevel = n_level + 1;
+                        EditorGUILayout.BeginHorizontal();
+                        bundle.isFold = EditorGUILayout.Foldout(bundle.isFold, bundle.name);
+                        //删除视图
+                        if (GUILayout.Button("删除"))
+                        {
+                            bundles.Remove(bundle);
+                            pathPoint.bundles.Remove(bundle);
+                            continue;
+                        }
+                        EditorGUILayout.EndHorizontal();
+
+                        if (bundle.isFold)
+                        {
+                            ShowSingleBundleGUI(bundle, n_level + 1);
+                        }
+
+                        EditorGUI.indentLevel = n_level + 2;
+                        //消息视图
+                        MessageView(bundle);
+
+                    }
+
+                }
+            }
+        }
+    }
+
+    void ShowBundleBuMaskFilter()
+    {
+        for (int i = 0; i < bundles.Count; i++)
+        {
+            if (
+                !
+                (GetIsShowByRelyMask(bundles[i])
+                && GetIsFitsBundleQuery(bundles[i]))
+                )
+            {
+                continue;
+            }
+
+            //折叠标签
+            EditorGUI.indentLevel = 2;
+            EditorGUILayout.BeginHorizontal();
+            bundles[i].isFold = EditorGUILayout.Foldout(bundles[i].isFold, bundles[i].name);
+
+            //删除视图
+            if (GUILayout.Button("删除"))
+            {
+                bundles.RemoveAt(i);
+                ArrangeBundlesByLayer();
+                continue;
+            }
+            EditorGUILayout.EndHorizontal();
+
+            //内容
+            EditorGUI.indentLevel = 3;
+            if (bundles[i].isFold)
+            {
+                ShowSingleBundleGUI(bundles[i],4);
+            }
+            EditorGUI.indentLevel = 2;
+            //消息视图
+            MessageView(bundles[i]);
+        }
+    }
+
+    void ShowSingleBundleGUI(EditPackageConfig bundle, int l_foldIndex)
+    {
+        EditorGUILayout.BeginVertical();
+        EditorGUI.indentLevel = l_foldIndex + 1;
+
+        if (bundle.mainObject != null
+            && bundle.mainObject.obj != null)
+        {
+            bundle.name = bundle.mainObject.obj.name;
+        }
+        else
+        {
+            bundle.name = "Null";
+        }
+
+        //主资源
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("主资源:");
+        EditorGUILayout.ObjectField(bundle.mainObject.obj, typeof(Object), false);
+        EditorGUILayout.EndHorizontal();
+
+        //依赖包
+        EditorGUILayout.BeginHorizontal();
+        EditorGUILayout.LabelField("依赖包:");
+        bundle.relyPackagesMask = EditorGUILayout.MaskField(bundle.relyPackagesMask, RelyPackageNames);
+        EditorGUILayout.EndHorizontal();
+
+        //Debug.Log(" bundles[i].relyPackagesMask:  " + bundles[i].relyPackagesMask);
+
+        //加载路径
+        EditorGUILayout.LabelField("路径: ", bundle.path);
+        bundle.isFold_objects = EditorGUILayout.Foldout(bundle.isFold_objects, "Objects");
+
+        //子资源视图
+        EditorGUI.indentLevel = l_foldIndex + 2;
+        if (bundle.isFold_objects)
+        {
+            ObjectListView(bundle);
+        }
+
+        EditorGUILayout.EndVertical();
+
+        //}
+
+    }
+    #endregion
 
 
     #endregion
@@ -608,6 +822,18 @@ public class PackageConfigEditorWindow : EditorWindow
         {
             return false;
         }
+    }
+
+    bool GetIsFitsBundleQuery(EditPackageConfig package)
+    {
+        if(bundleQuery == "")
+        {
+            return true;
+        }
+
+        //大小写不敏感
+        string nameLower = package.name.ToLower();
+        return nameLower.Contains(bundleQuery.ToLower());
     }
 
     //自定义TosString()方法
@@ -1463,6 +1689,8 @@ public class PackageConfigEditorWindow : EditorWindow
     }
     #endregion
 
+
+   
 }
 
 public class EditPackageConfig
@@ -1488,4 +1716,15 @@ public class EditorObject
     [System.NonSerialized]
     public Object obj;
     public string path;
+}
+
+
+public class PathPoint
+{
+    public bool isFold = false;
+    public string s_nowPathPoint;
+    public PathPoint lastPathPoint;
+    public Dictionary<string, PathPoint> nextPathPoint;
+    public List<EditPackageConfig> bundles;
+
 }

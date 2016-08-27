@@ -7,7 +7,7 @@ public class UILayerManager : MonoBehaviour
     public Transform m_FixedLayerParent;
     public Transform m_NormalLayerParent;
     public Transform m_TopbarLayerParent;
-    public Transform m_popUpLayerParent;
+    public Transform m_PopUpLayerParent;
 
     public void Awake()
     {
@@ -31,7 +31,7 @@ public class UILayerManager : MonoBehaviour
             Debug.LogError("UILayerManager :TopbarLayerParent is null!");
         }
 
-        if (m_popUpLayerParent == null)
+        if (m_PopUpLayerParent == null)
         {
             Debug.LogError("UILayerManager :popUpLayerParent is null!");
         }
@@ -49,7 +49,7 @@ public class UILayerManager : MonoBehaviour
             case UIType.Fixed: l_ui.transform.SetParent(m_FixedLayerParent); break;
             case UIType.Normal: l_ui.transform.SetParent(m_NormalLayerParent); break;
             case UIType.TopBar: l_ui.transform.SetParent(m_TopbarLayerParent); break;
-            case UIType.PopUp: l_ui.transform.SetParent(m_popUpLayerParent); break;
+            case UIType.PopUp: l_ui.transform.SetParent(m_PopUpLayerParent); break;
         }
     }
 }
