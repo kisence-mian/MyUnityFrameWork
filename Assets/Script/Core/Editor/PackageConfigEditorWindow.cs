@@ -1689,8 +1689,6 @@ public class PackageConfigEditorWindow : EditorWindow
     }
     #endregion
 
-
-   
 }
 
 public class EditPackageConfig

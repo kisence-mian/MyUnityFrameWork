@@ -5,6 +5,7 @@ using System;
 public class ApplicationManager : MonoBehaviour 
 {
     public AppMode m_AppMode = AppMode.Developing;
+    public enum Status { };
 
     public void Awake()
     {
@@ -23,11 +24,11 @@ public class ApplicationManager : MonoBehaviour
         if (m_AppMode != AppMode.Release)
         {
             GUIConsole.Init();                                     //运行时Debug开启
-            ApplicationStatusManager.EnterTestModel<GameStatus>(); //可以从此处进入测试流程
+            //ApplicationStatusManager.EnterTestModel<FirstStatus.>(); //可以从此处进入测试流程
         }
         else
         {
-            ApplicationStatusManager.EnterStatus<GameStatus>();
+            //ApplicationStatusManager.EnterStatus<FirstStatus>();
         }
     }
 

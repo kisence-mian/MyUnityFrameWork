@@ -92,6 +92,7 @@ public class UIManager : MonoBehaviour
     {
         UISystemEvent.Dispatch(l_UI, UIEvent.OnDestroy);  //派发OnDestroy事件
         l_UI.OnDestroy();
+        l_UI.RemoveAllEvent();
         Destroy(l_UI.gameObject);
     }
 
