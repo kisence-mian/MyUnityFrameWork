@@ -1,12 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public class RuntimeTest : MonoBehaviour 
 {
 	// Use this for initialization
 	void Start ()
     {
-
+        Type tmp = Type.GetType("UIManager");
+        
+        Debug.Log("Type:" + tmp);
 	}
 	
 	// Update is called once per frame

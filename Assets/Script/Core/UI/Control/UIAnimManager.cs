@@ -8,7 +8,7 @@ public class UIAnimManager : MonoBehaviour
     public void StartEnterAnim(UIWindowBase l_UIbase, UICallBack callBack, params object[] objs)
     {
         UISystemEvent.Dispatch(l_UIbase, UIEvent.OnStartEnterAnim);
-        l_UIbase.EnterAnim(EndEnterAnim, callBack, objs);
+        StartCoroutine(l_UIbase.EnterAnim(EndEnterAnim, callBack, objs));
     }
 
     //进入动画播放完毕回调
@@ -34,7 +34,7 @@ public class UIAnimManager : MonoBehaviour
     public void StartExitAnim(UIWindowBase l_UIbase, UICallBack callBack, params object[] objs)
     {
         UISystemEvent.Dispatch(l_UIbase, UIEvent.OnStartExitAnim);
-        l_UIbase.ExitAnim(EndExitAnim, callBack, objs);
+        StartCoroutine(l_UIbase.ExitAnim(EndExitAnim, callBack, objs));
     }
 
     //退出动画播放完毕回调

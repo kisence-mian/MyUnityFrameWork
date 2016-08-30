@@ -53,9 +53,9 @@ public class GUIConsole
     static bool scrollToBottom = true;
     static bool collapse;
 
-    #if UNITY_ANDROID || UNITY_IOS
+#if !UNITY_EDITOR&&UNITY_ANDROID || UNITY_IOS
         static bool mTouching = false;
-    #endif
+#endif
 
     const int margin = 20;
     static Rect windowRect = new Rect(margin + Screen.width * 0.5f, margin, Screen.width * 0.5f - (2 * margin), Screen.height - (2 * margin));

@@ -2,10 +2,11 @@
 using System.Collections;
 using UnityEditor;
 using UnityEngine.UI;
+using System;
+using System.Reflection;
 public class UIEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
-
 
     [MenuItem("Window/UI编辑器工具")]
     public static void ShowWindow()
@@ -21,6 +22,8 @@ public class UIEditorWindow : EditorWindow
         {
             m_UILayerManager = uiManager.GetComponent<UILayerManager>();
         }
+
+        AnalysisStyleData();
     }
 
     void OnGUI()
@@ -68,7 +71,8 @@ public class UIEditorWindow : EditorWindow
         //UIManager
         GameObject l_UIManagerGo = new GameObject("UIManager");
         l_UIManagerGo.layer = LayerMask.NameToLayer("UI");
-        UIManager l_UIManager = l_UIManagerGo.AddComponent<UIManager>();
+        //UIManager l_UIManager = l_UIManagerGo.AddComponent<UIManager>();
+        l_UIManagerGo.AddComponent<UIManager>();
 
         //UIcamera
         GameObject l_cameraGo = new GameObject("UICamera");
@@ -160,6 +164,14 @@ public class UIEditorWindow : EditorWindow
         l_rtTmp.anchoredPosition3D = Vector3.zero;
         l_rtTmp.sizeDelta = Vector2.zero;
         l_layerTmp.m_PopUpLayerParent = l_goTmp.transform;
+        m_UILayerManager = l_layerTmp;
+
+        ProjectWindowUtil.ShowCreatedAsset(l_UIManagerGo);
+
+        string Path = "Resources/UI/UIManager.prefab";
+        FileTool.CreatFilePath(Application.dataPath +"/"+ Path);
+        PrefabUtility.CreatePrefab("Assets/" + Path, l_UIManagerGo, ReplacePrefabOptions.ConnectToPrefab);
+        
     }
 
     #endregion
@@ -177,27 +189,50 @@ public class UIEditorWindow : EditorWindow
         if (isFoldCreateUI)
         {
             EditorGUI.indentLevel = 1;
-            m_UIname = EditorGUILayout.TextField("UIname:", m_UIname);
-            m_UIType = (UIType)EditorGUILayout.EnumPopup("UIType:", m_UIType);
-
-            if (GUILayout.Button("创建UI"))
+            EditorGUILayout.LabelField("提示： 脚本和 UI 名称会自动添加Window后缀");
+            m_UIname = EditorGUILayout.TextField("UI Name:", m_UIname);
+            m_UIType = (UIType)EditorGUILayout.EnumPopup("UI Type:", m_UIType);
+            isAutoCreatePrefab = EditorGUILayout.Toggle("自动生成 Prefab",isAutoCreatePrefab);
+            if (m_UIname != "")
             {
-                if (m_UIname != "")
+                string l_nameTmp = m_UIname + "Window";
+                Type l_typeTmp = EditorTool.GetType(l_nameTmp);
+                if (l_typeTmp != null)
                 {
-                    CreatUI(m_UIname, m_UIType);
-                    m_UIname = "";
+                    if(l_typeTmp.BaseType.Equals(typeof(UIWindowBase)))
+                    {
+                        if (GUILayout.Button("创建UI"))
+                        {
+                            CreatUI(l_nameTmp, m_UIType);
+                            m_UIname = "";
+                        }
+                    }
+                    else
+                    {
+                        EditorGUILayout.LabelField("该类没有继承UIWindowBase");
+                    }
                 }
                 else
                 {
-                    EditorUtility.DisplayDialog("错误","UI名不能为空！","好的");
+                    if (GUILayout.Button("创建UI脚本"))
+                    {
+                        CreatUIScript(l_nameTmp);
+                    }
                 }
             }
         }
     }
 
+    bool isAutoCreatePrefab = true;
     void CreatUI(string l_UIWindowName, UIType l_UIType)
     {
         GameObject l_uiGo = new GameObject(l_UIWindowName);
+
+        Type type = EditorTool.GetType(l_UIWindowName);
+        UIWindowBase l_uiBaseTmp = l_uiGo.AddComponent(type) as UIWindowBase;
+
+        l_uiBaseTmp.m_UIType = l_UIType;
+
         l_uiGo.AddComponent<Canvas>();
         l_uiGo.AddComponent<GraphicRaycaster>();
 
@@ -220,14 +255,37 @@ public class UIEditorWindow : EditorWindow
         l_root.anchorMin = Vector2.zero;
         l_root.anchorMax = Vector2.one;
 
+        l_uiBaseTmp.m_bgMask = l_BgGo;
+        l_uiBaseTmp.m_uiRoot = l_rootGo;
 
         if(m_UILayerManager)
         {
-            m_UILayerManager.SetLayer(new UIWindowBase());
+            m_UILayerManager.SetLayer(l_uiBaseTmp);
         }
+
+        if (isAutoCreatePrefab)
+        {
+            string Path = "Resources/UI/" + l_UIWindowName + "/" + l_UIWindowName + ".prefab";
+            FileTool.CreatFilePath(Application.dataPath + "/" + Path);
+            PrefabUtility.CreatePrefab("Assets/" + Path, l_uiGo, ReplacePrefabOptions.ConnectToPrefab);
+        }
+
+        ProjectWindowUtil.ShowCreatedAsset(l_uiGo);
+    }
+
+    void CreatUIScript(string l_UIWindowName)
+    {
+        string LoadPath = Application.dataPath + "/Script/Core/Editor/res/UIWindowClassTemplate.txt";
+        string SavePath = Application.dataPath + "/Script/UI/" + l_UIWindowName + "/" + l_UIWindowName + ".cs";
+
+        string l_UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
+        string l_classContent = l_UItemplate.Replace("{0}", l_UIWindowName);
+
+        ResourceIOTool.WriteStringByFile(SavePath , l_classContent);
+
+        AssetDatabase.Refresh();
     }
     #endregion
-
 
     #region UIStyle
 
@@ -239,11 +297,19 @@ public class UIEditorWindow : EditorWindow
         if (isFoldUIStyle)
         {
             EditorGUI.indentLevel = 1;
-            if (GUILayout.Button("创建UI Style"))
+            if (GUILayout.Button("以当前UI 生成Style"))
             {
                 CreateUIStyle();
             }
         }
+    }
+
+    void ShowStyleGUI()
+    {
+        //for()
+        //{
+
+        //}
     }
 
 
@@ -251,5 +317,14 @@ public class UIEditorWindow : EditorWindow
     {
 
     }
+
+    public void AnalysisStyleData()
+    {
+
+    }
+
+
     #endregion
 }
+
+
