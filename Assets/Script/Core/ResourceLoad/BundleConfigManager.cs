@@ -1,21 +1,26 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public static class BundleConfigManager 
 {
     public static string configFileName = "BundleConfig";
 
-    public static string key_relyBundle = "relyBundles";
+    public static string key_relyBundle   = "relyBundles";
     public static string key_bundles      = "AssetsBundles";
 
-    static Dictionary<string, BundleConfig> relyBundleConfigs = new Dictionary<string, BundleConfig>();
-    static Dictionary<string, BundleConfig> bundleConfigs = new Dictionary<string, BundleConfig>();
-
+    static Dictionary<string, BundleConfig> relyBundleConfigs;
+    static Dictionary<string, BundleConfig> bundleConfigs ;
 
     public static void Initialize()
     {
         Dictionary<string, object> data = ConfigManager.GetData(configFileName);
+
+        if (data == null)
+        {
+            throw new Exception("BundleConfigManager Initialize Exception: " + configFileName + "file is not exits");
+        }
 
         relyBundleConfigs = JsonTool.Json2Dictionary<BundleConfig>(data[key_relyBundle].ToString());
         bundleConfigs     = JsonTool.Json2Dictionary<BundleConfig>(data[key_bundles   ].ToString());
@@ -23,25 +28,35 @@ public static class BundleConfigManager
 
     public static BundleConfig GetBundleConfig(string bundleName)
     {
-        if (bundleConfigs.ContainsKey(bundleName) )
+        if (bundleConfigs == null)
+        {
+            throw new Exception("BundleConfigManager GetBundleConfig Exception: bundleConfigs is null  do you Initialize?");
+        }
+
+        if (bundleConfigs.ContainsKey(bundleName))
         {
             return bundleConfigs[bundleName];
         }
         else
         {
-            return null;
+            throw new Exception("BundleConfigManager GetBundleConfig Exception: Dont find " + bundleName + " please check BundleConfig!");
         }
     }
 
     public static BundleConfig GetRelyBundleConfig(string bundleName)
     {
+        if (relyBundleConfigs == null)
+        {
+            throw new Exception("BundleConfigManager GetRelyBundleConfig Exception: relyBundleConfigs is null do you Initialize?");
+        }
+
         if (relyBundleConfigs.ContainsKey(bundleName))
         {
             return relyBundleConfigs[bundleName];
         }
         else
         {
-            return null;
+            throw new Exception("BundleConfigManager GetRelyBundleConfig Exception: Dont find " + bundleName + " please check BundleConfig!");
         }
     }
 }
