@@ -8,7 +8,7 @@ public class UIEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
 
-    [MenuItem("Window/UI编辑器工具")]
+    [MenuItem("Window/UI/UI编辑器工具")]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(UIEditorWindow));

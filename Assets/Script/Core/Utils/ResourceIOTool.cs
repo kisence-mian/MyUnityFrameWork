@@ -40,7 +40,6 @@ public class ResourceIOTool :MonoBehaviour
             }
 
             StreamReader sr = File.OpenText(path);
-
             line.Append(sr.ReadToEnd());
 
             sr.Close();

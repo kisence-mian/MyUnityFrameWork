@@ -62,4 +62,11 @@ public class FileTool
             return name;
         }
     }
+
+    //取出一个路径下的文件名
+    public static string GetFileNameByPath(string path)
+    {
+        FileInfo fi = new FileInfo(path);
+        return fi.Name; // text.txt
+    }
 }

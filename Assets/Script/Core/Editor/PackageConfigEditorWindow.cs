@@ -31,6 +31,7 @@ public class PackageConfigEditorWindow : EditorWindow
     {
         //Debug.Log("初始化");
 
+
         LoadAndAnalysisJson();
         AnalysisVersionFile();
         UpdateRelyPackageNames();
@@ -52,9 +53,6 @@ public class PackageConfigEditorWindow : EditorWindow
 
     string[] RelyPackageNames = new string[1];
 
-    GUIStyle errorMsg = new GUIStyle();
-    GUIStyle warnMsg  = new GUIStyle();
-
     bool isProgress        = false;
     float progress         = 0;
     string progressContent = "";
@@ -62,12 +60,12 @@ public class PackageConfigEditorWindow : EditorWindow
     bool isContent = false;
     string messageContent = "";
 
+    int ButtonWidth = 100;
+
     void OnGUI()
     {
         titleContent.text = "打包设置编辑器";
 
-        errorMsg.normal.textColor = Color.red;
-        warnMsg.normal.textColor = Color.yellow;
         UpdateRelyPackageNames();
 
         EditorGUILayout.BeginHorizontal();
@@ -98,6 +96,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
         GUILayout.EndScrollView();
 
+        EditorGUI.indentLevel = 0;
         GUILayout.BeginHorizontal();
 
         checkMaterial = EditorGUILayout.Toggle("检查材质球和贴图", checkMaterial);
@@ -248,7 +247,7 @@ public class PackageConfigEditorWindow : EditorWindow
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.ObjectField(pack.objects[j].obj,typeof(Object),false);
 
-            if (GUILayout.Button("删除"))
+            if (GUILayout.Button("删除", GUILayout.Width(ButtonWidth)))
             {
                 pack.objects.RemoveAt(j);
             }
@@ -291,12 +290,12 @@ public class PackageConfigEditorWindow : EditorWindow
     {
         for (int i = 0; i < package.errorMsg.Count; i++)
         {
-            EditorGUILayout.LabelField("ERROR: " + package.errorMsg[i], errorMsg);
+            EditorGUILayout.LabelField("ERROR: " + package.errorMsg[i], EditorGUIStyleData.s_ErrorMessageLabel);
         }
 
         for (int i = 0; i < package.warnMsg.Count; i++)
         {
-            EditorGUILayout.LabelField("WARN: " + package.warnMsg[i], warnMsg);
+            EditorGUILayout.LabelField("WARN: " + package.warnMsg[i], EditorGUIStyleData.s_WarnMessageLabel);
         }
     }
 
@@ -462,7 +461,7 @@ public class PackageConfigEditorWindow : EditorWindow
                     EditorGUILayout.BeginHorizontal();
                     bundle.isFold = EditorGUILayout.Foldout(bundle.isFold, bundle.name);
                     //删除视图
-                    if (GUILayout.Button("删除"))
+                    if (GUILayout.Button("删除", GUILayout.Width(ButtonWidth)))
                     {
                         bundles.Remove(bundle);
                         pathPoint.bundles.Remove(bundle);
@@ -519,7 +518,7 @@ public class PackageConfigEditorWindow : EditorWindow
                         EditorGUILayout.BeginHorizontal();
                         bundle.isFold = EditorGUILayout.Foldout(bundle.isFold, bundle.name);
                         //删除视图
-                        if (GUILayout.Button("删除"))
+                        if (GUILayout.Button("删除", GUILayout.Width(ButtonWidth)))
                         {
                             bundles.Remove(bundle);
                             pathPoint.bundles.Remove(bundle);
@@ -562,7 +561,7 @@ public class PackageConfigEditorWindow : EditorWindow
             bundles[i].isFold = EditorGUILayout.Foldout(bundles[i].isFold, bundles[i].name);
 
             //删除视图
-            if (GUILayout.Button("删除"))
+            if (GUILayout.Button("删除", GUILayout.Width(ButtonWidth)))
             {
                 bundles.RemoveAt(i);
                 ArrangeBundlesByLayer();
