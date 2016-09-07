@@ -37,7 +37,6 @@ public class UITemplateConfigManager : MonoBehaviour {
         }
         else
         {
-            Debug.Log("addData:" + name);
             s_templateData.Add(name, obj);
         }
         SaveData();
@@ -50,7 +49,6 @@ public class UITemplateConfigManager : MonoBehaviour {
         LoadData();
         if (s_templateData.ContainsKey(name))
         {
-            Debug.Log("DestroyData:" + name);
             s_templateData.Remove(name);
         }
         else

@@ -7,6 +7,9 @@ public static class EditorGUIStyleData
     public static GUIStyle s_ErrorMessageLabel = new GUIStyle();
     public static GUIStyle s_WarnMessageLabel = new GUIStyle();
 
+    public static int s_ButtonWidth_large = 200;
+    public static int s_ButtonWidth_small = 100;
+
     static EditorGUIStyleData()
     {
         s_ErrorMessageLabel.normal.textColor = Color.red;

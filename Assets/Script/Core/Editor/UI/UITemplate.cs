@@ -8,16 +8,14 @@ using System.IO;
 using System.Collections.Generic;
 
 #pragma warning disable
-public class UITemplateEditor : EditorWindow
+public class UITemplate
 {
     //模板prafeb所在路径
     const string c_TemplateResPath = "Assets/EditorTemplateRes/";
-    //空白模板名称
-    const string c_BlankTemplateName = "BlankTemplate";
-    //空白接口名称
-    const string c_BlankPortNmae = "BlankPort";
+
     //接口名标志
-    const string c_Interface = "Interface";
+    const string s_InterfaceName = "Interface";
+    const string s_TemplateName = "Template";
 
     //所有模板名称
     string[] allTemplateName;
@@ -55,51 +53,48 @@ public class UITemplateEditor : EditorWindow
     //debug信息
     List<string> myDebug = new List<string>();
 
-    [MenuItem("Window/UI/UI模板工具")]
+    #region GUI
 
-    public static void ShowWindow()
+    public void GUI()
     {
-        EditorWindow.GetWindow(typeof(UITemplateEditor));
-    }
-
-    void OnGUI()
-    {
-        EditorGUILayout.BeginVertical();
+        CurrentChildGUI();
         CreatBlankTemple_GUI();
         TempleInfo_GUI();
+        InterfaceGUI();
         ShowAllTemple_GUI();
-        EditorGUILayout.EndVertical();
 
         if (GUILayout.Button("应用所有模板"))
         {
-            ReadyApplyTemplate();
-
-            allTemplateName = UITemplateConfigManager.GetUIStyleList();
-            foreach (var oneTemplateName in allTemplateName)
-            {
-                ApplyOneTemplate(oneTemplateName);
-            }
+            ApplyAllUITemplate();
         }
     }
 
-    //是否保存模板根节点的Canvas组件
+    #endregion
 
-    #region 创建部分
+    #region 创建模板
     //隐藏创建部分
     bool b_isFoldCreatTemplate = true;
+
+    public void CurrentChildGUI()
+    {
+        EditorGUI.indentLevel = 1;
+        EditorGUILayout.Space();
+        EditorGUILayout.ObjectField("当前节点:", go_SelectedNode, typeof(GameObject));
+        EditorGUILayout.Space();
+    }
 
     /// <summary>
     /// 创建部分UI显示
     /// </summary>
-    void CreatBlankTemple_GUI()
+    public void CreatBlankTemple_GUI()
     {
-        EditorGUI.indentLevel = 0;
+        EditorGUI.indentLevel = 1;
         
         b_isFoldCreatTemplate = EditorGUILayout.Foldout((b_isFoldCreatTemplate), "创建模板:");
 
         if (b_isFoldCreatTemplate)
         {
-            EditorGUI.indentLevel = 1;
+            EditorGUI.indentLevel = 2;
 
             EditorGUILayout.LabelField("提示：模板名中不能含有下划线");
             s_nowTemplateName = EditorGUILayout.TextField("模板名称：", s_nowTemplateName);
@@ -148,34 +143,30 @@ public class UITemplateEditor : EditorWindow
     /// <summary>
     /// 创建一个空白模板
     /// </summary>
-    void CreatUIBlankTemplate()
+    public void CreatUIBlankTemplate()
     {
-        pre_UITemplate          = FindPrefabInTemplateRes(c_BlankTemplateName);
-
-        go_UITemplate           = GameObject.Instantiate(pre_UITemplate);
-        go_UITemplate.name      = s_nowTemplateName;
-        newTemplateName         = s_nowTemplateName;
+        go_UITemplate           = new GameObject(s_TemplateName +"_"+ s_nowTemplateName);
         pre_UITemplate          = null;
 
+        if (go_SelectedNode != null)
+        {
+            go_UITemplate.transform.SetParent(go_SelectedNode.transform);
+        }
+        SaveTemplate();
+
         b_isFoldCreatTemplate   = false;
+        b_isFoldTemplateInfo    = true;
     }
-#endregion
+    #endregion
 
     #region 模板当前信息
     //是否折叠
     bool b_isFoldTemplateInfo = false;
-    bool b_isFoldCreateInterface = false;
 
-    //是否折叠所有UI
-    bool b_isFoldUsedUI = false;
-
-    //模板的新名称
-    string newTemplateName = "";
-
-    void TempleInfo_GUI()
+    public void TempleInfo_GUI()
     {
         //SelectCurrentTemplate();
-        EditorGUI.indentLevel = 0;
+        EditorGUI.indentLevel = 1;
         EditorGUILayout.BeginHorizontal();
         b_isFoldTemplateInfo = EditorGUILayout.Foldout((b_isFoldTemplateInfo), "当前模板信息:");
         //if (GUILayout.Button("查看/编辑选中的模板",GUILayout.Width(200)))
@@ -187,33 +178,14 @@ public class UITemplateEditor : EditorWindow
 
         if (b_isFoldTemplateInfo && (go_UITemplate != null || pre_UITemplate != null))
         {
-            EditorGUI.indentLevel = 1;
+            EditorGUI.indentLevel = 2;
 
-            EditorGUILayout.LabelField("模板名称："+ newTemplateName);
+            EditorGUILayout.LabelField("模板名称：" + s_nowTemplateName);
 
             EditorGUILayout.ObjectField("模板预设：", pre_UITemplate, typeof(GameObject));
             EditorGUILayout.ObjectField("模板实例：", go_UITemplate, typeof(GameObject));
-            
-            b_isFoldCreateInterface = EditorGUILayout.Foldout(b_isFoldCreateInterface, "创建接口:");
-            if (b_isFoldCreateInterface)
-            {
-                EditorGUI.indentLevel = 2;
 
-                newPortName = EditorGUILayout.TextField("接口名：", newPortName);
-                EditorGUILayout.ObjectField("当前节点:", go_SelectedNode, typeof(GameObject));
-
-                if (IsReasonable(newPortName))
-                {
-                    if (GUILayout.Button("在当前节点添加一个接口"))
-                    {
-                        CreatOnePort();
-                    }
-                }
-
-                EditorGUILayout.Space();
-            }
-
-            EditorGUI.indentLevel = 1;
+            EditorGUI.indentLevel = 2;
             if (GUILayout.Button("保存模板"))
             {
                 SaveTemplate();
@@ -229,8 +201,8 @@ public class UITemplateEditor : EditorWindow
             {
                 if (EditorUtility.DisplayDialog("警告", "该操作不可逆，确定删除该模板？", "是", "否"))
                 {
-                    DeleteNowTemlate();
-                    DestroyImmediate(go_UITemplate);
+                    DeleteTemlate(s_nowTemplateName);
+                    GameObject.DestroyImmediate(go_UITemplate);
                 }
             }
 
@@ -248,7 +220,6 @@ public class UITemplateEditor : EditorWindow
         go_SelectedObj = Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets)[0] as GameObject;
         selectedObjName = go_SelectedObj.name.Split('_');
         s_nowTemplateName = JudgeNowSelectObjType();
-        newTemplateName = s_nowTemplateName;
 
         ReadyApplyTemplate();
         allUsedTheTemplateUI = FindHadOneTemplateUI(s_nowTemplateName);
@@ -256,21 +227,6 @@ public class UITemplateEditor : EditorWindow
         DisposeSelectObj();
     }
 
-    //模板应用新名字(相当于创建一个新模板，所以要删除旧数据，记录新数据)
-    void UseNewTemlateName()
-    {
-        UITemplateConfigManager.DestroyData(s_nowTemplateName);
-        s_nowTemplateName     = newTemplateName;
-        AssetDatabase.RenameAsset(c_TemplateResPath + pre_UITemplate.name+".prefab",newTemplateName);
-        if (go_UITemplate != null)
-        {
-            go_UITemplate.name = s_nowTemplateName;
-        }
-        UITemplateConfigManager.AddData(s_nowTemplateName);
-
-        ReadyApplyTemplate();
-        ApplyOneTemplate(s_nowTemplateName);
-    }
 
     //判断当前选中的是那种类型
     string JudgeNowSelectObjType()
@@ -332,7 +288,7 @@ public class UITemplateEditor : EditorWindow
         go_UITemplate           = go_SelectedObj;
         pre_UITemplate          = FindPrefabInTemplateRes(s_nowTemplateName);
         b_isFoldTemplateInfo    = true;
-        Debug.Log("选中的是模板实例");
+        //Debug.Log("选中的是模板实例");
     }
 
     //选中的是模板
@@ -341,7 +297,7 @@ public class UITemplateEditor : EditorWindow
         go_UITemplate           = null;
         pre_UITemplate          = FindPrefabInTemplateRes(s_nowTemplateName); 
         b_isFoldTemplateInfo    = true;
-        Debug.Log("选中的是模板");
+        //Debug.Log("选中的是模板");
     }
 
     //选中的是使用了模板的UI
@@ -350,7 +306,7 @@ public class UITemplateEditor : EditorWindow
         go_UITemplate           = null;
         pre_UITemplate          = FindPrefabInTemplateRes(s_nowTemplateName);
         b_isFoldTemplateInfo    = true;
-        Debug.Log("选中的是使用了模板的UI");
+        //Debug.Log("选中的是使用了模板的UI");
     }
 
     //选中的是没有使用模板的UI
@@ -361,6 +317,55 @@ public class UITemplateEditor : EditorWindow
         Debug.Log("选中的是没有使用模板的UI");
     }
 
+
+
+    //保存模板
+    void SaveTemplate()
+    {
+        pre_UITemplate = PrefabUtility.CreatePrefab(c_TemplateResPath + s_nowTemplateName + ".prefab", go_UITemplate, ReplacePrefabOptions.ConnectToPrefab);
+        UITemplateConfigManager.AddData(s_nowTemplateName);
+    }
+
+    //删除模板（包括数据）
+    void DeleteTemlate(string l_TemplateName)
+    {
+        UITemplateConfigManager.DestroyData(l_TemplateName);
+        GameObject.DestroyImmediate(FindPrefabInTemplateRes(l_TemplateName), true);
+
+        Debug.Log(Application.dataPath + "/../" + c_TemplateResPath + l_TemplateName + ".prefab");
+
+        File.Delete(Application.dataPath + "/../" + c_TemplateResPath + l_TemplateName + ".prefab");
+    }
+
+
+#endregion
+
+    #region 接口
+
+    bool b_isFoldCreateInterface = false;
+    public void InterfaceGUI()
+    {
+        EditorGUI.indentLevel = 1;
+        b_isFoldCreateInterface = EditorGUILayout.Foldout(b_isFoldCreateInterface, "创建接口:");
+        if (b_isFoldCreateInterface)
+        {
+
+            EditorGUI.indentLevel = 2;
+            newPortName = EditorGUILayout.TextField("接口名：", newPortName);
+           
+            if (IsReasonable(newPortName))
+            {
+                if (GUILayout.Button("在当前节点添加一个接口"))
+                {
+                    CreatOnePort();
+                }
+                EditorGUILayout.Space();
+            }
+
+
+        }
+    }
+
     //创建一个接口
     void CreatOnePort()
     {
@@ -369,124 +374,14 @@ public class UITemplateEditor : EditorWindow
             Debug.LogError("请先选中要添加接口的GameObject！");
             return;
         }
-        GameObject go_newPort           = Instantiate(FindPrefabInTemplateRes(c_BlankPortNmae));
-        go_newPort.transform.parent     = go_SelectedNode.transform;
-
-        go_newPort.name                 = c_Interface+"_"+newPortName ;
+        GameObject go_newPort = new GameObject(s_InterfaceName + "_" + newPortName);
+        go_newPort.transform.parent = go_SelectedNode.transform;
 
     }
 
+    #endregion
 
-#endregion
-
-    #region 保存模板
-    //是否隐藏
-    bool b_isFoldSaveTemplate = false;
-    //是否保留根节点的Canvas等组件
-    bool b_saveTemplateCanvas = false;
-
-    void SaveTemple_GUI()
-    {
-        EditorGUI.indentLevel = 0;
-        b_isFoldSaveTemplate = EditorGUILayout.Foldout((b_isFoldSaveTemplate), "保存模板:");
-        if (b_isFoldSaveTemplate && go_UITemplate!= null)
-        {
-            EditorGUI.indentLevel = 1;
-            
-            b_saveTemplateCanvas = EditorGUILayout.Toggle("保存模板根节点的Canvas", b_saveTemplateCanvas);
-            if (GUILayout.Button("保存模板"))
-            {
-                SaveTemplate();
-            }
-        }
-    }
-
-    //保存模板
-    void SaveTemplate()
-    {
-        pre_UITemplate = PrefabUtility.CreatePrefab(c_TemplateResPath + s_nowTemplateName + ".prefab", go_UITemplate, ReplacePrefabOptions.ConnectToPrefab);
-        UITemplateConfigManager.AddData(s_nowTemplateName);
-    }
-#endregion
-
-    #region 删除模板
-    //是否折叠
-    bool b_isFoldDeleteTemplate = false;
-
-    void DeleteTemple_GUI()
-    {
-        EditorGUI.indentLevel   = 0;
-        b_isFoldDeleteTemplate  = EditorGUILayout.Foldout((b_isFoldDeleteTemplate), "删除模板:");
-        EditorGUI.indentLevel   = 1;
-       
-        if (b_isFoldDeleteTemplate)
-        {
-            EditorGUILayout.LabelField("为避免误操作，请折叠本标签！", EditorGUIStyleData.s_ErrorMessageLabel);
-            Button_DeleteTemplateGo();
-            Button_DeleteTemplatePrefab();
-            Button_DeleteTemplatePrefabAndGo();
-        }
-    }
-
-    //删除当前的模板实例
-    void Button_DeleteTemplateGo()
-    {
-        if (go_UITemplate != null)
-        {
-            if (GUILayout.Button("删除当前的模板实例"))
-            {
-                DestroyImmediate(go_UITemplate);
-
-            }
-
-        }
-    }
-
-    //删除当前的模板，但不删实例
-    void Button_DeleteTemplatePrefab()
-    {
-        if (pre_UITemplate != null)
-        {
-            if (GUILayout.Button("删除当前的模板，但不删实例"))
-            {
-                DeleteNowTemlate();
-
-            }
-
-        }
-    }
-
-    //删除当前的模板与实例
-    void Button_DeleteTemplatePrefabAndGo()
-    {
-        if (go_UITemplate != null && pre_UITemplate != null)
-        {
-            if (GUILayout.Button("删除当前的模板与实例"))
-            {
-                DeleteNowTemlate();
-                DestroyImmediate(go_UITemplate);
-                b_isFoldDeleteTemplate = false;
-
-            }
-
-        }
- 
-    }
-
-
-    //删除当前模板（包括数据）
-    void DeleteNowTemlate()
-    {
-
-        UITemplateConfigManager.DestroyData(s_nowTemplateName);
-        DestroyImmediate(pre_UITemplate, true);
-        
-        
-    }
-
-#endregion
-
-    #region 使用模板
+    #region 模版列表
     //是否折叠
     bool b_isFoldUseTemple      = false;
     bool b_isfoldDebugInfo      = false;
@@ -495,7 +390,7 @@ public class UITemplateEditor : EditorWindow
     string newPortName          = "";
 
     //显示所有模板
-    void ShowAllTemple_GUI()
+    public void ShowAllTemple_GUI()
     {
         if (Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets).Length > 0)
         {
@@ -506,48 +401,79 @@ public class UITemplateEditor : EditorWindow
             go_SelectedNode = null;
         }
 
-        EditorGUI.indentLevel = 0;
+        EditorGUI.indentLevel = 1;
         b_isFoldUseTemple = EditorGUILayout.Foldout((b_isFoldUseTemple), "模板列表:");
         if (b_isFoldUseTemple)
         {
-            EditorGUI.indentLevel   = 1;
-            allTemplateName    = UITemplateConfigManager.GetUIStyleList();
+            EditorGUI.indentLevel   = 2;
+            string[] allTemplateName = UITemplateConfigManager.GetUIStyleList();
 
             for (int i = 0; i < allTemplateName.Length; i++)
             {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField(allTemplateName[i] + ":", GUILayout.Width(70));
-                EditorGUILayout.ObjectField(FindPrefabInTemplateRes(allTemplateName[i]), typeof(GameObject), GUILayout.Width(100));
-
-
-                if(GUILayout.Button("选中此模板"))
+                bool b_isFoldTmp = EditorGUILayout.Foldout(GetListIsFold(i), allTemplateName[i] + ":");
+                SetListIsFold(i,b_isFoldTmp);
+                if (GetListIsFold(i))
                 {
-
+                    SingleTemplateInfo(allTemplateName[i]);
                 }
-
-                EditorGUILayout.EndHorizontal();
             }
+            EditorGUILayout.Space();
         }
 
+    }
 
-        EditorGUI.indentLevel = 0;
-        EditorGUILayout.BeginHorizontal();
-        b_isfoldDebugInfo = EditorGUILayout.Foldout((b_isfoldDebugInfo), "反馈信息:");
-        if (GUILayout.Button("清理", GUILayout.Width(200)))
+    int currentIndex = -1;
+    bool GetListIsFold(int index)
+    {
+        return (currentIndex == index);
+    }
+
+    void SetListIsFold(int index,bool isFold)
+    {
+        if (isFold == true)
         {
-            myDebug.Clear();
+            currentIndex = index;
         }
-        EditorGUILayout.EndHorizontal();
-        if (b_isfoldDebugInfo)
+
+        if (isFold == false
+            && index == currentIndex)
         {
-            EditorGUI.indentLevel = 1;
-            foreach (var item in myDebug)
+            currentIndex = -1;
+        }
+    }
+
+    void SingleTemplateInfo(string templateName)
+    {
+        EditorGUI.indentLevel = 3;
+
+        GUILayout.BeginHorizontal();
+        EditorGUILayout.ObjectField(FindPrefabInTemplateRes(templateName), typeof(GameObject));
+        //EditorGUILayout.Space();
+        if (GUILayout.Button("创建此模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_small)))
+        {
+            CreatUIByOneTemplate(templateName);
+        }
+
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        EditorGUILayout.Space();
+        if (GUILayout.Button("应用此模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_small)))
+        {
+            ApplyOneTemplate(templateName);
+        }
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        EditorGUILayout.Space();
+        if (GUILayout.Button("删除此模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_small)))
+        {
+            if (EditorUtility.DisplayDialog("警告", "该操作不可逆，确定删除该模板？", "是", "否"))
             {
-                EditorGUILayout.LabelField(item, EditorGUIStyleData.s_WarnMessageLabel);
+                DeleteTemlate(templateName);
             }
-
         }
- 
+        GUILayout.EndHorizontal();
     }
 
     //当前选中的节点,将成为新UI的父节点
@@ -556,10 +482,10 @@ public class UITemplateEditor : EditorWindow
     //用模板创建UI
     void CreatUIByOneTemplate(string templateName)
     {
-        GameObject go_newUI = Instantiate(FindPrefabInTemplateRes(templateName));
+        GameObject go_newUI = GameObject.Instantiate(FindPrefabInTemplateRes(templateName));
         if (go_SelectedNode != null)
         {
-            go_newUI.transform.parent = go_SelectedNode.transform;
+            go_newUI.transform.SetParent( go_SelectedNode.transform);
         }
         
         if (newUIName == "")
@@ -571,7 +497,6 @@ public class UITemplateEditor : EditorWindow
             go_newUI.name   = templateName+ "_" + newUIName   ;
         }
         s_nowTemplateName   = templateName;
-        newTemplateName     = s_nowTemplateName;
         go_UITemplate       = go_newUI;
         pre_UITemplate      = FindPrefabInTemplateRes(templateName);
  
@@ -594,8 +519,20 @@ public class UITemplateEditor : EditorWindow
     //一个预设的路径
     string oneUIPrefabPsth;
 
+
+    public void ApplyAllUITemplate()
+    {
+        ReadyApplyTemplate();
+
+        allTemplateName = UITemplateConfigManager.GetUIStyleList();
+        foreach (var oneTemplateName in allTemplateName)
+        {
+            ApplyOneTemplate(oneTemplateName);
+        }
+    }
+
     //应用模板之前的准备
-    void ReadyApplyTemplate()
+    public void ReadyApplyTemplate()
     {
         //myDebug.Clear();
         allUIPrefab = new Dictionary<string, GameObject>();
@@ -605,7 +542,7 @@ public class UITemplateEditor : EditorWindow
     }
 
     //读取“Resources/UI”目录下所有的UI预设
-    void ReadAllUIResources(string path)
+    public void ReadAllUIResources(string path)
     {
         allUIPrefabName = Directory.GetFiles(Application.dataPath + "/" + path);
         foreach (var item in allUIPrefabName)
@@ -631,19 +568,19 @@ public class UITemplateEditor : EditorWindow
         foreach (var oneUI in allUsedUI)
         {
             //Debug.Log(oneUI);
-            GameObject goUI = Instantiate(oneUI);
-            GameObject goTemplate = Instantiate(FindPrefabInTemplateRes(templateName));
+            GameObject goUI = GameObject.Instantiate(oneUI);
+            GameObject goTemplate = GameObject.Instantiate(FindPrefabInTemplateRes(templateName));
 
             foreach (Transform child in goUI.transform)
             {
-                if (child.name.Contains(c_Interface))
+                if (child.name.Contains(s_InterfaceName))
                 {
                     foreach (Transform templateChild in goTemplate.transform)
                     {
                         if (child.name == templateChild.name)
                         {
                             child.parent = templateChild.parent;
-                            DestroyImmediate(templateChild.gameObject, true);
+                            GameObject.DestroyImmediate(templateChild.gameObject, true);
                         }
                     }
                 }
@@ -652,8 +589,8 @@ public class UITemplateEditor : EditorWindow
             myDebug.Add("应用成功：  模板：" + templateName + "  UI：" + oneUI.name);
 
             PrefabUtility.ReplacePrefab(goTemplate, oneUI);
-            DestroyImmediate(goUI, true);
-            DestroyImmediate(goTemplate, true);
+            GameObject.DestroyImmediate(goUI, true);
+            GameObject.DestroyImmediate(goTemplate, true);
            
         }
  
@@ -668,16 +605,15 @@ public class UITemplateEditor : EditorWindow
         string[] prefabNameSplit;
         foreach (var item in allUIPrefab.Keys)
         {
-            prefabNameSplit = item.Split('_');
-            foreach (var uiFrag in prefabNameSplit)
-            {
-                if (uiFrag == templateName)
-                {
-
+            //prefabNameSplit = item.Split('_');
+            //foreach (var uiFrag in prefabNameSplit)
+            //{
+            //    if (uiFrag == templateName)
+            //    {
                     findedUI.Add(allUIPrefab[item]);
                     
-                }
-            }
+                //}
+            //}
         }
 
         return findedUI;
