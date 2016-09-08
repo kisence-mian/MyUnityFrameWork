@@ -583,7 +583,7 @@ public class UITemplate
                             GameObject.DestroyImmediate(templateChild.gameObject, true);
                         }
                     }
-                }  
+                }
                 
             }
             myDebug.Add("应用成功：  模板：" + templateName + "  UI：" + oneUI.name);
