@@ -32,6 +32,7 @@ public class LogOutPutThread
 
         public void Init()
         {
+
             ApplicationManager.s_OnApplicationQuit += Close;
 
             this.mWritingLogQueue = new Queue<LogInfo>();
@@ -44,6 +45,9 @@ public class LogOutPutThread
 
 
             string logPath = string.Format("{0}/{1}/{2}.txt", mDevicePersistentPath, LogPath, logName);
+
+            UpLoadLogic(logPath);
+
             if (File.Exists(logPath))
                 File.Delete(logPath);
             string logDir = Path.GetDirectoryName(logPath);
@@ -110,7 +114,58 @@ public class LogOutPutThread
 
 		public void Close()
 		{
+            ExitLogic();
 			this.mIsRunning = false;
 			this.mLogWriter.Close();
 		}
+
+         public void Pause()
+        {
+            ExitLogic();
+        }
+
+        Dictionary<string, object> m_logData;
+        string ConfigName = "LogInfo";
+
+        string isCrashKey = "isCrash";
+
+        string logPathKey = "logPath";
+
+        public void UpLoadLogic(string logPath)
+        {
+            m_logData = ConfigManager.GetData(ConfigName);
+
+            if ((bool)m_logData[isCrashKey] == true)
+            {
+                //上传
+                HTTPTool.Upload_Request(URLManager.GetURL("LogUpLoadURL"), (string)m_logData[logPathKey]);
+            }
+
+            //初始化数据
+            if (m_logData.ContainsKey(isCrashKey))
+            {
+                m_logData[isCrashKey] = false;
+                m_logData[logPathKey] = logPath;
+            }
+            else
+            {
+                m_logData.Add(isCrashKey, false);
+                m_logData.Add(logPathKey, logPath);
+            }
+        }
+
+        
+        public void ExitLogic()
+        {
+            if (m_logData.ContainsKey(isCrashKey))
+            {
+                m_logData[isCrashKey] = false;
+            }
+            else
+            {
+                m_logData.Add(isCrashKey, false);
+            }
+
+            ConfigManager.SaveData(ConfigName, m_logData);
+        }
 }

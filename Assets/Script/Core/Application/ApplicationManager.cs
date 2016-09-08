@@ -34,9 +34,11 @@ public class ApplicationManager : MonoBehaviour
 
     #region 程序生命周期事件派发
 
-    public static ApplicationCallback s_OnApplicationQuit = null;
-    public static ApplicationCallback s_OnApplicationUpdate = null;
-    public static ApplicationCallback s_OnApplicationOnGUI = null;
+    public static ApplicationVoidCallback s_OnApplicationQuit = null;
+    public static ApplicationBoolCallback s_OnApplicationPause = null;
+    public static ApplicationBoolCallback s_OnApplicationFocus = null;
+    public static ApplicationVoidCallback s_OnApplicationUpdate = null;
+    public static ApplicationVoidCallback s_OnApplicationOnGUI = null;
 
     void OnApplicationQuit()
     {
@@ -45,6 +47,40 @@ public class ApplicationManager : MonoBehaviour
             try
             {
                 s_OnApplicationQuit();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
+        }
+    }
+
+    /*
+     * 强制暂停时，先 OnApplicationPause，后 OnApplicationFocus
+     * 重新“启动”游戏时，先OnApplicationFocus，后 OnApplicationPause
+     */
+    void OnApplicationPause(bool pauseStatus)
+    {
+        if (s_OnApplicationPause != null)
+        {
+            try
+            {
+                s_OnApplicationPause(pauseStatus);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
+        }
+    }
+
+    void OnApplicationFocus(bool focusStatus)
+    {
+        if (s_OnApplicationFocus != null)
+        {
+            try
+            {
+                s_OnApplicationFocus(focusStatus);
             }
             catch (Exception e)
             {
@@ -92,4 +128,5 @@ public enum AppMode
     Release
 }
 
-public delegate void ApplicationCallback();
+public delegate void ApplicationBoolCallback(bool status);
+public delegate void ApplicationVoidCallback();
