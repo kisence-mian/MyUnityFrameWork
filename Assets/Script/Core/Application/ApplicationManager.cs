@@ -33,7 +33,7 @@ public class ApplicationManager : MonoBehaviour
     }
 
     #region 程序生命周期事件派发
-
+        
     public static ApplicationCallback s_OnApplicationQuit = null;
     public static ApplicationCallback s_OnApplicationUpdate = null;
     public static ApplicationCallback s_OnApplicationOnGUI = null;
