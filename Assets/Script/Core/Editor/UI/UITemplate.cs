@@ -314,6 +314,8 @@ public class UITemplate
         pre_UITemplate = PrefabUtility.CreatePrefab(c_TemplateResPath + l_templateName + ".prefab", saveprefab, ReplacePrefabOptions.ConnectToPrefab);
         UITemplateConfigManager.AddData(l_templateName);
 
+        //PrefabUtility.ConnectGameObjectToPrefab(go_UITemplate, pre_UITemplate);
+
         GameObject.DestroyImmediate(saveprefab);
     }
 
@@ -528,6 +530,7 @@ public class UITemplate
         EditorGUILayout.Space();
         if (GUILayout.Button("应用此模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_large)))
         {
+            ReadyApplyTemplate();
             ApplyOneTemplate(templateName);
         }
         EditorGUILayout.Space();
@@ -558,7 +561,7 @@ public class UITemplate
             go_newUI.transform.SetParent( go_SelectedNode.transform);
         }
 
-        go_newUI.name = s_TemplateName + "_" + templateName;
+        go_newUI.name = templateName;
 
         RectTransform rt = go_newUI.GetComponent<RectTransform>();
 
@@ -632,8 +635,6 @@ public class UITemplate
     {
         List<GameObject> allUsedUI = FindHadOneTemplateUI(templateName);
 
-
-
         foreach (var oneUI in allUsedUI)
         {
             Debug.Log(oneUI.name);
@@ -660,21 +661,29 @@ public class UITemplate
     {
         foreach (Transform node in l_oldNode.transform)
         {
+            RecursionNodeToReplaceTemplate(node.gameObject, l_newTemplate);
+
             if (node.name == l_newTemplate.name)
             {
                 ReplaceTemplate(l_oldNode.transform, node.gameObject, l_newTemplate);
             }
-            else
-            {
-                RecursionNodeToReplaceTemplate(node.gameObject, l_newTemplate);
-            }
+            //else
+            //{
+                
+            //}
         }
     }
 
-    Dictionary<string, GameObject> m_interfaceTmp;
+    struct InterfaceReplaceStruct
+    {
+        public GameObject go;
+        public int index;
+    }
+
+    Dictionary<string, InterfaceReplaceStruct> m_interfaceTmp;
     void ReplaceTemplate(Transform l_parent,GameObject l_oldTemplate, GameObject l_newTemplate)
     {
-        m_interfaceTmp = new Dictionary<string, GameObject>();
+        m_interfaceTmp = new Dictionary<string, InterfaceReplaceStruct>();
 
         //先把旧UI下的接口移出来，存入表中
         RecursionNodeToReplaceInterfaceStepOne(l_oldTemplate.transform);
@@ -703,7 +712,11 @@ public class UITemplate
             {
                 if (!m_interfaceTmp.ContainsKey(node.name))
                 {
-                    m_interfaceTmp.Add(node.name,node.gameObject);
+                    InterfaceReplaceStruct tmp = new InterfaceReplaceStruct();
+                    tmp.go = node.gameObject;
+                    tmp.index = node.transform.GetSiblingIndex();
+
+                    m_interfaceTmp.Add(node.name, tmp);
                 }
                 else
                 {
@@ -711,7 +724,11 @@ public class UITemplate
                 }
                 node.SetParent(null);
             }
-            RecursionNodeToReplaceInterfaceStepOne(node);
+            else
+            {
+                RecursionNodeToReplaceInterfaceStepOne(node);
+            }
+            
         }
     }
 
@@ -721,10 +738,14 @@ public class UITemplate
         {
             if (m_interfaceTmp.ContainsKey(node.name))
             {
-                m_interfaceTmp[node.name].transform.SetParent(node.parent);
-                m_interfaceTmp.Remove(node.name);
+                InterfaceReplaceStruct tmp = m_interfaceTmp[node.name];
 
+                m_interfaceTmp.Remove(node.name);
                 GameObject.DestroyImmediate(node.gameObject);
+
+                tmp.go.transform.SetParent(l_parent);
+                tmp.go.transform.SetSiblingIndex(tmp.index);
+
             }
             else
             {
@@ -743,7 +764,10 @@ public class UITemplate
         string[] prefabNameSplit;
         foreach (var item in allUIPrefab.Keys)
         {
-           findedUI.Add(allUIPrefab[item]);
+            if (allUIPrefab[item].name != "UIManager")
+            {
+                findedUI.Add(allUIPrefab[item]);
+            }
         }
 
         return findedUI;
