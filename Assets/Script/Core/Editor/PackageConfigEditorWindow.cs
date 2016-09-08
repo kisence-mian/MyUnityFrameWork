@@ -60,7 +60,7 @@ public class PackageConfigEditorWindow : EditorWindow
     bool isContent = false;
     string messageContent = "";
 
-    int ButtonWidth = 100;
+    int ButtonWidth = EditorGUIStyleData.s_ButtonWidth_large;
 
     void OnGUI()
     {

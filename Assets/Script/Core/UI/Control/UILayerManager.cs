@@ -40,9 +40,6 @@ public class UILayerManager : MonoBehaviour
 	public void SetLayer(UIWindowBase l_ui)
     {
         RectTransform l_rt = l_ui.GetComponent<RectTransform>();
-        l_rt.anchoredPosition = Vector3.zero;
-        l_rt.sizeDelta = Vector2.zero;
-
         switch (l_ui.m_UIType)
         {
             case UIType.GameUI: l_ui.transform.SetParent(m_GameUILayerParent); break;
@@ -51,5 +48,15 @@ public class UILayerManager : MonoBehaviour
             case UIType.TopBar: l_ui.transform.SetParent(m_TopbarLayerParent); break;
             case UIType.PopUp: l_ui.transform.SetParent(m_PopUpLayerParent); break;
         }
+
+        if (l_ui.m_UIType != UIType.GameUI)
+        {
+            l_rt.anchoredPosition = Vector3.zero;
+            l_rt.sizeDelta = Vector2.zero;
+            l_rt.anchorMin = Vector2.zero;
+            l_rt.anchorMax = Vector3.one;
+            l_rt.localScale = Vector3.one;
+        }
+
     }
 }
