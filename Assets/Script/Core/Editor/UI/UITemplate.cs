@@ -745,14 +745,11 @@ public class UITemplate
 
                 tmp.go.transform.SetParent(l_parent);
                 tmp.go.transform.SetSiblingIndex(tmp.index);
-
             }
             else
             {
                 RecursionNodeToReplaceInterfaceStepTwo(node);
             }
-
-
         }
     }
 
