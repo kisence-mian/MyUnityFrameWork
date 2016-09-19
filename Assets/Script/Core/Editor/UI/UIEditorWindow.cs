@@ -43,6 +43,13 @@ public class UIEditorWindow : EditorWindow
         EditorGUILayout.EndVertical();
     }
 
+    void OnSelectionChange()
+    {
+        m_UItemplate.SelectCurrentTemplate();
+
+        base.Repaint();
+    }
+
     #region UIManager
 
     bool isFoldUImanager = false;

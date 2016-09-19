@@ -18,13 +18,13 @@ public class UIStyleConfigManager
     {
         LoadData();
 
-        Dictionary<string, object> dataTmp = new Dictionary<string, object>();
-        foreach (var obj in s_StyleData)
-        {
-            dataTmp.Add(obj.Key, UIStyleInfo.StlyleData2String(obj.Value));
-        }
+        //Dictionary<string, object> dataTmp = new Dictionary<string, object>();
+        //foreach (var obj in s_StyleData)
+        //{
+        //    dataTmp.Add(obj.Key, UIStyleInfo.StlyleData2String(obj.Value));
+        //}
 
-        ConfigManager.SaveEditorConfigData(ConfigName, dataTmp);
+        //ConfigManager.SaveEditorConfigData(ConfigName, dataTmp);
     }
 
     public static void AddData(string key,UIStyleInfo styleData)
@@ -68,15 +68,15 @@ public class UIStyleConfigManager
 
     static void LoadData()
     {
-        if (s_StyleData == null)
-        {
-            Dictionary<string, object> dataTmp = new Dictionary<string, object>();
-            s_StyleData = new Dictionary<string, UIStyleInfo>();
+        //if (s_StyleData == null)
+        //{
+        //    Dictionary<string, object> dataTmp = new Dictionary<string, object>();
+        //    s_StyleData = new Dictionary<string, UIStyleInfo>();
 
-            foreach (var obj in dataTmp)
-            {
-                s_StyleData.Add(obj.Key, UIStyleInfo.String2StlyleData((string)obj.Value));
-            }
-        }
+        //    foreach (var obj in dataTmp)
+        //    {
+        //        s_StyleData.Add(obj.Key, UIStyleInfo.String2StlyleData((string)obj.Value));
+        //    }
+        //}
     }
 }

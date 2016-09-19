@@ -36,17 +36,7 @@ public class RuntimeTest : MonoBehaviour
 
         if (Input.GetKey(KeyCode.I))
         {
-            UIManager.DestroyUIWindow("MianMenu");
-        }
-
-        if (Input.GetKey(KeyCode.O))
-        {
-            UIManager.ShowUIWindow("MianMenu");
-        }
-
-        if (Input.GetKey(KeyCode.P))
-        {
-            UIManager.HideUIWindow("MianMenu");
+            UIManager.CloseUIWindow("MianMenu");
         }
 
         if (Input.GetKey(KeyCode.C))

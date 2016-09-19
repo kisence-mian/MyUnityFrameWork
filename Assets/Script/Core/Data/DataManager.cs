@@ -28,7 +28,7 @@ public class DataManager
     }
 
     //只在编辑器下能够使用
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
 
     public static void SaveData(string ConfigName, DataTable data)
     {
@@ -93,7 +93,5 @@ public class DataManager
 
         return builder.ToString();
     }
-#endif
-
-
+    #endif
 }

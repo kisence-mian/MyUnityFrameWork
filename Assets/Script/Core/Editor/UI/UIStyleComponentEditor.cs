@@ -3,30 +3,30 @@ using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
 
-[CustomEditor(typeof(UIWindowBase),true)]
-public class UIBaseWindowEditor : Editor 
+[CustomEditor(typeof(UIStyleComponent), true)]
+public class UIStyleComponentEditor : Editor 
 {
     public string m_StyleName = "";
     public int m_currentStyle = 0;
 
     public override void OnInspectorGUI()
     {
-        //string[] a = UIStyleConfigManager.GetUIStyleList();
-        //m_currentStyle = EditorGUILayout.Popup("当前 UIStyle:",m_currentStyle, a);
+        string[] a = UIStyleConfigManager.GetUIStyleList();
+        m_currentStyle = EditorGUILayout.Popup("当前 UIStyle:",m_currentStyle, a);
 
-        //if (GUILayout.Button("生成Stlye模板"))
-        //{
-        //    CreatStyleTmp();
-        //}
+        if (GUILayout.Button("生成Stlye模板"))
+        {
+            CreatStyleTmp();
+        }
 
-        //if (GUILayout.Button("套用Stlye模板"))
-        //{
-        //    if (m_StyleName!= "")
-        //    {
-        //        AppStyleTmp(UIStyleConfigManager.GetData(m_StyleName));
-        //    }
-        //}
-        base.OnInspectorGUI();
+        if (GUILayout.Button("套用Stlye模板"))
+        {
+            if (m_StyleName!= "")
+            {
+                AppStyleTmp(UIStyleConfigManager.GetData(m_StyleName));
+            }
+        }
+        //base.OnInspectorGUI();
     }
 
     public void CreatStyleTmp()

@@ -119,16 +119,15 @@ public class LogOutPutThread
 			this.mLogWriter.Close();
 		}
 
-         public void Pause()
+        public void Pause()
         {
             ExitLogic();
         }
 
         Dictionary<string, object> m_logData;
+
         string ConfigName = "LogInfo";
-
         string isCrashKey = "isCrash";
-
         string logPathKey = "logPath";
 
         public void UpLoadLogic(string logPath)

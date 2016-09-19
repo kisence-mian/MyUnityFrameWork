@@ -8,153 +8,153 @@ using UnityEditor;
 public class UIStyleInfo
 {
     public string m_StyleInfoName;
-    
-    public List<UITextStyleInfo>     m_Texts;
-    public List<UIRawImageInfo>      m_RawImages;
-    public List<UIImageInfo>         m_Images;
-    public List<UIRectTransformInfo> m_RectTransforms;
-    public List<UIButtonInfo>        m_Buttons;
+
+    public UITextStyleInfo m_TextInfo;
+    public UIRawImageInfo m_RawImageInfo;
+    public UIImageInfo m_ImageInfo;
+    public UIRectTransformInfo m_RectTransformInfo;
+    public UIButtonInfo m_ButtonInfo;
 
     public void GetStyle(GameObject go)
     {
-        m_StyleInfoName = go.name;
+        //m_StyleInfoName = go.name;
 
-        m_Texts = new List<UITextStyleInfo>();
-        Text[] texts = go.GetComponentsInChildren<Text>();
-        UITextStyleInfo l_textInfo = new UITextStyleInfo();;
-        for (int i = 0; i < texts.Length;i++)
-        {
-            m_Texts.Add((UITextStyleInfo)l_textInfo.GetStyle(texts[i]));
-        }
+        //m_TextInfo = UITextStyleInfo();
+        //Text[] texts = go.GetComponentsInChildren<Text>();
+        //UITextStyleInfo l_textInfo = new UITextStyleInfo();;
+        //for (int i = 0; i < texts.Length;i++)
+        //{
+        //    m_TextInfo.Add((UITextStyleInfo)l_textInfo.GetStyle(texts[i]));
+        //}
 
-        m_Images = new List<UIImageInfo>();
-        Image[] Images = go.GetComponentsInChildren<Image>();
-        UIImageInfo l_imageInfo = new UIImageInfo(); ;
-        for (int i = 0; i < Images.Length; i++)
-        {
-            m_Images.Add((UIImageInfo)l_imageInfo.GetStyle(Images[i]));
-        }
-
-
-        m_RawImages = new List<UIRawImageInfo>();
-        RawImage[] rawImagess = go.GetComponentsInChildren<RawImage>();
-        UIRawImageInfo l_rawImageInfo = new UIRawImageInfo(); ;
-        for (int i = 0; i < rawImagess.Length; i++)
-        {
-            m_RawImages.Add((UIRawImageInfo)l_rawImageInfo.GetStyle(rawImagess[i]));
-        }
+        //m_Images = new List<UIImageInfo>();
+        //Image[] Images = go.GetComponentsInChildren<Image>();
+        //UIImageInfo l_imageInfo = new UIImageInfo(); ;
+        //for (int i = 0; i < Images.Length; i++)
+        //{
+        //    m_Images.Add((UIImageInfo)l_imageInfo.GetStyle(Images[i]));
+        //}
 
 
-        m_Buttons = new List<UIButtonInfo>();
-        Button[] Buttons = go.GetComponentsInChildren<Button>();
-        UIButtonInfo l_ButtonInfo = new UIButtonInfo(); ;
-        for (int i = 0; i < Buttons.Length; i++)
-        {
-            m_Buttons.Add((UIButtonInfo)l_ButtonInfo.GetStyle(Buttons[i]));
-        }
+        //m_RawImages = new List<UIRawImageInfo>();
+        //RawImage[] rawImagess = go.GetComponentsInChildren<RawImage>();
+        //UIRawImageInfo l_rawImageInfo = new UIRawImageInfo(); ;
+        //for (int i = 0; i < rawImagess.Length; i++)
+        //{
+        //    m_RawImages.Add((UIRawImageInfo)l_rawImageInfo.GetStyle(rawImagess[i]));
+        //}
 
-        m_RectTransforms = new List<UIRectTransformInfo>();
-        RectTransform[] rects = go.GetComponentsInChildren<RectTransform>();
-        UIRectTransformInfo l_rectInfo = new UIRectTransformInfo(); ;
-        for (int i = 0; i < rects.Length; i++)
-        {
-            m_RectTransforms.Add((UIRectTransformInfo)l_rectInfo.GetStyle(rects[i]));
-        }
+
+        //m_Buttons = new List<UIButtonInfo>();
+        //Button[] Buttons = go.GetComponentsInChildren<Button>();
+        //UIButtonInfo l_ButtonInfo = new UIButtonInfo(); ;
+        //for (int i = 0; i < Buttons.Length; i++)
+        //{
+        //    m_Buttons.Add((UIButtonInfo)l_ButtonInfo.GetStyle(Buttons[i]));
+        //}
+
+        //m_RectTransforms = new List<UIRectTransformInfo>();
+        //RectTransform[] rects = go.GetComponentsInChildren<RectTransform>();
+        //UIRectTransformInfo l_rectInfo = new UIRectTransformInfo(); ;
+        //for (int i = 0; i < rects.Length; i++)
+        //{
+        //    m_RectTransforms.Add((UIRectTransformInfo)l_rectInfo.GetStyle(rects[i]));
+        //}
     }
 
-    public void ApplyStyle(GameObject go)
-    {
-        Text[] cmops = go.GetComponentsInChildren<Text>();
-        for (int i = 0; i < m_Texts.Count; i++)
-        {
-            for (int j = 0; j < cmops.Length; j++)
-            {
-                if (m_Texts[i].IsFits(cmops[j].name))
-                {
-                    m_Texts[i].ApplyStyle(cmops[j]);
-                }
-            }
-        }
+    //public void ApplyStyle(GameObject go)
+    //{
+    //    Text[] cmops = go.GetComponentsInChildren<Text>();
+    //    for (int i = 0; i < m_Texts.Count; i++)
+    //    {
+    //        for (int j = 0; j < cmops.Length; j++)
+    //        {
+    //            if (m_Texts[i].IsFits(cmops[j].name))
+    //            {
+    //                m_Texts[i].ApplyStyle(cmops[j]);
+    //            }
+    //        }
+    //    }
 
-        Image[] Images = go.GetComponentsInChildren<Image>();
-        for (int i = 0; i < m_Images.Count; i++)
-        {
-            for (int j = 0; j < Images.Length; j++)
-            {
-                if (m_Images[i].IsFits(Images[j].name))
-                {
-                    m_Images[i].ApplyStyle(Images[j]);
-                }
-            }
-        }
+    //    Image[] Images = go.GetComponentsInChildren<Image>();
+    //    for (int i = 0; i < m_Images.Count; i++)
+    //    {
+    //        for (int j = 0; j < Images.Length; j++)
+    //        {
+    //            if (m_Images[i].IsFits(Images[j].name))
+    //            {
+    //                m_Images[i].ApplyStyle(Images[j]);
+    //            }
+    //        }
+    //    }
 
-        RawImage[] rawImagess = go.GetComponentsInChildren<RawImage>();
-        for (int i = 0; i < m_RawImages.Count; i++)
-        {
-            for (int j = 0; j < rawImagess.Length; j++)
-            {
-                if (m_RawImages[i].IsFits(cmops[j].name))
-                {
-                    m_RawImages[i].ApplyStyle(cmops[j]);
-                }
-            }
-        }
+    //    RawImage[] rawImagess = go.GetComponentsInChildren<RawImage>();
+    //    for (int i = 0; i < m_RawImages.Count; i++)
+    //    {
+    //        for (int j = 0; j < rawImagess.Length; j++)
+    //        {
+    //            if (m_RawImages[i].IsFits(cmops[j].name))
+    //            {
+    //                m_RawImages[i].ApplyStyle(cmops[j]);
+    //            }
+    //        }
+    //    }
 
-        Button[] Buttons = go.GetComponentsInChildren<Button>();
-        for (int i = 0; i < m_Buttons.Count; i++)
-        {
-            for (int j = 0; j < Buttons.Length; j++)
-            {
-                if (m_Buttons[i].IsFits(Buttons[j].name))
-                {
-                    m_Buttons[i].ApplyStyle(Buttons[j]);
-                }
-            }
-        }
+    //    Button[] Buttons = go.GetComponentsInChildren<Button>();
+    //    for (int i = 0; i < m_Buttons.Count; i++)
+    //    {
+    //        for (int j = 0; j < Buttons.Length; j++)
+    //        {
+    //            if (m_Buttons[i].IsFits(Buttons[j].name))
+    //            {
+    //                m_Buttons[i].ApplyStyle(Buttons[j]);
+    //            }
+    //        }
+    //    }
 
-        RectTransform[] rects = go.GetComponentsInChildren<RectTransform>();
-        for (int i = 0; i < m_RectTransforms.Count; i++)
-        {
-            for (int j = 0; j < rects.Length; j++)
-            {
-                if (m_RectTransforms[i].IsFits(rects[j].name))
-                {
-                    m_RectTransforms[i].ApplyStyle(rects[j]);
-                }
-            }
-        }
-    }
+    //    RectTransform[] rects = go.GetComponentsInChildren<RectTransform>();
+    //    for (int i = 0; i < m_RectTransforms.Count; i++)
+    //    {
+    //        for (int j = 0; j < rects.Length; j++)
+    //        {
+    //            if (m_RectTransforms[i].IsFits(rects[j].name))
+    //            {
+    //                m_RectTransforms[i].ApplyStyle(rects[j]);
+    //            }
+    //        }
+    //    }
+    //}
 
-    public static string StlyleData2String(UIStyleInfo l_styleData)
-    {
-        Dictionary<string, object> result = new Dictionary<string, object>();
+    //public static string StlyleData2String(UIStyleInfo l_styleData)
+    //{
+    //    Dictionary<string, object> result = new Dictionary<string, object>();
 
-        result.Add("StyleInfoName",     l_styleData.m_StyleInfoName);
-        result.Add("m_Texts",           JsonTool.List2Json<UITextStyleInfo>(l_styleData.m_Texts));
-        result.Add("m_RawImages",       JsonTool.List2Json<UIRawImageInfo>(l_styleData.m_RawImages));
-        result.Add("m_Images",          JsonTool.List2Json<UIImageInfo>(l_styleData.m_Images));
-        result.Add("m_RectTransforms",  JsonTool.List2Json<UIRectTransformInfo>(l_styleData.m_RectTransforms));
-        result.Add("m_Buttons",         JsonTool.List2Json<UIButtonInfo>(l_styleData.m_Buttons));
+    //    result.Add("StyleInfoName",     l_styleData.m_StyleInfoName);
+    //    result.Add("m_Texts",           JsonTool.List2Json<UITextStyleInfo>(l_styleData.m_Texts));
+    //    result.Add("m_RawImages",       JsonTool.List2Json<UIRawImageInfo>(l_styleData.m_RawImages));
+    //    result.Add("m_Images",          JsonTool.List2Json<UIImageInfo>(l_styleData.m_Images));
+    //    result.Add("m_RectTransforms",  JsonTool.List2Json<UIRectTransformInfo>(l_styleData.m_RectTransforms));
+    //    result.Add("m_Buttons",         JsonTool.List2Json<UIButtonInfo>(l_styleData.m_Buttons));
 
-        return MiniJSON.Json.Serialize(result);
-    }
+    //    return MiniJSON.Json.Serialize(result);
+    //}
 
-    public static UIStyleInfo String2StlyleData(string l_content)
-    {
-        Dictionary<string, object> dict = (Dictionary<string, object>)MiniJSON.Json.Deserialize(l_content);
+    //public static UIStyleInfo String2StlyleData(string l_content)
+    //{
+    //    Dictionary<string, object> dict = (Dictionary<string, object>)MiniJSON.Json.Deserialize(l_content);
 
-        UIStyleInfo result = new UIStyleInfo();
+    //    UIStyleInfo result = new UIStyleInfo();
 
-        result.m_StyleInfoName = (string)dict["StyleInfoName"];
+    //    result.m_StyleInfoName = (string)dict["StyleInfoName"];
 
-        result.m_Texts          = JsonTool.Json2List<UITextStyleInfo>(      (string)dict["m_Texts"]);
-        result.m_RawImages      = JsonTool.Json2List<UIRawImageInfo>(       (string)dict["m_RawImages"]);
-        result.m_Images         = JsonTool.Json2List<UIImageInfo>(          (string)dict["m_Images"]);
-        result.m_RectTransforms = JsonTool.Json2List<UIRectTransformInfo>(  (string)dict["m_RectTransforms"]);
-        result.m_Buttons        = JsonTool.Json2List<UIButtonInfo>(         (string)dict["m_Buttons"]);
+    //    result.m_Texts          = JsonTool.Json2List<UITextStyleInfo>(      (string)dict["m_Texts"]);
+    //    result.m_RawImages      = JsonTool.Json2List<UIRawImageInfo>(       (string)dict["m_RawImages"]);
+    //    result.m_Images         = JsonTool.Json2List<UIImageInfo>(          (string)dict["m_Images"]);
+    //    result.m_RectTransforms = JsonTool.Json2List<UIRectTransformInfo>(  (string)dict["m_RectTransforms"]);
+    //    result.m_Buttons        = JsonTool.Json2List<UIButtonInfo>(         (string)dict["m_Buttons"]);
 
-        return result;
-    }
+    //    return result;
+    //}
 }
 
 public class UIInfoInterface

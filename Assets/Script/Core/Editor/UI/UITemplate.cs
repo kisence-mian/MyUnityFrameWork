@@ -248,7 +248,7 @@ public class UITemplate
         }
     }
 
-    void SelectCurrentTemplate()
+    public void SelectCurrentTemplate()
     {
         if (Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets).Length == 0)
         {
@@ -761,7 +761,8 @@ public class UITemplate
         string[] prefabNameSplit;
         foreach (var item in allUIPrefab.Keys)
         {
-            if (allUIPrefab[item].name != "UIManager")
+            if (allUIPrefab[item]!= null && 
+                allUIPrefab[item].name != "UIManager")
             {
                 findedUI.Add(allUIPrefab[item]);
             }
