@@ -72,7 +72,7 @@ public class UIStyleComponentEditor : Editor
     public void CreatStyle(string UIstyleName)
     {
         UIStyleInfo styleTmp = new UIStyleInfo();
-        styleTmp.GetStyle(((UIStyleComponent)target).gameObject);
+        styleTmp.GetStyle(comp.gameObject);
 
         styleTmp.m_StyleInfoName = UIstyleName;
 
@@ -85,12 +85,12 @@ public class UIStyleComponentEditor : Editor
 
     public void ApplyStyle(UIStyleInfo l_styleInfo)
     {
-        l_styleInfo.ApplyStyle(((UIStyleComponent)target).gameObject);
+        l_styleInfo.ApplyStyle(comp.gameObject);
     }
 
     public void ReplaceStyle(UIStyleInfo l_styleInfo)
     {
-        l_styleInfo = l_styleInfo.GetStyle(((UIStyleComponent)target).gameObject);
+        l_styleInfo = l_styleInfo.GetStyle(comp.gameObject);
     }
 
     int GetStyleID()

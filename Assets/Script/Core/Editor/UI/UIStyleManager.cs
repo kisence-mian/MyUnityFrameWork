@@ -166,15 +166,15 @@ public class UIStyleManager
             EditorGUILayout.Space();
             if (GUILayout.Button("删除", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_large)))
             {
-                m_deleteKey = data.m_StyleInfoName;
+                if (EditorUtility.DisplayDialog("警告", "该操作不可逆，是否删除？", "是", "否"))
+                {
+                    m_deleteKey = data.m_StyleInfoName;
+                }
             }
             EditorGUILayout.Space();
             EditorGUILayout.EndHorizontal();
 
-
-
             EditorGUILayout.Space();
-
         }
     }
 

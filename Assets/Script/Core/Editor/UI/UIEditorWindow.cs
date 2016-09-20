@@ -55,6 +55,12 @@ public class UIEditorWindow : EditorWindow
         base.Repaint();
     }
 
+    //当工程改变时
+    void OnProjectChange()
+    {
+        FindAllUI();
+    }
+
     #region UIManager
 
     bool isFoldUImanager = false;

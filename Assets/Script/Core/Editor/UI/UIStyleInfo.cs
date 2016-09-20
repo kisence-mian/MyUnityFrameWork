@@ -19,8 +19,6 @@ public class UIStyleInfo
 
     public UIStyleInfo GetStyle(GameObject go)
     {
-        Debug.Log("GetStyle");
-
         Text compText = go.GetComponent<Text>();
         if (compText != null)
         {
@@ -32,7 +30,7 @@ public class UIStyleInfo
         if (compImage != null)
         {
             m_ImageInfo.isActive = true;
-            m_ImageInfo.GetStyle(compText);
+            m_ImageInfo.GetStyle(compImage);
         }
 
         RectTransform compRectTransform = go.GetComponent<RectTransform>();
@@ -47,8 +45,6 @@ public class UIStyleInfo
 
     public void ApplyStyle(GameObject go)
     {
-        Debug.Log("ApplyStyle " + m_TextInfo.isActive);
-
         if (m_TextInfo.isActive)
         {
             Text compText = go.GetComponent<Text>();
