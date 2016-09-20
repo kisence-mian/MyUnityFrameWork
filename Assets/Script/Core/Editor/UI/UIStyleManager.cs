@@ -61,8 +61,6 @@ public class UIStyleManager
                     }
                 }
 
-
-
                 EditorGUILayout.Space();
                 EditorGUILayout.EndHorizontal();
             }
