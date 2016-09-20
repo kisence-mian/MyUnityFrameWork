@@ -70,10 +70,10 @@ public class UIManager : MonoBehaviour
     /// <summary>
     /// 打开UI
     /// </summary>
-    /// <param name="l_UIname"></param>
-    /// <param name="l_callback"></param>
-    /// <param name="l_objs"></param>
-    /// <returns></returns>
+    /// <param name="l_UIname">UI名</param>
+    /// <param name="l_callback">动画播放完毕回调</param>
+    /// <param name="l_objs">回调传参</param>
+    /// <returns>返回打开的UI</returns>
     public static UIWindowBase OpenUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
     {
         GameObject l_UItmp = GameObjectManager.CreatGameObject(l_UIname, s_Instance.gameObject);
@@ -102,11 +102,10 @@ public class UIManager : MonoBehaviour
     /// <summary>
     /// 关闭UI
     /// </summary>
-    /// <param name="l_UI"></param>
-    /// <param name="isPlayAnim"></param>
-    /// <param name="l_callback"></param>
-    /// <param name="l_objs"></param>
-
+    /// <param name="l_UI">目标UI</param>
+    /// <param name="isPlayAnim">是否播放关闭动画</param>
+    /// <param name="l_callback">动画播放完毕回调</param>
+    /// <param name="l_objs">回调传参</param>
     public static void CloseUIWindow(UIWindowBase l_UI,bool isPlayAnim = true ,UICallBack l_callback = null, params object[] l_objs)
     {
         RemoveUI(l_UI);        //移除UI引用
@@ -166,7 +165,7 @@ public class UIManager : MonoBehaviour
 
     #region UI内存管理
 
-    public void DestroyUI(UIWindowBase l_UI)
+    public static void DestroyUI(UIWindowBase l_UI)
     {
         if (s_hideUIs.ContainsKey(l_UI.name))
         {
@@ -181,28 +180,29 @@ public class UIManager : MonoBehaviour
         Destroy(l_UI.gameObject);
     }
 
-    public void DestroyAllUI()
+    public static void DestroyAllUI()
     {
-        foreach(List<UIWindowBase> l_uis in s_UIs.Values)
+        DestroyAllActiveUI();
+        DestroyAllHideUI();
+    }
+
+    #endregion
+
+    #region 打开UI列表的管理
+
+    /// <summary>
+    /// 删除所有打开的UI
+    /// </summary>
+    public static void DestroyAllActiveUI()
+    {
+        foreach (List<UIWindowBase> l_uis in s_UIs.Values)
         {
             for (int i = 0; i < l_uis.Count; i++)
             {
                 DestroyUI(l_uis[i]);
             }
         }
-
-        foreach (List<UIWindowBase> l_uis in s_hideUIs.Values)
-        {
-            for (int i = 0; i < s_hideUIs.Count; i++)
-            {
-                DestroyUI(l_uis[i]);
-            }
-        }
     }
-
-    #endregion
-
-    #region 打开UI列表的管理
 
     public static UIWindowBase GetUI<T>() where T : UIWindowBase
     {
@@ -268,6 +268,25 @@ public class UIManager : MonoBehaviour
 
     #region 隐藏UI列表的管理
 
+    /// <summary>
+    /// 删除所有隐藏的UI
+    /// </summary>
+    public static void DestroyAllHideUI()
+    {
+        foreach (List<UIWindowBase> l_uis in s_hideUIs.Values)
+        {
+            for (int i = 0; i < s_hideUIs.Count; i++)
+            {
+                DestroyUI(l_uis[i]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取一个隐藏的UI,如果有多个同名UI，则返回最后创建的那一个
+    /// </summary>
+    /// <param name="l_UIname">UI名</param>
+    /// <returns></returns>
     public static UIWindowBase GetHideUI(string l_UIname)
     {
         if (!s_hideUIs.ContainsKey(l_UIname))
@@ -296,8 +315,6 @@ public class UIManager : MonoBehaviour
         {
             s_hideUIs.Add(l_UI.name, new List<UIWindowBase>());
         }
-
-        Debug.Log("AddUI: " + l_UI.name);
 
         s_hideUIs[l_UI.name].Add(l_UI);
     }

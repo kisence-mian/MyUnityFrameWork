@@ -60,7 +60,13 @@ public class GameObjectManager :MonoBehaviour
         return false;
     }
 
-    public static GameObject GetInstanceByPool(string l_name,GameObject l_parent = null)
+    /// <summary>
+    /// 从对象池取出一个对象，如果没有，则直接创建它
+    /// </summary>
+    /// <param name="l_name">对象名</param>
+    /// <param name="l_parent">要创建到的父节点</param>
+    /// <returns>返回这个对象</returns>
+    public static GameObject CreatGameObjectByPool(string l_name,GameObject l_parent = null)
     {
         if (IsExist(l_name))
         {
@@ -86,7 +92,11 @@ public class GameObjectManager :MonoBehaviour
         }
     }
 
-    public static void DestroyByPool(GameObject obj)
+    /// <summary>
+    /// 将一个对象放入对象池
+    /// </summary>
+    /// <param name="obj">目标对象</param>
+    public static void DestroyGameobjectByPool(GameObject obj)
     {
         string key = obj.name.Replace("(Clone)", "");
 
@@ -100,6 +110,35 @@ public class GameObjectManager :MonoBehaviour
         obj.SetActive(false);
         obj.name = key;
         obj.transform.SetParent(s_PoolParent);
+    }
+
+    /// <summary>
+    /// 清空对象池
+    /// </summary>
+    public static void CleanPool()
+    {
+        foreach (string name in s_objectPool.Keys)
+        {
+            CleanPoolByName(name);
+        }
+    }
+
+    /// <summary>
+    /// 清除掉某一个对象的所有对象池缓存
+    /// </summary>
+    public static void CleanPoolByName(string name)
+    {
+        if (s_objectPool.ContainsKey(name))
+        {
+            List<GameObject> l_objList = s_objectPool[name];
+
+            for (int i = 0; i < l_objList.Count; i++)
+            {
+                Destroy(l_objList[i]);
+            }
+
+            s_objectPool.Remove(name);
+        }
     }
 
 
