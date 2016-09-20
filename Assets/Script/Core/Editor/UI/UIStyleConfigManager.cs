@@ -5,9 +5,10 @@ using System.Collections.Generic;
 public class UIStyleConfigManager 
 {
     const string ConfigName = "UIStyleConfigData";
+    const string DataName   = "UIStyle";
     static Dictionary<string, UIStyleInfo> s_StyleData;
 
-    public static Dictionary<string,UIStyleInfo> GetData()
+    public static Dictionary<string, UIStyleInfo> GetData()
     {
         LoadData();
 
@@ -18,13 +19,18 @@ public class UIStyleConfigManager
     {
         LoadData();
 
-        //Dictionary<string, object> dataTmp = new Dictionary<string, object>();
+        //s_StyleData = s_data;
+
+        Dictionary<string, object> dataTmp = new Dictionary<string, object>();
+
+        dataTmp.Add(DataName, JsonTool.Dictionary2Json<UIStyleInfo>(s_StyleData));
+
         //foreach (var obj in s_StyleData)
         //{
         //    dataTmp.Add(obj.Key, UIStyleInfo.StlyleData2String(obj.Value));
         //}
 
-        //ConfigManager.SaveEditorConfigData(ConfigName, dataTmp);
+        ConfigManager.SaveEditorConfigData(ConfigName, dataTmp);
     }
 
     public static void AddData(string key,UIStyleInfo styleData)
@@ -55,6 +61,15 @@ public class UIStyleConfigManager
         }
     }
 
+    public static void DeleteData(string key)
+    {
+        LoadData();
+        if (s_StyleData.ContainsKey(key))
+        {
+            s_StyleData.Remove(key);
+        }
+    }
+
     public static string[] GetUIStyleList()
     {
         LoadData();
@@ -68,15 +83,19 @@ public class UIStyleConfigManager
 
     static void LoadData()
     {
-        //if (s_StyleData == null)
-        //{
-        //    Dictionary<string, object> dataTmp = new Dictionary<string, object>();
-        //    s_StyleData = new Dictionary<string, UIStyleInfo>();
+        if (s_StyleData == null)
+        {
+            Dictionary<string, object> dataTmp = ConfigManager.GetEditorConfigData(ConfigName);
 
-        //    foreach (var obj in dataTmp)
-        //    {
-        //        s_StyleData.Add(obj.Key, UIStyleInfo.String2StlyleData((string)obj.Value));
-        //    }
-        //}
+            if (dataTmp.ContainsKey(DataName))
+            {
+                s_StyleData = JsonTool.Json2Dictionary<UIStyleInfo>((string)dataTmp[DataName]);
+            }
+            else
+            {
+                s_StyleData = new Dictionary<string, UIStyleInfo>();
+            }
+            
+        }
     }
 }

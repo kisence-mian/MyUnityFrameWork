@@ -4,6 +4,8 @@ using UnityEditor;
 using UnityEngine.UI;
 using System;
 using System.Reflection;
+using System.Collections.Generic;
+using System.IO;
 public class UIEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
@@ -14,6 +16,7 @@ public class UIEditorWindow : EditorWindow
         EditorWindow.GetWindow(typeof(UIEditorWindow));
     }
 
+
     void OnEnable()
     {
         GameObject uiManager = GameObject.Find("UIManager");
@@ -23,7 +26,9 @@ public class UIEditorWindow : EditorWindow
             m_UILayerManager = uiManager.GetComponent<UILayerManager>();
         }
 
-        AnalysisStyleData();
+        m_styleManager.OnEnable();
+
+        FindAllUI();
     }
 
     void OnGUI()
@@ -147,6 +152,8 @@ public class UIEditorWindow : EditorWindow
 
     #region UIStyle
 
+    UIStyleManager m_styleManager = new UIStyleManager();
+
     bool isFoldUIStyle = false;
     void UIStyleGUI()
     {
@@ -154,33 +161,51 @@ public class UIEditorWindow : EditorWindow
         isFoldUIStyle = EditorGUILayout.Foldout(isFoldUIStyle, "UIStyle:");
         if (isFoldUIStyle)
         {
-            EditorGUI.indentLevel = 1;
-            if (GUILayout.Button("以当前UI 生成Style"))
-            {
-                CreateUIStyle();
-            }
+            m_styleManager.GUI();
         }
     }
 
-    void ShowStyleGUI()
-    {
-        //for()
-        //{
 
-        //}
+    #endregion
+
+    #region UI
+
+    //所有UI预设
+    public static Dictionary<string, GameObject> allUIPrefab;
+    //所有UI预设名称
+    string[] allUIPrefabName;
+    //一个UI预设的名称
+    string oneUIPrefabName;
+    //一个预设的路径
+    string oneUIPrefabPsth;
+
+    /// <summary>
+    /// 获取到所有的UIprefab
+    /// </summary>
+    public void FindAllUI()
+    {
+        allUIPrefab = new Dictionary<string, GameObject>();
+        FindAllUIResources("Resources/UI");
     }
 
-
-    void CreateUIStyle()
+    //读取“Resources/UI”目录下所有的UI预设
+    public void FindAllUIResources(string path)
     {
-
+        allUIPrefabName = Directory.GetFiles(Application.dataPath + "/" + path);
+        foreach (var item in allUIPrefabName)
+        {
+            oneUIPrefabName = item.Split('\\')[1].Split('.')[0];
+            if (item.EndsWith(".prefab"))
+            {
+                oneUIPrefabPsth = path + "/" + oneUIPrefabName + ".prefab";
+                allUIPrefab.Add(oneUIPrefabName, AssetDatabase.LoadAssetAtPath("Assets/" + oneUIPrefabPsth, typeof(GameObject)) as GameObject);
+            }
+            else if (item.Split('.')[(item.Split('.').Length - 2)] != "prefab")
+            {
+                FindAllUIResources(path + "/" + oneUIPrefabName);
+            }
+        }
     }
-
-    public void AnalysisStyleData()
-    {
-
-    }
-
 
     #endregion
 }

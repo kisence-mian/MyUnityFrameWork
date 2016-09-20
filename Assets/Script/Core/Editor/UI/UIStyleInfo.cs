@@ -9,161 +9,85 @@ public class UIStyleInfo
 {
     public string m_StyleInfoName;
 
-    public UITextStyleInfo m_TextInfo;
-    public UIRawImageInfo m_RawImageInfo;
-    public UIImageInfo m_ImageInfo;
-    public UIRectTransformInfo m_RectTransformInfo;
-    public UIButtonInfo m_ButtonInfo;
+    public UITextStyleInfo m_TextInfo = new UITextStyleInfo();
+    public UIRawImageInfo m_RawImageInfo = new UIRawImageInfo();
+    public UIImageInfo m_ImageInfo = new UIImageInfo();
+    public UIRectTransformInfo m_RectTransformInfo = new UIRectTransformInfo();
+    public UIButtonInfo m_ButtonInfo = new UIButtonInfo();
 
-    public void GetStyle(GameObject go)
+    public bool isFold = false;
+
+    public UIStyleInfo GetStyle(GameObject go)
     {
-        //m_StyleInfoName = go.name;
+        Debug.Log("GetStyle");
 
-        //m_TextInfo = UITextStyleInfo();
-        //Text[] texts = go.GetComponentsInChildren<Text>();
-        //UITextStyleInfo l_textInfo = new UITextStyleInfo();;
-        //for (int i = 0; i < texts.Length;i++)
-        //{
-        //    m_TextInfo.Add((UITextStyleInfo)l_textInfo.GetStyle(texts[i]));
-        //}
+        Text compText = go.GetComponent<Text>();
+        if (compText != null)
+        {
+            m_TextInfo.isActive = true;
+            m_TextInfo.GetStyle(compText);
+        }
 
-        //m_Images = new List<UIImageInfo>();
-        //Image[] Images = go.GetComponentsInChildren<Image>();
-        //UIImageInfo l_imageInfo = new UIImageInfo(); ;
-        //for (int i = 0; i < Images.Length; i++)
-        //{
-        //    m_Images.Add((UIImageInfo)l_imageInfo.GetStyle(Images[i]));
-        //}
+        Image compImage = go.GetComponent<Image>();
+        if (compImage != null)
+        {
+            m_ImageInfo.isActive = true;
+            m_ImageInfo.GetStyle(compText);
+        }
 
+        RectTransform compRectTransform = go.GetComponent<RectTransform>();
+        if (compRectTransform != null)
+        {
+            m_RectTransformInfo.isActive = true;
+            m_RectTransformInfo.GetStyle(compRectTransform);
+        }
 
-        //m_RawImages = new List<UIRawImageInfo>();
-        //RawImage[] rawImagess = go.GetComponentsInChildren<RawImage>();
-        //UIRawImageInfo l_rawImageInfo = new UIRawImageInfo(); ;
-        //for (int i = 0; i < rawImagess.Length; i++)
-        //{
-        //    m_RawImages.Add((UIRawImageInfo)l_rawImageInfo.GetStyle(rawImagess[i]));
-        //}
-
-
-        //m_Buttons = new List<UIButtonInfo>();
-        //Button[] Buttons = go.GetComponentsInChildren<Button>();
-        //UIButtonInfo l_ButtonInfo = new UIButtonInfo(); ;
-        //for (int i = 0; i < Buttons.Length; i++)
-        //{
-        //    m_Buttons.Add((UIButtonInfo)l_ButtonInfo.GetStyle(Buttons[i]));
-        //}
-
-        //m_RectTransforms = new List<UIRectTransformInfo>();
-        //RectTransform[] rects = go.GetComponentsInChildren<RectTransform>();
-        //UIRectTransformInfo l_rectInfo = new UIRectTransformInfo(); ;
-        //for (int i = 0; i < rects.Length; i++)
-        //{
-        //    m_RectTransforms.Add((UIRectTransformInfo)l_rectInfo.GetStyle(rects[i]));
-        //}
+        return this;
     }
 
-    //public void ApplyStyle(GameObject go)
-    //{
-    //    Text[] cmops = go.GetComponentsInChildren<Text>();
-    //    for (int i = 0; i < m_Texts.Count; i++)
-    //    {
-    //        for (int j = 0; j < cmops.Length; j++)
-    //        {
-    //            if (m_Texts[i].IsFits(cmops[j].name))
-    //            {
-    //                m_Texts[i].ApplyStyle(cmops[j]);
-    //            }
-    //        }
-    //    }
+    public void ApplyStyle(GameObject go)
+    {
+        Debug.Log("ApplyStyle " + m_TextInfo.isActive);
 
-    //    Image[] Images = go.GetComponentsInChildren<Image>();
-    //    for (int i = 0; i < m_Images.Count; i++)
-    //    {
-    //        for (int j = 0; j < Images.Length; j++)
-    //        {
-    //            if (m_Images[i].IsFits(Images[j].name))
-    //            {
-    //                m_Images[i].ApplyStyle(Images[j]);
-    //            }
-    //        }
-    //    }
+        if (m_TextInfo.isActive)
+        {
+            Text compText = go.GetComponent<Text>();
+            if (compText!= null)
+            {
+                m_TextInfo.ApplyStyle(compText);
+            }
+        }
 
-    //    RawImage[] rawImagess = go.GetComponentsInChildren<RawImage>();
-    //    for (int i = 0; i < m_RawImages.Count; i++)
-    //    {
-    //        for (int j = 0; j < rawImagess.Length; j++)
-    //        {
-    //            if (m_RawImages[i].IsFits(cmops[j].name))
-    //            {
-    //                m_RawImages[i].ApplyStyle(cmops[j]);
-    //            }
-    //        }
-    //    }
+        if (m_ImageInfo.isActive)
+        {
+            Image compText = go.GetComponent<Image>();
+            if (compText != null)
+            {
+                m_ImageInfo.ApplyStyle(compText);
+            }
+        }
 
-    //    Button[] Buttons = go.GetComponentsInChildren<Button>();
-    //    for (int i = 0; i < m_Buttons.Count; i++)
-    //    {
-    //        for (int j = 0; j < Buttons.Length; j++)
-    //        {
-    //            if (m_Buttons[i].IsFits(Buttons[j].name))
-    //            {
-    //                m_Buttons[i].ApplyStyle(Buttons[j]);
-    //            }
-    //        }
-    //    }
+        if (m_RectTransformInfo.isActive)
+        {
+            RectTransform compText = go.GetComponent<RectTransform>();
+            if (compText != null)
+            {
+                m_RectTransformInfo.ApplyStyle(compText);
+            }
+        }
+    }
 
-    //    RectTransform[] rects = go.GetComponentsInChildren<RectTransform>();
-    //    for (int i = 0; i < m_RectTransforms.Count; i++)
-    //    {
-    //        for (int j = 0; j < rects.Length; j++)
-    //        {
-    //            if (m_RectTransforms[i].IsFits(rects[j].name))
-    //            {
-    //                m_RectTransforms[i].ApplyStyle(rects[j]);
-    //            }
-    //        }
-    //    }
-    //}
-
-    //public static string StlyleData2String(UIStyleInfo l_styleData)
-    //{
-    //    Dictionary<string, object> result = new Dictionary<string, object>();
-
-    //    result.Add("StyleInfoName",     l_styleData.m_StyleInfoName);
-    //    result.Add("m_Texts",           JsonTool.List2Json<UITextStyleInfo>(l_styleData.m_Texts));
-    //    result.Add("m_RawImages",       JsonTool.List2Json<UIRawImageInfo>(l_styleData.m_RawImages));
-    //    result.Add("m_Images",          JsonTool.List2Json<UIImageInfo>(l_styleData.m_Images));
-    //    result.Add("m_RectTransforms",  JsonTool.List2Json<UIRectTransformInfo>(l_styleData.m_RectTransforms));
-    //    result.Add("m_Buttons",         JsonTool.List2Json<UIButtonInfo>(l_styleData.m_Buttons));
-
-    //    return MiniJSON.Json.Serialize(result);
-    //}
-
-    //public static UIStyleInfo String2StlyleData(string l_content)
-    //{
-    //    Dictionary<string, object> dict = (Dictionary<string, object>)MiniJSON.Json.Deserialize(l_content);
-
-    //    UIStyleInfo result = new UIStyleInfo();
-
-    //    result.m_StyleInfoName = (string)dict["StyleInfoName"];
-
-    //    result.m_Texts          = JsonTool.Json2List<UITextStyleInfo>(      (string)dict["m_Texts"]);
-    //    result.m_RawImages      = JsonTool.Json2List<UIRawImageInfo>(       (string)dict["m_RawImages"]);
-    //    result.m_Images         = JsonTool.Json2List<UIImageInfo>(          (string)dict["m_Images"]);
-    //    result.m_RectTransforms = JsonTool.Json2List<UIRectTransformInfo>(  (string)dict["m_RectTransforms"]);
-    //    result.m_Buttons        = JsonTool.Json2List<UIButtonInfo>(         (string)dict["m_Buttons"]);
-
-    //    return result;
-    //}
 }
 
-public class UIInfoInterface
+public class UIStyleInfoInterface
 {
     /// <summary>
     /// 正则表达式匹配规则
     /// </summary>
 
     public string REfilter;
+    public bool isFold = false;
+    public bool isActive = false;
 
     public bool IsFits(string l_UIname)
     {
@@ -177,7 +101,7 @@ public class UIInfoInterface
 
     }
 
-    public virtual UIInfoInterface GetStyle(Component component)
+    public virtual UIStyleInfoInterface GetStyle(Component component)
     {
         //UIInfoInterface tmp = new UIInfoInterface();
 
@@ -187,11 +111,11 @@ public class UIInfoInterface
     }
 }
 
-public class UIGraphicInfo : UIInfoInterface
+public class UIGraphicInfo : UIStyleInfoInterface
 {
-    bool raycastTarget;
+    public bool raycastTarget;
     public Color color;
-    Material material;
+    public Material material;
 
 
     public override void ApplyStyle(Component component)
@@ -203,9 +127,10 @@ public class UIGraphicInfo : UIInfoInterface
         comp.color = color;
         comp.material = material;
         comp.raycastTarget = raycastTarget;
+
     }
 
-    public override UIInfoInterface GetStyle(Component component)
+    public override UIStyleInfoInterface GetStyle(Component component)
     {
         Graphic comp = (Graphic)component;
         UIGraphicInfo style = (UIGraphicInfo)base.GetStyle(component);
@@ -220,42 +145,51 @@ public class UIGraphicInfo : UIInfoInterface
 [System.Serializable]
 public class UITextStyleInfo : UIGraphicInfo
 {
-    public string fontPath = "";
+    public Font font;
     public FontStyle fontStyle;
     public int fontSize;
+    public float lineSpacing;
     public TextAnchor alignment;
     public HorizontalWrapMode horizontalOverflow;
     public VerticalWrapMode verticalOverflow;
     public bool alignByGeometry;
+
+    public bool richText;
+    public bool bestFit;
 
     public override void ApplyStyle(Component component)
     {
         base.ApplyStyle(component);
         Text comp = (Text)component;
 
-        comp.font               = AssetDatabase.LoadAssetAtPath<Font>(fontPath); 
-        comp.fontStyle          = fontStyle;
-        comp.fontSize           = fontSize;
-        comp.alignment          = alignment;
-        comp.horizontalOverflow = horizontalOverflow;
-        comp.verticalOverflow   = verticalOverflow;
-        comp.alignByGeometry    = alignByGeometry;
-
+        comp.font                 = font; 
+        comp.fontStyle            = fontStyle;
+        comp.fontSize             = fontSize;
+        comp.lineSpacing          = lineSpacing;
+        comp.alignment            = alignment;
+        comp.horizontalOverflow   = horizontalOverflow;
+        comp.verticalOverflow     = verticalOverflow;
+        comp.alignByGeometry      = alignByGeometry;
+        comp.supportRichText      = richText;
+        comp.resizeTextForBestFit = bestFit;
     }
 
-    public override UIInfoInterface GetStyle(Component component)
+    public override UIStyleInfoInterface GetStyle(Component component)
     {
         Text comp = (Text)component;
         UITextStyleInfo style = (UITextStyleInfo)base.GetStyle(component); ;
 
-        style.fontPath           = AssetDatabase.GetAssetPath(comp.font);
+        style.font               = comp.font;
         style.fontStyle          = comp.fontStyle;
         style.fontSize           = comp.fontSize;
+        style.lineSpacing        = comp.lineSpacing;
         style.alignment          = comp.alignment;
         style.horizontalOverflow = comp.horizontalOverflow;
         style.verticalOverflow   = comp.verticalOverflow;
         style.alignByGeometry    = comp.alignByGeometry;
 
+        style.richText           = comp.supportRichText;
+        style.bestFit            = comp.resizeTextForBestFit;
         return style;
     }
 }
@@ -275,7 +209,7 @@ public class UIRawImageInfo : UIGraphicInfo
         comp.uvRect = uvRect;
     }
 
-    public override UIInfoInterface GetStyle(Component component)
+    public override UIStyleInfoInterface GetStyle(Component component)
     {
         RawImage comp = (RawImage)component;
         UIRawImageInfo style = (UIRawImageInfo)base.GetStyle(component);
@@ -285,7 +219,7 @@ public class UIRawImageInfo : UIGraphicInfo
     }
 }
 [System.Serializable]
-public class UIButtonInfo : UIInfoInterface
+public class UIButtonInfo : UIStyleInfoInterface
 {
     bool interactable;
 
@@ -297,7 +231,7 @@ public class UIButtonInfo : UIInfoInterface
         comp.interactable = interactable;
     }
 
-    public override UIInfoInterface GetStyle(Component component)
+    public override UIStyleInfoInterface GetStyle(Component component)
     {
         Button comp = (Button)component;
         UIButtonInfo style = (UIButtonInfo)base.GetStyle(component);
@@ -308,7 +242,7 @@ public class UIButtonInfo : UIInfoInterface
 }
 
 [System.Serializable]
-public class UIRectTransformInfo : UIInfoInterface
+public class UIRectTransformInfo : UIStyleInfoInterface
 {
     public Vector2 anchorMin;
     public Vector2 anchorMax;
@@ -316,7 +250,7 @@ public class UIRectTransformInfo : UIInfoInterface
     public Vector2 pivot;
 
     public Vector3 anchoredPosition3D;
-    public Quaternion localRotation;
+    public Vector3 localRotation;
     public Vector3 localScale;
 
     public override void ApplyStyle(Component component)
@@ -326,21 +260,21 @@ public class UIRectTransformInfo : UIInfoInterface
 
         comp.anchorMin          = anchorMin;
         comp.anchorMax          = anchorMax;
-        comp.localRotation      = localRotation;
+        comp.localEulerAngles   = localRotation;
         comp.localScale         = localScale;
         comp.pivot              = pivot;
         comp.anchoredPosition3D = anchoredPosition3D;
         comp.sizeDelta          = sizeDelta;
     }
 
-    public override UIInfoInterface GetStyle(Component component)
+    public override UIStyleInfoInterface GetStyle(Component component)
     {
         RectTransform comp = (RectTransform)component;
         UIRectTransformInfo style = (UIRectTransformInfo)base.GetStyle(component);
 
         style.anchorMin          = comp.anchorMin;
         style.anchorMax          = comp.anchorMax;
-        style.localRotation      = comp.localRotation;
+        style.localRotation      = comp.localEulerAngles;
         style.localScale         = comp.localScale;
         style.pivot              = comp.pivot;
         style.anchoredPosition3D = comp.anchoredPosition3D;

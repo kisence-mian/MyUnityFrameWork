@@ -9,7 +9,7 @@ using System.Collections;
 		private readonly static string TotalAllocMemroyFormation = "Alloc Memory : {0}M";
 		private readonly static string TotalReservedMemoryFormation = "Reserved Memory : {0}M";
 		private readonly static string TotalUnusedReservedMemoryFormation = "Unused Reserved: {0}M";
-        private readonly static string RuntimeMemorySizeFormation = "RuntimeMemorySize: {0}M";
+        //private readonly static string RuntimeMemorySizeFormation = "RuntimeMemorySize: {0}M";
 		private readonly static string MonoHeapFormation = "Mono Heap : {0}M";
 		private readonly static string MonoUsedFormation = "Mono Used : {0}M";
 		// 字节到兆
@@ -18,7 +18,7 @@ using System.Collections;
 		private Rect allocMemoryRect;
 		private Rect reservedMemoryRect;
 		private Rect unusedReservedMemoryRect;
-        private Rect RuntimeMemorySizeRect;
+        //private Rect RuntimeMemorySizeRect;
 		private Rect monoHeapRect;
 		private Rect monoUsedRect;
 

@@ -223,7 +223,6 @@ public class UITemplate
                 EditorGUILayout.Space();
                 if (GUILayout.Button("应用模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_large)))
                 {
-                    ReadyApplyTemplate();
                     ApplyOneTemplate(s_nowTemplateName);
                 }
                 //EditorGUILayout.Space();
@@ -470,13 +469,12 @@ public class UITemplate
         b_isFoldUseTemple = EditorGUILayout.Foldout((b_isFoldUseTemple), "模板列表:");
         if (b_isFoldUseTemple)
         {
-            EditorGUI.indentLevel   = 2;
-
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos,GUILayout.ExpandHeight(false));
             string[] allTemplateName = UITemplateConfigManager.GetUIStyleList();
 
             for (int i = 0; i < allTemplateName.Length; i++)
             {
+                EditorGUI.indentLevel = 2;
                 bool b_isFoldTmp = EditorGUILayout.Foldout(GetListIsFold(i), allTemplateName[i] + ":");
                 SetListIsFold(i,b_isFoldTmp);
                 if (GetListIsFold(i))
@@ -530,7 +528,6 @@ public class UITemplate
         EditorGUILayout.Space();
         if (GUILayout.Button("应用此模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_large)))
         {
-            ReadyApplyTemplate();
             ApplyOneTemplate(templateName);
         }
         EditorGUILayout.Space();
@@ -579,54 +576,14 @@ public class UITemplate
 
     #region 模板替换部分
 
-    //所有UI预设
-    Dictionary<string, GameObject> allUIPrefab;
-    //所有UI预设名称
-    string[] allUIPrefabName;
-    //一个UI预设的名称
-    string oneUIPrefabName;
-    //一个预设的路径
-    string oneUIPrefabPsth;
-
 
     public void ApplyAllUITemplate()
     {
-        ReadyApplyTemplate();
 
         allTemplateName = UITemplateConfigManager.GetUIStyleList();
         foreach (var oneTemplateName in allTemplateName)
         {
             ApplyOneTemplate(oneTemplateName);
-        }
-    }
-
-    //应用模板之前的准备
-    public void ReadyApplyTemplate()
-    {
-        //myDebug.Clear();
-        allUIPrefab = new Dictionary<string, GameObject>();
-        ReadAllUIResources("Resources/UI");
-        //Debug.Log("“Resources/UI”目录下UI总数：" + allUIPrefab.Count);
- 
-    }
-
-    //读取“Resources/UI”目录下所有的UI预设
-    public void ReadAllUIResources(string path)
-    {
-        allUIPrefabName = Directory.GetFiles(Application.dataPath + "/" + path);
-        foreach (var item in allUIPrefabName)
-        {
-            oneUIPrefabName = item.Split('\\')[1].Split('.')[0];
-            if (item.EndsWith(".prefab"))
-            {
-
-                oneUIPrefabPsth = path + "/" + oneUIPrefabName + ".prefab";
-                allUIPrefab.Add(oneUIPrefabName, AssetDatabase.LoadAssetAtPath("Assets/"+oneUIPrefabPsth, typeof(GameObject)) as GameObject);
-            }
-            else if (item.Split('.')[(item.Split('.').Length - 2)] != "prefab")
-            {
-                ReadAllUIResources(path + "/" + oneUIPrefabName);
-            }
         }
     }
 
@@ -759,12 +716,12 @@ public class UITemplate
     {
         List<GameObject> findedUI = new List<GameObject>();
         string[] prefabNameSplit;
-        foreach (var item in allUIPrefab.Keys)
+        foreach (var item in UIEditorWindow.allUIPrefab.Keys)
         {
-            if (allUIPrefab[item]!= null && 
-                allUIPrefab[item].name != "UIManager")
+            if (UIEditorWindow.allUIPrefab[item] != null &&
+                UIEditorWindow.allUIPrefab[item].name != "UIManager")
             {
-                findedUI.Add(allUIPrefab[item]);
+                findedUI.Add(UIEditorWindow.allUIPrefab[item]);
             }
         }
 
