@@ -18,6 +18,7 @@ public class UICreateService
         //UIcamera
         GameObject l_cameraGo = new GameObject("UICamera");
         l_cameraGo.transform.SetParent(l_UIManagerGo.transform);
+        l_cameraGo.transform.localPosition = new Vector3(0, 0, -1000);
         Camera l_camera = l_cameraGo.AddComponent<Camera>();
         l_camera.cullingMask = LayerMask.GetMask("UI");
         l_camera.orthographic = true;
@@ -62,6 +63,7 @@ public class UICreateService
         UILayerManager l_layerTmp = l_UIManagerGo.GetComponent<UILayerManager>();
 
         l_goTmp = new GameObject("GameUI");
+        l_goTmp.layer = LayerMask.NameToLayer("UI");
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
@@ -71,6 +73,7 @@ public class UICreateService
         l_layerTmp.m_GameUILayerParent = l_goTmp.transform;
 
         l_goTmp = new GameObject("Fixed");
+        l_goTmp.layer = LayerMask.NameToLayer("UI");
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
@@ -80,6 +83,7 @@ public class UICreateService
         l_layerTmp.m_FixedLayerParent = l_goTmp.transform;
 
         l_goTmp = new GameObject("Normal");
+        l_goTmp.layer = LayerMask.NameToLayer("UI");
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
@@ -89,6 +93,7 @@ public class UICreateService
         l_layerTmp.m_NormalLayerParent = l_goTmp.transform;
 
         l_goTmp = new GameObject("TopBar");
+        l_goTmp.layer = LayerMask.NameToLayer("UI");
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
@@ -98,6 +103,7 @@ public class UICreateService
         l_layerTmp.m_TopbarLayerParent = l_goTmp.transform;
 
         l_goTmp = new GameObject("PopUp");
+        l_goTmp.layer = LayerMask.NameToLayer("UI");
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
