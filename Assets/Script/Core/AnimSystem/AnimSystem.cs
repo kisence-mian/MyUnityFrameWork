@@ -17,6 +17,9 @@ public class AnimSystem : MonoBehaviour
             GameObject animGameObject = new GameObject();
             animGameObject.name = "AnimSystem";
             instance = animGameObject.AddComponent<AnimSystem>();
+
+
+            ResourceManager.Load("");
         }
 
         return instance;
