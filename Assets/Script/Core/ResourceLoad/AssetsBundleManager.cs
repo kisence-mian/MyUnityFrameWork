@@ -12,7 +12,6 @@ public static class AssetsBundleManager
     static Dictionary<string, Bundle> bundles        = new Dictionary<string, Bundle>();
     static Dictionary<string, RelyBundle> relyBundle = new Dictionary<string, RelyBundle>(); //所有依赖包
 
-
     /// <summary>
     /// 同步加载一个bundles
     /// </summary>

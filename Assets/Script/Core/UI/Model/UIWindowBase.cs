@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class UIWindowBase : MonoBehaviour 
+public class UIWindowBase : UIBase 
 {
     public UIType m_UIType;
 
@@ -12,34 +12,20 @@ public class UIWindowBase : MonoBehaviour
 
     List<Enum> m_EventNames = new List<Enum>();
 
-    //当UI第一次打开时调用OnInit方法，调用时机在OnOpen之前
-    public virtual void OnInit()
-    {
-    }
-
-    public virtual void OnDestroy()
-    {
-    }
+    #region 重载方法
 
     public virtual void OnOpen()
     {
+
     }
 
     public virtual void OnClose()
     {
-    }
 
-    public virtual void OnHide()
-    {
-    }
-
-    public virtual void OnShow()
-    {
     }
 
     public virtual void OnRefresh()
     {
-
     }
 
     public virtual IEnumerator EnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack,params object[] objs)
@@ -68,6 +54,10 @@ public class UIWindowBase : MonoBehaviour
 
     }
 
+    #endregion 
+
+    #region 继承方法
+
     public void AddEvent(Enum l_Event)
     {
         if (!m_EventNames.Contains(l_Event))
@@ -91,40 +81,8 @@ public class UIWindowBase : MonoBehaviour
         UISystemEvent.Dispatch(this, UIEvent.OnRefresh);
         OnRefresh();
     }
+
+    #endregion
 }
 
-/// <summary>
-/// UI回调
-/// </summary>
-/// <param name="objs"></param>
-public delegate void UICallBack(UIWindowBase UI,params object[] objs);
-public delegate void UIAnimCallBack(UIWindowBase l_UIbase, UICallBack callBack, params object[] objs);
 
-public enum UIType
-{
-    GameUI,
-
-    Fixed,
-    Normal,
-    TopBar,
-    PopUp
-}
-
-public enum UIEvent
-{
-    OnOpen,
-    OnClose,
-    OnHide,
-    OnShow,
-
-    OnInit,
-    OnDestroy,
-
-    OnRefresh,
-
-    OnStartEnterAnim,
-    OnCompleteEnterAnim,
-
-    OnStartExitAnim,
-    OnCompleteExitAnim,
-}
