@@ -725,6 +725,32 @@ public class AnimData
 
 
     #endregion
+
+
+
+    #region PingPang 起点终点交换
+    public static void ExchangeTwoValue(ref Vector3 v1, ref Vector3 v2)
+    {
+        Vector3 v3 = v1;
+        v1 = v2;
+        v2 = v3;
+
+    }
+    public static void ExchangeTwoValue(ref Vector2 v1, ref Vector2 v2)
+    {
+        Vector2 v3 = v1;
+        v1 = v2;
+        v2 = v3;
+
+    }
+    public static void ExchangeTwoValue(ref float v1, ref float v2)
+    {
+        float v3 = v1;
+        v1 = v2;
+        v2 = v3;
+
+    }
+    #endregion
 }
 
 

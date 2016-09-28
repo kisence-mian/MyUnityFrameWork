@@ -178,12 +178,7 @@ public class UIEditorWindow : EditorWindow
 
     //所有UI预设
     public static Dictionary<string, GameObject> allUIPrefab;
-    //所有UI预设名称
-    string[] allUIPrefabName;
-    //一个UI预设的名称
-    string oneUIPrefabName;
-    //一个预设的路径
-    string oneUIPrefabPsth;
+
 
     /// <summary>
     /// 获取到所有的UIprefab
@@ -197,19 +192,22 @@ public class UIEditorWindow : EditorWindow
     //读取“Resources/UI”目录下所有的UI预设
     public void FindAllUIResources(string path)
     {
-        allUIPrefabName = Directory.GetFiles(Application.dataPath + "/" + path);
+        string[] allUIPrefabName = Directory.GetFiles(Application.dataPath + "/" + path);
         foreach (var item in allUIPrefabName)
         {
-            oneUIPrefabName = item.Split('\\')[1].Split('.')[0];
+            string oneUIPrefabName = item.Split('\\')[1].Split('.')[0];
             if (item.EndsWith(".prefab"))
             {
-                oneUIPrefabPsth = path + "/" + oneUIPrefabName + ".prefab";
+                string oneUIPrefabPsth = path + "/" + oneUIPrefabName + ".prefab";
                 allUIPrefab.Add(oneUIPrefabName, AssetDatabase.LoadAssetAtPath("Assets/" + oneUIPrefabPsth, typeof(GameObject)) as GameObject);
             }
-            else if (item.Split('.')[(item.Split('.').Length - 2)] != "prefab")
-            {
-                FindAllUIResources(path + "/" + oneUIPrefabName);
-            }
+        }
+
+        string[] dires = Directory.GetDirectories(path);
+
+        for (int i = 0; i < dires.Length; i++)
+        {
+            FindAllUIResources(dires[i]);
         }
     }
 

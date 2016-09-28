@@ -17,9 +17,6 @@ public class AnimSystem : MonoBehaviour
             GameObject animGameObject = new GameObject();
             animGameObject.name = "AnimSystem";
             instance = animGameObject.AddComponent<AnimSystem>();
-
-
-            ResourceManager.Load("");
         }
 
         return instance;
@@ -450,57 +447,43 @@ public class AnimSystem : MonoBehaviour
 
             //执行Update
             animList[i].executeUpdate();
-
-            if (animList[i].isDone == true)
-            {
-               
-                //执行回调
-                animList[i].executeCallBack();
-
-                switch (animList[i].playType)
-                {
-                    case PlayType.Once: 
-                        animList.RemoveAt(i);
-                        i--;
-                        break;
-                    case PlayType.Loop:
-                        animList[i].isDone = false;
-                        animList[i].currentTime = 0;
-                        break;
-                    case PlayType.PingPang:
-
-                        ExchangeTwoValue(ref animList[i].fromV2, ref animList[i].toV2);
-                        ExchangeTwoValue(ref animList[i].fromPos, ref animList[i].toPos);
-                        ExchangeTwoValue(ref animList[i].fromAlpha, ref animList[i].toAlpha);
-                        animList[i].isDone = false;
-                        animList[i].currentTime = 0;
-                        break;
-                }
-            }
+            AnimPlayNext(animList, i);
+            
         }
     }
 
-    public void ExchangeTwoValue(ref Vector3 v1, ref Vector3 v2)
+    //动画完成后，后续处理，例如循环播放等
+    void AnimPlayNext(List<AnimData> allAnimData,int i)
     {
-        Vector3 v3 = v1;
-        v1 = v2;
-        v2 = v3;
+        if (animList[i].isDone == true)
+        {
+
+            //执行回调
+            animList[i].executeCallBack();
+
+            switch (animList[i].playType)
+            {
+                case PlayType.Once:
+                    animList.RemoveAt(i);
+                    i--;
+                    break;
+                case PlayType.Loop:
+                    animList[i].isDone = false;
+                    animList[i].currentTime = 0;
+                    break;
+                case PlayType.PingPang:
+
+                    AnimData.ExchangeTwoValue(ref animList[i].fromV2, ref animList[i].toV2);
+                    AnimData.ExchangeTwoValue(ref animList[i].fromPos, ref animList[i].toPos);
+                    AnimData.ExchangeTwoValue(ref animList[i].fromAlpha, ref animList[i].toAlpha);
+                    animList[i].isDone = false;
+                    animList[i].currentTime = 0;
+                    break;
+            }
+        }
  
     }
-    public void ExchangeTwoValue(ref Vector2 v1, ref Vector2 v2)
-    {
-        Vector2 v3 = v1;
-        v1 = v2;
-        v2 = v3;
-
-    }
-    public void ExchangeTwoValue(ref float v1, ref float v2)
-    {
-        float v3 = v1;
-        v1 = v2;
-        v2 = v3;
-
-    }
+    
 
     #endregion
 }

@@ -160,10 +160,7 @@ public class UITemplate
         go_UITemplate = new GameObject(s_TemplateName + "_" + s_newTemplateName);
         pre_UITemplate          = null;
 
-        if (go_SelectedNode != null)
-        {
-            go_UITemplate.transform.SetParent(go_SelectedNode.transform);
-        }
+    
 
         RectTransform rt =  go_UITemplate.AddComponent<RectTransform>();
 
