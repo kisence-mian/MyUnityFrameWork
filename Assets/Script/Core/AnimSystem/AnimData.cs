@@ -56,7 +56,6 @@ public class AnimData
             case AnimType.LocalScale: LocalScale(); break;
             case AnimType.SizeDetal: SizeDelta(); break;
         }
-
     }
 
     public void executeCallBack()
@@ -72,12 +71,34 @@ public class AnimData
         {
             Debug.LogError(e.ToString());
         }
-
-       
     }
 
 
+    //动画完成后，后续处理，例如循环播放等
+    public bool AnimReplayLogic()
+    {
+        switch (playType)
+        {
+            case PlayType.Once:
+                return false;
 
+            case PlayType.Loop:
+                isDone = false;
+                currentTime = 0;
+                return true;
+
+            case PlayType.PingPang:
+
+                ExchangeV2();
+                ExchangeAlpha();
+                ExchangePos();
+                isDone = false;
+                currentTime = 0;
+                return true;
+        }
+
+        return false;
+    }
 
     float getInterpolation(float oldValue, float aimValue)
     {
@@ -209,7 +230,6 @@ public class AnimData
     {
         return (1 - n_time) * (1 - n_time) * (1 - n_time) * startPos + 3 * (1 - n_time) * (1 - n_time) * n_time * t_ControlPoint[0] + 3 * (1 - n_time) * n_time * n_time * t_ControlPoint[1] + n_time * n_time * n_time * endPos;
     }
-
 
 
     public void Init()
@@ -729,26 +749,26 @@ public class AnimData
 
 
     #region PingPang 起点终点交换
-    public static void ExchangeTwoValue(ref Vector3 v1, ref Vector3 v2)
+    public  void ExchangeV2()
     {
-        Vector3 v3 = v1;
-        v1 = v2;
-        v2 = v3;
+        Vector2 Vtmp = fromV2;
+        fromV2 = toV2;
+        toV2 = Vtmp;
 
     }
-    public static void ExchangeTwoValue(ref Vector2 v1, ref Vector2 v2)
+    public void ExchangePos()
     {
-        Vector2 v3 = v1;
-        v1 = v2;
-        v2 = v3;
+
+        Vector3 Vtmp = fromPos;
+        fromPos = toPos;
+        toPos = Vtmp;
 
     }
-    public static void ExchangeTwoValue(ref float v1, ref float v2)
+    public void ExchangeAlpha()
     {
-        float v3 = v1;
-        v1 = v2;
-        v2 = v3;
-
+        float alphaTmp = fromAlpha;
+        fromAlpha = toAlpha;
+        toAlpha = alphaTmp;
     }
     #endregion
 }

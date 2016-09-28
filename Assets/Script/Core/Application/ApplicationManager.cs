@@ -7,7 +7,7 @@ public class ApplicationManager : MonoBehaviour
     public AppMode m_AppMode = AppMode.Developing;
 
     [HideInInspector]
-    public string m_Status;
+    public string m_Status = "";
 
     public void Awake()
     {
