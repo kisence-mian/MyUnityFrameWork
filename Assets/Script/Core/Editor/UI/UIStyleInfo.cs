@@ -240,14 +240,14 @@ public class UIButtonInfo : UIStyleInfoInterface
 [System.Serializable]
 public class UIRectTransformInfo : UIStyleInfoInterface
 {
-    public Vector2 anchorMin;
-    public Vector2 anchorMax;
+    public Vector2 anchorMin = Vector2.zero;
+    public Vector2 anchorMax = Vector2.one;
     public Vector2 sizeDelta;
     public Vector2 pivot;
 
-    public Vector3 anchoredPosition3D;
-    public Vector3 localRotation;
-    public Vector3 localScale;
+    public Vector3 anchoredPosition3D = Vector3.zero;
+    public Vector3 localRotation      = Vector3.zero;
+    public Vector3 localScale         = Vector3.one;
 
     public override void ApplyStyle(Component component)
     {
