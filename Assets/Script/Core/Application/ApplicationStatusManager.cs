@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class ApplicationStatusManager 
 {
@@ -8,7 +9,7 @@ public class ApplicationStatusManager
     /// 当前程序在哪个状态
     /// </summary>
     public static IApplicationStatus s_currentAppStatus;
-    static List<IApplicationStatus> s_statusList = new List<IApplicationStatus>();
+    static Dictionary<string,IApplicationStatus> s_status = new Dictionary<string,IApplicationStatus>();
 
     public static void Init()
     {
@@ -19,32 +20,40 @@ public class ApplicationStatusManager
     /// 切换游戏状态
     /// </summary>
     /// <param name="l_appStatus"></param>
-    public static void EnterStatus<T>() where T:IApplicationStatus,new()
+    public static void EnterStatus<T>() where T:IApplicationStatus
     {
-        if (s_currentAppStatus!=null)
+        EnterStatus(typeof(T).Name);
+    }
+
+    public static void EnterStatus(string l_statusName)
+    {
+        if (s_currentAppStatus != null)
         {
             s_currentAppStatus.OnExitStatus();
         }
 
-        s_currentAppStatus = GetAppStatus<T>();
+        s_currentAppStatus = GetAppStatus(l_statusName);
         s_currentAppStatus.OnEnterStatus();
     }
 
-
-    public static IApplicationStatus GetAppStatus<T>() where T:IApplicationStatus,new()
+    public static IApplicationStatus GetAppStatus<T>() where T:IApplicationStatus
     {
-        for (int i = 0; i < s_statusList.Count;i++ )
+        return GetAppStatus(typeof(T).Name);
+    }
+
+    public static IApplicationStatus GetAppStatus(string l_statusName)
+    {
+        if (s_status.ContainsKey(l_statusName))
         {
-            if((s_statusList[i] is T) != true)
-            {
-                return s_statusList[i];
-            }
+            return s_status[l_statusName];
         }
+        else
+        {
+            IApplicationStatus l_statusTmp = (IApplicationStatus)Activator.CreateInstance(Type.GetType(l_statusName));
+            s_status.Add(l_statusName, l_statusTmp);
 
-        IApplicationStatus l_statusTmp = new T();
-        s_statusList.Add(l_statusTmp);
-
-        return l_statusTmp;
+            return l_statusTmp;
+        }
     }
 
     /// <summary>
@@ -62,14 +71,19 @@ public class ApplicationStatusManager
     /// 测试模式，流程入口
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public static void EnterTestModel<T>() where T : IApplicationStatus, new()
+    public static void EnterTestModel<T>() where T : IApplicationStatus
+    {
+        EnterTestModel(typeof(T).Name);
+    }
+
+    public static void EnterTestModel(string l_statusName)
     {
         if (s_currentAppStatus != null)
         {
             s_currentAppStatus.OnExitStatus();
         }
 
-        s_currentAppStatus = GetAppStatus<T>();
+        s_currentAppStatus = GetAppStatus(l_statusName);
         s_currentAppStatus.EnterStatusTestData();
         s_currentAppStatus.OnEnterStatus();
     }

@@ -5,7 +5,9 @@ using System;
 public class ApplicationManager : MonoBehaviour 
 {
     public AppMode m_AppMode = AppMode.Developing;
-    public enum Status { };
+
+    [HideInInspector]
+    public string m_Status;
 
     public void Awake()
     {
@@ -19,16 +21,19 @@ public class ApplicationManager : MonoBehaviour
     {
         SetResourceLoadType();            //设置资源加载类型
         Log.Init();                       //日志系统启动
-        ApplicationStatusManager.Init();  //游戏流程初始化
+        ApplicationStatusManager.Init();  //游戏流程状态机初始化
+
+        //全局状态初始化放在此处
 
         if (m_AppMode != AppMode.Release)
         {
-            GUIConsole.Init();                                     //运行时Debug开启
-            //ApplicationStatusManager.EnterTestModel<FirstStatus.>(); //可以从此处进入测试流程
+            GUIConsole.Init();                                    //运行时Debug
+            ApplicationStatusManager.EnterTestModel(m_Status);    //可以从此处进入测试流程
         }
         else
         {
-            //ApplicationStatusManager.EnterStatus<FirstStatus>();
+            //游戏流程状态机，开始第一个状态
+            ApplicationStatusManager.EnterStatus(m_Status);
         }
     }
 
