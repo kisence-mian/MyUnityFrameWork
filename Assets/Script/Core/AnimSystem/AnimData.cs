@@ -9,6 +9,7 @@ public class AnimData
     public AnimType animType;
     public InteType interpolationType;
     public PathType pathType = PathType.Line;
+    public PlayType playType = PlayType.Once;
 
     public GameObject animGameObejct;
     public bool b_isChild = false;
@@ -17,16 +18,15 @@ public class AnimData
     public Vector3[] v3Contral = null; //二阶取第一个用，三阶取前两个
     public float[] floatContral = null;
 
+
     public bool isDone = false;
+
 
     public object[] parameter;
     public AnimCallBack callBack;
 
 
-
-
-
-    public Vector3 formPos;
+    public Vector3 fromPos;
     public Vector3 toPos;
 
     public Vector2 fromV2;
@@ -35,7 +35,7 @@ public class AnimData
     RectTransform rectRransform;
     Transform transform;
 
-
+    
 
     public void executeUpdate()
     {
@@ -46,7 +46,6 @@ public class AnimData
             currentTime = totalTime;
             isDone = true;
         }
-
 
         switch (animType)
         {
@@ -73,7 +72,12 @@ public class AnimData
         {
             Debug.LogError(e.ToString());
         }
+
+       
     }
+
+
+
 
     float getInterpolation(float oldValue, float aimValue)
     {
@@ -143,13 +147,13 @@ public class AnimData
             if (floatContral != null)
             {
                 v3Contral = new Vector3[3];
-                v3Contral[0] = UnityEngine.Random.insideUnitSphere * floatContral[0] + formPos;
+                v3Contral[0] = UnityEngine.Random.insideUnitSphere * floatContral[0] + fromPos;
                 v3Contral[1] = UnityEngine.Random.insideUnitSphere * floatContral[1] + toPos;
 
                 //二阶贝塞尔，控制点以起点与终点的中间为随机中心
                 if (pathType == PathType.Bezier2)
                 {
-                    v3Contral[0] = UnityEngine.Random.insideUnitSphere * floatContral[0] + (formPos + toPos) * 0.5f;
+                    v3Contral[0] = UnityEngine.Random.insideUnitSphere * floatContral[0] + (fromPos + toPos) * 0.5f;
                 }
             }
             else
@@ -159,9 +163,9 @@ public class AnimData
         }
 
         //如果在平面内（z轴相同），控制点也要在该平面内
-        if (formPos.z == toPos.z)
+        if (fromPos.z == toPos.z)
         {
-            v3Contral[0].z = formPos.z;
+            v3Contral[0].z = fromPos.z;
             v3Contral[1].z = toPos.z;
         }
     }
@@ -240,7 +244,7 @@ public class AnimData
 
     List<Color> oldColor = new List<Color>();
 
-    public float formAlpha = 0;
+    public float fromAlpha = 0;
     public float toAlpha = 0;
 
     public void UguiAlphaInit(bool isChild)
@@ -251,12 +255,21 @@ public class AnimData
         if (isChild)
         {
             Image[] images = animGameObejct.GetComponentsInChildren<Image>();
-
-            for (int i = 0; i < images.Length; i++)
+            for(int i = 0; i < images.Length; i++)
             {
-                animObjectList_Image.Add(images[i]);
-                oldColor.Add(images[i].color);
+                if (images[i].transform.GetComponent<Mask>() == null)
+                {
+
+                    animObjectList_Image.Add(images[i]);
+                    oldColor.Add(images[i].color);
+                }
+                else
+                {
+                    //Debug.LogError("name:" + images[i].gameObject.name);
+                }
             }
+
+
 
             Text[] texts = animGameObejct.GetComponentsInChildren<Text>();
 
@@ -272,14 +285,14 @@ public class AnimData
             oldColor.Add(animGameObejct.GetComponent<Image>().color);
         }
 
-        setUGUIAlpha(formAlpha);
+        setUGUIAlpha(fromAlpha);
     }
 
     void UguiAlpha()
     {
         //Debug.Log("UguiAlpha " + currentTime +"  " + totalTime);
 
-        setUGUIAlpha(getInterpolation(formAlpha, toAlpha));
+        setUGUIAlpha(getInterpolation(fromAlpha, toAlpha));
     }
 
     public void setUGUIAlpha(float a)
@@ -329,7 +342,7 @@ public class AnimData
 
     void UguiPosition()
     {
-        rectRransform.anchoredPosition3D = getInterpolationV3(formPos, toPos);
+        rectRransform.anchoredPosition3D = getInterpolationV3(fromPos, toPos);
     }
 
 
@@ -347,17 +360,17 @@ public class AnimData
 
     void Position()
     {
-        transform.position = getInterpolationV3(formPos, toPos);
+        transform.position = getInterpolationV3(fromPos, toPos);
     }
 
     void LocalPosition()
     {
-        transform.localPosition = getInterpolationV3(formPos, toPos);
+        transform.localPosition = getInterpolationV3(fromPos, toPos);
     }
 
     void LocalScale()
     {
-        transform.localScale = getInterpolationV3(formPos, toPos);
+        transform.localScale = getInterpolationV3(fromPos, toPos);
     }
 
 
