@@ -192,6 +192,7 @@ public class UIStyleManager
         }
     }
 
+#pragma warning disable
     void GraphicGUI(UIGraphicInfo data)
     {
         data.color         = EditorGUILayout.ColorField("Color:", data.color);

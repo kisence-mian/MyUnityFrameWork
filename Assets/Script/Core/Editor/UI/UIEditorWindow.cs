@@ -186,13 +186,13 @@ public class UIEditorWindow : EditorWindow
     public void FindAllUI()
     {
         allUIPrefab = new Dictionary<string, GameObject>();
-        FindAllUIResources("Resources/UI");
+        FindAllUIResources(Application.dataPath + "/" + "Resources/UI");
     }
 
     //读取“Resources/UI”目录下所有的UI预设
     public void FindAllUIResources(string path)
     {
-        string[] allUIPrefabName = Directory.GetFiles(Application.dataPath + "/" + path);
+        string[] allUIPrefabName = Directory.GetFiles(path);
         foreach (var item in allUIPrefabName)
         {
             string oneUIPrefabName = item.Split('\\')[1].Split('.')[0];

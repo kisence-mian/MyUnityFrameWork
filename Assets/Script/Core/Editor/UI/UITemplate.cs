@@ -160,7 +160,7 @@ public class UITemplate
         go_UITemplate = new GameObject(s_TemplateName + "_" + s_newTemplateName);
         pre_UITemplate          = null;
 
-    
+        go_UITemplate.layer = LayerMask.NameToLayer("UI");
 
         RectTransform rt =  go_UITemplate.AddComponent<RectTransform>();
 

@@ -87,7 +87,7 @@ public class UIStyleConfigManager
         {
             Dictionary<string, object> dataTmp = ConfigManager.GetEditorConfigData(ConfigName);
 
-            if (dataTmp.ContainsKey(DataName))
+            if (dataTmp != null && dataTmp.ContainsKey(DataName))
             {
                 s_StyleData = JsonTool.Json2Dictionary<UIStyleInfo>((string)dataTmp[DataName]);
             }

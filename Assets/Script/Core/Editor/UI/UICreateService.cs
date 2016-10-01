@@ -65,6 +65,7 @@ public class UICreateService
         l_goTmp = new GameObject("GameUI");
         l_goTmp.layer = LayerMask.NameToLayer("UI");
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
+        l_goTmp.transform.localScale = Vector3.one;
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
         l_rtTmp.anchorMin = new Vector2(0, 0);
@@ -74,6 +75,7 @@ public class UICreateService
 
         l_goTmp = new GameObject("Fixed");
         l_goTmp.layer = LayerMask.NameToLayer("UI");
+        l_goTmp.transform.localScale = Vector3.one;
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
@@ -84,6 +86,7 @@ public class UICreateService
 
         l_goTmp = new GameObject("Normal");
         l_goTmp.layer = LayerMask.NameToLayer("UI");
+        l_goTmp.transform.localScale = Vector3.one;
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
@@ -95,6 +98,7 @@ public class UICreateService
         l_goTmp = new GameObject("TopBar");
         l_goTmp.layer = LayerMask.NameToLayer("UI");
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
+        l_goTmp.transform.localScale = Vector3.one;
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
         l_rtTmp.anchorMin = new Vector2(0, 0);
@@ -105,6 +109,7 @@ public class UICreateService
         l_goTmp = new GameObject("PopUp");
         l_goTmp.layer = LayerMask.NameToLayer("UI");
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
+        l_goTmp.transform.localScale = Vector3.one;
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
         l_rtTmp.anchorMin = new Vector2(0, 0);
@@ -128,6 +133,8 @@ public class UICreateService
         Type type = EditorTool.GetType(l_UIWindowName);
         UIWindowBase l_uiBaseTmp = l_uiGo.AddComponent(type) as UIWindowBase;
 
+        l_uiGo.layer = LayerMask.NameToLayer("UI");
+
         l_uiBaseTmp.m_UIType = l_UIType;
 
         l_uiGo.AddComponent<Canvas>();
@@ -139,6 +146,8 @@ public class UICreateService
         l_ui.anchorMax = Vector2.one;
 
         GameObject l_BgGo = new GameObject("BG");
+
+        l_BgGo.layer = LayerMask.NameToLayer("UI");
         RectTransform l_Bg = l_BgGo.AddComponent<RectTransform>();
         l_Bg.SetParent(l_ui);
         l_Bg.sizeDelta = Vector2.zero;
@@ -146,6 +155,7 @@ public class UICreateService
         l_Bg.anchorMax = Vector2.one;
 
         GameObject l_rootGo = new GameObject("root");
+        l_rootGo.layer = LayerMask.NameToLayer("UI");
         RectTransform l_root = l_rootGo.AddComponent<RectTransform>();
         l_root.SetParent(l_ui);
         l_root.sizeDelta = Vector2.zero;

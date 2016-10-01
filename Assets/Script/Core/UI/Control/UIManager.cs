@@ -76,7 +76,6 @@ public class UIManager : MonoBehaviour
     /// <returns>返回打开的UI</returns>
     public static UIWindowBase OpenUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
     {
-        GameObject l_UItmp = GameObjectManager.CreatGameObject(l_UIname, s_Instance.gameObject);
         UIWindowBase l_UIbase = GetHideUI(l_UIname);
 
         if (l_UIbase == null)
