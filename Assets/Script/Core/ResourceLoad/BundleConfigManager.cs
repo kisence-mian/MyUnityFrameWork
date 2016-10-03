@@ -30,7 +30,7 @@ public static class BundleConfigManager
     {
         if (bundleConfigs == null)
         {
-            throw new Exception("BundleConfigManager GetBundleConfig Exception: bundleConfigs is null  do you Initialize?");
+            throw new Exception("BundleConfigManager GetBundleConfig : bundleConfigs is null  do you Initialize?");
         }
 
         if (bundleConfigs.ContainsKey(bundleName))
@@ -39,7 +39,7 @@ public static class BundleConfigManager
         }
         else
         {
-            throw new Exception("BundleConfigManager GetBundleConfig Exception: Dont find " + bundleName + " please check BundleConfig!");
+            throw new Exception("BundleConfigManager GetBundleConfig : Dont find " + bundleName + " please check BundleConfig!");
         }
     }
 
@@ -68,6 +68,6 @@ public class BundleConfig
     public string[] relyPackages;     //依赖包
     public string md5;                //md5
     //[System.NonSerialized]
-    public ResLoadType loadType;      //加载绝对路径
+    public ResLoadType loadType;      //加载类型
 }
 

@@ -3,7 +3,6 @@ using System.Collections;
 
 public class IApplicationStatus
 {
-    public StatusType m_statusType;
     /// <summary>
     /// 测试使用，直接进入游戏某个流程时，这里可以初始化测试数据
     /// </summary>
@@ -36,9 +35,3 @@ public class IApplicationStatus
 
     }
 }
-
- public enum StatusType
- {
-     HotUpdate,
-     Game,
- }

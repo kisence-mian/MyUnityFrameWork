@@ -8,6 +8,10 @@ public class UIAnimManager : MonoBehaviour
     public void StartEnterAnim(UIWindowBase l_UIbase, UICallBack callBack, params object[] objs)
     {
         UISystemEvent.Dispatch(l_UIbase, UIEvent.OnStartEnterAnim);
+
+        Debug.Log(l_UIbase);
+
+
         StartCoroutine(l_UIbase.EnterAnim(EndEnterAnim, callBack, objs));
     }
 

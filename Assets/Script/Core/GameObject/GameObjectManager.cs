@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class GameObjectManager :MonoBehaviour
 {
@@ -35,13 +36,23 @@ public class GameObjectManager :MonoBehaviour
 
         if (l_goTmp == null)
         {
-            Debug.LogError("CreatGameObject error dont find :" + l_gameObjectName);
+            throw new Exception("CreatGameObject error dont find :" + l_gameObjectName);
         }
 
-        GameObject l_instanceTmp = Instantiate(l_goTmp);
-        l_instanceTmp.name = l_gameObjectName;
+        return CreatGameObject(l_goTmp, l_parent);
+    }
 
-        if(l_parent != null)
+    public static GameObject CreatGameObject(GameObject l_prefab, GameObject l_parent = null)
+    {
+        if (l_prefab == null)
+        {
+            throw new Exception("CreatGameObject error : l_prefab  is null");
+        }
+
+        GameObject l_instanceTmp = Instantiate(l_prefab);
+        l_instanceTmp.name = l_prefab.name;
+
+        if (l_parent != null)
         {
             l_instanceTmp.transform.SetParent(l_parent.transform);
         }
@@ -89,6 +100,32 @@ public class GameObjectManager :MonoBehaviour
         else
         {
             return CreatGameObject(l_name, l_parent);
+        }
+    }
+
+    public static GameObject CreatGameObjectByPool(GameObject l_prefab, GameObject l_parent = null)
+    {
+        if (IsExist(l_prefab.name))
+        {
+            GameObject go = s_objectPool[l_prefab.name][0];
+            s_objectPool[l_prefab.name].RemoveAt(0);
+
+            go.SetActive(true);
+
+            if (l_parent == null)
+            {
+                go.transform.SetParent(null);
+            }
+            else
+            {
+                go.transform.SetParent(l_parent.transform);
+            }
+
+            return go;
+        }
+        else
+        {
+            return CreatGameObject(l_prefab, l_parent);
         }
     }
 

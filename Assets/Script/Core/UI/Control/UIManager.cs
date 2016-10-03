@@ -10,11 +10,10 @@ public class UIManager : MonoBehaviour
     static UIManager s_instance;
     public static UILayerManager s_UILayerManager; //UI层级管理器
     public static UIAnimManager s_UIAnimManager;   //UI动画管理器
+    public static Camera s_UIcamera;               //UICamera
 
     static public Dictionary<string, List<UIWindowBase>> s_UIs     = new Dictionary<string, List<UIWindowBase>>(); //打开的UI
     static public Dictionary<string, List<UIWindowBase>> s_hideUIs = new Dictionary<string, List<UIWindowBase>>(); //隐藏的UI
-
-    public static Camera s_UIcamera;
 
     #region 初始化
 
@@ -236,8 +235,6 @@ public class UIManager : MonoBehaviour
             s_UIs.Add(l_UI.name, new List<UIWindowBase>());
         }
 
-        Debug.Log("AddUI: " + l_UI.name);
-
         s_UIs[l_UI.name].Add(l_UI);
     }
 
@@ -290,14 +287,12 @@ public class UIManager : MonoBehaviour
     {
         if (!s_hideUIs.ContainsKey(l_UIname))
         {
-            Debug.Log("!ContainsKey " + l_UIname);
             return null;
         }
         else
         {
             if (s_hideUIs[l_UIname].Count == 0)
             {
-                Debug.Log("s_UIs[UIname].Count == 0");
                 return null;
             }
             else

@@ -50,7 +50,8 @@ public class UIEditorWindow : EditorWindow
 
     void OnSelectionChange()
     {
-        m_UItemplate.SelectCurrentTemplate();
+        if (m_UItemplate != null)
+            m_UItemplate.SelectCurrentTemplate();
 
         base.Repaint();
     }

@@ -21,7 +21,7 @@ public class {0} : UIWindowBase
     {
         AnimSystem.uguiAlpha(gameObject, 0, 1, 1, InteType.Linear, true,(object[] obj)=>
         {
-            base.EnterAnim(l_animComplete, l_callBack, objs);
+            StartCoroutine(base.EnterAnim(l_animComplete, l_callBack, objs));
         });
 
         return null;
@@ -32,7 +32,7 @@ public class {0} : UIWindowBase
     {
         AnimSystem.uguiAlpha(gameObject, 1, 0, 1, InteType.Linear, true, (object[] obj) =>
         {
-            base.ExitAnim(l_animComplete, l_callBack, objs);
+            StartCoroutine(base.ExitAnim(l_animComplete, l_callBack, objs));
         });
 
         return null;

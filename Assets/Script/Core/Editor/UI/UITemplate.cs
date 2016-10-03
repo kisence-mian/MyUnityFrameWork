@@ -164,6 +164,13 @@ public class UITemplate
 
         RectTransform rt =  go_UITemplate.AddComponent<RectTransform>();
 
+        if(go_SelectedNode != null)
+        {
+            go_UITemplate.transform.SetParent(go_SelectedNode.transform);
+        }
+
+        go_UITemplate.transform.localScale = Vector3.one;
+
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
 

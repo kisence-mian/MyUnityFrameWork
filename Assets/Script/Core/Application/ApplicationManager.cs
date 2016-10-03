@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class ApplicationManager : MonoBehaviour 
 {
@@ -8,6 +9,9 @@ public class ApplicationManager : MonoBehaviour
 
     [HideInInspector]
     public string m_Status = "";
+
+    [HideInInspector]
+    public List<string> m_globalStatus;
 
     public void Awake()
     {
@@ -23,7 +27,8 @@ public class ApplicationManager : MonoBehaviour
         Log.Init();                       //日志系统启动
         ApplicationStatusManager.Init();  //游戏流程状态机初始化
 
-        //全局状态初始化放在此处
+        //初始化全局状态
+        InitGlobalStatus();
 
         if (m_AppMode != AppMode.Release)
         {
@@ -122,6 +127,14 @@ public class ApplicationManager : MonoBehaviour
         else
         {
             ResourceManager.gameLoadType = ResLoadType.HotUpdate;
+        }
+    }
+
+    void InitGlobalStatus()
+    {
+        for (int i = 0; i < m_globalStatus.Count; i++)
+        {
+            
         }
     }
     #endregion

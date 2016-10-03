@@ -4,10 +4,9 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
-
-public class PackageConfigEditorWindow : EditorWindow
+public class BundleConfigEditorWindow : EditorWindow
 {
-    const string configFileName = "PackageConfigEditor";
+    const string configFileName = "BundleConfigEditor";
 
     const string relyAssetsBundlePath = "RelyBundle"; //所有依赖包放在此目录下
 
@@ -108,12 +107,12 @@ public class PackageConfigEditorWindow : EditorWindow
             CheckPackage();
         }
 
-        if (GUILayout.Button("保存设置文件"))
+        if (GUILayout.Button("保存编辑器设置文件"))
         {
             CreatPackageFile();
         }
 
-        if (GUILayout.Button("不打包只生成资源路径文件"))
+        if (GUILayout.Button("生成游戏资源路径文件"))
         {
             CreatBundelPackageConfig();
         }
@@ -121,6 +120,11 @@ public class PackageConfigEditorWindow : EditorWindow
         if (GUILayout.Button("打包 并生成MD5文件"))
         {
             CheckAndPackage();
+        }
+
+        if (GUILayout.Button("生成MD5"))
+        {
+            CreatBundelPackageConfig();
         }
 
         GUILayout.BeginHorizontal();
@@ -896,7 +900,7 @@ public class PackageConfigEditorWindow : EditorWindow
 
     public static void ShowWindow()
     {
-        EditorWindow.GetWindow(typeof(PackageConfigEditorWindow));
+        EditorWindow.GetWindow(typeof(BundleConfigEditorWindow));
     }
     #endregion
 

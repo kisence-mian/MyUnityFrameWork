@@ -269,6 +269,8 @@ public class AnimData
 
     public void UguiAlphaInit(bool isChild)
     {
+        Debug.Log("UguiAlphaInit");
+
         animObjectList_Image = new List<Image>();
         oldColor = new List<Color>();
 
@@ -310,8 +312,6 @@ public class AnimData
 
     void UguiAlpha()
     {
-        //Debug.Log("UguiAlpha " + currentTime +"  " + totalTime);
-
         setUGUIAlpha(getInterpolation(fromAlpha, toAlpha));
     }
 
