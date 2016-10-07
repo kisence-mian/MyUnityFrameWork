@@ -50,9 +50,9 @@ public class UIManager : MonoBehaviour
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
-    public static UIWindowBase CreateUIWindow<T>() where T : UIWindowBase
+    public static T CreateUIWindow<T>() where T : UIWindowBase
     {
-        return CreateUIWindow(typeof(T).Name);
+        return (T)CreateUIWindow(typeof(T).Name);
     }
     public static UIWindowBase CreateUIWindow(string l_UIname)
     {
@@ -100,9 +100,9 @@ public class UIManager : MonoBehaviour
         s_UIAnimManager.StartEnterAnim(l_UIbase, l_callback, l_objs); //播放动画
         return l_UIbase;
     }
-    public static void OpenUIWindow<T>() where T : UIWindowBase
+    public static T OpenUIWindow<T>() where T : UIWindowBase
     {
-        OpenUIWindow(typeof(T).Name);
+        return (T)OpenUIWindow(typeof(T).Name);
     }
 
     /// <summary>

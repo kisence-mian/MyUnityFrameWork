@@ -25,6 +25,19 @@ public class ApplicationManagerComponentEditor : Editor
         m_currentSelectIndex = EditorGUILayout.Popup("First Status:", m_currentSelectIndex, m_statusList);
 
         m_app.m_Status = m_statusList[m_currentSelectIndex];
+        m_app.m_globalLogic = GetGlobaLogic();
+
+        GUILayout.Space(10);
+        if (m_app.m_globalLogic.Count != 0)
+        {
+            GUILayout.Label("Global Logic:");
+            //EditorGUI.indentLevel = 2;
+            for (int i = 0; i < m_app.m_globalLogic.Count; i++)
+            {
+                GUILayout.Label("  " + m_app.m_globalLogic[i]);
+            }
+        }
+
     }
 
     public string[] GetStatusList()
@@ -47,6 +60,22 @@ public class ApplicationManagerComponentEditor : Editor
         }
 
         return listTmp.ToArray();
+    }
+
+    public List<string> GetGlobaLogic()
+    {
+        List<string> listTmp = new List<string>();
+
+        Type[] types = Assembly.Load("Assembly-CSharp").GetTypes();
+
+        for (int i = 0; i < types.Length; i++)
+        {
+            if (types[i].IsSubclassOf(typeof(IApplicationGlobalLogic)))
+            {
+                listTmp.Add(types[i].Name);
+            }
+        }
+        return listTmp;
     }
 
     public int GetStatusIndex()

@@ -3,7 +3,12 @@ using System.Collections;
 
 public class IApplicationGlobalLogic 
 {
-    public void Init()
+    public virtual void Init()
+    {
+
+    }
+
+    public virtual void Update()
     {
 
     }

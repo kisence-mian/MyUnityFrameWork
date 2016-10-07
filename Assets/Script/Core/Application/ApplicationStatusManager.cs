@@ -13,9 +13,6 @@ public class ApplicationStatusManager
     //可切换状态
     static Dictionary<string,IApplicationStatus> s_status = new Dictionary<string,IApplicationStatus>();
 
-    //全局状态
-    //static Dictionary<string, IApplicationStatus> s_GlobalStatus = new Dictionary<string, IApplicationStatus>();
-
     public static void Init()
     {
         ApplicationManager.s_OnApplicationUpdate += AppUpdate;

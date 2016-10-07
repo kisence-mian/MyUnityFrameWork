@@ -11,7 +11,7 @@ public class ApplicationManager : MonoBehaviour
     public string m_Status = "";
 
     [HideInInspector]
-    public List<string> m_globalStatus;
+    public List<string> m_globalLogic;
 
     public void Awake()
     {
@@ -24,11 +24,12 @@ public class ApplicationManager : MonoBehaviour
     public void AppLaunch()
     {
         SetResourceLoadType();            //设置资源加载类型
+        BundleConfigManager.Initialize(); //资源路径管理器启动
         Log.Init();                       //日志系统启动
         ApplicationStatusManager.Init();  //游戏流程状态机初始化
 
-        //初始化全局状态
-        InitGlobalStatus();
+        //初始化全局逻辑
+        InitGlobalLogic();
 
         if (m_AppMode != AppMode.Release)
         {
@@ -130,11 +131,14 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-    void InitGlobalStatus()
+    /// <summary>
+    /// 初始化全局逻辑
+    /// </summary>
+    void InitGlobalLogic()
     {
-        for (int i = 0; i < m_globalStatus.Count; i++)
+        for (int i = 0; i < m_globalLogic.Count; i++)
         {
-            
+            GlobalLogicManager.InitLogic(m_globalLogic[i]);
         }
     }
     #endregion
