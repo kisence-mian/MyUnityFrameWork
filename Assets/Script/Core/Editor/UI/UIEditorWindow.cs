@@ -19,6 +19,7 @@ public class UIEditorWindow : EditorWindow
 
     void OnEnable()
     {
+        EditorGUIStyleData.Init();
         GameObject uiManager = GameObject.Find("UIManager");
 
         if(uiManager)
@@ -196,10 +197,10 @@ public class UIEditorWindow : EditorWindow
         string[] allUIPrefabName = Directory.GetFiles(path);
         foreach (var item in allUIPrefabName)
         {
-            string oneUIPrefabName = item.Split('\\')[1].Split('.')[0];
+            string oneUIPrefabName = FileTool.GetFileNameByPath(item);
             if (item.EndsWith(".prefab"))
             {
-                string oneUIPrefabPsth = path + "/" + oneUIPrefabName + ".prefab";
+                string oneUIPrefabPsth = path + "/" + oneUIPrefabName;
                 allUIPrefab.Add(oneUIPrefabName, AssetDatabase.LoadAssetAtPath("Assets/" + oneUIPrefabPsth, typeof(GameObject)) as GameObject);
             }
         }

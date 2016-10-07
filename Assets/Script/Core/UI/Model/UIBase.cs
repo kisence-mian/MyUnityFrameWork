@@ -51,8 +51,8 @@ public class UIBase : MonoBehaviour
     Dictionary<string, Text> m_texts                  = new Dictionary<string, Text>();
     Dictionary<string, Button> m_buttons              = new Dictionary<string, Button>();
     Dictionary<string, ScrollRect> m_scrollRects      = new Dictionary<string, ScrollRect>();
-    Dictionary<string, RawImage> m_rawImage           = new Dictionary<string, RawImage>();
-    Dictionary<string, RectTransform> m_rectTransform = new Dictionary<string, RectTransform>();
+    Dictionary<string, RawImage> m_rawImages           = new Dictionary<string, RawImage>();
+    Dictionary<string, RectTransform> m_rectTransforms = new Dictionary<string, RectTransform>();
 
     public GameObject GetGameObject(string name)
     {
@@ -68,16 +68,16 @@ public class UIBase : MonoBehaviour
 
     public RectTransform GetRectTransform(string name)
     {
-        if (m_rectTransform.ContainsKey(name))
+        if (m_rectTransforms.ContainsKey(name))
         {
-            return m_rectTransform[name];
+            return m_rectTransforms[name];
         }
 
         if (m_objects.ContainsKey(name))
         {
             RectTransform tmp = m_objects[name].GetComponent<RectTransform>();
 
-            m_rectTransform.Add(name, tmp);
+            m_rectTransforms.Add(name, tmp);
 
             return tmp;
         }
@@ -171,16 +171,16 @@ public class UIBase : MonoBehaviour
 
     public RawImage GetRawImage(string name)
     {
-        if (m_rawImage.ContainsKey(name))
+        if (m_rawImages.ContainsKey(name))
         {
-            return m_rawImage[name];
+            return m_rawImages[name];
         }
 
         if (m_objects.ContainsKey(name))
         {
             RawImage tmp = m_objects[name].GetComponent<RawImage>();
 
-            m_rawImage.Add(name, tmp);
+            m_rawImages.Add(name, tmp);
             return tmp;
         }
         else
@@ -188,5 +188,23 @@ public class UIBase : MonoBehaviour
             throw new Exception("UIWindowBase GetRawImage error: dont find " + name);
         }
     }
+
+
+    private RectTransform m_rectTransform;
+    public RectTransform m_RectTransform
+    {
+        get
+        {
+
+            if (m_rectTransform == null)
+            {
+                m_rectTransform = GetComponent<RectTransform>();
+            }
+
+            return m_rectTransform;
+        }
+        set { m_rectTransform = value; }
+    }
+
     #endregion
 }

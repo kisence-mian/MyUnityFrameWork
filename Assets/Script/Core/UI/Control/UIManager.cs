@@ -59,7 +59,10 @@ public class UIManager : MonoBehaviour
         GameObject l_UItmp = GameObjectManager.CreatGameObject(l_UIname, s_Instance.gameObject);
         UIWindowBase l_UIbase = l_UItmp.GetComponent<UIWindowBase>();
         UISystemEvent.Dispatch(l_UIbase, UIEvent.OnInit);  //派发OnInit事件
-        l_UIbase.Init();
+        try{
+            l_UIbase.Init();}
+        catch(Exception e){
+            Debug.LogError("OnInit Exception: " + e.ToString());}
 
         AddHideUI(l_UIbase);
 
@@ -86,7 +89,12 @@ public class UIManager : MonoBehaviour
         AddUI(l_UIbase);
 
         UISystemEvent.Dispatch(l_UIbase, UIEvent.OnOpen);  //派发OnOpen事件
-        l_UIbase.OnOpen();
+        try{
+            l_UIbase.OnOpen();}
+        catch (Exception e)
+        {
+            Debug.LogError("OnOpen Exception: " + e.ToString());
+        }
 
         s_UILayerManager.SetLayer(l_UIbase);      //设置层级
         s_UIAnimManager.StartEnterAnim(l_UIbase, l_callback, l_objs); //播放动画
@@ -130,7 +138,15 @@ public class UIManager : MonoBehaviour
     public static void CloseUIWindowCallBack(UIWindowBase l_UI, params object[] l_objs)
     {
         UISystemEvent.Dispatch(l_UI, UIEvent.OnDestroy);  //派发OnDestroy事件
-        l_UI.OnClose();
+        try
+        {
+            l_UI.OnClose();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("OnClose Exception: " + e.ToString());
+        }
+
         l_UI.RemoveAllEvent();
         AddHideUI(l_UI);
     }
@@ -173,8 +189,14 @@ public class UIManager : MonoBehaviour
         {
             RemoveUI(l_UI);   
         }
-
-        l_UI.OnDestroy();
+        try
+        {
+            l_UI.OnDestroy();
+        }
+        catch(Exception e)
+        {
+            Debug.LogError("OnDestroy :" + e.ToString());
+        }
         Destroy(l_UI.gameObject);
     }
 

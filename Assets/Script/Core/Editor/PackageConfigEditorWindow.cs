@@ -378,7 +378,6 @@ public class BundleConfigEditorWindow : EditorWindow
         progressContent = "";
     }
 
-
     #region 显示Bundle包
 
     bool b_ok = true;
@@ -631,7 +630,6 @@ public class BundleConfigEditorWindow : EditorWindow
 
     }
     #endregion
-
 
     #endregion
 
@@ -1064,9 +1062,10 @@ public class BundleConfigEditorWindow : EditorWindow
     Dictionary<string, List<EditorObject>> checkDict = new Dictionary<string, List<EditorObject>>();
     Dictionary<string, int> bundleName = new Dictionary<string, int>();
     int errorCount = 0;
-    int warnCount = 0;
+    int warnCount  = 0;
 
     bool checkMaterial = false;  //是否检查材质球
+
     /// <summary>
     /// 依赖包检查
     /// </summary>

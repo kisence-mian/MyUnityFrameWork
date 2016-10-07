@@ -343,8 +343,6 @@ public class AnimSystem : MonoBehaviour
 
     public static void ValueTo(AnimParamHash l_animHash)
     {
-        Debug.Log("ValueTo");
-
         AnimData l_tmp = l_animHash.GetAnimData();
 
         l_tmp.Init();

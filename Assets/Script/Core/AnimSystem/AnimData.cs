@@ -269,8 +269,6 @@ public class AnimData
 
     public void UguiAlphaInit(bool isChild)
     {
-        Debug.Log("UguiAlphaInit");
-
         animObjectList_Image = new List<Image>();
         oldColor = new List<Color>();
 

@@ -14,7 +14,7 @@ public class ApplicationStatusManager
     static Dictionary<string,IApplicationStatus> s_status = new Dictionary<string,IApplicationStatus>();
 
     //全局状态
-    static Dictionary<string, IApplicationStatus> s_GlobalStatus = new Dictionary<string, IApplicationStatus>();
+    //static Dictionary<string, IApplicationStatus> s_GlobalStatus = new Dictionary<string, IApplicationStatus>();
 
     public static void Init()
     {

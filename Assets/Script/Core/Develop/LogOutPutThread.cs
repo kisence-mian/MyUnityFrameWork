@@ -61,7 +61,7 @@ public class LogOutPutThread
             this.mFileLogThread = new Thread(new ThreadStart(WriteLog));
             this.mFileLogThread.Start();
 
-            Debug.Log(logPath);
+            //Debug.Log(logPath);
         }
 
 		void WriteLog()
@@ -136,6 +136,7 @@ public class LogOutPutThread
 
             if ((bool)m_logData[isCrashKey] == true)
             {
+                Debug.Log("上传");
                 //上传
                 HTTPTool.Upload_Request(URLManager.GetURL("LogUpLoadURL"), (string)m_logData[logPathKey]);
             }
