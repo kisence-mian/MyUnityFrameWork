@@ -6,65 +6,97 @@ using System;
 
 public class AnimData
 {
-    public AnimType animType;
-    public InteType interpolationType;
-    public PathType pathType = PathType.Line;
-    public PlayType playType = PlayType.Once;
+    #region 参数
 
-    public GameObject animGameObejct;
-    public bool b_isChild = false;
-    public float currentTime = 0;
-    public float totalTime = 0;
-    public Vector3[] v3Contral = null; //二阶取第一个用，三阶取前两个
-    public float[] floatContral = null;
+    //基本变量
+    public GameObject m_animGameObejct;
+    public AnimType m_animType;
+    public InteType m_interpolationType = InteType.Default ;
+    public PathType m_pathType = PathType.Line;
+    public RepeatType m_playType = RepeatType.Once;
 
+    //进度控制变量
+    public bool m_isDone = false;
+    public float m_currentTime = 0;
+    public float m_totalTime = 0;
 
-    public bool isDone = false;
+    //V3
+    public Vector3 m_fromV3;
+    public Vector3 m_toV3;
 
+    //V2
+    public Vector2 m_fromV2;
+    public Vector2 m_toV2;
 
-    public object[] parameter;
-    public AnimCallBack callBack;
-
-
-    public Vector3 fromPos;
-    public Vector3 toPos;
-
-    public Vector2 fromV2;
-    public Vector2 toV2;
-
-    RectTransform rectRransform;
-    Transform transform;
-
+    //Float
+    public float fromFloat = 0;
+    public float toFloat = 0;
     
+    //Color
+    public Color fromColor;
+    public Color toColor;
+
+    //动画回调
+    public object[] m_parameter;
+    public AnimCallBack m_callBack;
+    
+    //其他设置
+    public bool m_isChild = false;
+    public bool m_isLocal = false;
+
+    //控制点
+    public Vector3[] m_v3Contral = null; //二阶取第一个用，三阶取前两个
+    public float[] m_floatContral = null;
+
+    //自定义函数
+    public AnimCustomMethodVector3 m_customMethodV3;
+    public AnimCustomMethodVector2 m_customMethodV2;
+    public AnimCustomMethodFloat m_customMethodFloat;
+
+    //缓存变量
+    RectTransform m_rectRransform;
+    Transform m_transform;
+
+    #endregion
+
+    #region 核心函数
 
     public void executeUpdate()
     {
-        currentTime += Time.deltaTime;
+        m_currentTime += Time.deltaTime;
 
-        if (currentTime > totalTime)
+        if (m_currentTime > m_totalTime)
         {
-            currentTime = totalTime;
-            isDone = true;
+            m_currentTime = m_totalTime;
+            m_isDone = true;
         }
 
-        switch (animType)
+        switch (m_animType)
         {
-            case AnimType.UGUI_alpha: UguiAlpha(); break;
-            case AnimType.UGUI_anchoredPosition: UguiPosition(); break;
+            case AnimType.UGUI_Alpha: UguiAlpha(); break;
+            case AnimType.UGUI_AnchoredPosition: UguiPosition(); break;
+            case AnimType.UGUI_SizeDetal: SizeDelta(); break;
+
+
             case AnimType.Position: Position(); break;
             case AnimType.LocalPosition: LocalPosition(); break;
             case AnimType.LocalScale: LocalScale(); break;
-            case AnimType.SizeDetal: SizeDelta(); break;
+
+
+            case AnimType.Custom_Vector3: CustomMethodVector3(); break;
+            case AnimType.Custom_Vector2: CustomMethodVector2(); break;
+            case AnimType.Custom_Float:   CustomMethodFloat(); break;
         }
     }
 
+    //动画播放完毕执行回调
     public void executeCallBack()
     {
         try
         {
-            if (callBack != null)
+            if (m_callBack != null)
             {
-                callBack(parameter);
+                m_callBack(m_parameter);
             }
         }
         catch (Exception e)
@@ -73,108 +105,141 @@ public class AnimData
         }
     }
 
-
-    //动画完成后，后续处理，例如循环播放等
+    //动画循环逻辑
     public bool AnimReplayLogic()
     {
-        switch (playType)
+        switch (m_playType)
         {
-            case PlayType.Once:
+            case RepeatType.Once:
                 return false;
 
-            case PlayType.Loop:
-                isDone = false;
-                currentTime = 0;
+            case RepeatType.Loop:
+                m_isDone = false;
+                m_currentTime = 0;
                 return true;
 
-            case PlayType.PingPang:
+            case RepeatType.PingPang:
 
                 ExchangeV2();
                 ExchangeAlpha();
                 ExchangePos();
-                isDone = false;
-                currentTime = 0;
+                m_isDone = false;
+                m_currentTime = 0;
                 return true;
         }
 
         return false;
     }
 
-    float getInterpolation(float oldValue, float aimValue)
+    #region 循环逻辑
+
+    public void ExchangeV2()
     {
-        switch (interpolationType)
-        {
-            case InteType.Default:
-            case InteType.Linear: return Mathf.Lerp(oldValue, aimValue, currentTime / totalTime);
-            case InteType.InBack: return InBack(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outBack: return OutBack(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inOutBack: return InOutBack(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outInBack: return OutInBack(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inQuad: return InQuad(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outQuad: return OutQuad(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inoutQuad: return InoutQuad(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inCubic: return InCubic(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outCubic: return OutCubic(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inoutCubic: return InoutCubic(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inQuart: return InQuart(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outQuart: return OutQuart(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inOutQuart: return InOutQuart(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outInQuart: return OutInQuart(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inQuint: return InQuint(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outQuint: return OutQuint(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inOutQuint: return InOutQuint(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outInQuint: return OutInQuint(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inSine: return InSine(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outSine: return OutSine(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inOutSine: return InOutSine(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outInSine: return OutInSine(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inExpo: return InExpo(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outExpo: return OutExpo(oldValue, aimValue, currentTime, totalTime);
-            case InteType.inOutExpo: return InOutExpo(oldValue, aimValue, currentTime, totalTime);
-            case InteType.outInExpo: return OutInExpo(oldValue, aimValue, currentTime, totalTime);
-
-        }
-
-        return 0;
-    }
-
-    Vector3 getInterpolationV3(Vector3 oldValue, Vector3 aimValue)
-    {
-
-        Vector3 result = new Vector3(
-            getInterpolation(oldValue.x, aimValue.x),
-            getInterpolation(oldValue.y, aimValue.y),
-            getInterpolation(oldValue.z, aimValue.z)
-        );
-
-        if (pathType != PathType.Line)
-        {
-            result = getBezierInterpolationV3(oldValue, aimValue);
-        }
-
-        return result;
-
+        Vector2 Vtmp = m_fromV2;
+        m_fromV2 = m_toV2;
+        m_toV2 = Vtmp;
 
     }
+    public void ExchangePos()
+    {
 
+        Vector3 Vtmp = m_fromV3;
+        m_fromV3 = m_toV3;
+        m_toV3 = Vtmp;
+
+    }
+    public void ExchangeAlpha()
+    {
+        float alphaTmp = fromFloat;
+        fromFloat = toFloat;
+        toFloat = alphaTmp;
+    }
+
+    #endregion
+
+    #endregion
+
+    #region 初始化
+
+    public void Init()
+    {
+        switch (m_animType)
+        {
+            case AnimType.UGUI_Alpha: UguiAlphaInit(m_isLocal); break;
+            case AnimType.UGUI_AnchoredPosition: UguiPositionInit(); break;
+            case AnimType.UGUI_SizeDetal: UguiPositionInit(); break;
+            case AnimType.Position: TransfromInit(); break;
+            case AnimType.LocalPosition: TransfromInit(); break;
+            case AnimType.LocalScale: TransfromInit(); break;
+        }
+
+        if (m_pathType != PathType.Line)
+        {
+            BezierInit();
+        }
+    }
+
+    #endregion
+
+    #region CustomMethod
+
+    public void CustomMethodFloat()
+    {
+        try
+        {
+            m_customMethodFloat(GetInterpolation(fromFloat, toFloat));
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
+    }
+
+    public void CustomMethodVector2()
+    {
+        try
+        {
+            m_customMethodV2(GetInterpolationV3(m_fromV2, m_toV2));
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
+    }
+
+    public void CustomMethodVector3()
+    {
+        try
+        {
+            m_customMethodV3(GetInterpolationV3(m_fromV3, m_toV3));
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
+    }
+
+    #endregion
+
+    #region 贝塞尔曲线
 
     /// <summary>
     /// 贝塞尔初始化（根据随机范围进行控制点随机）
     /// </summary>
-    public void bezierInit()
+    public void BezierInit()
     {
-        if (v3Contral == null)
+        if (m_v3Contral == null)
         {
-            if (floatContral != null)
+            if (m_floatContral != null)
             {
-                v3Contral = new Vector3[3];
-                v3Contral[0] = UnityEngine.Random.insideUnitSphere * floatContral[0] + fromPos;
-                v3Contral[1] = UnityEngine.Random.insideUnitSphere * floatContral[1] + toPos;
+                m_v3Contral = new Vector3[3];
+                m_v3Contral[0] = UnityEngine.Random.insideUnitSphere * m_floatContral[0] + m_fromV3;
+                m_v3Contral[1] = UnityEngine.Random.insideUnitSphere * m_floatContral[1] + m_toV3;
 
                 //二阶贝塞尔，控制点以起点与终点的中间为随机中心
-                if (pathType == PathType.Bezier2)
+                if (m_pathType == PathType.Bezier2)
                 {
-                    v3Contral[0] = UnityEngine.Random.insideUnitSphere * floatContral[0] + (fromPos + toPos) * 0.5f;
+                    m_v3Contral[0] = UnityEngine.Random.insideUnitSphere * m_floatContral[0] + (m_fromV3 + m_toV3) * 0.5f;
                 }
             }
             else
@@ -184,30 +249,29 @@ public class AnimData
         }
 
         //如果在平面内（z轴相同），控制点也要在该平面内
-        if (fromPos.z == toPos.z)
+        if (m_fromV3.z == m_toV3.z)
         {
-            v3Contral[0].z = fromPos.z;
-            v3Contral[1].z = toPos.z;
+            m_v3Contral[0].z = m_fromV3.z;
+            m_v3Contral[1].z = m_toV3.z;
         }
     }
     /// <summary>
     /// 贝塞尔专用算法
     /// </summary>
-    Vector3 getBezierInterpolationV3(Vector3 oldValue, Vector3 aimValue)
+    Vector3 GetBezierInterpolationV3(Vector3 oldValue, Vector3 aimValue)
     {
-
         Vector3 result = new Vector3(
-            getInterpolation(oldValue.x, aimValue.x),
+            GetInterpolation(oldValue.x, aimValue.x),
             0,
             0
         );
         float n_finishingRate = (result.x - oldValue.x) / (aimValue.x - oldValue.x);
         n_finishingRate = Mathf.Clamp(n_finishingRate, -1, 2);
 
-        switch (pathType)
+        switch (m_pathType)
         {
-            case PathType.Bezier2: return Bezier2(oldValue, aimValue, n_finishingRate, v3Contral);
-            case PathType.Bezier3: return Bezier3(oldValue, aimValue, n_finishingRate, v3Contral);
+            case PathType.Bezier2: return Bezier2(oldValue, aimValue, n_finishingRate, m_v3Contral);
+            case PathType.Bezier3: return Bezier3(oldValue, aimValue, n_finishingRate, m_v3Contral);
             default: return Vector3.zero;
         }
 
@@ -225,63 +289,37 @@ public class AnimData
     /// <summary>
     /// 三阶贝塞尔曲线函数
     /// </summary>
-
     Vector3 Bezier3(Vector3 startPos, Vector3 endPos, float n_time, Vector3[] t_ControlPoint)
     {
         return (1 - n_time) * (1 - n_time) * (1 - n_time) * startPos + 3 * (1 - n_time) * (1 - n_time) * n_time * t_ControlPoint[0] + 3 * (1 - n_time) * n_time * n_time * t_ControlPoint[1] + n_time * n_time * n_time * endPos;
     }
 
-
-    public void Init()
-    {
-        switch (animType)
-        {
-            case AnimType.UGUI_alpha: UguiAlphaInit(b_isChild); break;
-            case AnimType.UGUI_anchoredPosition: UguiPositionInit(); break;
-            case AnimType.SizeDetal: UguiPositionInit(); break;
-            case AnimType.Position: TransfromInit(); break;
-            case AnimType.LocalPosition: TransfromInit(); break;
-            case AnimType.LocalScale: TransfromInit(); break;
-        }
-
-        if (pathType != PathType.Line)
-        {
-            bezierInit();
-        }
-
-
-
-    }
+    #endregion
 
     #region UGUI
 
-
-
     #region UGUI_alpha
 
-    List<Image> animObjectList_Image = new List<Image>();
-    List<Text> animObjectList_Text = new List<Text>();
+    List<Image> m_animObjectList_Image = new List<Image>();
+    List<Text> m_animObjectList_Text = new List<Text>();
 
-    List<Color> oldColor = new List<Color>();
-
-    public float fromAlpha = 0;
-    public float toAlpha = 0;
+    List<Color> m_oldColor = new List<Color>();
 
     public void UguiAlphaInit(bool isChild)
     {
-        animObjectList_Image = new List<Image>();
-        oldColor = new List<Color>();
+        m_animObjectList_Image = new List<Image>();
+        m_oldColor = new List<Color>();
 
         if (isChild)
         {
-            Image[] images = animGameObejct.GetComponentsInChildren<Image>();
+            Image[] images = m_animGameObejct.GetComponentsInChildren<Image>();
             for(int i = 0; i < images.Length; i++)
             {
                 if (images[i].transform.GetComponent<Mask>() == null)
                 {
 
-                    animObjectList_Image.Add(images[i]);
-                    oldColor.Add(images[i].color);
+                    m_animObjectList_Image.Add(images[i]);
+                    m_oldColor.Add(images[i].color);
                 }
                 else
                 {
@@ -291,26 +329,26 @@ public class AnimData
 
 
 
-            Text[] texts = animGameObejct.GetComponentsInChildren<Text>();
+            Text[] texts = m_animGameObejct.GetComponentsInChildren<Text>();
 
             for (int i = 0; i < texts.Length; i++)
             {
-                animObjectList_Text.Add(texts[i]);
-                oldColor.Add(texts[i].color);
+                m_animObjectList_Text.Add(texts[i]);
+                m_oldColor.Add(texts[i].color);
             }
         }
         else
         {
-            animObjectList_Image.Add(animGameObejct.GetComponent<Image>());
-            oldColor.Add(animGameObejct.GetComponent<Image>().color);
+            m_animObjectList_Image.Add(m_animGameObejct.GetComponent<Image>());
+            m_oldColor.Add(m_animGameObejct.GetComponent<Image>().color);
         }
 
-        setUGUIAlpha(fromAlpha);
+        setUGUIAlpha(fromFloat);
     }
 
     void UguiAlpha()
     {
-        setUGUIAlpha(getInterpolation(fromAlpha, toAlpha));
+        setUGUIAlpha(GetInterpolation(fromFloat, toFloat));
     }
 
     public void setUGUIAlpha(float a)
@@ -318,20 +356,20 @@ public class AnimData
         Color newColor = new Color();
 
         int index = 0;
-        for (int i = 0; i < animObjectList_Image.Count; i++)
+        for (int i = 0; i < m_animObjectList_Image.Count; i++)
         {
-            newColor = oldColor[index];
+            newColor = m_oldColor[index];
             newColor.a = a;
-            animObjectList_Image[i].color = newColor;
+            m_animObjectList_Image[i].color = newColor;
 
             index++;
         }
 
-        for (int i = 0; i < animObjectList_Text.Count; i++)
+        for (int i = 0; i < m_animObjectList_Text.Count; i++)
         {
-            newColor = oldColor[index];
+            newColor = m_oldColor[index];
             newColor.a = a;
-            animObjectList_Text[i].color = newColor;
+            m_animObjectList_Text[i].color = newColor;
 
             index++;
         }
@@ -341,12 +379,12 @@ public class AnimData
 
     void SizeDelta()
     {
-        if (rectRransform == null)
+        if (m_rectRransform == null)
         {
-            Debug.LogError(transform.name + "缺少RectTransform组件，不能进行sizeDelta变换！！");
+            Debug.LogError(m_transform.name + "缺少RectTransform组件，不能进行sizeDelta变换！！");
             return;
         }
-        rectRransform.sizeDelta = getInterpolationV3(fromV2, toV2);
+        m_rectRransform.sizeDelta = GetInterpolationV3(m_fromV2, m_toV2);
     }
 
     #endregion
@@ -355,58 +393,108 @@ public class AnimData
 
     public void UguiPositionInit()
     {
-        rectRransform = animGameObejct.GetComponent<RectTransform>();
+        m_rectRransform = m_animGameObejct.GetComponent<RectTransform>();
     }
 
     void UguiPosition()
     {
-        rectRransform.anchoredPosition3D = getInterpolationV3(fromPos, toPos);
+        m_rectRransform.anchoredPosition3D = GetInterpolationV3(m_fromV3, m_toV3);
     }
-
-
 
     #endregion
     #endregion
 
     #region Transfrom
 
-
     public void TransfromInit()
     {
-        transform = animGameObejct.transform;
+        m_transform = m_animGameObejct.transform;
     }
 
     void Position()
     {
-        transform.position = getInterpolationV3(fromPos, toPos);
+        m_transform.position = GetInterpolationV3(m_fromV3, m_toV3);
     }
 
     void LocalPosition()
     {
-        transform.localPosition = getInterpolationV3(fromPos, toPos);
+        m_transform.localPosition = GetInterpolationV3(m_fromV3, m_toV3);
     }
 
     void LocalScale()
     {
-        transform.localScale = getInterpolationV3(fromPos, toPos);
+        m_transform.localScale = GetInterpolationV3(m_fromV3, m_toV3);
+    }
+
+    #endregion
+
+    #region Color
+
+    #endregion
+
+    #region 插值算法
+
+    #region 总入口
+
+    float GetInterpolation(float oldValue, float aimValue)
+    {
+        switch (m_interpolationType)
+        {
+            case InteType.Default:
+            case InteType.Linear: return Mathf.Lerp(oldValue, aimValue, m_currentTime / m_totalTime);
+            case InteType.InBack: return InBack(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutBack: return OutBack(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InOutBack: return InOutBack(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutInBack: return OutInBack(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InQuad: return InQuad(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutQuad: return OutQuad(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InoutQuad: return InoutQuad(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InCubic: return InCubic(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutCubic: return OutCubic(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InoutCubic: return InoutCubic(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InQuart: return InQuart(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutQuart: return OutQuart(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InOutQuart: return InOutQuart(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutInQuart: return OutInQuart(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InQuint: return InQuint(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutQuint: return OutQuint(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InOutQuint: return InOutQuint(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutInQuint: return OutInQuint(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InSine: return InSine(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutSine: return OutSine(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InOutSine: return InOutSine(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutInSine: return OutInSine(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InExpo: return InExpo(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutExpo: return OutExpo(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.InOutExpo: return InOutExpo(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InteType.OutInExpo: return OutInExpo(oldValue, aimValue, m_currentTime, m_totalTime);
+        }
+
+        return 0;
+    }
+
+    Vector3 GetInterpolationV3(Vector3 oldValue, Vector3 aimValue)
+    {
+        Vector3 result = Vector3.zero;
+
+        if (m_pathType == PathType.Line)
+        {
+            result = new Vector3(
+                GetInterpolation(oldValue.x, aimValue.x),
+                GetInterpolation(oldValue.y, aimValue.y),
+                GetInterpolation(oldValue.z, aimValue.z)
+            );
+        }
+        else
+        {
+            result = GetBezierInterpolationV3(oldValue, aimValue);
+        }
+
+        return result;
     }
 
 
-
-
-
     #endregion
-
-    #region color
-    public Color fromColor;
-    public Color toColor;
-
-
-    #endregion
-
-
-
-    #region 插值算法
 
     public float InBack(float b, float to, float t, float d)
     {
@@ -439,7 +527,6 @@ public class AnimData
             t = t - 2;
             return c / 2 * (t * t * ((s + 1) * t + s) + 2) + b;
         }
-
     }
 
     public float OutInBack(float b, float to, float t, float d, float s = 1.70158f)
@@ -453,7 +540,6 @@ public class AnimData
 
             t = t / d - 1;
             return c * (t * t * ((s + 1) * t + s) + 1) + b;
-
         }
 
         else
@@ -471,7 +557,6 @@ public class AnimData
                 return c / 2 * (t * t * ((s + 1) * t + s) + 2) + b;
             }
         }
-
 
     }
 
@@ -701,8 +786,6 @@ public class AnimData
             return (float)(c / 2 * 1.0005 * (-Math.Pow(2, -10 * t) + 2) + b);
 
         }
-
-
     }
 
     public float OutInExpo(float b, float to, float t, float d)
@@ -730,45 +813,11 @@ public class AnimData
         }
     }
 
-
-
-
     //outInExpo,
     //inBack,
     //outBack,
     //inOutBack,
     //outInBack,
 
-
-
-
-    #endregion
-
-
-
-    #region PingPang 起点终点交换
-    public  void ExchangeV2()
-    {
-        Vector2 Vtmp = fromV2;
-        fromV2 = toV2;
-        toV2 = Vtmp;
-
-    }
-    public void ExchangePos()
-    {
-
-        Vector3 Vtmp = fromPos;
-        fromPos = toPos;
-        toPos = Vtmp;
-
-    }
-    public void ExchangeAlpha()
-    {
-        float alphaTmp = fromAlpha;
-        fromAlpha = toAlpha;
-        toAlpha = alphaTmp;
-    }
     #endregion
 }
-
-

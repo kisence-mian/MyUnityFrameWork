@@ -19,6 +19,8 @@ public class ReusingScrollRect : ScrollRect
 
     Vector3 m_itemSize;
 
+    #region 公共方法
+
     public void Init(string itemName)
     {
         m_ItemName = itemName;
@@ -32,13 +34,6 @@ public class ReusingScrollRect : ScrollRect
         m_itemSize = m_itemPrefab.GetComponent<RectTransform>().sizeDelta;
     }
 
-    public void SetLayout()
-    {
-        content.anchorMin = GetMinAchors();
-        content.anchorMax = GetMaxAchors();
-        content.pivot = GetPivot();
-        content.anchoredPosition3D = Vector3.zero;
-    }
 
     public void SetData(List<Dictionary<string, object>> data)
     {
@@ -50,6 +45,34 @@ public class ReusingScrollRect : ScrollRect
         SetItemDisplay();
     }
 
+    public ReusingScrollItemBase GetItem(int index)
+    {
+        for (int i = 0; i < m_items.Count; i++)
+        {
+            if(m_items[i].m_index == index)
+            {
+                return m_items[i];
+            }
+        }
+
+        return null;
+    }
+
+    public Vector3 GetItemAnchorPos(int index)
+    {
+        return GetItemPos(index) + GetRealItemOffset() + content.localPosition;
+    }
+
+    public void SetPos(Vector3 pos)
+    {
+        content.anchoredPosition3D = pos;
+
+        SetItemDisplay();
+    }
+
+    #endregion 
+
+    #region 继承方法
     protected override void SetContentAnchoredPosition(Vector2 position)
     {
         base.SetContentAnchoredPosition(position);
@@ -62,6 +85,18 @@ public class ReusingScrollRect : ScrollRect
 
         UpdateBounds();
         SetItemDisplay();
+    }
+
+    #endregion
+
+    #region 私有方法
+
+    void SetLayout()
+    {
+        content.anchorMin = GetMinAchors();
+        content.anchorMax = GetMaxAchors();
+        content.pivot = GetPivot();
+        content.anchoredPosition3D = Vector3.zero;
     }
 
     void UpdateBounds()
@@ -379,6 +414,10 @@ public class ReusingScrollRect : ScrollRect
 
     //}
 
+    #endregion
+
+    #region 私有类和枚举
+
     class ReusingData
     {
         public int index;
@@ -390,4 +429,6 @@ public class ReusingScrollRect : ScrollRect
         Show,
         Hide
     }
+
+    #endregion
 }
