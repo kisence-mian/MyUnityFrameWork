@@ -443,14 +443,14 @@ public class AnimSystem : MonoBehaviour
                     //From
                     case AnimParamType.FromV3: DataTmp.m_fromV3 = (Vector3)hash.Value; break;
                     case AnimParamType.FromV2: DataTmp.m_fromV2 = (Vector2)hash.Value; break;
-                    case AnimParamType.FromColor: DataTmp.fromColor = (Color)hash.Value; break;
-                    case AnimParamType.FromFloat: DataTmp.fromFloat = (float)hash.Value; break;
+                    case AnimParamType.FromColor: DataTmp.m_fromColor = (Color)hash.Value; break;
+                    case AnimParamType.FromFloat: DataTmp.m_fromFloat = (float)hash.Value; break;
                     
                     //To
                     case AnimParamType.ToV3: DataTmp.m_toV3 = (Vector3)hash.Value; break;
                     case AnimParamType.ToV2: DataTmp.m_toV2 = (Vector2)hash.Value; break;
-                    case AnimParamType.ToColor: DataTmp.toColor = (Color)hash.Value; break;
-                    case AnimParamType.ToFloat: DataTmp.toFloat = (float)hash.Value; break;
+                    case AnimParamType.ToColor: DataTmp.m_toColor = (Color)hash.Value; break;
+                    case AnimParamType.ToFloat: DataTmp.m_toFloat = (float)hash.Value; break;
 
                     //动画回调
                     case AnimParamType.CallBack: DataTmp.m_callBack = (AnimCallBack)hash.Value; break;

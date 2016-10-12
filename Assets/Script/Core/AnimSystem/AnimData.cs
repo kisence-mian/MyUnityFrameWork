@@ -29,12 +29,12 @@ public class AnimData
     public Vector2 m_toV2;
 
     //Float
-    public float fromFloat = 0;
-    public float toFloat = 0;
+    public float m_fromFloat = 0;
+    public float m_toFloat = 0;
     
     //Color
-    public Color fromColor;
-    public Color toColor;
+    public Color m_fromColor;
+    public Color m_toColor;
 
     //动画回调
     public object[] m_parameter;
@@ -150,9 +150,9 @@ public class AnimData
     }
     public void ExchangeAlpha()
     {
-        float alphaTmp = fromFloat;
-        fromFloat = toFloat;
-        toFloat = alphaTmp;
+        float alphaTmp = m_fromFloat;
+        m_fromFloat = m_toFloat;
+        m_toFloat = alphaTmp;
     }
 
     #endregion
@@ -165,7 +165,7 @@ public class AnimData
     {
         switch (m_animType)
         {
-            case AnimType.UGUI_Alpha: UguiAlphaInit(m_isLocal); break;
+            case AnimType.UGUI_Alpha: UguiAlphaInit(m_isChild); break;
             case AnimType.UGUI_AnchoredPosition: UguiPositionInit(); break;
             case AnimType.UGUI_SizeDetal: UguiPositionInit(); break;
             case AnimType.Position: TransfromInit(); break;
@@ -187,7 +187,7 @@ public class AnimData
     {
         try
         {
-            m_customMethodFloat(GetInterpolation(fromFloat, toFloat));
+            m_customMethodFloat(GetInterpolation(m_fromFloat, m_toFloat));
         }
         catch (Exception e)
         {
@@ -317,7 +317,6 @@ public class AnimData
             {
                 if (images[i].transform.GetComponent<Mask>() == null)
                 {
-
                     m_animObjectList_Image.Add(images[i]);
                     m_oldColor.Add(images[i].color);
                 }
@@ -326,8 +325,6 @@ public class AnimData
                     //Debug.LogError("name:" + images[i].gameObject.name);
                 }
             }
-
-
 
             Text[] texts = m_animGameObejct.GetComponentsInChildren<Text>();
 
@@ -343,12 +340,12 @@ public class AnimData
             m_oldColor.Add(m_animGameObejct.GetComponent<Image>().color);
         }
 
-        setUGUIAlpha(fromFloat);
+        setUGUIAlpha(m_fromFloat);
     }
 
     void UguiAlpha()
     {
-        setUGUIAlpha(GetInterpolation(fromFloat, toFloat));
+        setUGUIAlpha(GetInterpolation(m_fromFloat, m_toFloat));
     }
 
     public void setUGUIAlpha(float a)

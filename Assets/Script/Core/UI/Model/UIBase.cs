@@ -40,22 +40,36 @@ public class UIBase : MonoBehaviour
     //生成对象表，便于快速获取对象，并忽略层级
     void CreateObjectTable()
     {
-        for(int i=0;i < m_objectList.Count;i++)
+        m_objects = new Dictionary<string, GameObject>();
+
+        for (int i = 0; i < m_objectList.Count; i++)
         {
-            m_objects.Add(m_objectList[i].name, m_objectList[i]);
+            if (m_objectList[i] != null)
+            {
+                m_objects.Add(m_objectList[i].name, m_objectList[i]);
+            }
+            else
+            {
+                Debug.LogWarning(name + " m_objectList[" + i + "] is Null !");
+            }
         }
     }
 
-    Dictionary<string, GameObject> m_objects          = new Dictionary<string, GameObject>();
-    Dictionary<string, Image> m_images                = new Dictionary<string, Image>();
-    Dictionary<string, Text> m_texts                  = new Dictionary<string, Text>();
-    Dictionary<string, Button> m_buttons              = new Dictionary<string, Button>();
-    Dictionary<string, ScrollRect> m_scrollRects      = new Dictionary<string, ScrollRect>();
-    Dictionary<string, RawImage> m_rawImages           = new Dictionary<string, RawImage>();
+    Dictionary<string, GameObject> m_objects;
+    Dictionary<string, Image> m_images = new Dictionary<string, Image>();
+    Dictionary<string, Text> m_texts = new Dictionary<string, Text>();
+    Dictionary<string, Button> m_buttons = new Dictionary<string, Button>();
+    Dictionary<string, ScrollRect> m_scrollRects = new Dictionary<string, ScrollRect>();
+    Dictionary<string, RawImage> m_rawImages = new Dictionary<string, RawImage>();
     Dictionary<string, RectTransform> m_rectTransforms = new Dictionary<string, RectTransform>();
 
     public GameObject GetGameObject(string name)
     {
+        if (m_objects == null)
+        {
+            CreateObjectTable();
+        }
+
         if (m_objects.ContainsKey(name))
         {
             return m_objects[name];
@@ -73,18 +87,9 @@ public class UIBase : MonoBehaviour
             return m_rectTransforms[name];
         }
 
-        if (m_objects.ContainsKey(name))
-        {
-            RectTransform tmp = m_objects[name].GetComponent<RectTransform>();
-
-            m_rectTransforms.Add(name, tmp);
-
-            return tmp;
-        }
-        else
-        {
-            throw new Exception("UIWindowBase GetRectTransform error: dont find " + name);
-        }
+        RectTransform tmp = GetGameObject(name).GetComponent<RectTransform>();
+        m_rectTransforms.Add(name, tmp);
+        return tmp;
     }
 
     public Image GetImage(string name)
@@ -94,18 +99,9 @@ public class UIBase : MonoBehaviour
             return m_images[name];
         }
 
-        if (m_objects.ContainsKey(name))
-        {
-            Image tmp = m_objects[name].GetComponent<Image>();
-
-            m_images.Add(name, tmp);
-
-            return tmp;
-        }
-        else
-        {
-            throw new Exception("UIWindowBase GetImage error: dont find " + name);
-        }
+        Image tmp = GetGameObject(name).GetComponent<Image>();
+        m_images.Add(name, tmp);
+        return tmp;
     }
 
     public Text GetText(string name)
@@ -115,18 +111,9 @@ public class UIBase : MonoBehaviour
             return m_texts[name];
         }
 
-        if (m_objects.ContainsKey(name))
-        {
-            Text tmp = m_objects[name].GetComponent<Text>();
-
-            m_texts.Add(name, tmp);
-
-            return tmp;
-        }
-        else
-        {
-            throw new Exception("UIWindowBase GetText error: dont find " + name);
-        }
+        Text tmp = GetGameObject(name).GetComponent<Text>();
+        m_texts.Add(name, tmp);
+        return tmp;
     }
 
     public Button GetButton(string name)
@@ -136,17 +123,9 @@ public class UIBase : MonoBehaviour
             return m_buttons[name];
         }
 
-        if (m_objects.ContainsKey(name))
-        {
-            Button tmp = m_objects[name].GetComponent<Button>();
-
-            m_buttons.Add(name, tmp);
-            return tmp;
-        }
-        else
-        {
-            throw new Exception("UIWindowBase GetText error: dont find " + name);
-        }
+        Button tmp = GetGameObject(name).GetComponent<Button>();
+        m_buttons.Add(name, tmp);
+        return tmp;
     }
 
     public ScrollRect GetScrollRect(string name)
@@ -156,17 +135,9 @@ public class UIBase : MonoBehaviour
             return m_scrollRects[name];
         }
 
-        if (m_objects.ContainsKey(name))
-        {
-            ScrollRect tmp = m_objects[name].GetComponent<ScrollRect>();
-
-            m_scrollRects.Add(name, tmp);
-            return tmp;
-        }
-        else
-        {
-            throw new Exception("UIWindowBase GetScrollRect error: dont find " + name);
-        }
+        ScrollRect tmp = GetGameObject(name).GetComponent<ScrollRect>();
+        m_scrollRects.Add(name, tmp);
+        return tmp;
     }
 
     public RawImage GetRawImage(string name)
@@ -176,17 +147,9 @@ public class UIBase : MonoBehaviour
             return m_rawImages[name];
         }
 
-        if (m_objects.ContainsKey(name))
-        {
-            RawImage tmp = m_objects[name].GetComponent<RawImage>();
-
-            m_rawImages.Add(name, tmp);
-            return tmp;
-        }
-        else
-        {
-            throw new Exception("UIWindowBase GetRawImage error: dont find " + name);
-        }
+        RawImage tmp = GetGameObject(name).GetComponent<RawImage>();
+        m_rawImages.Add(name, tmp);
+        return tmp;
     }
 
 
@@ -195,7 +158,6 @@ public class UIBase : MonoBehaviour
     {
         get
         {
-
             if (m_rectTransform == null)
             {
                 m_rectTransform = GetComponent<RectTransform>();
