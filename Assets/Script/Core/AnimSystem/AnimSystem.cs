@@ -9,7 +9,7 @@ public class AnimSystem : MonoBehaviour
 
     static AnimSystem instance;
 
-    public static AnimSystem getInstance()
+    public static AnimSystem GetInstance()
     {
         if (instance == null)
         {
@@ -23,9 +23,37 @@ public class AnimSystem : MonoBehaviour
         return instance;
     }
 
+    #region UGUI_Color
+
+    public static AnimData UguiColor(GameObject animObject, Color from, Color to, float time, 
+        RepeatType playType = RepeatType.Once,
+        InteType interpolationType = InteType.Default,
+        bool isChild = true,
+        AnimCallBack callBack = null, params object[] parameter)
+    {
+        AnimParamHash animParnHash = new AnimParamHash(
+          AnimParamType.GameObj, animObject,
+          AnimParamType.AnimType, AnimType.UGUI_Color,
+          AnimParamType.FromColor, from,
+          AnimParamType.ToColor, to,
+          AnimParamType.Time, time,
+          AnimParamType.InteType, interpolationType,
+          AnimParamType.IsIncludeChild, isChild,
+          AnimParamType.CallBack, callBack,
+          AnimParamType.CallBackParams, parameter
+          );
+
+        return ValueTo(animParnHash);
+    }
+
+    #endregion
+
     #region UGUI Alpha
-    public static void uguiAlpha(GameObject animObject, float from, float to, float time, RepeatType playType, 
-        InteType interpolationType = InteType.Default, bool isChild = true, AnimCallBack callBack = null, params object[] parameter)
+    public static AnimData UguiAlpha(GameObject animObject, float from, float to, float time, 
+        RepeatType playType = RepeatType.Once, 
+        InteType interpolationType = InteType.Default, 
+        bool isChild = true,
+        AnimCallBack callBack = null, params object[] parameter)
     {
         AnimParamHash animParnHash = new AnimParamHash(
            AnimParamType.GameObj, animObject,
@@ -39,13 +67,13 @@ public class AnimSystem : MonoBehaviour
            AnimParamType.CallBackParams, parameter
            );
 
-        ValueTo(animParnHash);
+        return ValueTo(animParnHash);
     }
 
-    public static void uguiAlpha(GameObject animObject, float from, float to, float time, 
+    public static AnimData UguiAlpha(GameObject animObject, float from, float to, float time, 
         InteType interpolationType = InteType.Default, bool isChild = true, AnimCallBack callBack = null, params object[] parameter)
     {
-        uguiAlpha(animObject, from, to, time, RepeatType.Once,interpolationType, isChild, callBack, parameter);
+        return UguiAlpha(animObject, from, to, time, RepeatType.Once,interpolationType, isChild, callBack, parameter);
     }
 
 
@@ -53,7 +81,7 @@ public class AnimSystem : MonoBehaviour
 
     #region UGUI Move
 
-    public static void UguiMove(GameObject animObject, Vector3 from, Vector3 to, float time, 
+    public static AnimData UguiMove(GameObject animObject, Vector3 from, Vector3 to, float time, 
         InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
     {
         AnimParamHash animParnHash = new AnimParamHash(
@@ -67,21 +95,20 @@ public class AnimSystem : MonoBehaviour
           AnimParamType.CallBackParams, parameter
           );
 
-        ValueTo(animParnHash);
+        return ValueTo(animParnHash);
     }
 
-    public static void UguiMove(GameObject animObject, Vector3 to, float time,
+    public static AnimData UguiMove(GameObject animObject, Vector3 to, float time,
         InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
     {
         Vector3 from = animObject.GetComponent<RectTransform>().anchoredPosition;
 
-
-        UguiMove(animObject, from, to, time, interpolationType, callBack, parameter);
+        return UguiMove(animObject, from, to, time, interpolationType, callBack, parameter);
     }
     #endregion
 
     #region UGUI_SizeDelta
-    public static void SizeDelta(GameObject animObject, Vector2 from, Vector2 to, float time,
+    public static AnimData UguiSizeDelta(GameObject animObject, Vector2 from, Vector2 to, float time,
         RepeatType playType, InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
     {
         AnimParamHash animParnHash = new AnimParamHash(
@@ -96,26 +123,26 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.CallBackParams, parameter
             );
 
-        ValueTo(animParnHash);
+        return ValueTo(animParnHash);
     }
 
-    public static void SizeDelta(GameObject animObject, Vector2 from, Vector2 to, float time,
+    public static AnimData UguiSizeDelta(GameObject animObject, Vector2 from, Vector2 to, float time,
         InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
     {
-        SizeDelta(animObject, from, to, time, RepeatType.Once, interpolationType, callBack, parameter);
+        return UguiSizeDelta(animObject, from, to, time, RepeatType.Once, interpolationType, callBack, parameter);
     }
 
-    public static void SizeDelta(GameObject animObject, Vector2 to, float time,
+    public static AnimData UguiSizeDelta(GameObject animObject, Vector2 to, float time,
         InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
     {
         Vector2 from = animObject.GetComponent<RectTransform>().sizeDelta;
-        SizeDelta(animObject, from, to, time, interpolationType, callBack, parameter);
+        return UguiSizeDelta(animObject, from, to, time, interpolationType, callBack, parameter);
     }
 
     #endregion
 
     #region Move
-    public static void Move(GameObject animObject, Vector3 from, Vector3 to, float time, 
+    public static AnimData Move(GameObject animObject, Vector3 from, Vector3 to, float time, 
         InteType interpolationType = InteType.Default, RepeatType playType = RepeatType.Once, bool isLocal = true,
         AnimCallBack callBack = null, params object[] parameter)
     {
@@ -142,18 +169,17 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.CallBackParams, parameter
             );
 
-        ValueTo(animParnHash);
-
+        return ValueTo(animParnHash);
     }
 
-    public static void Move(GameObject animObject, Vector3 from, Vector3 to, float time, 
+    public static AnimData Move(GameObject animObject, Vector3 from, Vector3 to, float time, 
         InteType interpolationType = InteType.Default, bool isLocal = true, AnimCallBack callBack = null, params object[] parameter)
     {
-        Move(animObject, from, to, time, interpolationType, RepeatType.Once, isLocal, callBack, parameter);
+        return Move(animObject, from, to, time, interpolationType, RepeatType.Once, isLocal, callBack, parameter);
     }
 
     //不传From
-    public static void Move(GameObject animObject, Vector3 to, float time,
+    public static AnimData Move(GameObject animObject, Vector3 to, float time,
         InteType interpolationType = InteType.Default, bool isLocal = true, AnimCallBack callBack = null, params object[] parameter)
     {
         Vector3 from;
@@ -166,15 +192,13 @@ public class AnimSystem : MonoBehaviour
             from = animObject.transform.position;
         }
 
-
-        Move(animObject, from, to, time, interpolationType, isLocal, callBack, parameter);
-
+        return Move(animObject, from, to, time, interpolationType, isLocal, callBack, parameter);
     }
 
     #endregion
 
     #region Scale
-    public static void Scale(GameObject animObject, Vector3 from, Vector3 to, float time,RepeatType playType , 
+    public static AnimData Scale(GameObject animObject, Vector3 from, Vector3 to, float time, RepeatType playType, 
         InteType interpolationType = InteType.Default , AnimCallBack callBack = null, params object[] parameter)
     {
         AnimParamHash animParnHash = new AnimParamHash(
@@ -189,28 +213,27 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.CallBackParams, parameter
             );
 
-        ValueTo(animParnHash);
+        return ValueTo(animParnHash);
     }
 
-    public static void Scale(GameObject animObject, Vector3 from, Vector3 to, float time,
+    public static AnimData Scale(GameObject animObject, Vector3 from, Vector3 to, float time,
         InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
     {
-        Scale(animObject, from, to, time, RepeatType.Once,interpolationType,  callBack, parameter);
+        return Scale(animObject, from, to, time, RepeatType.Once,interpolationType,  callBack, parameter);
     }
 
-    public static void Scale(GameObject animObject, Vector3 to, float time,
+    public static AnimData Scale(GameObject animObject, Vector3 to, float time,
         InteType interpolationType = InteType.Default, AnimCallBack callBack = null, params object[] parameter)
     {
         Vector3 from = animObject.transform.localScale;
-        Scale(animObject, from, to, time, interpolationType, callBack, parameter);
-
+        return Scale(animObject, from, to, time, interpolationType, callBack, parameter);
     }
 
     #endregion
 
     #region CustomMethod
 
-    public static void CustomMethodToFloat(AnimCustomMethodFloat method, float from, float to, float time, 
+    public static AnimData CustomMethodToFloat(AnimCustomMethodFloat method, float from, float to, float time, 
         InteType interpolationType = InteType.Default,
         RepeatType repeatType = RepeatType.Once,
         AnimCallBack callBack = null, params object[] parameter)
@@ -227,10 +250,10 @@ public class AnimSystem : MonoBehaviour
            AnimParamType.CallBackParams, parameter
            );
 
-        ValueTo(animParnHash);
+        return ValueTo(animParnHash);
     }
 
-    public static void CustomMethodToVector2(AnimCustomMethodVector2 method, Vector2 from, Vector2 to, float time,
+    public static AnimData CustomMethodToVector2(AnimCustomMethodVector2 method, Vector2 from, Vector2 to, float time,
         InteType interpolationType = InteType.Default,
         RepeatType repeatType = RepeatType.Once,
         AnimCallBack callBack = null, params object[] parameter)
@@ -247,10 +270,10 @@ public class AnimSystem : MonoBehaviour
            AnimParamType.CallBackParams, parameter
            );
 
-        ValueTo(animParnHash);
+        return ValueTo(animParnHash);
     }
 
-    public static void CustomMethodToVector3(AnimCustomMethodVector3 method, Vector3 from, Vector3 to, float time,
+    public static AnimData CustomMethodToVector3(AnimCustomMethodVector3 method, Vector3 from, Vector3 to, float time,
        InteType interpolationType = InteType.Default,
         RepeatType repeatType = RepeatType.Once,
         AnimCallBack callBack = null, params object[] parameter)
@@ -267,13 +290,13 @@ public class AnimSystem : MonoBehaviour
            AnimParamType.CallBackParams, parameter
            );
 
-        ValueTo(animParnHash);
+        return ValueTo(animParnHash);
     }
 
     #endregion
 
     #region 贝塞尔
-    public static void BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time,
+    public static AnimData BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time,
         RepeatType playType, InteType interpolationType = InteType.Default, bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2, Vector3[] t_Bezier_contral = null,
         AnimCallBack callBack = null, params object[] parameter)
@@ -303,17 +326,17 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.CallBackParams, parameter
             );
 
-        ValueTo(animParnHash);
+        return ValueTo(animParnHash);
     }
 
-    public static void BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time,
+    public static AnimData BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time,
         InteType interpolationType = InteType.Default, bool isLocal = true, PathType bezierMoveType = PathType.Bezier2, Vector3[] t_Bezier_contral = null, AnimCallBack callBack = null, params object[] parameter)
     {
-        BezierMove(animObject, from, to, time, RepeatType.Once, interpolationType, isLocal, bezierMoveType, t_Bezier_contral, callBack, parameter);
+        return BezierMove(animObject, from, to, time, RepeatType.Once, interpolationType, isLocal, bezierMoveType, t_Bezier_contral, callBack, parameter);
     }
 
     //不传From，传准确控制点
-    public static void BezierMove(GameObject animObject, Vector3 to, float time,
+    public static AnimData BezierMove(GameObject animObject, Vector3 to, float time,
         InteType interpolationType = InteType.Default,
         RepeatType playType = RepeatType.Once,
         bool isLocal = true,
@@ -331,11 +354,11 @@ public class AnimSystem : MonoBehaviour
             from = animObject.transform.position;
         }
 
-        BezierMove(animObject, from, to, time, playType, interpolationType, isLocal, bezierMoveType, t_Bezier_contral, callBack, parameter);
+        return BezierMove(animObject, from, to, time, playType, interpolationType, isLocal, bezierMoveType, t_Bezier_contral, callBack, parameter);
     }
 
     //传From，传准确控制点随机范围
-    public static void BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time, RepeatType playType,
+    public static AnimData BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time, RepeatType playType,
         InteType interpolationType = InteType.Default,
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
@@ -367,21 +390,21 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.CallBackParams, parameter
             );
 
-        ValueTo(animParnHash);
+        return ValueTo(animParnHash);
     }
 
-    public static void BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time,
+    public static AnimData BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time,
         InteType interpolationType = InteType.Default, bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
         float[] t_Bezier_contralRadius = null,
         AnimCallBack callBack = null, params object[] parameter)
     {
-        BezierMove(animObject, from, to, time, RepeatType.Once, interpolationType, isLocal, bezierMoveType, t_Bezier_contralRadius, callBack, parameter);
+        return BezierMove(animObject, from, to, time, RepeatType.Once, interpolationType, isLocal, bezierMoveType, t_Bezier_contralRadius, callBack, parameter);
     }
 
 
     //不传From，传准确控制点随机范围
-    public static void BezierMove(GameObject animObject, Vector3 to, float time, RepeatType playType,
+    public static AnimData BezierMove(GameObject animObject, Vector3 to, float time, RepeatType playType,
         InteType interpolationType = InteType.Default,
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
@@ -398,20 +421,22 @@ public class AnimSystem : MonoBehaviour
             from = animObject.transform.position;
         }
 
-        BezierMove(animObject, from, to, time, playType, interpolationType, isLocal, bezierMoveType, t_Bezier_contralRadius, callBack, parameter);
+        return BezierMove(animObject, from, to, time, playType, interpolationType, isLocal, bezierMoveType, t_Bezier_contralRadius, callBack, parameter);
     }
 
     #endregion
 
     #region ValueTo
 
-    public static void ValueTo(AnimParamHash l_animHash)
+    public static AnimData ValueTo(AnimParamHash l_animHash)
     {
-        AnimData l_tmp = l_animHash.GetAnimData();
+       AnimData l_tmp = l_animHash.GetAnimData();
 
-        l_tmp.Init();
+       l_tmp.Init();
 
-        getInstance().animList.Add(l_tmp);
+       GetInstance().animList.Add(l_tmp);
+
+       return l_tmp;
     }
 
     public class AnimParamHash : Dictionary<AnimParamType, object>
@@ -513,6 +538,61 @@ public class AnimSystem : MonoBehaviour
 
     #endregion
 
+    #region 功能函数
+
+    /// <summary>
+    /// 停止一个对象身上的所有动画
+    /// </summary>
+    /// <param name="animGameObject">要停止动画的对象</param>
+    /// <param name="isCallBack">是否触发回调</param>
+    public static void StopAnim(GameObject animGameObject,bool isCallBack = false)
+    {
+        for (int i = 0; i < GetInstance().animList.Count; i++)
+        {
+            if (GetInstance().animList[i].m_animGameObejct == animGameObject)
+            {
+                if(isCallBack)
+                {
+                    AnimData dataTmp = GetInstance().animList[i];
+                    dataTmp.executeCallBack();
+                }
+
+                GetInstance().animList.RemoveAt(i);
+                i--;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 停止一个动画
+    /// </summary>
+    /// <param name="animGameObject">要停止的动画</param>
+    /// <param name="isCallBack">是否触发回调</param>
+    public static void StopAnim(AnimData animData, bool isCallBack = false)
+    {
+        if (isCallBack)
+        {
+            animData.executeCallBack();
+        }
+
+        GetInstance().animList.Remove(animData);
+    }
+
+    /// <summary>
+    /// 立即完成一个动画
+    /// </summary>
+    /// <param name="animGameObject">要完成的</param>
+    public static void FinishAnim(AnimData animData)
+    {
+        animData.m_currentTime = animData.m_totalTime;
+        animData.executeUpdate();
+        animData.executeCallBack();
+
+        GetInstance().animList.Remove(animData);
+    }
+
+    #endregion
+
     #endregion
 
     #region 实例部分
@@ -558,6 +638,7 @@ public enum AnimType
     Position,
     LocalScale,
 
+    UGUI_Color,
     UGUI_Alpha,
     UGUI_AnchoredPosition,
     UGUI_SizeDetal,
