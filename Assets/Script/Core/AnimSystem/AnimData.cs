@@ -35,6 +35,7 @@ public class AnimData
     //Color
     public Color m_fromColor;
     public Color m_toColor;
+    List<Color> m_oldColor = new List<Color>();
 
     //动画回调
     public object[] m_parameter;
@@ -82,7 +83,11 @@ public class AnimData
             case AnimType.Position: Position(); break;
             case AnimType.LocalPosition: LocalPosition(); break;
             case AnimType.LocalScale: LocalScale(); break;
+            case AnimType.LocalRotate: LocalRotate(); break;
+            case AnimType.Rotate: Rotate(); break;
 
+            case AnimType.Color: UpdateColor(); break;
+            case AnimType.Alpha: UpdateAlpha(); break;
 
             case AnimType.Custom_Vector3: CustomMethodVector3(); break;
             case AnimType.Custom_Vector2: CustomMethodVector2(); break;
@@ -170,9 +175,15 @@ public class AnimData
             case AnimType.UGUI_Alpha: UguiAlphaInit(m_isChild); break;
             case AnimType.UGUI_AnchoredPosition: UguiPositionInit(); break;
             case AnimType.UGUI_SizeDetal: UguiPositionInit(); break;
+
+            case AnimType.Color: ColorInit(m_isChild); break;
+            case AnimType.Alpha: AlphaInit(m_isChild); break;
+
             case AnimType.Position: TransfromInit(); break;
             case AnimType.LocalPosition: TransfromInit(); break;
             case AnimType.LocalScale: TransfromInit(); break;
+            case AnimType.LocalRotate: TransfromInit(); break;
+            case AnimType.Rotate: TransfromInit(); break;
         }
 
         if (m_pathType != PathType.Line)
@@ -307,7 +318,7 @@ public class AnimData
 
     #region ALpha
 
-    List<Color> m_oldColor = new List<Color>();
+    
 
     public void UguiAlphaInit(bool isChild)
     {
@@ -454,6 +465,7 @@ public class AnimData
 
     #endregion
 
+    #region UGUI_SizeDelta
     void SizeDelta()
     {
         if (m_rectRransform == null)
@@ -464,7 +476,9 @@ public class AnimData
         m_rectRransform.sizeDelta = GetInterpolationV3(m_fromV2, m_toV2);
     }
 
-    #region UGUI_position
+    #endregion
+
+    #region UGUI_Position
 
     public void UguiPositionInit()
     {
@@ -477,6 +491,7 @@ public class AnimData
     }
 
     #endregion
+
     #endregion
 
     #region Transfrom
@@ -496,6 +511,16 @@ public class AnimData
         m_transform.localPosition = GetInterpolationV3(m_fromV3, m_toV3);
     }
 
+    void LocalRotate()
+    {
+        m_transform.localEulerAngles = GetInterpolationV3(m_fromV3, m_toV3);
+    }
+
+    void Rotate()
+    {
+        m_transform.eulerAngles = GetInterpolationV3(m_fromV3, m_toV3);
+    }
+
     void LocalScale()
     {
         m_transform.localScale = GetInterpolationV3(m_fromV3, m_toV3);
@@ -504,6 +529,96 @@ public class AnimData
     #endregion
 
     #region Color
+
+    List<SpriteRenderer> m_animObjectList_Sprite = new List<SpriteRenderer>();
+
+    #region ALPHA
+
+    public void AlphaInit(bool isChild)
+    {
+        if (isChild)
+        {
+            SpriteRenderer[] images = m_animGameObejct.GetComponentsInChildren<SpriteRenderer>();
+            for (int i = 0; i < images.Length; i++)
+            {
+                m_animObjectList_Sprite.Add(images[i]);
+                m_oldColor.Add(images[i].color);
+            }
+        }
+        else
+        {
+            SpriteRenderer image = m_animGameObejct.GetComponent<SpriteRenderer>();
+            if (image != null)
+            {
+                m_animObjectList_Sprite.Add(image);
+                m_oldColor.Add(image.color);
+            }
+        }
+
+        SetAlpha(m_fromFloat);
+    }
+
+    void UpdateAlpha()
+    {
+        SetAlpha(GetInterpolation(m_fromFloat, m_toFloat));
+    }
+
+    public void SetAlpha(float a)
+    {
+        Color newColor = new Color();
+
+        int index = 0;
+        for (int i = 0; i < m_animObjectList_Sprite.Count; i++)
+        {
+            newColor = m_oldColor[index];
+            newColor.a = a;
+            m_animObjectList_Image[i].color = newColor;
+
+            index++;
+        }
+    }
+
+    #endregion
+
+    #region Color
+
+    public void ColorInit(bool isChild)
+    {
+        if (isChild)
+        {
+            SpriteRenderer[] images = m_animGameObejct.GetComponentsInChildren<SpriteRenderer>();
+
+            for (int i = 0; i < images.Length; i++)
+            {
+                m_animObjectList_Sprite.Add(images[i]);
+            }
+        }
+        else
+        {
+            SpriteRenderer image = m_animGameObejct.GetComponent<SpriteRenderer>();
+            if (image != null)
+            {
+                m_animObjectList_Sprite.Add(image);
+            }
+        }
+
+        SetColor(m_fromColor);
+    }
+
+    void UpdateColor()
+    {
+        SetColor(GetInterpolationColor(m_fromColor, m_toColor));
+    }
+
+    public void SetColor(Color color)
+    {
+        for (int i = 0; i < m_animObjectList_Sprite.Count; i++)
+        {
+            m_animObjectList_Image[i].color = color;
+        }
+    }
+
+    #endregion
 
     #endregion
 

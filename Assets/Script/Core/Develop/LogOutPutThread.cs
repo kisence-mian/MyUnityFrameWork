@@ -134,7 +134,7 @@ public class LogOutPutThread
         {
             m_logData = ConfigManager.GetData(ConfigName);
 
-            if ((bool)m_logData[isCrashKey] == true)
+            if (m_logData.ContainsKey(ConfigName) && (bool)m_logData[isCrashKey] == true)
             {
                 Debug.Log("上传");
                 //上传

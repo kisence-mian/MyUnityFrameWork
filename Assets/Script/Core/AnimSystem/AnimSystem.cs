@@ -141,6 +141,56 @@ public class AnimSystem : MonoBehaviour
 
     #endregion
 
+    #region Color
+
+    public static AnimData ColorTo(GameObject animObject, Color from, Color to, float time,
+       InteType interpolationType = InteType.Default,
+        RepeatType playType = RepeatType.Once,
+        bool isChild = true,
+       AnimCallBack callBack = null, params object[] parameter)
+    {
+
+        AnimParamHash animParnHash = new AnimParamHash(
+            AnimParamType.GameObj, animObject,
+            AnimParamType.AnimType, AnimType.Color,
+            AnimParamType.FromColor, from,
+            AnimParamType.ToColor, to,
+            AnimParamType.Time, time,
+            AnimParamType.InteType, interpolationType,
+            AnimParamType.IsIncludeChild, isChild,
+            AnimParamType.RepeatType, playType,
+            AnimParamType.CallBack, callBack,
+            AnimParamType.CallBackParams, parameter
+            );
+
+        return ValueTo(animParnHash);
+    }
+
+    public static AnimData AlphaTo(GameObject animObject, float from, float to, float time,
+      InteType interpolationType = InteType.Default, 
+      RepeatType playType = RepeatType.Once,
+      bool isChild = true,
+      AnimCallBack callBack = null, params object[] parameter)
+    {
+
+        AnimParamHash animParnHash = new AnimParamHash(
+            AnimParamType.GameObj, animObject,
+            AnimParamType.AnimType, AnimType.Alpha,
+            AnimParamType.FromFloat, from,
+            AnimParamType.ToFloat, to,
+            AnimParamType.Time, time,
+            AnimParamType.InteType, interpolationType,
+            AnimParamType.IsIncludeChild, isChild,
+            AnimParamType.RepeatType, playType,
+            AnimParamType.CallBack, callBack,
+            AnimParamType.CallBackParams, parameter
+            );
+
+        return ValueTo(animParnHash);
+    }
+
+    #endregion
+
     #region Move
     public static AnimData Move(GameObject animObject, Vector3 from, Vector3 to, float time, 
         InteType interpolationType = InteType.Default, RepeatType playType = RepeatType.Once, bool isLocal = true,
@@ -194,6 +244,44 @@ public class AnimSystem : MonoBehaviour
 
         return Move(animObject, from, to, time, interpolationType, isLocal, callBack, parameter);
     }
+
+    #endregion
+
+    #region Rotate
+
+    public static void Rotate(GameObject animObject, Vector3 from, Vector3 to, float time, 
+        InteType interpolationType = InteType.Default, 
+        RepeatType playType = RepeatType.Once,
+        bool isLocal = true,
+        AnimCallBack callBack = null, params object[] parameter)
+    {
+        AnimType animType;
+        if (isLocal)
+        {
+            animType = AnimType.LocalRotate;
+        }
+        else
+        {
+            animType = AnimType.Rotate;
+        }
+
+        AnimParamHash animParnHash = new AnimParamHash(
+            AnimParamType.GameObj, animObject,
+            AnimParamType.AnimType, animType,
+            AnimParamType.FromV3, from,
+            AnimParamType.ToV3, to,
+            AnimParamType.Time, time,
+            AnimParamType.InteType, interpolationType,
+            AnimParamType.IsLocal, isLocal,
+            AnimParamType.RepeatType, playType,
+            AnimParamType.CallBack, callBack,
+            AnimParamType.CallBackParams, parameter
+            );
+
+        ValueTo(animParnHash);
+
+    }
+
 
     #endregion
 
@@ -637,6 +725,11 @@ public enum AnimType
     LocalPosition,
     Position,
     LocalScale,
+    LocalRotate,
+    Rotate,
+    
+    Color,
+    Alpha,
 
     UGUI_Color,
     UGUI_Alpha,
