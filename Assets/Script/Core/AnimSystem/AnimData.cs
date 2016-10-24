@@ -273,13 +273,7 @@ public class AnimData
     /// </summary>
     Vector3 GetBezierInterpolationV3(Vector3 oldValue, Vector3 aimValue)
     {
-        Vector3 result = new Vector3(
-            GetInterpolation(oldValue.x, aimValue.x),
-            0,
-            0
-        );
-        float n_finishingRate = (result.x - oldValue.x) / (aimValue.x - oldValue.x);
-        n_finishingRate = Mathf.Clamp(n_finishingRate, -1, 2);
+        float n_finishingRate = m_currentTime / m_totalTime;
 
         switch (m_pathType)
         {
@@ -304,7 +298,10 @@ public class AnimData
     /// </summary>
     Vector3 Bezier3(Vector3 startPos, Vector3 endPos, float n_time, Vector3[] t_ControlPoint)
     {
-        return (1 - n_time) * (1 - n_time) * (1 - n_time) * startPos + 3 * (1 - n_time) * (1 - n_time) * n_time * t_ControlPoint[0] + 3 * (1 - n_time) * n_time * n_time * t_ControlPoint[1] + n_time * n_time * n_time * endPos;
+        return (1 - n_time) * (1 - n_time) * (1 - n_time) * startPos 
+            + 3 * (1 - n_time) * (1 - n_time) * n_time * t_ControlPoint[0] 
+            + 3 * (1 - n_time) * n_time * n_time * t_ControlPoint[1] 
+            + n_time * n_time * n_time * endPos;
     }
 
     #endregion
@@ -572,7 +569,7 @@ public class AnimData
         {
             newColor = m_oldColor[index];
             newColor.a = a;
-            m_animObjectList_Image[i].color = newColor;
+            m_animObjectList_Sprite[i].color = newColor;
 
             index++;
         }
@@ -614,7 +611,7 @@ public class AnimData
     {
         for (int i = 0; i < m_animObjectList_Sprite.Count; i++)
         {
-            m_animObjectList_Image[i].color = color;
+            m_animObjectList_Sprite[i].color = color;
         }
     }
 
