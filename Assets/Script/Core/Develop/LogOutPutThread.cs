@@ -132,40 +132,40 @@ public class LogOutPutThread
 
         public void UpLoadLogic(string logPath)
         {
-            m_logData = ConfigManager.GetData(ConfigName);
+            //m_logData = ConfigManager.GetData(ConfigName);
 
-            if (m_logData.ContainsKey(ConfigName) && (bool)m_logData[isCrashKey] == true)
-            {
-                Debug.Log("上传");
-                //上传
-                HTTPTool.Upload_Request(URLManager.GetURL("LogUpLoadURL"), (string)m_logData[logPathKey]);
-            }
+            //if (m_logData.ContainsKey(ConfigName) && (bool)m_logData[isCrashKey] == true)
+            //{
+            //    Debug.Log("上传");
+            //    //上传
+            //    HTTPTool.Upload_Request(URLManager.GetURL("LogUpLoadURL"), (string)m_logData[logPathKey]);
+            //}
 
-            //初始化数据
-            if (m_logData.ContainsKey(isCrashKey))
-            {
-                m_logData[isCrashKey] = false;
-                m_logData[logPathKey] = logPath;
-            }
-            else
-            {
-                m_logData.Add(isCrashKey, false);
-                m_logData.Add(logPathKey, logPath);
-            }
+            ////初始化数据
+            //if (m_logData.ContainsKey(isCrashKey))
+            //{
+            //    m_logData[isCrashKey] = false;
+            //    m_logData[logPathKey] = logPath;
+            //}
+            //else
+            //{
+            //    m_logData.Add(isCrashKey, false);
+            //    m_logData.Add(logPathKey, logPath);
+            //}
         }
 
         
         public void ExitLogic()
         {
-            if (m_logData.ContainsKey(isCrashKey))
-            {
-                m_logData[isCrashKey] = false;
-            }
-            else
-            {
-                m_logData.Add(isCrashKey, false);
-            }
+            //if (m_logData.ContainsKey(isCrashKey))
+            //{
+            //    m_logData[isCrashKey] = false;
+            //}
+            //else
+            //{
+            //    m_logData.Add(isCrashKey, false);
+            //}
 
-            ConfigManager.SaveData(ConfigName, m_logData);
+            //ConfigManager.SaveData(ConfigName, m_logData);
         }
 }

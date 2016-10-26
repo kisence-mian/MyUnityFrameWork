@@ -1,9 +1,9 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using MiniJSON;
 using System.Text;
+using System;
 
 /// <summary>
 /// 配置管理器，可读可写，可同步，有默认值
@@ -11,36 +11,34 @@ using System.Text;
 /// </summary>
 public static class ConfigManager 
 {
-    public const string directoryName = "Config";
+    public const string c_directoryName = "Config";
 
-    public static Dictionary<string, object> GetData(string ConfigName)
+    public static Dictionary<string, SingleConfig> GetData(string ConfigName)
     {
         string dataJson = "";
 
-        if (ResourceManager.gameLoadType != ResLoadType.Resource)
-        {
-            dataJson = ResourceIOTool.ReadStringByFile(GetAbsolutePath(ConfigName));
-        }
-        else
-        {
-            dataJson = ResourceIOTool.ReadStringByResource(GetRelativelyPath(ConfigName));
-        }
+        #if UNITY_EDITOR
+                dataJson = ResourceIOTool.ReadStringByResource(GetRelativelyPath(ConfigName));
+        #else
+                dataJson = ResourceManager.ReadTextFile(ConfigName);
+        #endif
 
         if (dataJson == "")
         {
-            Debug.Log(ConfigName + " dont find!");
-            return new Dictionary<string,object>();
+            #if !UNITY_EDITOR
+                throw new Exception("ConfigManager GetData not find " + ConfigName);
+            #else
+                return new Dictionary<string, SingleConfig>();
+            #endif
         }
         else
         {
-            return Json.Deserialize(dataJson) as Dictionary<string, object>;
+            return JsonTool.Json2Dictionary<SingleConfig>(dataJson);
+            //return Json.Deserialize(dataJson) as Dictionary<string, object>;
         }
     }
 
-    public static void SaveData(string ConfigName, Dictionary<string, object> data)
-    {
-        ResourceIOTool.WriteStringByFile(GetAbsolutePath(ConfigName), Json.Serialize(data));
-    }
+
 
     //获取的是绝对路径
     static string GetAbsolutePath(string ConfigName)
@@ -64,7 +62,7 @@ public static class ConfigManager
     static string GetRelativelyPath(string ConfigName)
     {
         StringBuilder builder = new StringBuilder();
-        builder.Append(directoryName);
+        builder.Append(c_directoryName);
         builder.Append("/");
         builder.Append(ConfigName);
         builder.Append(".json");
@@ -75,6 +73,16 @@ public static class ConfigManager
 
 //只在编辑器下能够使用
 #if UNITY_EDITOR
+
+    public static void SaveData(string ConfigName, Dictionary<string, SingleConfig> data)
+    {
+        ResourceIOTool.WriteStringByFile(GetAbsolutePath(ConfigName), JsonTool.Dictionary2Json<SingleConfig>(data));
+
+        //ResourceIOTool.WriteStringByFile(GetAbsolutePath(ConfigName), Json.Serialize(data));
+
+        UnityEditor.AssetDatabase.Refresh();
+    }
+
     public static Dictionary<string, object> GetEditorConfigData(string ConfigName)
     {
         UnityEditor.AssetDatabase.Refresh();
@@ -105,7 +113,7 @@ public static class ConfigManager
         StringBuilder builder = new StringBuilder();
         builder.Append(Application.dataPath);
         builder.Append("/Editor");
-        builder.Append(directoryName);
+        builder.Append(c_directoryName);
         builder.Append("/");
         builder.Append(ConfigName);
         builder.Append(".json");

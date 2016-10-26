@@ -928,7 +928,7 @@ public class BundleConfigEditorWindow : EditorWindow
         for (int i = 0; i < dires.Length;i++ )
         {
             //配置不打包
-            if (!dires[i].Equals(resourcePath + ConfigManager.directoryName))
+            if (!dires[i].Equals(resourcePath + ConfigManager.c_directoryName))
             {
                 RecursionDirectory(dires[i]);
             }
@@ -1588,7 +1588,7 @@ public class BundleConfigEditorWindow : EditorWindow
     //生成游戏中使用的配置文件
     public void CreatBundelPackageConfig()
     {
-        Dictionary<string, object> gameConfig = new Dictionary<string, object>();
+        Dictionary<string, SingleConfig> gameConfig = new Dictionary<string, SingleConfig>();
 
         Dictionary<string,BundleConfig> gameRelyBundles = new Dictionary<string,BundleConfig>();
         for (int i = 0; i < relyPackages.Count; i++)
@@ -1618,8 +1618,8 @@ public class BundleConfigEditorWindow : EditorWindow
             gameAssetsBundles.Add(pack.name,pack);
         }
 
-        gameConfig.Add(BundleConfigManager.key_relyBundle  , JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles));
-        gameConfig.Add(BundleConfigManager.key_bundles     , JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles));
+        gameConfig.Add(BundleConfigManager.key_relyBundle  , new SingleConfig( JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles)));
+        gameConfig.Add(BundleConfigManager.key_bundles     , new SingleConfig( JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles)));
 
         //保存游戏中读取的配置文件
         ConfigManager.SaveData(BundleConfigManager.configFileName, gameConfig);
@@ -1629,29 +1629,29 @@ public class BundleConfigEditorWindow : EditorWindow
     //生成版本文件
     public void CreatVersionFile()
     {
-        Dictionary<string, object> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
+        Dictionary<string, SingleConfig> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
 
         if (VersionData == null)
         {
-            VersionData = new Dictionary<string, object>();
+            VersionData = new Dictionary<string, SingleConfig>();
         }
 
         if (VersionData.ContainsKey(UpdateManager.key_largeVersion))
         {
-            VersionData[UpdateManager.key_largeVersion] = largeVersion.ToString();
+            VersionData[UpdateManager.key_largeVersion] = new SingleConfig(largeVersion);
         }
         else
         {
-            VersionData.Add(UpdateManager.key_largeVersion, largeVersion.ToString());
+            VersionData.Add(UpdateManager.key_largeVersion, new SingleConfig(largeVersion));
         }
 
         if (VersionData.ContainsKey(UpdateManager.key_smallVerson))
         {
-            VersionData[UpdateManager.key_smallVerson] = smallVersion.ToString();
+            VersionData[UpdateManager.key_smallVerson] = new SingleConfig(smallVersion);
         }
         else
         {
-            VersionData.Add(UpdateManager.key_smallVerson, smallVersion.ToString());
+            VersionData.Add(UpdateManager.key_smallVerson, new SingleConfig(smallVersion));
         }
 
         ConfigManager.SaveData(UpdateManager.versionFileName, VersionData);
@@ -1661,7 +1661,7 @@ public class BundleConfigEditorWindow : EditorWindow
     //解析版本号文件
     public void AnalysisVersionFile()
     {
-        Dictionary<string, object> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
+        Dictionary<string, SingleConfig> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
 
         if (VersionData == null)
         {
@@ -1673,7 +1673,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
         if (VersionData.ContainsKey(UpdateManager.key_largeVersion))
         {
-            largeVersion = int.Parse( VersionData[UpdateManager.key_largeVersion].ToString());
+            largeVersion = VersionData[UpdateManager.key_largeVersion].GetInt();
         }
         else
         {
@@ -1682,7 +1682,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
         if (VersionData.ContainsKey(UpdateManager.key_smallVerson))
         {
-            smallVersion = int.Parse(VersionData[UpdateManager.key_smallVerson].ToString());
+            smallVersion = VersionData[UpdateManager.key_smallVerson].GetInt();
         }
         else
         {

@@ -273,12 +273,12 @@ public class SingleData : Dictionary<string, string>
     {
         if (this.ContainsKey(key))
         {
-            return ParseVector2(this[key]);
+            return ParseTool.String2Vector2(this[key]);
         }
 
         if (data.defaultValue.ContainsKey(key))
         {
-            return ParseVector2(data.defaultValue[key]);
+            return ParseTool.String2Vector2(data.defaultValue[key]);
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
@@ -288,12 +288,12 @@ public class SingleData : Dictionary<string, string>
     {
         if (this.ContainsKey(key))
         {
-            return ParseVector3(this[key]);
+            return ParseTool.String2Vector3(this[key]);
         }
 
         if (data.defaultValue.ContainsKey(key))
         {
-            return ParseVector3(data.defaultValue[key]);
+            return ParseTool.String2Vector3(data.defaultValue[key]);
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
@@ -303,71 +303,15 @@ public class SingleData : Dictionary<string, string>
     {
         if (this.ContainsKey(key))
         {
-            return ParseColor(this[key]);
+            return ParseTool.String2Color(this[key]);
         }
 
         if (data.defaultValue.ContainsKey(key))
         {
-            return ParseColor(data.defaultValue[key]);
+            return ParseTool.String2Color(data.defaultValue[key]);
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
-    }
-
-    public Vector2 ParseVector2(string value)
-    {
-        try
-        {
-            string[] values = value.Split('|');
-            float x = float.Parse(values[0]);
-            float y = float.Parse(values[1]);
-
-            return new Vector2(x, y);
-        }
-        catch (Exception e)
-        {
-            throw new Exception("ParseVector2: Don't convert value to Vector2 value:" + value + "\n" + e.ToString()); // throw  
-        }
-    }
-
-    public Vector3 ParseVector3(string value)
-    {
-        try
-        {
-            string[] values = value.Split('|');
-            float x = float.Parse(values[0]);
-            float y = float.Parse(values[1]);
-            float z = float.Parse(values[2]);
-
-            return new Vector3(x, y, z);
-        }
-        catch (Exception e)
-        {
-            throw new Exception("ParseVector3: Don't convert value to Vector3 value:" + value + "\n" + e.ToString()); // throw  
-        }
-    }
-
-    public Color ParseColor(string value)
-    {
-        try
-        {
-            string[] values = value.Split('|');
-            float r = float.Parse(values[0]);
-            float g = float.Parse(values[1]);
-            float b = float.Parse(values[2]);
-            float a = 1;
-
-            if (values.Length > 3)
-            {
-                a = float.Parse(values[3]);
-            }
-
-            return new Color(r, g, b, a);
-        }
-        catch (Exception e)
-        {
-            throw new Exception("ParseColor: Don't convert value to Color value:" + value + "\n" + e.ToString()); // throw  
-        }
     }
 }
 

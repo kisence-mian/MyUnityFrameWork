@@ -13,7 +13,7 @@ public class AnimData
     public AnimType m_animType;
     public InteType m_interpolationType = InteType.Default ;
     public PathType m_pathType = PathType.Line;
-    public RepeatType m_playType = RepeatType.Once;
+    public RepeatType m_repeatType = RepeatType.Once;
 
     //进度控制变量
     public bool m_isDone = false;
@@ -41,6 +41,9 @@ public class AnimData
     public object[] m_parameter;
     public AnimCallBack m_callBack;
     
+    //闪烁
+    public float m_space = 0;
+
     //其他设置
     public bool m_isChild = false;
     public bool m_isLocal = false;
@@ -92,6 +95,8 @@ public class AnimData
             case AnimType.Custom_Vector3: CustomMethodVector3(); break;
             case AnimType.Custom_Vector2: CustomMethodVector2(); break;
             case AnimType.Custom_Float:   CustomMethodFloat(); break;
+
+            case AnimType.Blink: Blink(); break;
         }
     }
 
@@ -114,7 +119,7 @@ public class AnimData
     //动画循环逻辑
     public bool AnimReplayLogic()
     {
-        switch (m_playType)
+        switch (m_repeatType)
         {
             case RepeatType.Once:
                 return false;
@@ -619,6 +624,25 @@ public class AnimData
 
     #endregion
 
+    #region 闪烁
+    float n_timer = 0;
+
+    void Blink()
+    {
+        if (n_timer < 0)
+        {
+            n_timer = m_space;
+            m_animGameObejct.SetActive(!m_animGameObejct.activeSelf);
+        }
+        else
+        {
+            n_timer -= Time.deltaTime;
+        }
+ 
+    }
+
+    #endregion
+
     #region 插值算法
 
     #region 总入口
@@ -1016,4 +1040,6 @@ public class AnimData
     //outInBack,
 
     #endregion
+
+   
 }
