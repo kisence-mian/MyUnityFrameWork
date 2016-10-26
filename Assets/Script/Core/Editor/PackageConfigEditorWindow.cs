@@ -114,7 +114,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
         if (GUILayout.Button("生成游戏资源路径文件"))
         {
-            CreatBundelPackageConfig();
+            CheckAndCreatBundelPackageConfig();
         }
 
         if (GUILayout.Button("打包 并生成MD5文件"))
@@ -124,7 +124,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
         if (GUILayout.Button("生成MD5"))
         {
-            CreatBundelPackageConfig();
+            CheckAndCreatBundelPackageConfig();
         }
 
         GUILayout.BeginHorizontal();
@@ -927,11 +927,11 @@ public class BundleConfigEditorWindow : EditorWindow
 
         for (int i = 0; i < dires.Length;i++ )
         {
-            //配置不打包
-            if (!dires[i].Equals(resourcePath + ConfigManager.c_directoryName))
-            {
+            ////配置不打包
+            //if (!dires[i].Equals(resourcePath + ConfigManager.c_directoryName))
+            //{
                 RecursionDirectory(dires[i]);
-            }
+            //}
         }
 
         string[] files = Directory.GetFiles(path);
@@ -1584,6 +1584,23 @@ public class BundleConfigEditorWindow : EditorWindow
     #endregion
 
     #region 生成游戏中使用的配置文件
+
+    void CheckAndCreatBundelPackageConfig()
+    {
+        CheckPackage();
+
+        if (errorCount == 0)
+        {
+            CreatBundelPackageConfig();
+        }
+        else
+        {
+            if (EditorUtility.DisplayDialog("失败", "打包设置有错误，请先修复错误！", "好的", "仍要继续") == false)
+            {
+                CreatBundelPackageConfig();
+            }
+        }
+    }
 
     //生成游戏中使用的配置文件
     public void CreatBundelPackageConfig()
