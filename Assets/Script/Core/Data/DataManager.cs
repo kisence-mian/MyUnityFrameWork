@@ -10,12 +10,20 @@ using System.Text;
  * */
 public class DataManager 
 {
-    public const string directoryName = "Data";
+    public const string c_directoryName = "Data";
+    public const string c_expandName = "txt";
     public static DataTable GetData(string ConfigName)
     {
         string dataJson = "";
 
-        dataJson = ResourceManager.ReadTextFile(ConfigName);
+        #if UNITY_EDITOR
+            dataJson = ResourceIOTool.ReadStringByResource(
+                    PathTool.GetRelativelyPath(c_directoryName,
+                                                ConfigName,
+                                                c_expandName));
+        #else
+            dataJson = ResourceManager.ReadTextFile(ConfigName);
+        #endif
 
         if (dataJson == "")
         {
@@ -78,14 +86,14 @@ public class DataManager
         {
             builder.Append(Application.dataPath);
             builder.Append("/Editor");
-            builder.Append(directoryName);
+            builder.Append(c_directoryName);
             builder.Append("/");
         }
         else
         {
             builder.Append(Application.dataPath);
             builder.Append("/Resources/");
-            builder.Append(directoryName);
+            builder.Append(c_directoryName);
             builder.Append("/");
         }
         builder.Append(ConfigName);

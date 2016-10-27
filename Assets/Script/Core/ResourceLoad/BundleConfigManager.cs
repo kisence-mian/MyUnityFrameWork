@@ -15,7 +15,7 @@ public static class BundleConfigManager
 
     public static void Initialize()
     {
-        Dictionary<string, SingleConfig> data = ConfigManager.GetData(configFileName);
+        Dictionary<string, SingleField> data = ConfigManager.GetData(configFileName);
 
         if (data == null)
         {

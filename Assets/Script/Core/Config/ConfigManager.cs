@@ -12,13 +12,17 @@ using System;
 public static class ConfigManager 
 {
     public const string c_directoryName = "Config";
+    public const string c_expandName    = "json";
 
-    public static Dictionary<string, SingleConfig> GetData(string ConfigName)
+    public static Dictionary<string, SingleField> GetData(string ConfigName)
     {
         string dataJson = "";
 
         #if UNITY_EDITOR
-                dataJson = ResourceIOTool.ReadStringByResource(GetRelativelyPath(ConfigName));
+                dataJson = ResourceIOTool.ReadStringByResource( 
+                    PathTool.GetRelativelyPath(c_directoryName,
+                                                ConfigName,
+                                                c_expandName));
         #else
                 dataJson = ResourceManager.ReadTextFile(ConfigName);
         #endif
@@ -28,57 +32,26 @@ public static class ConfigManager
             #if !UNITY_EDITOR
                 throw new Exception("ConfigManager GetData not find " + ConfigName);
             #else
-                return new Dictionary<string, SingleConfig>();
+                return new Dictionary<string, SingleField>();
             #endif
         }
         else
         {
-            return JsonTool.Json2Dictionary<SingleConfig>(dataJson);
+            return JsonTool.Json2Dictionary<SingleField>(dataJson);
             //return Json.Deserialize(dataJson) as Dictionary<string, object>;
         }
-    }
-
-
-
-    //获取的是绝对路径
-    static string GetAbsolutePath(string ConfigName)
-    {
-        StringBuilder builder = new StringBuilder();
-
-#if UNITY_EDITOR
-
-        builder.Append(Application.dataPath);
-        builder.Append("/Resources");
-#else
-        builder.Append(Application.persistentDataPath);
-#endif
-        builder.Append("/");
-        builder.Append(GetRelativelyPath(ConfigName));
-
-        return builder.ToString();
-    }
-
-    //获取相对路径
-    static string GetRelativelyPath(string ConfigName)
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.Append(c_directoryName);
-        builder.Append("/");
-        builder.Append(ConfigName);
-        builder.Append(".json");
-
-        return builder.ToString();
     }
 
 
 //只在编辑器下能够使用
 #if UNITY_EDITOR
 
-    public static void SaveData(string ConfigName, Dictionary<string, SingleConfig> data)
+    public static void SaveData(string ConfigName, Dictionary<string, SingleField> data)
     {
-        ResourceIOTool.WriteStringByFile(GetAbsolutePath(ConfigName), JsonTool.Dictionary2Json<SingleConfig>(data));
-
-        //ResourceIOTool.WriteStringByFile(GetAbsolutePath(ConfigName), Json.Serialize(data));
+        ResourceIOTool.WriteStringByFile(PathTool.GetRelativelyPath(c_directoryName,
+                                                ConfigName,
+                                                c_expandName),
+                                        JsonTool.Dictionary2Json<SingleField>(data));
 
         UnityEditor.AssetDatabase.Refresh();
     }
@@ -87,7 +60,7 @@ public static class ConfigManager
     {
         UnityEditor.AssetDatabase.Refresh();
 
-        string dataJson = ResourceIOTool.ReadStringByFile(GetEditorPath(ConfigName));
+        string dataJson = ResourceIOTool.ReadStringByFile(PathTool.GetEditorPath(c_directoryName, ConfigName, c_expandName));
 
         if (dataJson == "")
         {
@@ -103,22 +76,9 @@ public static class ConfigManager
     {
         string configDataJson = Json.Serialize(data);
 
-        ResourceIOTool.WriteStringByFile(GetEditorPath(ConfigName), configDataJson);
+        ResourceIOTool.WriteStringByFile(PathTool.GetEditorPath(c_directoryName, ConfigName, c_expandName), configDataJson);
 
         UnityEditor.AssetDatabase.Refresh();
-    }
-
-    public static string GetEditorPath(string ConfigName)
-    {
-        StringBuilder builder = new StringBuilder();
-        builder.Append(Application.dataPath);
-        builder.Append("/Editor");
-        builder.Append(c_directoryName);
-        builder.Append("/");
-        builder.Append(ConfigName);
-        builder.Append(".json");
-
-        return builder.ToString();
     }
 #endif
 }

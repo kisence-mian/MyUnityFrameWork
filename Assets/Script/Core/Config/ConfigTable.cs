@@ -8,59 +8,65 @@ public class ConfigTable :  Dictionary<string, SingleData>
 }
 
 [SerializeField]
-public class SingleConfig
+public class SingleField
 {
-    public ConfigType m_type;
+    public FieldType m_type;
 
     public string m_content;
 
     #region 构造函数
 
-    public SingleConfig()
+    public SingleField()
     {
-        m_type = ConfigType.String;
+        m_type = FieldType.String;
         m_content = "";
     }
 
-    public SingleConfig(string contrnt)
+    public SingleField(FieldType type,string content)
     {
-        m_type = ConfigType.String;
+        m_type = type;
+        m_content = content;
+    }
+
+    public SingleField(string contrnt)
+    {
+        m_type = FieldType.String;
         m_content = contrnt;
     }
 
-    public SingleConfig(int contrnt)
+    public SingleField(int contrnt)
     {
-        m_type = ConfigType.Int;
+        m_type = FieldType.Int;
         m_content = contrnt.ToString();
     }
 
-    public SingleConfig(float contrnt)
+    public SingleField(float contrnt)
     {
-        m_type = ConfigType.Float;
+        m_type = FieldType.Float;
         m_content = contrnt.ToString();
     }
 
-    public SingleConfig(bool contrnt)
+    public SingleField(bool contrnt)
     {
-        m_type = ConfigType.Bool;
+        m_type = FieldType.Bool;
         m_content = contrnt.ToString();
     }
 
-    public SingleConfig(Vector2 contrnt)
+    public SingleField(Vector2 contrnt)
     {
-        m_type = ConfigType.Vector2;
+        m_type = FieldType.Vector2;
         m_content = contrnt.ToSaveString();
     }
 
-    public SingleConfig(Vector3 contrnt)
+    public SingleField(Vector3 contrnt)
     {
-        m_type = ConfigType.Vector3;
+        m_type = FieldType.Vector3;
         m_content = contrnt.ToSaveString();
     }
 
-    public SingleConfig(Color contrnt)
+    public SingleField(Color contrnt)
     {
-        m_type = ConfigType.Color;
+        m_type = FieldType.Color;
         m_content = contrnt.ToSaveString();
     }
 
@@ -72,22 +78,22 @@ public class SingleConfig
     {
         switch (m_type)
         {
-            case ConfigType.Bool:
+            case FieldType.Bool:
                 m_content = false.ToString();
                 break;
-            case ConfigType.Vector2:
+            case FieldType.Vector2:
                 m_content = Vector2.zero.ToSaveString();
                 break;
-            case ConfigType.Vector3:
+            case FieldType.Vector3:
                 m_content = Vector3.zero.ToSaveString();
                 break;
-            case ConfigType.Color:
+            case FieldType.Color:
                 m_content = Color.white.ToSaveString();
                 break;
-            case ConfigType.Float:
+            case FieldType.Float:
                 m_content = (0.0f).ToString();
                 break;
-            case ConfigType.Int:
+            case FieldType.Int:
                 m_content = (0).ToString();
                 break;
         }
@@ -135,7 +141,7 @@ public class SingleConfig
     #endregion
 }
 
-public enum ConfigType
+public enum FieldType
 {
     String,
     Bool,

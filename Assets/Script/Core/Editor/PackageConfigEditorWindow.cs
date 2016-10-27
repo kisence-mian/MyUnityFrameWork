@@ -1605,7 +1605,7 @@ public class BundleConfigEditorWindow : EditorWindow
     //生成游戏中使用的配置文件
     public void CreatBundelPackageConfig()
     {
-        Dictionary<string, SingleConfig> gameConfig = new Dictionary<string, SingleConfig>();
+        Dictionary<string, SingleField> gameConfig = new Dictionary<string, SingleField>();
 
         Dictionary<string,BundleConfig> gameRelyBundles = new Dictionary<string,BundleConfig>();
         for (int i = 0; i < relyPackages.Count; i++)
@@ -1635,8 +1635,8 @@ public class BundleConfigEditorWindow : EditorWindow
             gameAssetsBundles.Add(pack.name,pack);
         }
 
-        gameConfig.Add(BundleConfigManager.key_relyBundle  , new SingleConfig( JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles)));
-        gameConfig.Add(BundleConfigManager.key_bundles     , new SingleConfig( JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles)));
+        gameConfig.Add(BundleConfigManager.key_relyBundle  , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles)));
+        gameConfig.Add(BundleConfigManager.key_bundles     , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles)));
 
         //保存游戏中读取的配置文件
         ConfigManager.SaveData(BundleConfigManager.configFileName, gameConfig);
@@ -1646,29 +1646,29 @@ public class BundleConfigEditorWindow : EditorWindow
     //生成版本文件
     public void CreatVersionFile()
     {
-        Dictionary<string, SingleConfig> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
+        Dictionary<string, SingleField> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
 
         if (VersionData == null)
         {
-            VersionData = new Dictionary<string, SingleConfig>();
+            VersionData = new Dictionary<string, SingleField>();
         }
 
         if (VersionData.ContainsKey(UpdateManager.key_largeVersion))
         {
-            VersionData[UpdateManager.key_largeVersion] = new SingleConfig(largeVersion);
+            VersionData[UpdateManager.key_largeVersion] = new SingleField(largeVersion);
         }
         else
         {
-            VersionData.Add(UpdateManager.key_largeVersion, new SingleConfig(largeVersion));
+            VersionData.Add(UpdateManager.key_largeVersion, new SingleField(largeVersion));
         }
 
         if (VersionData.ContainsKey(UpdateManager.key_smallVerson))
         {
-            VersionData[UpdateManager.key_smallVerson] = new SingleConfig(smallVersion);
+            VersionData[UpdateManager.key_smallVerson] = new SingleField(smallVersion);
         }
         else
         {
-            VersionData.Add(UpdateManager.key_smallVerson, new SingleConfig(smallVersion));
+            VersionData.Add(UpdateManager.key_smallVerson, new SingleField(smallVersion));
         }
 
         ConfigManager.SaveData(UpdateManager.versionFileName, VersionData);
@@ -1678,7 +1678,7 @@ public class BundleConfigEditorWindow : EditorWindow
     //解析版本号文件
     public void AnalysisVersionFile()
     {
-        Dictionary<string, SingleConfig> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
+        Dictionary<string, SingleField> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
 
         if (VersionData == null)
         {

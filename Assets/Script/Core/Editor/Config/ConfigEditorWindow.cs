@@ -19,7 +19,7 @@ public class ConfigEditorWindow : EditorWindow
     List<String> m_configNameList = new List<string>();
 
     string m_currentConfigName;
-    Dictionary<string, SingleConfig> m_currentConfig;
+    Dictionary<string, SingleField> m_currentConfig;
 
     void OnEnable()
     {
@@ -102,7 +102,7 @@ public class ConfigEditorWindow : EditorWindow
                 EditorGUILayout.Space();
                 if (GUILayout.Button("新增", GUILayout.Width(position.width - 60)))
                 {
-                    Dictionary<string,SingleConfig> dict = new Dictionary<string,SingleConfig>();
+                    Dictionary<string,SingleField> dict = new Dictionary<string,SingleField>();
                     ConfigManager.SaveData(configName, dict);
 
                     LoadConfig(configName);
@@ -146,9 +146,9 @@ public class ConfigEditorWindow : EditorWindow
 
     bool isFold = false;
     string fieldName = "";
-    ConfigType newType;
-    SingleConfig content = new SingleConfig();
-    void AddFieldGUI(Dictionary<string, SingleConfig> dict)
+    FieldType newType;
+    SingleField content = new SingleField();
+    void AddFieldGUI(Dictionary<string, SingleField> dict)
     {
         EditorGUI.indentLevel = 1;
         isFold = EditorGUILayout.Foldout(isFold,"新增字段");
@@ -157,7 +157,7 @@ public class ConfigEditorWindow : EditorWindow
             EditorGUI.indentLevel = 2;
 
             fieldName = EditorGUILayout.TextField("字段名",fieldName);
-            newType = (ConfigType)EditorGUILayout.EnumPopup("字段类型", content.m_type);
+            newType = (FieldType)EditorGUILayout.EnumPopup("字段类型", content.m_type);
 
             if (content.m_type != newType)
             {
@@ -165,7 +165,7 @@ public class ConfigEditorWindow : EditorWindow
                 content.Reset();
             }
 
-            content.m_content = FieldGUI(content);
+            content.m_content = EditorUtilGUI.SingleFieldGUI(content);
 
             if (!dict.ContainsKey(fieldName) && fieldName != "")
             {
@@ -177,7 +177,7 @@ public class ConfigEditorWindow : EditorWindow
                     m_currentConfig.Add(fieldName, content);
 
                     fieldName = "";
-                    content = new SingleConfig();
+                    content = new SingleField();
                     newType = content.m_type;
                 }
 
@@ -194,11 +194,11 @@ public class ConfigEditorWindow : EditorWindow
         }
     }
 
-    void ConfigItemGUI(Dictionary<string, SingleConfig> dict,string key)
+    void ConfigItemGUI(Dictionary<string, SingleField> dict,string key)
     {
         EditorGUI.indentLevel = 2;
         string newContent = "";
-        SingleConfig data = dict[key];
+        SingleField data = dict[key];
 
         EditorGUILayout.LabelField(key);
         
@@ -219,7 +219,7 @@ public class ConfigEditorWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
-        newContent = FieldGUI(data);
+        newContent = EditorUtilGUI.SingleFieldGUI(data);
 
         if (data.GetString() != newContent)
         {
@@ -229,43 +229,6 @@ public class ConfigEditorWindow : EditorWindow
         EditorGUILayout.Space();
     }
 
-    string FieldGUI(SingleConfig data)
-    {
-        string content = "";
-
-        switch (data.m_type)
-        {
-            case ConfigType.String:
-                content = EditorGUILayout.TextField("字段内容", data.GetString());
-                break;
-
-            case ConfigType.Int:
-                content = EditorGUILayout.IntField("字段内容", data.GetInt()).ToString();
-                break;
-
-            case ConfigType.Float:
-                content = EditorGUILayout.FloatField("字段内容", data.GetFloat()).ToString();
-                break;
-
-            case ConfigType.Bool:
-                content = EditorGUILayout.Toggle("字段内容", data.GetBool()).ToString();
-                break;
-
-            case ConfigType.Vector3:
-                content = EditorGUILayout.Vector3Field("字段内容", data.GetVector3()).ToSaveString();
-                break;
-
-            case ConfigType.Vector2:
-                content = EditorGUILayout.Vector2Field("字段内容", data.GetVector2()).ToSaveString();
-                break;
-
-            case ConfigType.Color:
-                content = EditorGUILayout.ColorField("字段内容", data.GetColor()).ToSaveString();
-                break;
-        }
-
-        return content;
-    }
 
     Vector2 pos = Vector3.zero;
     void ConfigEditorGUI()

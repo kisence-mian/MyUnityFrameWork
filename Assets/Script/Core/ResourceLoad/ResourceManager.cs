@@ -56,15 +56,6 @@ public static class ResourceManager
 
     public static ResLoadType GetLoadType(ResLoadType loadType)
     {
-        if (gameLoadType == ResLoadType.Resource)
-        {
-            return ResLoadType.Resource;
-        }
-
-        if (loadType == ResLoadType.Default)
-        {
-            return gameLoadType;
-        }
 
         return loadType;
     }
@@ -85,7 +76,7 @@ public static class ResourceManager
     }
 
     //保存一个文本
-    public static void WriteTextFile(string path,string content ,ResLoadType type = ResLoadType.Default)
+    public static void WriteTextFile(string path,string content ,ResLoadType type)
     {
         #if UNITY_EDITOR
             ResourceIOTool.WriteStringByFile(GetPath(path, type), content);
@@ -145,8 +136,6 @@ public static class ResourceManager
 
 public enum ResLoadType
 {
-    Default,
-
     Resource,
     Streaming,
     Persistent,
