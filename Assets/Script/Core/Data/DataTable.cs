@@ -16,7 +16,7 @@ public class DataTable : Dictionary<string, SingleData>
     /// <summary>
     /// 默认值
     /// </summary>
-    public Dictionary<string, string> m_defaultValue;
+    public Dictionary<string, string> m_defaultValue = new Dictionary<string,string>();
 
     /// <summary>
     /// 储存每个字段是什么类型
@@ -26,7 +26,7 @@ public class DataTable : Dictionary<string, SingleData>
     /// <summary>
     /// 单条记录所拥有的字段名
     /// </summary>
-    public List<string> TableKeys;
+    public List<string> TableKeys = new List<string>();
 
     /// <summary>
     /// 数据所有的Key
@@ -58,7 +58,7 @@ public class DataTable : Dictionary<string, SingleData>
             }
 
             string[] LineData;
-            for (lineIndex = 1;;lineIndex++)
+            for (lineIndex = 1; lineIndex < line.Length; lineIndex++)
             {
                 LineData = ConvertStringArray(line[lineIndex]);
 
@@ -93,17 +93,21 @@ public class DataTable : Dictionary<string, SingleData>
                 dataTmp.data = data;
                 string[] row = ConvertStringArray(line[i]);
 
-                for (int j = 0; j < row.Length; j++)
+                for (int j = 0; j < data.TableKeys.Count; j++)
                 {
                     if (!row[j].Equals(""))
                     {
+
+                        //Debug.Log("j:" + j + "  " + data.TableKeys.Count + "  " + row.Length);
                         dataTmp.Add(data.TableKeys[j], row[j]);
                     }
                 }
 
                 //第一个数据作为这一个记录的Key
-                data.Add(row[0], dataTmp);
-                data.TableIDs.Add(row[0]);
+                //data.Add(row[0], dataTmp);
+                //data.TableIDs.Add(row[0]);
+
+                data.AddData(dataTmp);
             }
 
             return data;
@@ -118,7 +122,7 @@ public class DataTable : Dictionary<string, SingleData>
     {
         l_data.m_defaultValue = new Dictionary<string, string>();
 
-        for (int i = 0; i < l_lineData.Length; i++)
+        for (int i = 0; i < l_lineData.Length && i < l_data.TableKeys.Count; i++)
         {
             if (!l_lineData[i].Equals(""))
             {
@@ -131,7 +135,7 @@ public class DataTable : Dictionary<string, SingleData>
     {
         l_data.m_tableTypes = new Dictionary<string, FieldType>();
 
-        for (int i = 0; i < l_lineData.Length; i++)
+        for (int i = 1; i < l_lineData.Length && i < l_data.TableKeys.Count; i++)
         {
             if (!l_lineData[i].Equals(""))
             {
@@ -139,9 +143,11 @@ public class DataTable : Dictionary<string, SingleData>
             }
         }
     }
+
     public static string Serialize(DataTable data)
     {
         StringBuilder build = new StringBuilder();
+
         //key
         for (int i = 0; i < data.TableKeys.Count; i++)
         {
@@ -156,49 +162,70 @@ public class DataTable : Dictionary<string, SingleData>
             }
         }
 
-        //defauleValue
-
-        build.Append(c_defaultValueTableTitle);
-
-        for (int i = 0; i < data.TableKeys.Count; i++)
+        //type
+        List<string> type = new List<string>(data.m_tableTypes.Keys);
+        if (type.Count > 0)
         {
-            string defauleValueTmp = "";
-
-            if (data.m_defaultValue.ContainsKey(data.TableKeys[i]))
-            {
-                defauleValueTmp = data.m_defaultValue[data.TableKeys[i]];
-            }
-
-            build.Append(defauleValueTmp);
+            build.Append(c_fieldTypeTableTitle);
             build.Append(c_split);
-            if (i != data.TableKeys.Count - 1)
+            for (int i = 1; i < data.TableKeys.Count; i++)
             {
-                build.Append(c_split);
-            }
-            else
-            {
-                build.Append(c_newline);
+                string key = data.TableKeys[i];
+                string typeString = "";
+
+                if (data.m_tableTypes.ContainsKey(key))
+                {
+                    typeString = data.m_tableTypes[key].ToString();
+                }
+                else
+                {
+                    typeString = FieldType.String.ToString();
+                }
+
+                build.Append(typeString);
+
+                if (i != data.TableKeys.Count - 1)
+                {
+                    build.Append(c_split);
+                }
+                else
+                {
+                    build.Append(c_newline);
+                }
             }
         }
 
-        List<string> keys = new List<string>(data.m_tableTypes.Keys);
+        //defauleValue
+        List<string> defaultValue = new List<string>(data.m_defaultValue.Keys);
 
-        //type
-
-        build.Append(c_fieldTypeTableTitle);
-        build.Append(c_split);
-        for (int i = 0; i < keys.Count; i++)
+        if (defaultValue.Count >0)
         {
-            string typeString = data.m_tableTypes[keys[i]].ToString();
+            build.Append(c_defaultValueTableTitle);
+            build.Append(c_split);
+            for (int i = 1; i < data.TableKeys.Count; i++)
+            {
+                string key = data.TableKeys[i];
+                string defauleValueTmp = "";
 
-            build.Append(typeString);
-            if (i != data.TableKeys.Count - 1)
-            {
-                build.Append(c_split);
-            }
-            else
-            {
-                build.Append(c_newline);
+                if (data.m_defaultValue.ContainsKey(key))
+                {
+                    defauleValueTmp = data.m_defaultValue[key];
+                }
+                else
+                {
+                    defauleValueTmp = "";
+                }
+
+                build.Append(defauleValueTmp);
+
+                if (i != data.TableKeys.Count - 1)
+                {
+                    build.Append(c_split);
+                }
+                else
+                {
+                    build.Append(c_newline);
+                }
             }
         }
 
@@ -267,6 +294,12 @@ public class DataTable : Dictionary<string, SingleData>
 
     public FieldType GetFieldType(string key)
     {
+        //主键只能是String类型
+        if (key == TableKeys[0])
+        {
+            return FieldType.String;
+        }
+
         if(m_tableTypes.ContainsKey(key))
         {
             return m_tableTypes[key];
@@ -274,6 +307,75 @@ public class DataTable : Dictionary<string, SingleData>
         else
         {
             return FieldType.String;
+        }
+    }
+
+    public void SetFieldType(string key,FieldType type )
+    {
+        //主键只能是String类型
+        if (key == TableKeys[0])
+        {
+            return;
+        }
+
+        if (m_tableTypes.ContainsKey(key))
+        {
+            m_tableTypes[key] = type;
+        }
+        else
+        {
+            m_tableTypes.Add(key,type);
+        }
+    }
+
+    public string GetDefault(string key)
+    {
+        if(m_defaultValue.ContainsKey(key))
+        {
+            return m_defaultValue[key];
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public void SetDefault(string key,string value)
+    {
+        if (!m_defaultValue.ContainsKey(key))
+        {
+            m_defaultValue.Add(key, value);
+        }
+        else
+        {
+            m_defaultValue[key] = value;
+        }
+    }
+
+    public void AddData(SingleData data)
+    {
+        if(data.ContainsKey(TableKeys[0]))
+        {
+            Add(data[TableKeys[0]], data);
+
+            TableIDs.Add(data[TableKeys[0]]);
+        }
+        else
+        {
+            throw new Exception("Add SingleData fail!");
+        }
+    }
+
+    public void RemoveData(string key)
+    {
+        if (ContainsKey(key))
+        {
+            Remove(key);
+            TableIDs.Remove(key);
+        }
+        else
+        {
+            throw new Exception("Add SingleData fail!");
         }
     }
 

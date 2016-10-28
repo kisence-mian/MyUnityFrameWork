@@ -26,6 +26,11 @@ public class SingleField
     {
         m_type = type;
         m_content = content;
+
+        if (content == null)
+        {
+            Reset();
+        }
     }
 
     public SingleField(string contrnt)
@@ -102,6 +107,27 @@ public class SingleField
     #endregion
 
     #region 取值封装
+
+    public string GetShowString()
+    {
+        switch (m_type)
+        {
+            case FieldType.Bool:
+                return  GetBool().ToString();
+            case FieldType.Vector2:
+                return  GetVector2().ToString();
+            case FieldType.Vector3:
+                return  GetVector3().ToString();
+            case FieldType.Color:
+                return  GetColor().ToString();
+            case FieldType.Float:
+                return  GetFloat().ToString();
+            case FieldType.Int:
+                return  GetInt().ToString();
+        }
+
+        return m_content;
+    }
 
     public int GetInt()
     {

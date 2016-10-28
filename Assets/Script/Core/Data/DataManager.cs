@@ -40,7 +40,14 @@ public class DataManager
 
     public static void SaveData(string ConfigName, DataTable data)
     {
-        ResourceIOTool.WriteStringByFile(GetEditorPath(ConfigName, false), DataTable.Serialize(data));
+        ResourceIOTool.WriteStringByFile(
+            PathTool.GetAbsolutePath(
+                ResLoadType.Resource,
+                PathTool.GetRelativelyPath(
+                    c_directoryName,
+                    ConfigName,
+                    c_expandName)), 
+            DataTable.Serialize(data));
     }
 
     /// <summary>
@@ -51,7 +58,7 @@ public class DataManager
     {
         UnityEditor.AssetDatabase.Refresh();
 
-        string dataJson = ResourceIOTool.ReadStringByFile(GetEditorPath(dataName, true));
+        string dataJson = ResourceIOTool.ReadStringByFile(PathTool.GetEditorPath(c_directoryName, dataName, c_expandName));
 
         if (dataJson == "")
         {
@@ -73,33 +80,9 @@ public class DataManager
     {
         string configDataJson = Json.Serialize(data);
 
-        ResourceIOTool.WriteStringByFile(GetEditorPath(ConfigName,true), configDataJson);
+        ResourceIOTool.WriteStringByFile(PathTool.GetEditorPath(c_directoryName, ConfigName, c_expandName), configDataJson);
 
         UnityEditor.AssetDatabase.Refresh();
-    }
-
-    public static string GetEditorPath(string ConfigName,bool isEditor)
-    {
-        StringBuilder builder = new StringBuilder();
-
-        if (isEditor)
-        {
-            builder.Append(Application.dataPath);
-            builder.Append("/Editor");
-            builder.Append(c_directoryName);
-            builder.Append("/");
-        }
-        else
-        {
-            builder.Append(Application.dataPath);
-            builder.Append("/Resources/");
-            builder.Append(c_directoryName);
-            builder.Append("/");
-        }
-        builder.Append(ConfigName);
-        builder.Append(".csv");
-
-        return builder.ToString();
     }
     #endif
 }

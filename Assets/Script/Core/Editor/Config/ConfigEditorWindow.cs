@@ -165,7 +165,7 @@ public class ConfigEditorWindow : EditorWindow
                 content.Reset();
             }
 
-            content.m_content = EditorUtilGUI.SingleFieldGUI(content);
+            content.m_content = EditorUtilGUI.FieldGUI_Type(content);
 
             if (!dict.ContainsKey(fieldName) && fieldName != "")
             {
@@ -219,7 +219,7 @@ public class ConfigEditorWindow : EditorWindow
 
         EditorGUILayout.EndHorizontal();
 
-        newContent = EditorUtilGUI.SingleFieldGUI(data);
+        newContent = EditorUtilGUI.FieldGUI_Type(data);
 
         if (data.GetString() != newContent)
         {
@@ -255,6 +255,7 @@ public class ConfigEditorWindow : EditorWindow
             if (GUILayout.Button("保存"))
             {
                 ConfigManager.SaveData(m_currentConfigName, m_currentConfig);
+                AssetDatabase.Refresh();
             }
 
             EditorGUILayout.EndScrollView();
