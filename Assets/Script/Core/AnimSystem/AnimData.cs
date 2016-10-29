@@ -11,14 +11,17 @@ public class AnimData
     //基本变量
     public GameObject m_animGameObejct;
     public AnimType m_animType;
-    public InteType m_interpolationType = InteType.Default ;
-    public PathType m_pathType = PathType.Line;
-    public RepeatType m_repeatType = RepeatType.Once;
+    public InterpType m_interpolationType = InterpType.Default ;
+    public PathType m_pathType            = PathType.Line;
+    public RepeatType m_repeatType        = RepeatType.Once;
+
+    public bool m_ignoreTimeScale = false;
 
     //进度控制变量
-    public bool m_isDone = false;
+    public bool  m_isDone      = false;
     public float m_currentTime = 0;
-    public float m_totalTime = 0;
+    public float m_totalTime   = 0;
+    public int   m_repeatCount = -1;
 
     //V3
     public Vector3 m_fromV3;
@@ -43,6 +46,7 @@ public class AnimData
     
     //闪烁
     public float m_space = 0;
+    float m_timer = 0;
 
     //其他设置
     public bool m_isChild = false;
@@ -67,7 +71,14 @@ public class AnimData
 
     public void executeUpdate()
     {
-        m_currentTime += Time.deltaTime;
+        if (m_ignoreTimeScale)
+        {
+            m_currentTime += Time.unscaledDeltaTime;
+        }
+        else
+        {
+            m_currentTime += Time.deltaTime;
+        }
 
         if (m_currentTime > m_totalTime)
         {
@@ -127,8 +138,7 @@ public class AnimData
             case RepeatType.Loop:
                 m_isDone = false;
                 m_currentTime = 0;
-                return true;
-
+                break;
             case RepeatType.PingPang:
 
                 ExchangeV2();
@@ -136,10 +146,18 @@ public class AnimData
                 ExchangePos();
                 m_isDone = false;
                 m_currentTime = 0;
-                return true;
+                break;
         }
 
-        return false;
+        if (m_repeatCount == -1)
+        {
+            return true;
+        }
+        else
+        {
+            m_repeatCount--;
+            return  (m_repeatCount < 0);
+        }
     }
 
     #region 循环逻辑
@@ -625,18 +643,17 @@ public class AnimData
     #endregion
 
     #region 闪烁
-    float n_timer = 0;
 
     void Blink()
     {
-        if (n_timer < 0)
+        if (m_timer < 0)
         {
-            n_timer = m_space;
+            m_timer = m_space;
             m_animGameObejct.SetActive(!m_animGameObejct.activeSelf);
         }
         else
         {
-            n_timer -= Time.deltaTime;
+            m_timer -= Time.deltaTime;
         }
  
     }
@@ -651,34 +668,34 @@ public class AnimData
     {
         switch (m_interpolationType)
         {
-            case InteType.Default:
-            case InteType.Linear: return Mathf.Lerp(oldValue, aimValue, m_currentTime / m_totalTime);
-            case InteType.InBack: return InBack(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutBack: return OutBack(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InOutBack: return InOutBack(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutInBack: return OutInBack(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InQuad: return InQuad(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutQuad: return OutQuad(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InoutQuad: return InoutQuad(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InCubic: return InCubic(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutCubic: return OutCubic(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InoutCubic: return InoutCubic(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InQuart: return InQuart(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutQuart: return OutQuart(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InOutQuart: return InOutQuart(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutInQuart: return OutInQuart(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InQuint: return InQuint(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutQuint: return OutQuint(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InOutQuint: return InOutQuint(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutInQuint: return OutInQuint(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InSine: return InSine(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutSine: return OutSine(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InOutSine: return InOutSine(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutInSine: return OutInSine(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InExpo: return InExpo(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutExpo: return OutExpo(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.InOutExpo: return InOutExpo(oldValue, aimValue, m_currentTime, m_totalTime);
-            case InteType.OutInExpo: return OutInExpo(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.Default:
+            case InterpType.Linear: return Mathf.Lerp(oldValue, aimValue, m_currentTime / m_totalTime);
+            case InterpType.InBack: return InBack(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutBack: return OutBack(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InOutBack: return InOutBack(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutInBack: return OutInBack(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InQuad: return InQuad(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutQuad: return OutQuad(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InoutQuad: return InoutQuad(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InCubic: return InCubic(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutCubic: return OutCubic(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InoutCubic: return InoutCubic(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InQuart: return InQuart(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutQuart: return OutQuart(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InOutQuart: return InOutQuart(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutInQuart: return OutInQuart(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InQuint: return InQuint(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutQuint: return OutQuint(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InOutQuint: return InOutQuint(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutInQuint: return OutInQuint(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InSine: return InSine(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutSine: return OutSine(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InOutSine: return InOutSine(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutInSine: return OutInSine(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InExpo: return InExpo(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutExpo: return OutExpo(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.InOutExpo: return InOutExpo(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutInExpo: return OutInExpo(oldValue, aimValue, m_currentTime, m_totalTime);
         }
 
         return 0;
@@ -1040,6 +1057,4 @@ public class AnimData
     //outInBack,
 
     #endregion
-
-   
 }

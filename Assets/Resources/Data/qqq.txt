@@ -1,4 +1,0 @@
-aaa	aaaa
-type	String
-default	asasddas
-asdasddas	

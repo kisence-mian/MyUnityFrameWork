@@ -126,9 +126,9 @@ public class LogOutPutThread
 
         Dictionary<string, object> m_logData;
 
-        string ConfigName = "LogInfo";
-        string isCrashKey = "isCrash";
-        string logPathKey = "logPath";
+        //string ConfigName = "LogInfo";
+        //string isCrashKey = "isCrash";
+        //string logPathKey = "logPath";
 
         public void UpLoadLogic(string logPath)
         {

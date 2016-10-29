@@ -209,7 +209,6 @@ public class DataEditorWindow : EditorWindow
             EditorGUI.indentLevel++;
 
             string key = dict.TableKeys[0];
-            FieldType type = m_currentData.GetFieldType(key);
 
             AddDataPos = EditorGUILayout.BeginScrollView(AddDataPos, GUILayout.ExpandHeight(false));
 
@@ -283,7 +282,6 @@ public class DataEditorWindow : EditorWindow
             for (int i = 0; i < keys.Count; i++)
             {
                 string keyTmp = keys[i];
-                FieldType type = table.GetFieldType(keyTmp);
 
                 if (i == 0)
                 {
