@@ -6,8 +6,10 @@ public class FirstStatus : IApplicationStatus
 
     public override void OnEnterStatus()
     {
-        GameObjectManager.CreatGameObjectByPool("Cube");
+        GameObjectManager.CreatGameObjectByPool("gogo");
 
-        ConfigManager.GetData("adasda")["qqq"].GetString();
+        //ConfigManager.GetData("adasda")["qqq"].GetString();
+
+        Debug.Log("hello");
     }
 }

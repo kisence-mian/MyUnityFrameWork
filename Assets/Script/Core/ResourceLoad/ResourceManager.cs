@@ -56,6 +56,11 @@ public static class ResourceManager
 
     public static ResLoadType GetLoadType(ResLoadType loadType)
     {
+        //如果设置从Resource中加载则忽略打包设置
+        if (gameLoadType == ResLoadType.Resource)
+        {
+            return ResLoadType.Resource;
+        }
 
         return loadType;
     }

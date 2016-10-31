@@ -17,7 +17,9 @@ public static class BundleConfigManager
     {
         Dictionary<string, SingleField> data = ConfigManager.GetData(configFileName);
 
-        if (data == null)
+        if (data == null
+            || !data.ContainsKey(key_relyBundle) 
+            || !data.ContainsKey(key_bundles))
         {
             throw new Exception("BundleConfigManager Initialize Exception: " + configFileName + "file is not exits");
         }
