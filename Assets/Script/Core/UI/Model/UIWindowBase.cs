@@ -38,6 +38,11 @@ public class UIWindowBase : UIBase
 
     public virtual void OnCompleteEnterAnim()
     {
+        //AnimSystem.Move(gameObject, Vector3.zero, Vector3.one, 0.5f, isLocal: false);
+
+        GameObject go =  GameObjectManager.CreatGameObjectByPool("go");
+
+        GameObjectManager.DestroyGameobjectByPool(go);
 
     }
 

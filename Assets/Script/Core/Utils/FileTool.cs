@@ -5,15 +5,24 @@ using System.IO;
 public class FileTool  
 {
     /// <summary>
-    /// 判断有没有这个文件路径，如果没有则创建它
+    /// 判断有没有这个文件路径，如果没有则创建它(路径会去掉文件名)
     /// </summary>
     /// <param name="filepath"></param>
     public static void CreatFilePath(string filepath)
     {
         string newPathDir = Path.GetDirectoryName(filepath);
 
-        if (!Directory.Exists(newPathDir))
-            Directory.CreateDirectory(newPathDir);
+        CreatPath(newPathDir);
+    }
+
+    /// <summary>
+    /// 判断有没有这个路径，如果没有则创建它
+    /// </summary>
+    /// <param name="filepath"></param>
+    public static void CreatPath(string path)
+    {
+        if (!Directory.Exists(path))
+            Directory.CreateDirectory(path);
     }
 
     /// <summary>

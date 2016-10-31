@@ -6,42 +6,42 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
-public class ConfigEditorWindow : EditorWindow
+public class RecordEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
 
-    [MenuItem("Window/配置编辑器", priority = 500)]
+    [MenuItem("Window/持久数据编辑器", priority = 500)]
     public static void ShowWindow()
     {
-        EditorWindow.GetWindow(typeof(ConfigEditorWindow));
+        EditorWindow.GetWindow(typeof(RecordEditorWindow));
     }
 
-    List<String> m_configNameList = new List<string>();
+    List<String> m_recordNameList = new List<string>();
 
-    string m_currentConfigName;
-    Dictionary<string, SingleField> m_currentConfig;
+    string m_currentRecordName;
+    RecordTable m_currentRecord;
 
     void OnEnable()
     {
         m_currentSelectIndex = 0;
         EditorGUIStyleData.Init();
 
-        FindAllConfigName();
+        FindAllRecordName();
     }
 
     void OnGUI()
     {
-        titleContent.text = "配置编辑器";
+        titleContent.text = "持久数据编辑器";
 
         EditorGUILayout.BeginVertical();
 
-        SelectConfigGUI();
+        SelectRecordGUI();
 
-        ConfigEditorGUI();
+        RecordEditorGUI();
 
-        DeleteConfigGUI();
+        DeleteRecordGUI();
 
-        AddConfigGUI();
+        AddRecordGUI();
 
 
         EditorGUILayout.EndVertical();
@@ -56,58 +56,59 @@ public class ConfigEditorWindow : EditorWindow
     //当工程改变时
     void OnProjectChange()
     {
-        FindAllConfigName();
+        FindAllRecordName();
     }
 
     #region GUI
 
-    #region 配置加载与新增
+    #region 数据加载与新增
 
     int m_currentSelectIndex = 0;
-    void SelectConfigGUI()
+    void SelectRecordGUI()
     {
-        string[] mask = m_configNameList.ToArray();
-        m_currentSelectIndex = EditorGUILayout.Popup("当前配置：", m_currentSelectIndex, mask);
+        string[] mask = m_recordNameList.ToArray();
+        m_currentSelectIndex = EditorGUILayout.Popup("当前数据：", m_currentSelectIndex, mask);
 
-        LoadConfig(mask[m_currentSelectIndex]);
+        LoadRecord(mask[m_currentSelectIndex]);
     }
 
-    void LoadConfig(string configName)
+    void LoadRecord(string recordName)
     {
-        if (m_currentConfigName != configName)
+        if (m_currentRecordName != recordName)
         {
-            m_currentConfigName = configName;
+            m_currentRecordName = recordName;
 
-            if (m_currentConfigName != "None")
-                m_currentConfig = ConfigManager.GetData(configName);
+            if (m_currentRecordName != "None")
+                m_currentRecord = RecordManager.GetData(recordName);
         }
     }
-    bool isConfigFold;
-    string configName = "";
-    void AddConfigGUI()
+    bool isRecordFold;
+    string recordName = "";
+    void AddRecordGUI()
     {
         EditorGUI.indentLevel = 0;
 
-        isConfigFold = EditorGUILayout.Foldout(isConfigFold, "新增配置");
+        isRecordFold = EditorGUILayout.Foldout(isRecordFold, "新增数据");
         
-        if (isConfigFold)
+        if (isRecordFold)
         {
             EditorGUI.indentLevel = 1;
 
-            configName = EditorGUILayout.TextField("配置名", configName);
+            recordName = EditorGUILayout.TextField("数据名", recordName);
 
-            if (!m_configNameList.Contains(configName) && configName != "")
+            if (!m_recordNameList.Contains(recordName) && recordName != "")
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.Space();
                 if (GUILayout.Button("新增", GUILayout.Width(position.width - 60)))
                 {
-                    Dictionary<string,SingleField> dict = new Dictionary<string,SingleField>();
-                    ConfigManager.SaveData(configName, dict);
+                    RecordTable dict = new RecordTable();
+                    RecordManager.SaveData(recordName, dict);
+                    FindAllRecordName();
 
-                    LoadConfig(configName);
+                    LoadRecord(recordName);
 
-                    configName = "";
+                    recordName = "";
                 }
 
                 EditorGUILayout.Space();
@@ -115,9 +116,9 @@ public class ConfigEditorWindow : EditorWindow
             }
             else
             {
-                if (m_configNameList.Contains(configName))
+                if (m_recordNameList.Contains(recordName))
                 {
-                    EditorGUILayout.LabelField("已存在该配置");
+                    EditorGUILayout.LabelField("已存在该数据");
                 }
             }
         }
@@ -125,17 +126,26 @@ public class ConfigEditorWindow : EditorWindow
         EditorGUILayout.Space();
     }
 
-    void DeleteConfigGUI()
+    void DeleteRecordGUI()
     {
-        if (m_currentConfigName != "None")
+        if (m_currentRecordName != "None")
         {
-            if (GUILayout.Button("删除配置"))
+            if (GUILayout.Button("删除数据"))
             {
-                if (EditorUtility.DisplayDialog("警告", "确定要删除该配置吗！", "是", "取消"))
+                if (EditorUtility.DisplayDialog("警告", "确定要删除该数据吗！", "是", "取消"))
                 {
-                    File.Delete(Application.dataPath + "/Resources/" + ConfigManager.c_directoryName + "/" + m_currentConfigName + ".json");
+                    File.Delete(Application.dataPath + "/Resources/" + RecordManager.c_directoryName + "/" + m_currentRecordName + ".json");
                     AssetDatabase.Refresh();
                 }
+            }
+        }
+
+        if (GUILayout.Button("清空数据"))
+        {
+            if (EditorUtility.DisplayDialog("警告", "确定要清空所有持久化数据吗！", "是", "取消"))
+            {
+                FileTool.DeleteDirectory(Application.persistentDataPath + "/" + RecordManager.c_directoryName);
+                FindAllRecordName();
             }
         }
     }
@@ -174,7 +184,7 @@ public class ConfigEditorWindow : EditorWindow
 
                 if (GUILayout.Button("新增", GUILayout.Width(position.width - 60)))
                 {
-                    m_currentConfig.Add(fieldName, content);
+                    m_currentRecord.Add(fieldName, content);
 
                     fieldName = "";
                     content = new SingleField();
@@ -194,7 +204,7 @@ public class ConfigEditorWindow : EditorWindow
         }
     }
 
-    void ConfigItemGUI(Dictionary<string, SingleField> dict,string key)
+    void RecordItemGUI(Dictionary<string, SingleField> dict,string key)
     {
         EditorGUI.indentLevel = 2;
         string newContent = "";
@@ -231,30 +241,30 @@ public class ConfigEditorWindow : EditorWindow
 
 
     Vector2 pos = Vector3.zero;
-    void ConfigEditorGUI()
+    void RecordEditorGUI()
     {
-        if (m_currentConfig != null
-            && m_currentConfigName != "None")
+        if (m_currentRecord != null
+            && m_currentRecordName != "None")
         {
             EditorGUILayout.Space();
             EditorGUI.indentLevel = 1;
             pos = EditorGUILayout.BeginScrollView(pos,GUILayout.ExpandHeight(false));
 
-            List<string> keys = new List<string>(m_currentConfig.Keys);
+            List<string> keys = new List<string>(m_currentRecord.Keys);
 
             for (int i = 0; i < keys.Count; i++)
             {
-                ConfigItemGUI(m_currentConfig, keys[i]);
+                RecordItemGUI(m_currentRecord, keys[i]);
             }
 
             EditorGUILayout.Space();
 
-            AddFieldGUI(m_currentConfig);
+            AddFieldGUI(m_currentRecord);
 
             EditorGUILayout.Space();
             if (GUILayout.Button("保存"))
             {
-                ConfigManager.SaveData(m_currentConfigName, m_currentConfig);
+                RecordManager.SaveData(m_currentRecordName, m_currentRecord);
                 AssetDatabase.Refresh();
             }
 
@@ -266,40 +276,45 @@ public class ConfigEditorWindow : EditorWindow
 
     #endregion
 
-    #region FindConfig
+    #region FindRecord
 
-    void FindAllConfigName()
+    void FindAllRecordName()
     {
         AssetDatabase.Refresh();
-        m_configNameList = new List<string>();
+        m_recordNameList = new List<string>();
 
-        m_configNameList.Add("None");
+        m_recordNameList.Add("None");
 
-        FindConfigName(Application.dataPath + "/Resources/" + ConfigManager.c_directoryName);
+        FindRecordName(Application.persistentDataPath + "/" + RecordManager.c_directoryName);
+
+        if (m_currentSelectIndex >= m_recordNameList.Count)
+        {
+            m_currentSelectIndex = m_recordNameList.Count - 1;
+        }
     }
 
-    public void FindConfigName(string path)
+    public void FindRecordName(string path)
     {
+        FileTool.CreatPath(path);
+
         string[] allUIPrefabName = Directory.GetFiles(path);
         foreach (var item in allUIPrefabName)
         {
-            
-            if (item.EndsWith(".json"))
+            if (item.EndsWith("." + RecordManager.c_expandName))
             {
-                string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
-                m_configNameList.Add(configName);
+                string recordName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
+                m_recordNameList.Add(recordName);
             }
         }
 
         //string[] dires = Directory.GetDirectories(path);
         //for (int i = 0; i < dires.Length; i++)
         //{
-        //    FindConfigName(dires[i]);
+        //    FindRecordName(dires[i]);
         //}
     }
 
     #endregion
-
 
 }
 

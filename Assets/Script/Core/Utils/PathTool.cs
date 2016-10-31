@@ -48,10 +48,10 @@ public class PathTool
     }
 
     //获取相对路径
-    public static string GetRelativelyPath(string directoryName, string fileName, string expandName)
+    public static string GetRelativelyPath(string path, string fileName, string expandName)
     {
         StringBuilder builder = new StringBuilder();
-        builder.Append(directoryName);
+        builder.Append(path);
         builder.Append("/");
         builder.Append(fileName);
         builder.Append(".");

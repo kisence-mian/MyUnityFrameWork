@@ -48,9 +48,10 @@ public static class ConfigManager
 
     public static void SaveData(string ConfigName, Dictionary<string, SingleField> data)
     {
-        ResourceIOTool.WriteStringByFile(PathTool.GetRelativelyPath(c_directoryName,
+        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadType.Resource,
+            PathTool.GetRelativelyPath(c_directoryName,
                                                 ConfigName,
-                                                c_expandName),
+                                                c_expandName)),
                                         JsonTool.Dictionary2Json<SingleField>(data));
 
         UnityEditor.AssetDatabase.Refresh();

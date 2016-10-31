@@ -1,0 +1,5 @@
+id	asdasd
+type	Color
+default	1|1|1|1
+asdasdads	
+111	1|0|0|1
