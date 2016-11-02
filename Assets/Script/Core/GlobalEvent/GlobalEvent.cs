@@ -124,13 +124,17 @@ public class GlobalEvent {
         {
             for (int i = 0; i < mEventDic[type].Count; i++)
             {
-                try
+                //遍历委托链表
+                foreach (EventHandle callBack in mEventDic[type][i].GetInvocationList())
                 {
-                    mEventDic[type][i](args);
-                }
-                catch(Exception e)
-                {
-                    Debug.LogError(e.ToString());
+                    try
+                    {
+                        callBack(args);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e.ToString());
+                    }
                 }
             }
         }
@@ -139,13 +143,17 @@ public class GlobalEvent {
         {
             for (int i = 0; i < mUseOnceEventDic[type].Count; i++)
             {
-                try
+                //遍历委托链表
+                foreach (EventHandle callBack in mUseOnceEventDic[type][i].GetInvocationList())
                 {
-                    mUseOnceEventDic[type][i](args);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e.ToString());
+                    try
+                    {
+                        callBack(args);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e.ToString());
+                    }
                 }
             }
             RemoveEvent(type);
