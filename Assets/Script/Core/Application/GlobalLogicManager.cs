@@ -24,7 +24,14 @@ public class GlobalLogicManager
             IApplicationGlobalLogic l_statusTmp = (IApplicationGlobalLogic)Activator.CreateInstance(Type.GetType(logicName));
             s_GlobalStatus.Add(logicName, l_statusTmp);
 
-            l_statusTmp.Init();
+            try
+            {
+                l_statusTmp.Init();
+            }
+            catch(Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
         }
     }
 
