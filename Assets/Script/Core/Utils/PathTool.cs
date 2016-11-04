@@ -4,28 +4,28 @@ using System.Text;
 
 public class PathTool
 {
-    /// <summary>
-    /// 获得绝对路径
-    /// </summary>
-    /// <param name="loadType">资源加载类型</param>
-    /// <param name="relativelyPath">相对路径</param>
-    /// <returns>绝对路径</returns>
 
-    public static string GetAbsolutePath(ResLoadType loadType, string relativelyPath)
+    public static string GetPath(ResLoadType loadType)
     {
         StringBuilder path = new StringBuilder();
         switch (loadType)
         {
             case ResLoadType.Resource:
-                #if UNITY_EDITOR
-                    path.Append(Application.dataPath);
-                    path.Append("/Resources/");
-                    break;
-                #endif
+#if UNITY_EDITOR
+                path.Append(Application.dataPath);
+                path.Append("/Resources/");
+                break;
+#endif
 
             case ResLoadType.Streaming:
+
+#if UNITY_ANDROID
                 path.Append(Application.streamingAssetsPath);
                 path.Append("/");
+#else
+                path.Append(Application.dataPath );
+                path.Append("!assets/");
+#endif
                 break;
 
             case ResLoadType.Persistent:
@@ -42,9 +42,19 @@ public class PathTool
                 Debug.LogError("Type Error !" + loadType);
                 break;
         }
-
-        path.Append(relativelyPath);
         return path.ToString();
+    }
+
+
+    /// <summary>
+    /// 组合绝对路径
+    /// </summary>
+    /// <param name="loadType">资源加载类型</param>
+    /// <param name="relativelyPath">相对路径</param>
+    /// <returns>绝对路径</returns>
+    public static string GetAbsolutePath(ResLoadType loadType, string relativelyPath)
+    {
+        return GetPath(loadType) + relativelyPath;
     }
 
     //获取相对路径

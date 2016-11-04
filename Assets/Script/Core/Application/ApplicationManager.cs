@@ -24,7 +24,7 @@ public class ApplicationManager : MonoBehaviour
     public void AppLaunch()
     {
         SetResourceLoadType();            //设置资源加载类型
-        BundleConfigManager.Initialize(); //资源路径管理器启动
+        RecourcesConfigManager.Initialize(); //资源路径管理器启动
         Log.Init();                       //日志系统启动
         ApplicationStatusManager.Init();  //游戏流程状态机初始化
 
@@ -123,11 +123,11 @@ public class ApplicationManager : MonoBehaviour
     {
         if (m_AppMode == AppMode.Developing)
         {
-            ResourceManager.gameLoadType = ResLoadType.Resource;
+            ResourceManager.m_gameLoadType = ResLoadType.Resource;
         }
         else
         {
-            ResourceManager.gameLoadType = ResLoadType.HotUpdate;
+            ResourceManager.m_gameLoadType = ResLoadType.HotUpdate;
         }
     }
 

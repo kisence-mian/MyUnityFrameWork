@@ -880,7 +880,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
     string GetExportPath(string path, string name)
     {
-        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(FileTool.RemoveExpandName(path)) + ".assetBundle";
+        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(FileTool.RemoveExpandName(path)) + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
     }
 
     #endregion
@@ -1616,7 +1616,7 @@ public class BundleConfigEditorWindow : EditorWindow
             pack.path          = relyPackages[i].path;
             pack.relyPackages  = new string[0];
             pack.md5           = MD5Tool.GetFileMD5(GetExportPath(pack.path, pack.name)); //获取bundle包的md5
-            pack.loadType      = ResLoadType.Streaming;  //默认放在沙盒路径下
+            //pack.loadType      = ResLoadType.Streaming;  //默认放在沙盒路径下
 
             gameRelyBundles.Add(pack.name,pack);
         }
@@ -1630,16 +1630,16 @@ public class BundleConfigEditorWindow : EditorWindow
             pack.path          = bundles[i].path;
             pack.relyPackages  = GetRelyPackNames(bundles[i].relyPackagesMask); //获取依赖包的名字
             pack.md5           = MD5Tool.GetFileMD5(GetExportPath(pack.path, pack.name)); //获取bundle包的md5
-            pack.loadType      = ResLoadType.Streaming;  //默认放在沙盒路径下
+            //pack.loadType      = ResLoadType.Streaming;  //默认放在沙盒路径下
 
             gameAssetsBundles.Add(pack.name,pack);
         }
 
-        gameConfig.Add(BundleConfigManager.key_relyBundle  , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles)));
-        gameConfig.Add(BundleConfigManager.key_bundles     , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles)));
+        gameConfig.Add(RecourcesConfigManager.c_relyBundleKey  , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles)));
+        gameConfig.Add(RecourcesConfigManager.c_bundlesKey     , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles)));
 
         //保存游戏中读取的配置文件
-        ConfigManager.SaveData(BundleConfigManager.configFileName, gameConfig);
+        ConfigManager.SaveData(RecourcesConfigManager.c_configFileName, gameConfig);
         AssetDatabase.Refresh();
     }
 

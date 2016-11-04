@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class test01Window : UIWindowBase 
+public class heiheiheiWindow : UIWindowBase 
 {
 
     //UI的初始化请放在这里
@@ -19,22 +19,22 @@ public class test01Window : UIWindowBase
     //UI的进入动画
     public override IEnumerator EnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
     {
-        AnimSystem.UguiAlpha(gameObject, 0, 1, 1, callBack:(object[] obj)=>
+        AnimSystem.UguiAlpha(gameObject, null, 1, callBack:(object[] obj)=>
         {
-            base.EnterAnim(l_animComplete, l_callBack, objs);
+            StartCoroutine(base.EnterAnim(l_animComplete, l_callBack, objs));
         });
 
-        return null;
+        yield return new WaitForEndOfFrame();
     }
 
     //UI的退出动画
     public override IEnumerator ExitAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
     {
-        AnimSystem.UguiAlpha(gameObject, 1, 0, 1, callBack: (object[] obj) =>
+        AnimSystem.UguiAlpha(gameObject , null, 0, callBack:(object[] obj) =>
         {
-            base.ExitAnim(l_animComplete, l_callBack, objs);
+            StartCoroutine(base.ExitAnim(l_animComplete, l_callBack, objs));
         });
 
-        return null;
+        yield return new WaitForEndOfFrame();
     }
 }

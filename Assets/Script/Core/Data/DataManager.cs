@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MiniJSON;
 using System.Text;
+using System;
 
 /*
  * 数据管理器，只读，可热更新，可使用默认值
@@ -12,14 +13,29 @@ public class DataManager
 {
     public const string c_directoryName = "Data";
     public const string c_expandName = "txt";
-    public static DataTable GetData(string ConfigName)
+
+
+    /// <summary>
+    /// 数据缓存
+    /// </summary>
+    static Dictionary<string, DataTable> s_dataCatch = new Dictionary<string, DataTable>();
+
+    public static DataTable GetData(string DataName)
     {
+
+        if(s_dataCatch.ContainsKey(DataName))
+        {
+            return s_dataCatch[DataName];
+        }
+
+        DataTable data = null;
+
         string dataJson = "";
 
         #if UNITY_EDITOR
             dataJson = ResourceIOTool.ReadStringByResource(
                     PathTool.GetRelativelyPath(c_directoryName,
-                                                ConfigName,
+                                                DataName,
                                                 c_expandName));
         #else
             dataJson = ResourceManager.ReadTextFile(ConfigName);
@@ -27,12 +43,13 @@ public class DataManager
 
         if (dataJson == "")
         {
-            return null;
+            throw new Exception("Dont Find " + DataName);
         }
-        else
-        {
-            return DataTable.Analysis(dataJson);
-        }
+
+        data = DataTable.Analysis(dataJson);
+        s_dataCatch.Add(DataName, data);
+
+        return data;
     }
 
     //只在编辑器下能够使用

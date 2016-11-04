@@ -8,23 +8,41 @@ public class RecordManager
     public const string c_directoryName = "Record";
     public const string c_expandName    = "json";
 
+    /// <summary>
+    /// 记录缓存
+    /// </summary>
+    static Dictionary<string, RecordTable> s_RecordCatch = new Dictionary<string, RecordTable>();
+
     public static RecordTable GetData(string RecordName)
     {
+        if (s_RecordCatch.ContainsKey(RecordName))
+        {
+            return s_RecordCatch[RecordName];
+        }
+
+        RecordTable record = null;
+
         string dataJson = "";
 
+        //记录永远从沙盒路径读取
         dataJson = ResourceIOTool.ReadStringByFile(
             PathTool.GetAbsolutePath(ResLoadType.Persistent,
                 PathTool.GetRelativelyPath(c_directoryName,
                                             RecordName,
                                             c_expandName)));
+
         if (dataJson == "")
         {
-            return new RecordTable();
+            record = new RecordTable();
         }
         else
         {
-            return RecordTable.Analysis(dataJson);
+            record = RecordTable.Analysis(dataJson);
         }
+
+        s_RecordCatch.Add(RecordName, record);
+
+        return new RecordTable();
     }
 
     public static void SaveData(string RecordName, RecordTable data)

@@ -13,13 +13,12 @@ public class testWindow : UIWindowBase
     //请在这里写UI的更新逻辑，当该UI监听的事件触发时，该函数会被调用
     public override void OnRefresh()
     {
-
     }
 
     //UI的进入动画
     public override IEnumerator EnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
     {
-        AnimSystem.UguiAlpha(gameObject, 0, 1, 1, InterpType.Linear, true,(object[] obj)=>
+        AnimSystem.UguiAlpha(gameObject, 0, 1, 1, callBack:(object[] obj)=>
         {
             base.EnterAnim(l_animComplete, l_callBack, objs);
         });
@@ -30,7 +29,7 @@ public class testWindow : UIWindowBase
     //UI的退出动画
     public override IEnumerator ExitAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
     {
-        AnimSystem.UguiAlpha(gameObject, 1, 0, 1, InterpType.Linear, true, (object[] obj) =>
+        AnimSystem.UguiAlpha(gameObject, 1, 0, 1, callBack: (object[] obj) =>
         {
             base.ExitAnim(l_animComplete, l_callBack, objs);
         });

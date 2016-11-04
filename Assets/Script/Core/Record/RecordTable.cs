@@ -42,87 +42,87 @@ public class RecordTable : Dictionary<string, SingleField>
         }
     }
 
-    public SingleField GetRecord(string key,string defaultValue)
+    public string GetRecord(string key, string defaultValue)
     {
         if (this.ContainsKey(key))
         {
-            return this[key];
+            return this[key].GetString() ;
         }
         else
         {
-            return new SingleField(defaultValue);
+            return new SingleField(defaultValue).GetString();
         }
     }
 
-    public SingleField GetRecord(string key, bool defaultValue)
+    public bool GetRecord(string key, bool defaultValue)
     {
         if (this.ContainsKey(key))
         {
-            return this[key];
+            return this[key].GetBool();
         }
         else
         {
-            return new SingleField(defaultValue);
+            return new SingleField(defaultValue).GetBool();
         }
     }
 
-    public SingleField GetRecord(string key, int defaultValue)
+    public int GetRecord(string key, int defaultValue)
     {
         if (this.ContainsKey(key))
         {
-            return this[key];
+            return this[key].GetInt();
         }
         else
         {
-            return new SingleField(defaultValue);
+            return new SingleField(defaultValue).GetInt();
         }
     }
 
-    public SingleField GetRecord(string key, float defaultValue)
+    public float GetRecord(string key, float defaultValue)
     {
         if (this.ContainsKey(key))
         {
-            return this[key];
+            return this[key].GetFloat();
         }
         else
         {
-            return new SingleField(defaultValue);
+            return new SingleField(defaultValue).GetFloat();
         }
     }
 
-    public SingleField GetRecord(string key, Vector2 defaultValue)
+    public Vector2 GetRecord(string key, Vector2 defaultValue)
     {
         if (this.ContainsKey(key))
         {
-            return this[key];
+            return this[key].GetVector2();
         }
         else
         {
-            return new SingleField(defaultValue);
+            return new SingleField(defaultValue).GetVector2();
         }
     }
 
-    public SingleField GetRecord(string key, Vector3 defaultValue)
+    public Vector3 GetRecord(string key, Vector3 defaultValue)
     {
         if (this.ContainsKey(key))
         {
-            return this[key];
+            return this[key].GetVector3();
         }
         else
         {
-            return new SingleField(defaultValue);
+            return new SingleField(defaultValue).GetVector3();
         }
     }
 
-    public SingleField GetRecord(string key, Color defaultValue)
+    public Color GetRecord(string key, Color defaultValue)
     {
         if (this.ContainsKey(key))
         {
-            return this[key];
+            return this[key].GetColor();
         }
         else
         {
-            return new SingleField(defaultValue);
+            return new SingleField(defaultValue).GetColor();
         }
     }
 

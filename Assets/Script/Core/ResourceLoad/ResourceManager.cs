@@ -11,7 +11,7 @@ public static class ResourceManager
     /// <summary>
     /// 游戏内资源读取类型
     /// </summary>
-    public static ResLoadType gameLoadType = ResLoadType.Resource; //默认从resourcePath中读取
+    public static ResLoadType m_gameLoadType = ResLoadType.Resource; //默认从resourcePath中读取
 
     public static string GetPath(string localPath, ResLoadType loadType)
     {
@@ -57,7 +57,7 @@ public static class ResourceManager
     public static ResLoadType GetLoadType(ResLoadType loadType)
     {
         //如果设置从Resource中加载则忽略打包设置
-        if (gameLoadType == ResLoadType.Resource)
+        if (m_gameLoadType == ResLoadType.Resource)
         {
             return ResLoadType.Resource;
         }
@@ -92,16 +92,14 @@ public static class ResourceManager
 
     public static object Load(string name)
     {
-        BundleConfig packData  = BundleConfigManager.GetBundleConfig(name);
+        BundleConfig packData  = RecourcesConfigManager.GetBundleConfig(name);
 
         if(packData == null)
         {
             throw new Exception("Load Exception not find " + name);
         }
 
-        ResLoadType loadTypeTmp = GetLoadType(packData.loadType);
-
-        if (loadTypeTmp == ResLoadType.Resource)
+        if (m_gameLoadType == ResLoadType.Resource)
         {
             return Resources.Load(packData.path);
         }
@@ -112,16 +110,14 @@ public static class ResourceManager
     }
     public static void LoadAsync(string name,LoadCallBack callBack)
     {
-        BundleConfig packData  = BundleConfigManager.GetBundleConfig(name);
+        BundleConfig packData  = RecourcesConfigManager.GetBundleConfig(name);
 
         if (packData == null)
         {
             return ;
         }
 
-        ResLoadType loadTypeTmp = GetLoadType(packData.loadType);
-
-        if (loadTypeTmp == ResLoadType.Resource)
+        if (m_gameLoadType == ResLoadType.Resource)
         {
             ResourceIOTool.ResourceLoadAsync(packData.path, callBack);
         }

@@ -7,7 +7,7 @@ using System;
 [RequireComponent(typeof(UIAnimManager))]
 public class UIManager : MonoBehaviour
 {
-    static UIManager s_instance;
+    public static GameObject s_UIManagerGo;
     public static UILayerManager s_UILayerManager; //UI层级管理器
     public static UIAnimManager s_UIAnimManager;   //UI动画管理器
     public static Camera s_UIcamera;               //UICamera
@@ -17,22 +17,11 @@ public class UIManager : MonoBehaviour
 
     #region 初始化
 
-    public static UIManager s_Instance
-    {
-        get
-        {
-            if (s_instance == null)
-            {
-                Init();
-            }
-            return s_instance;
-        }
-    }
-
     public static void Init()
     {
         GameObject l_instance = GameObjectManager.CreatGameObject("UIManager");
-        s_instance = l_instance.GetComponent<UIManager>();
+
+        s_UIManagerGo = l_instance;
 
         s_UILayerManager = l_instance.GetComponent<UILayerManager>();
         s_UIAnimManager  = l_instance.GetComponent<UIAnimManager>();
@@ -56,7 +45,7 @@ public class UIManager : MonoBehaviour
     }
     public static UIWindowBase CreateUIWindow(string l_UIname)
     {
-        GameObject l_UItmp = GameObjectManager.CreatGameObject(l_UIname, s_Instance.gameObject);
+        GameObject l_UItmp = GameObjectManager.CreatGameObject(l_UIname, s_UIManagerGo);
         UIWindowBase l_UIbase = l_UItmp.GetComponent<UIWindowBase>();
         UISystemEvent.Dispatch(l_UIbase, UIEvent.OnInit);  //派发OnInit事件
         try{

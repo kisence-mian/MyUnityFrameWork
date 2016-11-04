@@ -9,8 +9,11 @@ using System;
 /// </summary>
 public static class AssetsBundleManager 
 {
-    static Dictionary<string, Bundle> bundles        = new Dictionary<string, Bundle>();
-    static Dictionary<string, RelyBundle> relyBundle = new Dictionary<string, RelyBundle>(); //所有依赖包
+    public const string c_HotUpdateRecordName = "HotUpdateRecord";
+    public const string c_AssetsBundlesExpandName = "assetBundle";
+
+    static Dictionary<string, Bundle> s_bundles        = new Dictionary<string, Bundle>();
+    static Dictionary<string, RelyBundle> s_relyBundle = new Dictionary<string, RelyBundle>(); //所有依赖包
 
     /// <summary>
     /// 同步加载一个bundles
@@ -18,7 +21,7 @@ public static class AssetsBundleManager
     /// <param name="name">bundle名</param>
     public static Bundle LoadBundle(string bundleName)
     {
-        BundleConfig configTmp = BundleConfigManager.GetBundleConfig(bundleName);
+        BundleConfig configTmp = RecourcesConfigManager.GetBundleConfig(bundleName);
 
         string path = GetBundlePath(configTmp);
 
@@ -36,14 +39,14 @@ public static class AssetsBundleManager
     {
         RelyBundle tmp = null;
 
-        if (relyBundle.ContainsKey(relyBundleName))
+        if (s_relyBundle.ContainsKey(relyBundleName))
         {
-            tmp = relyBundle[relyBundleName];
+            tmp = s_relyBundle[relyBundleName];
             tmp.relyCount++;
         }
         else
         {
-            BundleConfig configTmp = BundleConfigManager.GetRelyBundleConfig(relyBundleName);
+            BundleConfig configTmp = RecourcesConfigManager.GetRelyBundleConfig(relyBundleName);
             string path = GetBundlePath(configTmp);
 
             tmp = AddRelyBundle(relyBundleName, AssetBundle.LoadFromFile(path));
@@ -58,7 +61,7 @@ public static class AssetsBundleManager
     /// <param name="bundleName">bundle名</param>
     public static void LoadBundleAsync(string bundleName, BundleLoadCallBack callBack)
     {
-        BundleConfig configTmp = BundleConfigManager.GetBundleConfig(bundleName);
+        BundleConfig configTmp = RecourcesConfigManager.GetBundleConfig(bundleName);
 
         if (configTmp == null)
         {
@@ -115,9 +118,9 @@ public static class AssetsBundleManager
     /// <param name="callBack"></param>
     public static void LoadRelyBundleAsync(string relyBundleName, RelyBundleLoadCallBack callBack)
     {
-        if (relyBundle.ContainsKey(relyBundleName))
+        if (s_relyBundle.ContainsKey(relyBundleName))
         {
-            RelyBundle tmp = relyBundle[relyBundleName];
+            RelyBundle tmp = s_relyBundle[relyBundleName];
             tmp.relyCount++;
 
             callBack(LoadState.CompleteState, tmp);
@@ -125,9 +128,9 @@ public static class AssetsBundleManager
         else
         {
             //先占位，避免重复加载
-            relyBundle.Add(relyBundleName, null);
+            s_relyBundle.Add(relyBundleName, null);
 
-            BundleConfig configTmp = BundleConfigManager.GetRelyBundleConfig(relyBundleName);
+            BundleConfig configTmp = RecourcesConfigManager.GetRelyBundleConfig(relyBundleName);
             string path = GetBundlePath(configTmp);
 
             ResourceIOTool.AssetsBundleLoadAsync(path, (LoadState state,AssetBundle bundle)=>
@@ -151,9 +154,9 @@ public static class AssetsBundleManager
     /// <returns>目标资源</returns>
     public static object Load(string name)
     {
-        if(bundles.ContainsKey(name))
+        if(s_bundles.ContainsKey(name))
         {
-            return bundles[name].mainAsset;
+            return s_bundles[name].mainAsset;
         }
         else
         {
@@ -172,13 +175,13 @@ public static class AssetsBundleManager
     {
         try
         {
-            if (bundles.ContainsKey(name))
+            if (s_bundles.ContainsKey(name))
             {
                 //如果加载完了就直接回调
                 //如果没有加载完,就缓存起来,等到加载完了一起回调
-                if (bundles[name] != null)
+                if (s_bundles[name] != null)
                 {
-                    callBack(LoadState.CompleteState, bundles[name].mainAsset);
+                    callBack(LoadState.CompleteState, s_bundles[name].mainAsset);
                 }
                 else
                 {
@@ -196,7 +199,7 @@ public static class AssetsBundleManager
             else
             {
                 //先占位，避免重复加载
-                bundles.Add(name, null);
+                s_bundles.Add(name, null);
 
                 LoadBundleAsync(name, (LoadState state, Bundle bundlle) =>
                 {
@@ -223,18 +226,18 @@ public static class AssetsBundleManager
     /// <param name="bundleName"></param>
     public static void UnLoadBundle(string bundleName)
     {
-        if (bundles.ContainsKey(bundleName))
+        if (s_bundles.ContainsKey(bundleName))
         {
-            BundleConfig configTmp = bundles[bundleName].bundleConfig;
+            BundleConfig configTmp = s_bundles[bundleName].bundleConfig;
             //卸载依赖包
             for (int i = 0; i < configTmp.relyPackages.Length; i++)
             {
                 UnLoadRelyBundle(configTmp.relyPackages[i]);
             }
 
-            bundles[bundleName].bundle.Unload(true);
+            s_bundles[bundleName].bundle.Unload(true);
 
-            bundles.Remove(bundleName);
+            s_bundles.Remove(bundleName);
         }
         else
         {
@@ -248,14 +251,14 @@ public static class AssetsBundleManager
     /// <param name="relyBundleName"></param>
     public static void UnLoadRelyBundle(string relyBundleName)
     {
-        if (relyBundle.ContainsKey(relyBundleName))
+        if (s_relyBundle.ContainsKey(relyBundleName))
         {
-            relyBundle[relyBundleName].relyCount --;
+            s_relyBundle[relyBundleName].relyCount --;
 
-            if (relyBundle[relyBundleName].relyCount <=0)
+            if (s_relyBundle[relyBundleName].relyCount <=0)
             {
-                relyBundle[relyBundleName].bundle.Unload(true);
-                relyBundle.Remove(relyBundleName);
+                s_relyBundle[relyBundleName].bundle.Unload(true);
+                s_relyBundle.Remove(relyBundleName);
             }
         }
         else
@@ -267,15 +270,15 @@ public static class AssetsBundleManager
     public static Bundle AddBundle(string bundleName, AssetBundle aess)
     {
         Bundle bundleTmp = new Bundle();
-        BundleConfig configTmp = BundleConfigManager.GetBundleConfig(bundleName);
+        BundleConfig configTmp = RecourcesConfigManager.GetBundleConfig(bundleName);
 
-        if (bundles.ContainsKey(bundleName))
+        if (s_bundles.ContainsKey(bundleName))
         {
-            bundles[bundleName] = bundleTmp;
+            s_bundles[bundleName] = bundleTmp;
         }
         else
         {
-            bundles.Add(bundleName, bundleTmp);
+            s_bundles.Add(bundleName, bundleTmp);
         }
 
         bundleTmp.bundleConfig = configTmp;
@@ -315,13 +318,13 @@ public static class AssetsBundleManager
         tmp.relyCount = 1;
         tmp.bundle = aess;
 
-        if (relyBundle.ContainsKey(relyBundleName))
+        if (s_relyBundle.ContainsKey(relyBundleName))
         {
-            relyBundle[relyBundleName] = tmp;
+            s_relyBundle[relyBundleName] = tmp;
         }
         else
         {
-            relyBundle.Add(relyBundleName, tmp);
+            s_relyBundle.Add(relyBundleName, tmp);
         }
 
         if (tmp.bundle == null)
@@ -340,36 +343,18 @@ public static class AssetsBundleManager
     /// <returns></returns>
     public static string GetBundlePath(BundleConfig config)
     {
+        bool isLoadByPersistent = RecordManager.GetData(c_HotUpdateRecordName).GetRecord(config.name, false);
+
+        ResLoadType loadType = ResLoadType.Streaming;
+
         //加载路径由 加载根目录 和 相对路径 合并而成
         //加载根目录由配置决定
-        return GetPath(config.path, config.loadType);
-    }
-
-    public static string GetPath(string localPath, ResLoadType loadType)
-    {
-        StringBuilder path = new StringBuilder();
-        switch (loadType)
+        if (isLoadByPersistent)
         {
-            case ResLoadType.Streaming:
-#if UNITY_EDITOR
-                path.Append(Application.dataPath);
-                path.Append("/StreamingAssets/");
-                break;
-#else
-                    path.Append(Application.streamingAssetsPath);
-                    path.Append("/");
-                    break;
-#endif
-
-            case ResLoadType.Persistent:
-                path.Append(Application.persistentDataPath);
-                path.Append("/");
-                break;
+            loadType = ResLoadType.Persistent;
         }
 
-        path.Append(localPath);
-        path.Append(".assetBundle");
-        return path.ToString();
+        return PathTool.GetAbsolutePath(loadType, config.path + "." + c_AssetsBundlesExpandName);
     }
 }
 
