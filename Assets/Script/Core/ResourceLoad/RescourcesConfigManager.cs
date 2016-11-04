@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public static class RecourcesConfigManager 
+public static class RescourcesConfigManager 
 {
     public const string c_configFileName = "BundleConfig";
 
@@ -15,7 +15,7 @@ public static class RecourcesConfigManager
 
     public static void Initialize()
     {
-        Dictionary<string, SingleField> data = ConfigManager.GetData(c_configFileName);
+        Dictionary<string, SingleField> data = GetResourcesConfig();
 
         if (data == null
             || !data.ContainsKey(c_relyBundleKey) 
@@ -59,6 +59,28 @@ public static class RecourcesConfigManager
         else
         {
             throw new Exception("RecourcesConfigManager GetRelyBundleConfig Exception: Dont find " + bundleName + " please check BundleConfig!");
+        }
+    }
+
+
+    public static Dictionary<string, SingleField> GetResourcesConfig()
+    {
+        string dataJson = "";
+
+        ResLoadType type = ResLoadType.Streaming;
+
+        dataJson = ResourceIOTool.ReadStringByResource(
+            PathTool.GetRelativelyPath(ConfigManager.c_directoryName,
+                                        c_configFileName,
+                                        ConfigManager.c_expandName));
+
+        if (dataJson == "")
+        {
+            throw new Exception("ResourcesConfig not find " + c_configFileName);
+        }
+        else
+        {
+            return JsonTool.Json2Dictionary<SingleField>(dataJson);
         }
     }
 }

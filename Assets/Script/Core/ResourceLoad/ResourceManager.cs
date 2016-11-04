@@ -13,47 +13,6 @@ public static class ResourceManager
     /// </summary>
     public static ResLoadType m_gameLoadType = ResLoadType.Resource; //默认从resourcePath中读取
 
-    public static string GetPath(string localPath, ResLoadType loadType)
-    {
-        StringBuilder path = new StringBuilder();
-        switch (loadType)
-        {
-            case ResLoadType.Resource: 
-                #if UNITY_EDITOR
-                    path.Append( Application.dataPath);
-                    path.Append("/Resources/");
-                    break;
-                #endif
-            case ResLoadType.Streaming:
-                #if UNITY_EDITOR
-                    path.Append(Application.dataPath);
-                    path.Append("/StreamingAssets/");
-                    break;
-                #else
-                    path.Append(Application.streamingAssetsPath);
-                    path.Append("/");
-                    break;
-                #endif
-
-            case ResLoadType.Persistent:
-                path.Append(Application.persistentDataPath);
-                path.Append("/");
-                break;
-
-            case ResLoadType.Catch:
-                path.Append(Application.temporaryCachePath);
-                path.Append("/");
-                break;
-
-            default:
-                Debug.LogError("Type Error !" + loadType);
-                break;
-        }
-
-        path.Append(localPath);
-        return path.ToString();
-    }
-
     public static ResLoadType GetLoadType(ResLoadType loadType)
     {
         //如果设置从Resource中加载则忽略打包设置
@@ -84,7 +43,7 @@ public static class ResourceManager
     public static void WriteTextFile(string path,string content ,ResLoadType type)
     {
         #if UNITY_EDITOR
-            ResourceIOTool.WriteStringByFile(GetPath(path, type), content);
+            ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(type, path), content);
         #else
             
         #endif
@@ -92,7 +51,7 @@ public static class ResourceManager
 
     public static object Load(string name)
     {
-        BundleConfig packData  = RecourcesConfigManager.GetBundleConfig(name);
+        BundleConfig packData  = RescourcesConfigManager.GetBundleConfig(name);
 
         if(packData == null)
         {
@@ -110,7 +69,7 @@ public static class ResourceManager
     }
     public static void LoadAsync(string name,LoadCallBack callBack)
     {
-        BundleConfig packData  = RecourcesConfigManager.GetBundleConfig(name);
+        BundleConfig packData  = RescourcesConfigManager.GetBundleConfig(name);
 
         if (packData == null)
         {

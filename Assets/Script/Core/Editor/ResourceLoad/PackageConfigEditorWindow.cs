@@ -1635,11 +1635,11 @@ public class BundleConfigEditorWindow : EditorWindow
             gameAssetsBundles.Add(pack.name,pack);
         }
 
-        gameConfig.Add(RecourcesConfigManager.c_relyBundleKey  , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles)));
-        gameConfig.Add(RecourcesConfigManager.c_bundlesKey     , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles)));
+        gameConfig.Add(RescourcesConfigManager.c_relyBundleKey  , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles)));
+        gameConfig.Add(RescourcesConfigManager.c_bundlesKey     , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles)));
 
         //保存游戏中读取的配置文件
-        ConfigManager.SaveData(RecourcesConfigManager.c_configFileName, gameConfig);
+        ConfigManager.SaveData(RescourcesConfigManager.c_configFileName, gameConfig);
         AssetDatabase.Refresh();
     }
 

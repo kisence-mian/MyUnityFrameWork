@@ -6,7 +6,7 @@ public class HotUpdateStatus : IApplicationStatus
 
     public override void OnEnterStatus()
     {
-        RecourcesConfigManager.Initialize();
+        RescourcesConfigManager.Initialize();
         UIManager.Init();
     }
 }

@@ -10,7 +10,7 @@ namespace Framework
         [Test(Description="UIManager 加载测试")]
         public void UIManagerLoadTest()
         {
-            RecourcesConfigManager.Initialize();
+            RescourcesConfigManager.Initialize();
 
             GameObject manager = GameObjectManager.CreatGameObject("UIManager");
 

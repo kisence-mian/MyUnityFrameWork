@@ -24,7 +24,7 @@ public class ApplicationManager : MonoBehaviour
     public void AppLaunch()
     {
         SetResourceLoadType();            //设置资源加载类型
-        RecourcesConfigManager.Initialize(); //资源路径管理器启动
+        RescourcesConfigManager.Initialize(); //资源路径管理器启动
         Log.Init();                       //日志系统启动
         ApplicationStatusManager.Init();  //游戏流程状态机初始化
 

@@ -21,7 +21,7 @@ public static class AssetsBundleManager
     /// <param name="name">bundle名</param>
     public static Bundle LoadBundle(string bundleName)
     {
-        BundleConfig configTmp = RecourcesConfigManager.GetBundleConfig(bundleName);
+        BundleConfig configTmp = RescourcesConfigManager.GetBundleConfig(bundleName);
 
         string path = GetBundlePath(configTmp);
 
@@ -46,7 +46,7 @@ public static class AssetsBundleManager
         }
         else
         {
-            BundleConfig configTmp = RecourcesConfigManager.GetRelyBundleConfig(relyBundleName);
+            BundleConfig configTmp = RescourcesConfigManager.GetRelyBundleConfig(relyBundleName);
             string path = GetBundlePath(configTmp);
 
             tmp = AddRelyBundle(relyBundleName, AssetBundle.LoadFromFile(path));
@@ -61,7 +61,7 @@ public static class AssetsBundleManager
     /// <param name="bundleName">bundle名</param>
     public static void LoadBundleAsync(string bundleName, BundleLoadCallBack callBack)
     {
-        BundleConfig configTmp = RecourcesConfigManager.GetBundleConfig(bundleName);
+        BundleConfig configTmp = RescourcesConfigManager.GetBundleConfig(bundleName);
 
         if (configTmp == null)
         {
@@ -130,7 +130,7 @@ public static class AssetsBundleManager
             //先占位，避免重复加载
             s_relyBundle.Add(relyBundleName, null);
 
-            BundleConfig configTmp = RecourcesConfigManager.GetRelyBundleConfig(relyBundleName);
+            BundleConfig configTmp = RescourcesConfigManager.GetRelyBundleConfig(relyBundleName);
             string path = GetBundlePath(configTmp);
 
             ResourceIOTool.AssetsBundleLoadAsync(path, (LoadState state,AssetBundle bundle)=>
@@ -270,7 +270,7 @@ public static class AssetsBundleManager
     public static Bundle AddBundle(string bundleName, AssetBundle aess)
     {
         Bundle bundleTmp = new Bundle();
-        BundleConfig configTmp = RecourcesConfigManager.GetBundleConfig(bundleName);
+        BundleConfig configTmp = RescourcesConfigManager.GetBundleConfig(bundleName);
 
         if (s_bundles.ContainsKey(bundleName))
         {
