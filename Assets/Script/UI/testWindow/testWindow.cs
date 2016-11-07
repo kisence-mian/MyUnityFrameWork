@@ -7,7 +7,7 @@ public class testWindow : UIWindowBase
     //UI的初始化请放在这里
     public override void OnInit()
     {
-
+        GetButton("Button").onClick.AddListener(onCLick);
     }
 
     //请在这里写UI的更新逻辑，当该UI监听的事件触发时，该函数会被调用
@@ -23,7 +23,7 @@ public class testWindow : UIWindowBase
             base.EnterAnim(l_animComplete, l_callBack, objs);
         });
 
-        return null;
+        yield break;
     }
 
     //UI的退出动画
@@ -34,6 +34,12 @@ public class testWindow : UIWindowBase
             base.ExitAnim(l_animComplete, l_callBack, objs);
         });
 
-        return null;
+        yield break;
+    }
+
+    public void onCLick()
+    {
+        Debug.Log("onCLick");
+        UIManager.CloseUIWindow(this);
     }
 }

@@ -117,14 +117,14 @@ public class UIManager : MonoBehaviour
                 l_callback = CloseUIWindowCallBack;
             }
 
-            s_UIAnimManager.StartEnterAnim(l_UI, l_callback, l_objs);
+            s_UIAnimManager.StartExitAnim(l_UI, l_callback, l_objs);
         }
         else
         {
             CloseUIWindowCallBack(l_UI, l_objs);
         }
     }
-    public static void CloseUIWindowCallBack(UIWindowBase l_UI, params object[] l_objs)
+    static void CloseUIWindowCallBack(UIWindowBase l_UI, params object[] l_objs)
     {
         UISystemEvent.Dispatch(l_UI, UIEvent.OnDestroy);  //派发OnDestroy事件
         try

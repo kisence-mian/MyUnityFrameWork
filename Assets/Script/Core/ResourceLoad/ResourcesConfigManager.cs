@@ -3,15 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public static class RescourcesConfigManager 
+public static class ResourcesConfigManager 
 {
-    public const string c_configFileName = "BundleConfig";
+    public const string c_configFileName = "ResourcesConfig";
 
     public const string c_relyBundleKey = "relyBundles";
     public const string c_bundlesKey = "AssetsBundles";
 
-    static Dictionary<string, BundleConfig> m_relyBundleConfigs;
-    static Dictionary<string, BundleConfig> m_bundleConfigs ;
+    static Dictionary<string, ResourcesConfig> m_relyBundleConfigs;
+    static Dictionary<string, ResourcesConfig> m_bundleConfigs ;
 
     public static void Initialize()
     {
@@ -24,11 +24,11 @@ public static class RescourcesConfigManager
             throw new Exception("RecourcesConfigManager Initialize Exception: " + c_configFileName + "file is not exits");
         }
 
-        m_relyBundleConfigs = JsonTool.Json2Dictionary<BundleConfig>(data[c_relyBundleKey].GetString());
-        m_bundleConfigs     = JsonTool.Json2Dictionary<BundleConfig>(data[c_bundlesKey].GetString());
+        m_relyBundleConfigs = JsonTool.Json2Dictionary<ResourcesConfig>(data[c_relyBundleKey].GetString());
+        m_bundleConfigs     = JsonTool.Json2Dictionary<ResourcesConfig>(data[c_bundlesKey].GetString());
     }
 
-    public static BundleConfig GetBundleConfig(string bundleName)
+    public static ResourcesConfig GetBundleConfig(string bundleName)
     {
         if (m_bundleConfigs == null)
         {
@@ -45,7 +45,7 @@ public static class RescourcesConfigManager
         }
     }
 
-    public static BundleConfig GetRelyBundleConfig(string bundleName)
+    public static ResourcesConfig GetRelyBundleConfig(string bundleName)
     {
         if (m_relyBundleConfigs == null)
         {
@@ -62,17 +62,35 @@ public static class RescourcesConfigManager
         }
     }
 
-
-    public static Dictionary<string, SingleField> GetResourcesConfig()
+    //资源路径数据不依赖任何其他数据
+    static Dictionary<string, SingleField> GetResourcesConfig()
     {
         string dataJson = "";
 
-        ResLoadType type = ResLoadType.Streaming;
+        if (ResourceManager.m_gameLoadType == ResLoadType.Resource)
+        {
+            dataJson = ResourceIOTool.ReadStringByResource(
+                PathTool.GetRelativelyPath(ConfigManager.c_directoryName,
+                                            c_configFileName,
+                                            ConfigManager.c_expandName));
+        }
+        else
+        {
+            ResLoadType type = ResLoadType.Streaming;
 
-        dataJson = ResourceIOTool.ReadStringByResource(
-            PathTool.GetRelativelyPath(ConfigManager.c_directoryName,
-                                        c_configFileName,
-                                        ConfigManager.c_expandName));
+            if(RecordManager.GetData(AssetsBundleManager.c_HotUpdateRecordName).GetRecord(c_configFileName,false))
+            {
+                type = ResLoadType.Persistent;
+            }
+
+            dataJson = ResourceIOTool.ReadStringByBundle(
+                PathTool.GetAbsolutePath(
+                     type,
+                     PathTool.GetRelativelyPath(
+                                     ConfigManager.c_directoryName,
+                                     c_configFileName,
+                                     AssetsBundleManager.c_AssetsBundlesExpandName)));
+        }
 
         if (dataJson == "")
         {
@@ -85,7 +103,7 @@ public static class RescourcesConfigManager
     }
 }
 
-public class BundleConfig
+public class ResourcesConfig
 {
     public string name;               //名称
     public string path;               //加载相对路径

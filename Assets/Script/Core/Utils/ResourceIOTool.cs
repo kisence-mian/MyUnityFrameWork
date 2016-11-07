@@ -17,9 +17,7 @@ public class ResourceIOTool :MonoBehaviour
         {
             GameObject resourceIOTool = new GameObject();
             resourceIOTool.name = "ResourceIO";
-
-            if(Application.isPlaying)
-                DontDestroyOnLoad(resourceIOTool);
+            DontDestroyOnLoad(resourceIOTool);
 
             instance = resourceIOTool.AddComponent<ResourceIOTool>();
         }
@@ -51,6 +49,16 @@ public class ResourceIOTool :MonoBehaviour
         }
 
         return line.ToString();
+    }
+
+    public static string ReadStringByBundle(string path)
+    {
+        AssetBundle ab = AssetBundle.LoadFromFile(path);
+        TextAsset ta = (TextAsset)ab.mainAsset;
+        string content = ta.ToString();
+        ab.Unload(true);
+
+        return content;
     }
 
     public static string ReadStringByResource(string path)

@@ -21,7 +21,7 @@ public static class AssetsBundleManager
     /// <param name="name">bundle名</param>
     public static Bundle LoadBundle(string bundleName)
     {
-        BundleConfig configTmp = RescourcesConfigManager.GetBundleConfig(bundleName);
+        ResourcesConfig configTmp = ResourcesConfigManager.GetBundleConfig(bundleName);
 
         string path = GetBundlePath(configTmp);
 
@@ -46,7 +46,7 @@ public static class AssetsBundleManager
         }
         else
         {
-            BundleConfig configTmp = RescourcesConfigManager.GetRelyBundleConfig(relyBundleName);
+            ResourcesConfig configTmp = ResourcesConfigManager.GetRelyBundleConfig(relyBundleName);
             string path = GetBundlePath(configTmp);
 
             tmp = AddRelyBundle(relyBundleName, AssetBundle.LoadFromFile(path));
@@ -61,7 +61,7 @@ public static class AssetsBundleManager
     /// <param name="bundleName">bundle名</param>
     public static void LoadBundleAsync(string bundleName, BundleLoadCallBack callBack)
     {
-        BundleConfig configTmp = RescourcesConfigManager.GetBundleConfig(bundleName);
+        ResourcesConfig configTmp = ResourcesConfigManager.GetBundleConfig(bundleName);
 
         if (configTmp == null)
         {
@@ -130,7 +130,7 @@ public static class AssetsBundleManager
             //先占位，避免重复加载
             s_relyBundle.Add(relyBundleName, null);
 
-            BundleConfig configTmp = RescourcesConfigManager.GetRelyBundleConfig(relyBundleName);
+            ResourcesConfig configTmp = ResourcesConfigManager.GetRelyBundleConfig(relyBundleName);
             string path = GetBundlePath(configTmp);
 
             ResourceIOTool.AssetsBundleLoadAsync(path, (LoadState state,AssetBundle bundle)=>
@@ -228,7 +228,7 @@ public static class AssetsBundleManager
     {
         if (s_bundles.ContainsKey(bundleName))
         {
-            BundleConfig configTmp = s_bundles[bundleName].bundleConfig;
+            ResourcesConfig configTmp = s_bundles[bundleName].bundleConfig;
             //卸载依赖包
             for (int i = 0; i < configTmp.relyPackages.Length; i++)
             {
@@ -270,7 +270,7 @@ public static class AssetsBundleManager
     public static Bundle AddBundle(string bundleName, AssetBundle aess)
     {
         Bundle bundleTmp = new Bundle();
-        BundleConfig configTmp = RescourcesConfigManager.GetBundleConfig(bundleName);
+        ResourcesConfig configTmp = ResourcesConfigManager.GetBundleConfig(bundleName);
 
         if (s_bundles.ContainsKey(bundleName))
         {
@@ -341,7 +341,7 @@ public static class AssetsBundleManager
     /// </summary>
     /// <param name="bundleName"></param>
     /// <returns></returns>
-    public static string GetBundlePath(BundleConfig config)
+    public static string GetBundlePath(ResourcesConfig config)
     {
         bool isLoadByPersistent = RecordManager.GetData(c_HotUpdateRecordName).GetRecord(config.name, false);
 
@@ -364,7 +364,7 @@ public class Bundle
 {
     public object mainAsset;
     public AssetBundle bundle;
-    public BundleConfig bundleConfig;
+    public ResourcesConfig bundleConfig;
 }
 
 public class RelyBundle

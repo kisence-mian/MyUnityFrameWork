@@ -9,9 +9,9 @@ namespace Framework
         [Test(Description = "资源路径数据存在测试")]
         public void BundleConfigExistTest()
         {
-            RescourcesConfigManager.Initialize();
+            ResourcesConfigManager.Initialize();
 
-            bool isExist = ConfigManager.GetIsExistData(RescourcesConfigManager.c_configFileName);
+            bool isExist = ConfigManager.GetIsExistData(ResourcesConfigManager.c_configFileName);
 
             Assert.AreEqual(isExist, true);
         }

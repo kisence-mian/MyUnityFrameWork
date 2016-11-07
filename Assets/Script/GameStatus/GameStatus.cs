@@ -5,7 +5,7 @@ public class GameStatus : IApplicationStatus
 {
     public override void OnEnterStatus()
     {
-        RescourcesConfigManager.Initialize();
+        ResourcesConfigManager.Initialize();
         UIManager.Init();
     }
 }

@@ -1607,11 +1607,11 @@ public class BundleConfigEditorWindow : EditorWindow
     {
         Dictionary<string, SingleField> gameConfig = new Dictionary<string, SingleField>();
 
-        Dictionary<string,BundleConfig> gameRelyBundles = new Dictionary<string,BundleConfig>();
+        Dictionary<string,ResourcesConfig> gameRelyBundles = new Dictionary<string,ResourcesConfig>();
         for (int i = 0; i < relyPackages.Count; i++)
         {
             //生成游戏中使用的依赖包数据
-            BundleConfig pack = new BundleConfig();
+            ResourcesConfig pack = new ResourcesConfig();
             pack.name          = relyPackages[i].name;
             pack.path          = relyPackages[i].path;
             pack.relyPackages  = new string[0];
@@ -1621,11 +1621,11 @@ public class BundleConfigEditorWindow : EditorWindow
             gameRelyBundles.Add(pack.name,pack);
         }
 
-        Dictionary<string,BundleConfig> gameAssetsBundles = new Dictionary<string,BundleConfig>();
+        Dictionary<string,ResourcesConfig> gameAssetsBundles = new Dictionary<string,ResourcesConfig>();
         for (int i = 0; i < bundles.Count; i++)
         {
             //生成游戏中使用的bundle包数据
-            BundleConfig pack = new BundleConfig();
+            ResourcesConfig pack = new ResourcesConfig();
             pack.name          = bundles[i].name;
             pack.path          = bundles[i].path;
             pack.relyPackages  = GetRelyPackNames(bundles[i].relyPackagesMask); //获取依赖包的名字
@@ -1635,11 +1635,11 @@ public class BundleConfigEditorWindow : EditorWindow
             gameAssetsBundles.Add(pack.name,pack);
         }
 
-        gameConfig.Add(RescourcesConfigManager.c_relyBundleKey  , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameRelyBundles)));
-        gameConfig.Add(RescourcesConfigManager.c_bundlesKey     , new SingleField( JsonTool.Dictionary2Json<BundleConfig>(gameAssetsBundles)));
+        gameConfig.Add(ResourcesConfigManager.c_relyBundleKey  , new SingleField( JsonTool.Dictionary2Json<ResourcesConfig>(gameRelyBundles)));
+        gameConfig.Add(ResourcesConfigManager.c_bundlesKey     , new SingleField( JsonTool.Dictionary2Json<ResourcesConfig>(gameAssetsBundles)));
 
         //保存游戏中读取的配置文件
-        ConfigManager.SaveData(RescourcesConfigManager.c_configFileName, gameConfig);
+        ConfigManager.SaveData(ResourcesConfigManager.c_configFileName, gameConfig);
         AssetDatabase.Refresh();
     }
 

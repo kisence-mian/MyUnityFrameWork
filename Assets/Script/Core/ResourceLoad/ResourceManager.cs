@@ -51,7 +51,7 @@ public static class ResourceManager
 
     public static object Load(string name)
     {
-        BundleConfig packData  = RescourcesConfigManager.GetBundleConfig(name);
+        ResourcesConfig packData  = ResourcesConfigManager.GetBundleConfig(name);
 
         if(packData == null)
         {
@@ -67,9 +67,10 @@ public static class ResourceManager
             return AssetsBundleManager.Load(name);
         }
     }
+
     public static void LoadAsync(string name,LoadCallBack callBack)
     {
-        BundleConfig packData  = RescourcesConfigManager.GetBundleConfig(name);
+        ResourcesConfig packData  = ResourcesConfigManager.GetBundleConfig(name);
 
         if (packData == null)
         {
