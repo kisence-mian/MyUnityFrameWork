@@ -28,6 +28,7 @@ public class UIEditorWindow : EditorWindow
         }
 
         m_styleManager.OnEnable();
+        m_UItemplate.OnEnable();
 
         FindAllUI();
     }
@@ -61,6 +62,7 @@ public class UIEditorWindow : EditorWindow
     void OnProjectChange()
     {
         FindAllUI();
+        m_UItemplate.OnProjectChange();
     }
 
     #region UIManager

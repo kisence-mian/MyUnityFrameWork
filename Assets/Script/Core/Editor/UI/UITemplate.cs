@@ -11,49 +11,41 @@ using System.Collections.Generic;
 public class UITemplate
 {
     //模板prafeb所在路径
-    const string c_TemplateResPath = "Assets/EditorTemplateRes/";
+    const string c_TemplateResPath = "EditorTemplateRes/";
 
     //接口名标志
-    const string s_InterfaceName = "Interface";
-    const string s_TemplateName = "Template";
+    const string c_InterfaceName = "Interface";
+    const string c_TemplateName = "Template";
 
     //所有模板名称
-    string[] allTemplateName;
+    List<string> m_allTemplateName = new List<string>();
 
     //当前显示的模板名
-    string s_nowTemplateName = null;
+    string m_nowTemplateName = null;
 
-    string s_newTemplateName = null;
-
-    //所有使用了本模板的UI
-    List<GameObject> allUsedTheTemplateUI;
+    string m_newTemplateName = null;
 
     //模板实例
-    GameObject go_UITemplate;
+    GameObject m_UITemplate;
 
     //模板预设
-    GameObject pre_UITemplate;
+    GameObject m_preUITemplate;
 
     //当前选中的gameObject
-    GameObject go_SelectedNode;
+    GameObject m_SelectedNode;
 
-    //选中的GameObject的名称分割
-    string[] selectedObjName;
-
-    //选中的是什么类型
-    SelectObjType selectObjType;
-
-    //选中的类型枚举
-    enum SelectObjType
+    public void OnEnable()
     {
-        Instance,       //模板实例
-        PreFab,         //模板
-        UsedTemplate,   //用了模板的UI
-        NoUsedTemplate  //没用模板的UI
+        EditorGUIStyleData.Init();
+
+        FindAllUITemplate();
     }
 
-    //debug信息
-    List<string> myDebug = new List<string>();
+    //当工程改变时
+    public void OnProjectChange()
+    {
+        FindAllUITemplate();
+    }
 
     #region GUI
 
@@ -84,7 +76,7 @@ public class UITemplate
     {
         EditorGUI.indentLevel = 1;
         EditorGUILayout.Space();
-        EditorGUILayout.ObjectField("当前节点:", go_SelectedNode, typeof(GameObject));
+        EditorGUILayout.ObjectField("当前节点:", m_SelectedNode, typeof(GameObject));
         EditorGUILayout.Space();
     }
 
@@ -102,21 +94,21 @@ public class UITemplate
             EditorGUI.indentLevel = 2;
 
             EditorGUILayout.LabelField("提示：模板名中不能含有下划线");
-            s_newTemplateName = EditorGUILayout.TextField("模板名称：", s_newTemplateName);
+            m_newTemplateName = EditorGUILayout.TextField("模板名称：", m_newTemplateName);
 
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.Space();
 
-            if (IsReasonable(s_newTemplateName))
+            if (IsReasonable(m_newTemplateName))
             {
-                if (HaveTheTemlate(s_newTemplateName))
+                if (HaveTheTemlate(m_newTemplateName))
                 {
                     if (GUILayout.Button("覆盖模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_large)))
                     {
                         if (EditorUtility.DisplayDialog("警告", "该模板已存在，是否覆盖？", "是", "否"))
                         {
                             CreatUIBlankTemplate();
-                            s_newTemplateName = "";
+                            m_newTemplateName = "";
                         }
                     }
                 }
@@ -125,7 +117,7 @@ public class UITemplate
                     if (GUILayout.Button("创建一个空白模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_large)))
                     {
                         CreatUIBlankTemplate();
-                        s_newTemplateName = "";
+                        m_newTemplateName = "";
                     }
                 }
             }
@@ -157,19 +149,19 @@ public class UITemplate
     /// </summary>
     public void CreatUIBlankTemplate()
     {
-        go_UITemplate = new GameObject(s_TemplateName + "_" + s_newTemplateName);
-        pre_UITemplate          = null;
+        m_UITemplate = new GameObject(c_TemplateName + "_" + m_newTemplateName);
+        m_preUITemplate          = null;
 
-        go_UITemplate.layer = LayerMask.NameToLayer("UI");
+        m_UITemplate.layer = LayerMask.NameToLayer("UI");
 
-        RectTransform rt =  go_UITemplate.AddComponent<RectTransform>();
+        RectTransform rt =  m_UITemplate.AddComponent<RectTransform>();
 
-        if(go_SelectedNode != null)
+        if(m_SelectedNode != null)
         {
-            go_UITemplate.transform.SetParent(go_SelectedNode.transform);
+            m_UITemplate.transform.SetParent(m_SelectedNode.transform);
         }
 
-        go_UITemplate.transform.localScale = Vector3.one;
+        m_UITemplate.transform.localScale = Vector3.one;
 
         rt.anchorMin = Vector2.zero;
         rt.anchorMax = Vector2.one;
@@ -178,7 +170,7 @@ public class UITemplate
         rt.sizeDelta = Vector2.zero;
         rt.localScale = Vector3.one;
 
-        SaveTemplate(go_UITemplate.name);
+        SaveTemplate(m_UITemplate.name);
 
         b_isFoldCreatTemplate   = false;
         b_isFoldTemplateInfo    = true;
@@ -195,7 +187,7 @@ public class UITemplate
     public void TempleInfo_GUI()
     {
         SelectCurrentTemplate();
-        if (go_UITemplate != null)
+        if (m_UITemplate != null)
         {
             EditorGUI.indentLevel = 1;
             b_isFoldTemplateInfo = EditorGUILayout.Foldout((b_isFoldTemplateInfo), "当前模板信息:");
@@ -204,10 +196,10 @@ public class UITemplate
             {
                 EditorGUI.indentLevel = 2;
 
-                EditorGUILayout.LabelField("模板名称：" + s_nowTemplateName);
+                EditorGUILayout.LabelField("模板名称：" + m_nowTemplateName);
 
-                EditorGUILayout.ObjectField("模板预设：", pre_UITemplate, typeof(GameObject));
-                EditorGUILayout.ObjectField("模板实例：", go_UITemplate, typeof(GameObject));
+                EditorGUILayout.ObjectField("模板预设：", m_preUITemplate, typeof(GameObject));
+                EditorGUILayout.ObjectField("模板实例：", m_UITemplate, typeof(GameObject));
 
                 InterfaceGUI();
 
@@ -217,7 +209,7 @@ public class UITemplate
                 EditorGUILayout.Space();
                 if (GUILayout.Button("保存模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_large)))
                 {
-                    SaveTemplate(s_nowTemplateName);
+                    SaveTemplate(m_nowTemplateName);
                 }
                 //EditorGUILayout.Space();
                 EditorGUILayout.EndHorizontal();
@@ -227,7 +219,7 @@ public class UITemplate
                 EditorGUILayout.Space();
                 if (GUILayout.Button("应用模板", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_large)))
                 {
-                    ApplyOneTemplate(s_nowTemplateName);
+                    ApplyOneTemplate(m_nowTemplateName);
                 }
                 //EditorGUILayout.Space();
                 EditorGUILayout.EndHorizontal();
@@ -239,8 +231,8 @@ public class UITemplate
                 {
                     if (EditorUtility.DisplayDialog("警告", "该操作不可逆，确定删除该模板？", "是", "否"))
                     {
-                        DeleteTemlate(s_nowTemplateName);
-                        GameObject.DestroyImmediate(go_UITemplate);
+                        DeleteTemlate(m_nowTemplateName);
+                        GameObject.DestroyImmediate(m_UITemplate);
                     }
                 }
                 //EditorGUILayout.Space();
@@ -258,66 +250,23 @@ public class UITemplate
             return;
         }
 
-        go_UITemplate = Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets)[0] as GameObject;
-        go_UITemplate = GetTemlateParant(go_UITemplate);
+        m_UITemplate = Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets)[0] as GameObject;
+        m_UITemplate = GetTemlateParant(m_UITemplate);
 
-        if (go_UITemplate != null)
+        if (m_UITemplate != null)
         {
-            s_nowTemplateName = GetTemplateName(go_UITemplate.name);
-            pre_UITemplate = FindPrefabInTemplateRes(s_nowTemplateName);
+            m_nowTemplateName = GetTemplateName(m_UITemplate.name);
+            m_preUITemplate = FindPrefabInTemplateRes(m_nowTemplateName);
         }
     }
 
-
-    //判断当前选中的是那种类型
-    string JudgeNowSelectObjType()
-    {
-        selectObjType = SelectObjType.NoUsedTemplate;
-        if (selectedObjName.Length == 1)
-        {
-            if (HaveTheTemlate(selectedObjName[0]))
-            {
-                if (GameObject.Find(selectedObjName[0]))
-                {
-                    selectObjType = SelectObjType.Instance;
-                }
-                else
-                {
-                    selectObjType = SelectObjType.PreFab;
-                }
-
-                return selectedObjName[0];
-            }
-
-            return "";
-        }
-        else
-        {
-            
-            foreach (string name in selectedObjName)
-            {
-                if (HaveTheTemlate(name))
-                {
-                    selectObjType = SelectObjType.UsedTemplate;
-                    return name;
-                }
-
-            }
-            return "";
- 
-        }
-
-    }
 
     //保存模板
     void SaveTemplate(string l_templateName)
     {
-        GameObject saveprefab = GetSavePerfab(go_UITemplate);
+        GameObject saveprefab = GetSavePerfab(m_UITemplate);
 
-        pre_UITemplate = PrefabUtility.CreatePrefab(c_TemplateResPath + l_templateName + ".prefab", saveprefab, ReplacePrefabOptions.ConnectToPrefab);
-        UITemplateConfigManager.AddData(l_templateName);
-
-        //PrefabUtility.ConnectGameObjectToPrefab(go_UITemplate, pre_UITemplate);
+        m_preUITemplate = PrefabUtility.CreatePrefab("Assets/" + c_TemplateResPath + l_templateName + ".prefab", saveprefab, ReplacePrefabOptions.ConnectToPrefab);
 
         GameObject.DestroyImmediate(saveprefab);
     }
@@ -337,7 +286,7 @@ public class UITemplate
     {
         foreach (Transform nodeTmp in node)
         {
-            if (nodeTmp.name.Contains(s_InterfaceName))
+            if (nodeTmp.name.Contains(c_InterfaceName))
             {
                 foreach (Transform no in nodeTmp)
                 {
@@ -354,13 +303,14 @@ public class UITemplate
     //删除模板（包括数据）
     void DeleteTemlate(string l_TemplateName)
     {
-        UITemplateConfigManager.DestroyData(l_TemplateName);
         GameObject.DestroyImmediate(FindPrefabInTemplateRes(l_TemplateName), true);
 
-        Debug.Log(Application.dataPath + "/../" + c_TemplateResPath + l_TemplateName + ".prefab");
+        Debug.Log(Application.dataPath + "/" + c_TemplateResPath + l_TemplateName + ".prefab");
 
-        File.Delete(Application.dataPath + "/../" + c_TemplateResPath + l_TemplateName + ".prefab");
-        File.Delete(Application.dataPath + "/../" + c_TemplateResPath + l_TemplateName + ".prefab.meta");
+        File.Delete(Application.dataPath + "/" + c_TemplateResPath + l_TemplateName + ".prefab");
+        File.Delete(Application.dataPath + "/" + c_TemplateResPath + l_TemplateName + ".prefab.meta");
+
+        AssetDatabase.Refresh();
     }
 
     #region 接口
@@ -375,7 +325,7 @@ public class UITemplate
         b_isFoldInterface = EditorGUILayout.Foldout(b_isFoldInterface, "接口:");
         if (b_isFoldInterface)
         {
-            m_interfaceList = GetInterfaceList(go_UITemplate);
+            m_interfaceList = GetInterfaceList(m_UITemplate);
 
             EditorGUI.indentLevel = 3;
             b_isFoldInterfaceList = EditorGUILayout.Foldout(b_isFoldInterfaceList, "接口列表:");
@@ -416,13 +366,13 @@ public class UITemplate
     //创建一个接口
     void CreatOneInterface()
     {
-        if (go_SelectedNode == null)
+        if (m_SelectedNode == null)
         {
             Debug.LogError("请先选中要添加接口的GameObject！");
             return;
         }
-        GameObject go_newPort = new GameObject(s_InterfaceName + "_" + newInterfaceName);
-        go_newPort.transform.parent = go_SelectedNode.transform;
+        GameObject go_newPort = new GameObject(c_InterfaceName + "_" + newInterfaceName);
+        go_newPort.transform.parent = m_SelectedNode.transform;
         RectTransform rt = go_newPort.AddComponent<RectTransform>();
 
         rt.anchorMin = Vector2.zero;
@@ -450,6 +400,7 @@ public class UITemplate
     #endregion
 
     #region 模版列表
+
     //是否折叠
     bool b_isFoldUseTemple      = false;
     bool b_isfoldDebugInfo      = false;
@@ -462,11 +413,11 @@ public class UITemplate
     {
         if (Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets).Length > 0)
         {
-            go_SelectedNode = Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets)[0] as GameObject;
+            m_SelectedNode = Selection.GetFiltered(typeof(GameObject), SelectionMode.DeepAssets)[0] as GameObject;
         }
         else
         {
-            go_SelectedNode = null;
+            m_SelectedNode = null;
         }
 
         EditorGUI.indentLevel = 1;
@@ -474,16 +425,15 @@ public class UITemplate
         if (b_isFoldUseTemple)
         {
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos,GUILayout.ExpandHeight(false));
-            string[] allTemplateName = UITemplateConfigManager.GetUIStyleList();
 
-            for (int i = 0; i < allTemplateName.Length; i++)
+            for (int i = 0; i < m_allTemplateName.Count; i++)
             {
                 EditorGUI.indentLevel = 2;
-                bool b_isFoldTmp = EditorGUILayout.Foldout(GetListIsFold(i), allTemplateName[i] + ":");
+                bool b_isFoldTmp = EditorGUILayout.Foldout(GetListIsFold(i), m_allTemplateName[i] + ":");
                 SetListIsFold(i,b_isFoldTmp);
                 if (GetListIsFold(i))
                 {
-                    SingleTemplateInfo(allTemplateName[i]);
+                    SingleTemplateInfo(m_allTemplateName[i]);
                 }
             }
             EditorGUILayout.EndScrollView();
@@ -557,9 +507,9 @@ public class UITemplate
     void CreatUIByOneTemplate(string templateName)
     {
         GameObject go_newUI = GameObject.Instantiate(FindPrefabInTemplateRes(templateName));
-        if (go_SelectedNode != null)
+        if (m_SelectedNode != null)
         {
-            go_newUI.transform.SetParent( go_SelectedNode.transform);
+            go_newUI.transform.SetParent( m_SelectedNode.transform);
         }
 
         go_newUI.name = templateName;
@@ -570,8 +520,8 @@ public class UITemplate
         rt.sizeDelta          = Vector2.zero;
         rt.localScale         = Vector3.one;
 
-        go_UITemplate       = go_newUI;
-        pre_UITemplate      = FindPrefabInTemplateRes(templateName);
+        m_UITemplate       = go_newUI;
+        m_preUITemplate      = FindPrefabInTemplateRes(templateName);
  
     }
 
@@ -580,12 +530,9 @@ public class UITemplate
 
     #region 模板替换部分
 
-
     public void ApplyAllUITemplate()
     {
-
-        allTemplateName = UITemplateConfigManager.GetUIStyleList();
-        foreach (var oneTemplateName in allTemplateName)
+        foreach (var oneTemplateName in m_allTemplateName)
         {
             ApplyOneTemplate(oneTemplateName);
         }
@@ -669,7 +616,7 @@ public class UITemplate
     {
         foreach (Transform node in l_parent)
         {
-            if(node.name.Contains(s_InterfaceName))
+            if(node.name.Contains(c_InterfaceName))
             {
                 if (!m_interfaceTmp.ContainsKey(node.name))
                 {
@@ -722,6 +669,7 @@ public class UITemplate
         string[] prefabNameSplit;
         foreach (var item in UIEditorWindow.allUIPrefab.Keys)
         {
+            Debug.Log(item);
             if (UIEditorWindow.allUIPrefab[item] != null &&
                 UIEditorWindow.allUIPrefab[item].name != "UIManager")
             {
@@ -738,21 +686,23 @@ public class UITemplate
     //获取Prefab
     GameObject FindPrefabInTemplateRes(string name)
     {
-        name = c_TemplateResPath + name;
+        name = "Assets/" + c_TemplateResPath + name;
         name += ".prefab";
+
+        //Debug.Log(name);
         return AssetDatabase.LoadAssetAtPath(name, typeof(GameObject)) as GameObject;
     }
 
     //该模板是否已经存在
     bool HaveTheTemlate(string name)
     {
-        return UITemplateConfigManager.HaveTheTemplate(name);
+        return m_allTemplateName.Contains(name);
     }
 
     //获取一个选中的接口
     GameObject GetTemlateParant(GameObject l_node)
     {
-        if (l_node.name.Contains(s_TemplateName))
+        if (l_node.name.Contains(c_TemplateName))
         {
             return l_node;
         }
@@ -775,33 +725,71 @@ public class UITemplate
         //return nodeName.Split('_')[1];
     }
 
+    /// <summary>
+    /// 获取接口列表
+    /// </summary>
+    /// <param name="l_node"></param>
+    /// <returns></returns>
     List<GameObject> GetInterfaceList(GameObject l_node)
     {
         List<GameObject> result = new List<GameObject>();
 
-        foreach (Transform tr in l_node.transform)
-        {
-            if(tr.name.Contains(s_InterfaceName))
-            {
-                result.Add(tr.gameObject);
-            }
-        }
+        RecursionFindInterface(result, l_node.transform);
 
         return result;
     }
 
+    void RecursionFindInterface(List<GameObject> interfaceList,Transform node)
+    {
+        foreach (Transform tr in node)
+        {
+            if (tr.name.Contains(c_InterfaceName))
+            {
+                interfaceList.Add(tr.gameObject);
+            }
+
+            RecursionFindInterface(interfaceList, tr);
+        }
+    }
+
     bool IsContainsInterfaceName(string newName)
     {
-
         foreach (GameObject tr in m_interfaceList)
         {
-            if (GetTemplateName(tr.name) == newName)
+            if (tr.name == c_InterfaceName + "_" + newName)
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    void FindAllUITemplate()
+    {
+        m_allTemplateName = new List<string>();
+        FindTemplateName(Application.dataPath +"/"+ c_TemplateResPath);
+    }
+
+    public void FindTemplateName(string path)
+    {
+        Debug.Log(path);
+
+        string[] allUIPrefabName = Directory.GetFiles(path);
+        foreach (var item in allUIPrefabName)
+        {
+            if (item.EndsWith(".prefab"))
+            {
+                string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
+                m_allTemplateName.Add(configName);
+            }
+        }
+
+        //string[] dires = Directory.GetDirectories(path);
+        //for (int i = 0; i < dires.Length; i++)
+        //{
+        //    FindConfigName(dires[i]);
+        //}
     }
 
 

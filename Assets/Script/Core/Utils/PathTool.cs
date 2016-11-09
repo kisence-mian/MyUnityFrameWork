@@ -19,12 +19,13 @@ public class PathTool
 
             case ResLoadType.Streaming:
 
-#if UNITY_ANDROID
-                path.Append(Application.streamingAssetsPath);
-                path.Append("/");
-#else
+#if UNITY_ANDROID && !UNITY_EDITOR
+
                 path.Append(Application.dataPath );
                 path.Append("!assets/");
+#else
+                path.Append(Application.streamingAssetsPath);
+                path.Append("/");
 #endif
                 break;
 

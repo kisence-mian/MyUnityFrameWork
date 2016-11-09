@@ -38,10 +38,10 @@ public class DataManager
                                                 DataName,
                                                 c_expandName));
         #else
-            dataJson = ResourceManager.ReadTextFile(ConfigName);
+            dataJson = ResourceManager.ReadTextFile(DataName);
         #endif
 
-        if (dataJson == "")
+            if (dataJson == "")
         {
             throw new Exception("Dont Find " + DataName);
         }

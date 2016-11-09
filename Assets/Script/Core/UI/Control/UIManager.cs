@@ -19,7 +19,12 @@ public class UIManager : MonoBehaviour
 
     public static void Init()
     {
-        GameObject l_instance = GameObjectManager.CreatGameObject("UIManager");
+        GameObject l_instance = GameObject.Find("UIManager");
+
+        if (l_instance == null)
+        {
+            l_instance = GameObjectManager.CreatGameObject("UIManager");
+        }
 
         s_UIManagerGo = l_instance;
 
