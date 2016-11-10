@@ -1,15 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class IApplicationGlobalLogic 
+public interface IApplicationGlobalLogic 
 {
-    public virtual void Init()
-    {
+    void Init();
 
-    }
-
-    public virtual void Update()
-    {
-
-    }
+    void Update();
 }
