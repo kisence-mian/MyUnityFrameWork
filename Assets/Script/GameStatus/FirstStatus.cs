@@ -19,5 +19,24 @@ public class FirstStatus : IApplicationStatus
         //ConfigManager.GetData("adasda")["qqq"].GetString();
 
         Debug.Log("hello");
+
+        InputUIEvent iue =  new InputUIEvent();
+
+        iue.m_ComponentName = "Button";
+        iue.m_UIName = "TestWindow";
+
+        iue.m_EventType = InputUIEventType.OnClick;
+
+        Debug.Log("iue: " + iue.Serialize());
+        Debug.Log("key: " + iue.GetEventKey());
+
+        InputNetworkEvent ine =  new InputNetworkEvent();
+
+        ine.m_MessgaeType = "qweasd";
+        ine.m_content     = "content";
+
+        Debug.Log("key: " + ine.GetEventKey());
+        Debug.Log("ine: " + ine.Serialize());
+       //iue.Serialize();
     }
 }

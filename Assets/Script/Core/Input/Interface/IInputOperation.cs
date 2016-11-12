@@ -5,5 +5,5 @@ public interface IInputOperation
 {
     bool IsCreatOperation();
 
-    IInputEventBase GetOperationEvent();
+    InputOperationEvent GetOperationEvent();
 }
