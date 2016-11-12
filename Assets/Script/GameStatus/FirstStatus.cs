@@ -20,23 +20,21 @@ public class FirstStatus : IApplicationStatus
 
         Debug.Log("hello");
 
-        InputUIEvent iue =  new InputUIEvent();
+        //InputManager.LoadDispatcher(typeof(InputOperationEvent).Name);
 
-        iue.m_ComponentName = "Button";
-        iue.m_UIName = "TestWindow";
+        InputManager.LoadDispatcher<InputNetworkEvent>();
 
-        iue.m_EventType = InputUIEventType.OnClick;
+        InputNetworkEvent e = new InputNetworkEvent();
 
-        Debug.Log("iue: " + iue.Serialize());
-        Debug.Log("key: " + iue.GetEventKey());
+        InputManager.AddListener<InputNetworkEvent>(e.GetEventKey(), CallBackTest);
 
-        InputNetworkEvent ine =  new InputNetworkEvent();
+        //InputManager.re
 
-        ine.m_MessgaeType = "qweasd";
-        ine.m_content     = "content";
+        InputManager.Dispatcher<InputNetworkEvent>(e);
+    }
 
-        Debug.Log("key: " + ine.GetEventKey());
-        Debug.Log("ine: " + ine.Serialize());
-       //iue.Serialize();
+    public void CallBackTest(InputNetworkEvent e)
+    {
+        Debug.Log(e.Serialize());
     }
 }

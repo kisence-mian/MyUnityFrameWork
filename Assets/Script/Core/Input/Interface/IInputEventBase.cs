@@ -5,9 +5,20 @@ public abstract class IInputEventBase
 {
     public float m_eventTime = 0;
 
+    string m_eventKey;
+
+    public IInputEventBase()
+    {
+        m_eventTime = Time.time;
+    }
+
     public virtual string GetEventKey()
     {
-        return ToString();
+        if (m_eventKey == null)
+        {
+            m_eventKey = ToString();
+        }
+        return m_eventKey;
     }
 
     /// <summary>

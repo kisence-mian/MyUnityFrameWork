@@ -45,11 +45,11 @@ public class AndroidPluginsManager : EditorWindow
 
     #endregion
 
-    class ManiFestFileInfo
-    {
-        public string m_showName;
-        public string m_path;
-    }
+    //class ManiFestFileInfo
+    //{
+    //    public string m_showName;
+    //    public string m_path;
+    //}
 
 }
 

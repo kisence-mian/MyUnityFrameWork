@@ -109,6 +109,7 @@ public class UIManager : MonoBehaviour
     public static void CloseUIWindow(UIWindowBase l_UI,bool isPlayAnim = true ,UICallBack l_callback = null, params object[] l_objs)
     {
         RemoveUI(l_UI);        //移除UI引用
+        l_UI.RemoveAllListener();
 
         if (isPlayAnim)
         {
@@ -131,7 +132,7 @@ public class UIManager : MonoBehaviour
     }
     static void CloseUIWindowCallBack(UIWindowBase l_UI, params object[] l_objs)
     {
-        UISystemEvent.Dispatch(l_UI, UIEvent.OnDestroy);  //派发OnDestroy事件
+        UISystemEvent.Dispatch(l_UI, UIEvent.OnClose);  //派发OnClose事件
         try
         {
             l_UI.OnClose();
@@ -141,7 +142,7 @@ public class UIManager : MonoBehaviour
             Debug.LogError("OnClose Exception: " + e.ToString());
         }
 
-        l_UI.RemoveAllEvent();
+
         AddHideUI(l_UI);
     }
     public static void CloseUIWindow(string l_UIname, bool isPlayAnim = true, UICallBack l_callback = null, params object[] l_objs)
@@ -183,6 +184,8 @@ public class UIManager : MonoBehaviour
         {
             RemoveUI(l_UI);   
         }
+
+        UISystemEvent.Dispatch(l_UI, UIEvent.OnDestroy);  //派发OnDestroy事件
         try
         {
             l_UI.OnDestroy();

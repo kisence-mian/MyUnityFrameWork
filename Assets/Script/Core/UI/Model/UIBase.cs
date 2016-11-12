@@ -35,6 +35,10 @@ public class UIBase : MonoBehaviour
         OnDestroy();
     }
 
+
+
+    #region 获取对象
+
     public List<GameObject> m_objectList = new List<GameObject>();
 
     //生成对象表，便于快速获取对象，并忽略层级
@@ -76,7 +80,7 @@ public class UIBase : MonoBehaviour
         }
         else
         {
-            throw new Exception("UIWindowBase GetGameObject error: dont find " + name);
+            throw new Exception("UIWindowBase GetGameObject error: dont find ->" + name + "<-");
         }
     }
 
@@ -167,6 +171,43 @@ public class UIBase : MonoBehaviour
         }
         set { m_rectTransform = value; }
     }
+
+    #endregion
+
+    #region 注册监听
+
+    protected List<Enum> m_EventNames = new List<Enum>();
+
+    List<InputEventHandle<InputUIOnClickEvent>> m_OnClickEvents = new List<InputEventHandle<InputUIOnClickEvent>>();
+
+    public virtual void RemoveAllListener()
+    {
+        for (int i = 0; i < m_OnClickEvents.Count; i++)
+        {
+            InputManager.RemoveListener<InputUIOnClickEvent>("",m_OnClickEvents[i]);
+        }
+
+        m_OnClickEvents.Clear();
+
+
+    }
+
+
+    public void AddOnClickListener(string buttonName,InputEventHandle<InputUIOnClickEvent> callback,string parm = null)
+    {
+        InputUIOnClickEvent eventTmp = new InputUIOnClickEvent(name, buttonName, parm);
+
+        InputManager.AddListener<InputUIOnClickEvent>(eventTmp.GetEventKey(), callback);
+
+        GetButton(buttonName).onClick.AddListener(()=>{
+
+            InputUIOnClickEvent eventTmp1 = new InputUIOnClickEvent(name, buttonName, parm);
+            InputManager.Dispatcher<InputUIOnClickEvent>(eventTmp1);
+            }
+        );
+    }
+
+    #endregion
 
     #endregion
 }

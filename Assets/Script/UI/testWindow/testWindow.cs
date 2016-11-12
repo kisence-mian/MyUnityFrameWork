@@ -7,7 +7,7 @@ public class testWindow : UIWindowBase
     //UI的初始化请放在这里
     public override void OnInit()
     {
-        GetButton("Button").onClick.AddListener(onCLick);
+        AddOnClickListener("Button", onCLick);
     }
 
     //请在这里写UI的更新逻辑，当该UI监听的事件触发时，该函数会被调用
@@ -37,9 +37,10 @@ public class testWindow : UIWindowBase
         yield break;
     }
 
-    public void onCLick()
+    public void onCLick(InputUIOnClickEvent Event)
     {
-        Debug.Log("onCLick");
-        UIManager.CloseUIWindow(this);
+        Debug.Log("onCLick" + Event.Serialize());
+        //Debug.Log("onCLick");
+        //UIManager.CloseUIWindow(this);
     }
 }
