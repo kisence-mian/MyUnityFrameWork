@@ -164,6 +164,18 @@ public static class AssetsBundleManager
         }
     }
 
+    public static T Load<T>(string name) where T: UnityEngine.Object
+    {
+        if (s_bundles.ContainsKey(name))
+        {
+            return (T)s_bundles[name].mainAsset;
+        }
+        else
+        {
+            return (T)LoadBundle(name).mainAsset;
+        }
+    }
+
     //所有缓存起来的回调
     static Dictionary<string, LoadCallBack> LoadAsyncDict = new Dictionary<string, LoadCallBack>();
     /// <summary>

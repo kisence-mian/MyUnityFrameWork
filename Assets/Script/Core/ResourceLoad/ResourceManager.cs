@@ -68,6 +68,25 @@ public static class ResourceManager
         }
     }
 
+    public static T Load<T>(string name) where T: UnityEngine.Object
+    {
+        ResourcesConfig packData = ResourcesConfigManager.GetBundleConfig(name);
+
+        if (packData == null)
+        {
+            throw new Exception("Load Exception not find " + name);
+        }
+
+        if (m_gameLoadType == ResLoadType.Resource)
+        {
+            return Resources.Load<T>(packData.path);
+        }
+        else
+        {
+            return AssetsBundleManager.Load<T>(name);
+        }
+    }
+
     public static void LoadAsync(string name,LoadCallBack callBack)
     {
         ResourcesConfig packData  = ResourcesConfigManager.GetBundleConfig(name);

@@ -49,12 +49,21 @@ public class AnimSystem : MonoBehaviour
         int repeatCount = -1, 
         AnimCallBack callBack = null, params object[] parameter)
     {
-        Color formTmp = from ?? animObject.GetComponent<Graphic>().color;
+
+        Color fromTmp = from ?? Color.white;
+
+        if (from == null)
+        {
+            if (animObject.GetComponent<Graphic>() != null)
+            {
+                fromTmp = from ?? animObject.GetComponent<Graphic>().color;
+            }
+        }
 
         AnimParamHash animParnHash = new AnimParamHash(
           AnimParamType.GameObj, animObject,
           AnimParamType.AnimType, AnimType.UGUI_Color,
-          AnimParamType.FromColor, formTmp,
+          AnimParamType.FromColor, fromTmp,
           AnimParamType.ToColor, to,
           AnimParamType.Time, time,
           AnimParamType.InteType, interp,
@@ -97,7 +106,15 @@ public class AnimSystem : MonoBehaviour
         AnimCallBack callBack = null, params object[] parameter)
     {
 
-        float fromTmp = from ?? animObject.GetComponent<Graphic>().color.a;
+        float fromTmp = from ?? 1;
+
+        if (from == null)
+        {
+            if (animObject.GetComponent<Graphic>() != null)
+            {
+                fromTmp = from ?? animObject.GetComponent<Graphic>().color.a;
+            }
+        }
 
         AnimParamHash animParnHash = new AnimParamHash(
            AnimParamType.GameObj, animObject,

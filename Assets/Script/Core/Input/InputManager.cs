@@ -24,7 +24,7 @@ public class InputManager
         LoadDispatcher<InputUIOnClickEvent>();
     }
 
-    public static void LoadDispatcher<T>() where T : IInputEventBase
+    public static InputDispatcher<T> LoadDispatcher<T>() where T : IInputEventBase
     {
         string DispatcherName = typeof(T).ToString();
 
@@ -33,11 +33,13 @@ public class InputManager
             throw new Exception(DispatcherName + " Dispatcher has exist!");
         }
 
-        IInputDispatcher Dispatcher = (IInputDispatcher)new InputDispatcher<T>();
+        InputDispatcher<T> Dispatcher = new InputDispatcher<T>();
 
         Dispatcher.m_OnAllEventDispatch = s_OnEventDispatch;
 
-        s_dispatcher.Add(DispatcherName, Dispatcher);
+        s_dispatcher.Add(DispatcherName, (IInputDispatcher)Dispatcher);
+
+        return Dispatcher;
     }
 
     public static void UnLoadDispatcher<T>() where T : IInputEventBase
@@ -95,7 +97,7 @@ public class InputManager
         }
         else
         {
-            throw new Exception("not find " + DispatcherName + " Dispatcher");
+            return LoadDispatcher<T>();
         }
     }
 

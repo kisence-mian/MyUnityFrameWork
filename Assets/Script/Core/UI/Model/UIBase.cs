@@ -35,8 +35,6 @@ public class UIBase : MonoBehaviour
         OnDestroy();
     }
 
-
-
     #region 获取对象
 
     public List<GameObject> m_objectList = new List<GameObject>();
@@ -188,7 +186,6 @@ public class UIBase : MonoBehaviour
         }
 
         m_OnClickEvents.Clear();
-
 
     }
 
