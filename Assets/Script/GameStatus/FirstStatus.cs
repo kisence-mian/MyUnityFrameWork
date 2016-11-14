@@ -26,7 +26,7 @@ public class FirstStatus : IApplicationStatus
 
         InputNetworkEvent e = new InputNetworkEvent();
 
-        InputManager.AddListener<InputNetworkEvent>(e.GetEventKey(), CallBackTest);
+        InputManager.AddListener<InputNetworkEvent>(e.EventKey, CallBackTest);
 
         //InputManager.re
 

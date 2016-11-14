@@ -13,8 +13,8 @@ public class InputUIOnClickEvent : InputUIEventBase
     {
     }
 
-    public override string GetEventKey()
+    public static string GetEventKey(string UIName, string ComponentName, string pram = null)
     {
-        return base.GetEventKey();
+        return UIName + "." + ComponentName + "." + pram + "." + InputUIEventType.Click.ToString();
     }
 }

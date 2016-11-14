@@ -5,14 +5,26 @@ public abstract class IInputEventBase
 {
     public float m_eventTime = 0;
 
-    string m_eventKey;
+    protected string m_eventKey;
+
+    public string EventKey
+    {
+        get {
+            if (m_eventKey == null)
+            {
+                m_eventKey = GetEventKey();
+            }
+            
+            return m_eventKey; }
+        set { m_eventKey = value; }
+    }
 
     public IInputEventBase()
     {
         m_eventTime = Time.time;
     }
 
-    public virtual string GetEventKey()
+    protected virtual string GetEventKey()
     {
         if (m_eventKey == null)
         {

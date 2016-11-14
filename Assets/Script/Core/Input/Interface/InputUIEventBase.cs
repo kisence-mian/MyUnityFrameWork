@@ -26,9 +26,14 @@ public abstract class InputUIEventBase : IInputEventBase
         m_pram = pram;
     }
 
-    public override string GetEventKey()
+    protected override string GetEventKey()
     {
-        return m_name + "." + m_compName + "." + m_pram + "." + m_type.ToString();
+        return GetEventKey(m_name, m_compName, m_type, m_pram);
+    }
+
+    public static string GetEventKey(string UIName, string ComponentName, InputUIEventType type, string pram = null)
+    {
+        return UIName + "." + ComponentName + "." + pram + "." + type.ToString();
     }
 
 }

@@ -39,7 +39,7 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
 
     public void Dispatch(Event inputEvent)
     {
-        string eventKey = inputEvent.GetEventKey();
+        string eventKey = inputEvent.EventKey;
 
         if (m_Listeners.ContainsKey(eventKey))
         {

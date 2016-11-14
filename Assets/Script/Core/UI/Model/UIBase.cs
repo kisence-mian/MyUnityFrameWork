@@ -176,13 +176,13 @@ public class UIBase : MonoBehaviour
 
     protected List<Enum> m_EventNames = new List<Enum>();
 
-    List<InputEventHandle<InputUIOnClickEvent>> m_OnClickEvents = new List<InputEventHandle<InputUIOnClickEvent>>();
+    List<InputEventRegisterInfo<InputUIOnClickEvent>> m_OnClickEvents = new List<InputEventRegisterInfo<InputUIOnClickEvent>>();
 
     public virtual void RemoveAllListener()
     {
         for (int i = 0; i < m_OnClickEvents.Count; i++)
         {
-            InputManager.RemoveListener<InputUIOnClickEvent>("",m_OnClickEvents[i]);
+            m_OnClickEvents[i].RemoveListener();
         }
 
         m_OnClickEvents.Clear();
@@ -192,16 +192,8 @@ public class UIBase : MonoBehaviour
 
     public void AddOnClickListener(string buttonName,InputEventHandle<InputUIOnClickEvent> callback,string parm = null)
     {
-        InputUIOnClickEvent eventTmp = new InputUIOnClickEvent(name, buttonName, parm);
-
-        InputManager.AddListener<InputUIOnClickEvent>(eventTmp.GetEventKey(), callback);
-
-        GetButton(buttonName).onClick.AddListener(()=>{
-
-            InputUIOnClickEvent eventTmp1 = new InputUIOnClickEvent(name, buttonName, parm);
-            InputManager.Dispatcher<InputUIOnClickEvent>(eventTmp1);
-            }
-        );
+        InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(GetButton(name), name, buttonName, parm, callback);
+        m_OnClickEvents.Add(info);
     }
 
     #endregion

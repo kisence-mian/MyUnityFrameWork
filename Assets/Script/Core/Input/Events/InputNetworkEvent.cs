@@ -13,7 +13,7 @@ public class InputNetworkEvent : IInputEventBase
     /// </summary>
     public string m_content = "";
 
-    public override string GetEventKey()
+    protected override string GetEventKey()
     {
         return m_MessgaeType;
     }
