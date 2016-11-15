@@ -1,12 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public  class IInputOperationEventCreaterBase  
+public abstract class IInputOperationEventCreaterBase  
 {
     public bool GetIsCreateEvent()
     {
         return false;
     }
 
-    public void Update();
+    //virtual void Update();
 }
