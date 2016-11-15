@@ -24,10 +24,13 @@ public class DataEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        m_currentSelectIndex = 0;
-        EditorGUIStyleData.Init();
+        if (!Application.isPlaying)
+        {
+            m_currentSelectIndex = 0;
+            EditorGUIStyleData.Init();
 
-        FindAllDataName();
+            FindAllDataName();
+        }
     }
 
     //当选择改变时

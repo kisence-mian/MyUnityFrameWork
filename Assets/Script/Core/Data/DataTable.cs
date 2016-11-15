@@ -362,7 +362,31 @@ public class DataTable : Dictionary<string, SingleData>
         }
         else
         {
-            throw new Exception("Add SingleData fail!");
+            throw new Exception("Add SingleData fail! The dataTable dont have MainKeyKey!");
+        }
+    }
+
+    public void SetData(SingleData data)
+    {
+        //主键
+        string mainKey = TableKeys[0];
+
+        if (data.ContainsKey(mainKey))
+        {
+            string key = data[mainKey];
+            if (ContainsKey(key))
+            {
+                this[key] = data;
+            }
+            else
+            {
+                Add(key, data);
+                TableIDs.Add(key);
+            }
+        }
+        else
+        {
+            throw new Exception("Add SingleData fail! The dataTable dont have MainKeyKey!");
         }
     }
 

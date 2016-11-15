@@ -14,11 +14,27 @@ public class DataManager
     public const string c_directoryName = "Data";
     public const string c_expandName = "txt";
 
-
     /// <summary>
     /// 数据缓存
     /// </summary>
     static Dictionary<string, DataTable> s_dataCatch = new Dictionary<string, DataTable>();
+
+    public static bool GetIsExistData(string DataName)
+    {
+        string dataJson = ResourceIOTool.ReadStringByResource(
+        PathTool.GetRelativelyPath(c_directoryName,
+                                    DataName,
+                                    c_expandName));
+
+        if (dataJson == "")
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
+    }
 
     public static DataTable GetData(string DataName)
     {
@@ -65,6 +81,8 @@ public class DataManager
                     ConfigName,
                     c_expandName)), 
             DataTable.Serialize(data));
+
+        UnityEditor.AssetDatabase.Refresh();
     }
 
     /// <summary>

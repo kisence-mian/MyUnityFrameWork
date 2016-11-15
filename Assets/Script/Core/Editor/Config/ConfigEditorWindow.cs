@@ -23,10 +23,13 @@ public class ConfigEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        m_currentSelectIndex = 0;
-        EditorGUIStyleData.Init();
+        if (!Application.isPlaying)
+        {
+            m_currentSelectIndex = 0;
+            EditorGUIStyleData.Init();
 
-        FindAllConfigName();
+            FindAllConfigName();
+        }
     }
 
     void OnGUI()
@@ -56,7 +59,10 @@ public class ConfigEditorWindow : EditorWindow
     //当工程改变时
     void OnProjectChange()
     {
-        FindAllConfigName();
+        if (!Application.isPlaying)
+        {
+            FindAllConfigName();
+        }
     }
 
     #region GUI

@@ -14,7 +14,7 @@ public static class ConfigManager
     public const string c_directoryName = "Config";
     public const string c_expandName    = "json";
 
-    public static bool GetIsExistData(string ConfigName)
+    public static bool GetIsExistConfig(string ConfigName)
     {
         string dataJson = ResourceManager.ReadTextFile(ConfigName);
 
