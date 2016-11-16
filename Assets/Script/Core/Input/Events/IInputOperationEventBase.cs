@@ -4,7 +4,7 @@ using System.Collections;
 /// <summary>
 /// 操作事件
 /// </summary>
-public class InputOperationEvent : IInputEventBase
+public abstract  class IInputOperationEventBase : IInputEventBase
 {
 
 }

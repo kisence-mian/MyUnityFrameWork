@@ -65,6 +65,8 @@ public class UIBase : MonoBehaviour
     Dictionary<string, RawImage> m_rawImages = new Dictionary<string, RawImage>();
     Dictionary<string, RectTransform> m_rectTransforms = new Dictionary<string, RectTransform>();
 
+    Dictionary<string, InputField> m_inputFields = new Dictionary<string, InputField>();
+
     public GameObject GetGameObject(string name)
     {
         if (m_objects == null)
@@ -127,6 +129,18 @@ public class UIBase : MonoBehaviour
 
         Button tmp = GetGameObject(name).GetComponent<Button>();
         m_buttons.Add(name, tmp);
+        return tmp;
+    }
+
+    public InputField GetInputField(string name)
+    {
+        if (m_inputFields.ContainsKey(name))
+        {
+            return m_inputFields[name];
+        }
+
+        InputField tmp = GetGameObject(name).GetComponent<InputField>();
+        m_inputFields.Add(name, tmp);
         return tmp;
     }
 

@@ -62,6 +62,13 @@ public class ConfigEditorWindow : EditorWindow
         if (!Application.isPlaying)
         {
             FindAllConfigName();
+
+            if (m_currentConfigName != null
+            && m_currentConfigName != ""
+            && m_currentConfigName != "None")
+            {
+                LoadConfig(m_currentConfigName);
+            }
         }
     }
 

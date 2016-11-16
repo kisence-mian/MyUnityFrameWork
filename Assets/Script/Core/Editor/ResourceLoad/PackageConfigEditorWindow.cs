@@ -29,7 +29,7 @@ public class BundleConfigEditorWindow : EditorWindow
     void OnEnable()
     {
         //Debug.Log("初始化");
-
+        EditorGUIStyleData.Init();
 
         LoadAndAnalysisJson();
         AnalysisVersionFile();

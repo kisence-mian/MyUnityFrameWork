@@ -24,6 +24,8 @@ public class GlobalLogicManager
             IApplicationGlobalLogic l_statusTmp = (IApplicationGlobalLogic)Activator.CreateInstance(Type.GetType(logicName));
             s_GlobalStatus.Add(logicName, l_statusTmp);
 
+            s_logicList = new List<IApplicationGlobalLogic>(s_GlobalStatus.Values);
+
             try
             {
                 l_statusTmp.Init();
@@ -50,7 +52,7 @@ public class GlobalLogicManager
         }
     }
 
-    static List<IApplicationGlobalLogic> s_logicList = new List<IApplicationGlobalLogic>(s_GlobalStatus.Values);
+    static List<IApplicationGlobalLogic> s_logicList = new List<IApplicationGlobalLogic>();
 	static void OnUpdate ()
     {
         for (int i = 0; i < s_logicList.Count; i++)

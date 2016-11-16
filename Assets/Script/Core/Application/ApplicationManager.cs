@@ -140,6 +140,8 @@ public class ApplicationManager : MonoBehaviour
     /// </summary>
     void InitGlobalLogic()
     {
+        GlobalLogicManager.Init();
+
         for (int i = 0; i < m_globalLogic.Count; i++)
         {
             GlobalLogicManager.InitLogic(m_globalLogic[i]);

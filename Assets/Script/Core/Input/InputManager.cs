@@ -20,8 +20,7 @@ public class InputManager
 
     public static void Init()
     {
-        //LoadDispatcher<InputUIEvent>();
-        LoadDispatcher<InputUIOnClickEvent>();
+        InputOperationEventProxy.Init();
     }
 
     public static InputDispatcher<T> LoadDispatcher<T>() where T : IInputEventBase
@@ -69,7 +68,7 @@ public class InputManager
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="callback"></param>
-    public static void AddListener<T>(InputEventHandle<T> callback) where T : InputOperationEvent
+    public static void AddListener<T>(InputEventHandle<T> callback) where T : IInputOperationEventBase
     {
         InputDispatcher<T> dispatcher = GetDispatcher<T>();
         dispatcher.AddListener(typeof(T).Name, callback);
@@ -81,7 +80,7 @@ public class InputManager
         dispatcher.RemoveListener(eventKey, callback);
     }
 
-    public static void RemoveListener<T>(InputEventHandle<T> callback) where T : InputOperationEvent
+    public static void RemoveListener<T>(InputEventHandle<T> callback) where T : IInputOperationEventBase
     {
         InputDispatcher<T> dispatcher = GetDispatcher<T>();
         dispatcher.RemoveListener(typeof(T).Name, callback);

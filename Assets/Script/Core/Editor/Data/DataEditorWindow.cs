@@ -42,7 +42,17 @@ public class DataEditorWindow : EditorWindow
     //当工程改变时
     void OnProjectChange()
     {
-        FindAllDataName();
+        if (!Application.isPlaying)
+        {
+            FindAllDataName();
+
+            if (m_currentDataName != null
+                && m_currentDataName != ""
+                && m_currentDataName != "None")
+            {
+                LoadData(m_currentDataName);
+            }
+        }
     }
 
     #region GUI

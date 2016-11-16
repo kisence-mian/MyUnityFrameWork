@@ -6,6 +6,9 @@ public class FirstStatus : IApplicationStatus
 
     public override void OnEnterStatus()
     {
+        InputOperationEventProxy.LoadEventCreater<CustomEvent>();
+        InputManager.AddListener<CustomEvent>(OnEventCallBack);
+
         GameObject go =  GameObjectManager.CreatGameObjectByPool("gogo");
 
         go.transform.position = new Vector3(0,0,300);
@@ -34,6 +37,11 @@ public class FirstStatus : IApplicationStatus
     }
 
     public void CallBackTest(InputNetworkEvent e)
+    {
+        Debug.Log(e.Serialize());
+    }
+
+    public void OnEventCallBack(CustomEvent e)
     {
         Debug.Log(e.Serialize());
     }
