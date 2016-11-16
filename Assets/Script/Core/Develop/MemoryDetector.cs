@@ -9,7 +9,7 @@ using System.Collections;
 		private readonly static string TotalAllocMemroyFormation = "Alloc Memory : {0}M";
 		private readonly static string TotalReservedMemoryFormation = "Reserved Memory : {0}M";
 		private readonly static string TotalUnusedReservedMemoryFormation = "Unused Reserved: {0}M";
-        //private readonly static string RuntimeMemorySizeFormation = "RuntimeMemorySize: {0}M";
+        private readonly static string RuntimeMemorySizeFormation = "RuntimeMemorySize: {0}M";
 		private readonly static string MonoHeapFormation = "Mono Heap : {0}M";
 		private readonly static string MonoUsedFormation = "Mono Used : {0}M";
 		// 字节到兆
@@ -18,7 +18,7 @@ using System.Collections;
 		private Rect allocMemoryRect;
 		private Rect reservedMemoryRect;
 		private Rect unusedReservedMemoryRect;
-        //private Rect RuntimeMemorySizeRect;
+        private Rect RuntimeMemorySizeRect;
 		private Rect monoHeapRect;
 		private Rect monoUsedRect;
 
@@ -29,10 +29,10 @@ using System.Collections;
 
         public void Init()
         {
-            this.x = 60;
+            this.x = 5;
             this.y = 60;
-            this.w = 200;
-            this.h = 20;
+            this.w = 400;
+            this.h = 30;
 
             this.allocMemoryRect = new Rect(x, y, w, h);
             this.reservedMemoryRect = new Rect(x, y + h, w, h);
@@ -53,7 +53,7 @@ using System.Collections;
 			GUI.Label(this.unusedReservedMemoryRect, 
 				string.Format(TotalUnusedReservedMemoryFormation, Profiler.GetTotalUnusedReservedMemory() * ByteToM));
             //GUI.Label(this.RuntimeMemorySizeRect,
-            //    string.Format(TotalUnusedReservedMemoryFormation, Profiler.GetRuntimeMemorySize(AssetsBundleManager) * ByteToM));
+            //    string.Format(TotalUnusedReservedMemoryFormation, Profiler.GetRuntimeMemorySize( .) * ByteToM));
 			GUI.Label(this.monoHeapRect,
 				string.Format(MonoHeapFormation, Profiler.GetMonoHeapSize() * ByteToM));
 			GUI.Label(this.monoUsedRect,

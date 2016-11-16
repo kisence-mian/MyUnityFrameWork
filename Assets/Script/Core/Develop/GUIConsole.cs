@@ -57,13 +57,15 @@ public class GUIConsole
         static bool mTouching = false;
 #endif
 
-    const int margin = 20;
-    static Rect windowRect = new Rect(margin + Screen.width * 0.5f, margin, Screen.width * 0.5f - (2 * margin), Screen.height - (2 * margin));
+    const int margin = 3;
+    const int offset = 180;
+    static Rect windowRect = new Rect(margin + Screen.width * 0.5f - offset, margin, Screen.width * 0.5f - (2 * margin) + offset, Screen.height - (2 * margin));
 
     static GUIContent clearLabel = new GUIContent("Clear", "Clear the contents of the console.");
     static GUIContent collapseLabel = new GUIContent("Collapse", "Hide repeated messages.");
     static GUIContent scrollToBottomLabel = new GUIContent("ScrollToBottom", "Scroll bar always at bottom");
 
+    static GUIStyle consoleStyle;
 
     public static void Init()
     {
@@ -72,10 +74,13 @@ public class GUIConsole
         memoryDetector = new MemoryDetector();
         memoryDetector.Init();
 
-        //        this.showGUI = App.Instance().showLogOnGUI;
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationOnGUI += OnGUI;
         Application.logMessageReceived += HandleLog;
+
+        //consoleStyle = GUI.skin.label;
+
+        //consoleStyle.fontSize = 20;
     }
 
     ~GUIConsole()
@@ -119,7 +124,7 @@ public class GUIConsole
         //    Application.Quit();
         //    #endif
         //}
-        windowRect = GUILayout.Window(123456, windowRect, ConsoleWindow, "Console");
+        windowRect = GUILayout.Window(100, windowRect, ConsoleWindow, "Console");
     }
 
 
@@ -128,6 +133,17 @@ public class GUIConsole
     /// </summary>
     static void ConsoleWindow(int windowID)
     {
+
+        //#if UNITY_ANDROID || UNITY_IOS
+         GUI.skin.label.fontSize = 20;
+         GUI.skin.button.fixedHeight = 50;
+         GUI.skin.verticalScrollbar.fixedWidth = 30;
+         GUI.skin.verticalScrollbarUpButton.fixedWidth = 30;
+         GUI.skin.verticalScrollbarThumb.fixedWidth = 30;
+        //#endif
+
+
+
         if (scrollToBottom)
         {
             GUILayout.BeginScrollView(Vector2.up * entries.Count * 100.0f);
@@ -159,6 +175,9 @@ public class GUIConsole
                     GUI.contentColor = Color.white;
                     break;
             }
+
+
+
             if (entry.type == LogType.Exception)
             {
                 GUILayout.Label(entry.message + " || " + entry.stackTrace);
@@ -178,7 +197,7 @@ public class GUIConsole
         }
         // Collapse toggle
         collapse = GUILayout.Toggle(collapse, collapseLabel, GUILayout.ExpandWidth(false));
-        scrollToBottom = GUILayout.Toggle(scrollToBottom, scrollToBottomLabel, GUILayout.ExpandWidth(false));
+        scrollToBottom = GUILayout.Toggle(scrollToBottom, scrollToBottomLabel,GUILayout.Height(20), GUILayout.ExpandWidth(false));
         GUILayout.EndHorizontal();
         // Set the window to be draggable by the top title bar
         GUI.DragWindow(new Rect(0, 0, 10000, 20));
