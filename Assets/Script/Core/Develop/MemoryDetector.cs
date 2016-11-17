@@ -29,10 +29,15 @@ using System.Collections;
 
         public void Init()
         {
+            GUIConsole.onGUICallback += OnGUI;
+        }
+
+        void ResetGUISize()
+        {
             this.x = 5;
-            this.y = 60;
-            this.w = 400;
-            this.h = 30;
+            this.y = GUIUtil.FontSize;
+            this.w = 1000;
+            this.h = GUIUtil.FontSize;
 
             this.allocMemoryRect = new Rect(x, y, w, h);
             this.reservedMemoryRect = new Rect(x, y + h, w, h);
@@ -40,12 +45,12 @@ using System.Collections;
             //this.RuntimeMemorySizeRect = new Rect(x, y + 3 * h, w, h);
             this.monoHeapRect = new Rect(x, y + 3 * h, w, h);
             this.monoUsedRect = new Rect(x, y + 4 * h, w, h);
-
-            GUIConsole.onGUICallback += OnGUI;
         }
 
 		void OnGUI()
 		{
+            ResetGUISize();
+
 			GUI.Label(this.allocMemoryRect, 
 				string.Format(TotalAllocMemroyFormation, Profiler.GetTotalAllocatedMemory() * ByteToM));
 			GUI.Label(this.reservedMemoryRect, 

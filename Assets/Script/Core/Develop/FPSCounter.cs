@@ -48,7 +48,7 @@ using System.Collections;
 
 		void OnGUI()
 		{
-			GUI.color = Color.black;
-			GUI.Label(new Rect(80, 20, 120, 40),"fps:" + this.fps.ToString());		
+            //GUI.color = Color.black;
+            GUI.Label(new Rect(3, 3, 1200, GUIUtil.FontSize), "fps:" + this.fps.ToString());		
         }
 	}

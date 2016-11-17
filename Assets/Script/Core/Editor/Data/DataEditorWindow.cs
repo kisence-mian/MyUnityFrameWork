@@ -24,13 +24,13 @@ public class DataEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        if (!Application.isPlaying)
-        {
-            m_currentSelectIndex = 0;
-            EditorGUIStyleData.Init();
+        //if (!Application.isPlaying)
+        //{
+        m_currentSelectIndex = 0;
+        EditorGUIStyleData.Init();
 
-            FindAllDataName();
-        }
+        FindAllDataName();
+        //}
     }
 
     //当选择改变时
@@ -79,8 +79,10 @@ public class DataEditorWindow : EditorWindow
     {
         string[] mask = m_dataNameList.ToArray();
         m_currentSelectIndex = EditorGUILayout.Popup("当前数据：", m_currentSelectIndex, mask);
-
-        LoadData(mask[m_currentSelectIndex]);
+        if (mask.Length !=0 )
+        {
+            LoadData(mask[m_currentSelectIndex]);
+        }
     }
 
     void LoadData(string dataName)

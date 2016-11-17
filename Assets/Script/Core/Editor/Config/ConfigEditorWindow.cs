@@ -23,13 +23,11 @@ public class ConfigEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        if (!Application.isPlaying)
-        {
-            m_currentSelectIndex = 0;
-            EditorGUIStyleData.Init();
+        
+        m_currentSelectIndex = 0;
+        EditorGUIStyleData.Init();
 
-            FindAllConfigName();
-        }
+        FindAllConfigName();
     }
 
     void OnGUI()
@@ -81,8 +79,10 @@ public class ConfigEditorWindow : EditorWindow
     {
         string[] mask = m_configNameList.ToArray();
         m_currentSelectIndex = EditorGUILayout.Popup("当前配置：", m_currentSelectIndex, mask);
-
-        LoadConfig(mask[m_currentSelectIndex]);
+        if (mask.Length != 0)
+        {
+            LoadConfig(mask[m_currentSelectIndex]);
+        }
     }
 
     void LoadConfig(string configName)

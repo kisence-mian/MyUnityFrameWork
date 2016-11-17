@@ -42,5 +42,7 @@ public class testWindow : UIWindowBase
         Debug.Log("onCLick" + Event.Serialize());
         //Debug.Log("onCLick");
         //UIManager.CloseUIWindow(this);
+
+        Debug.Log(Screen.width + "  " + Screen.height);
     }
 }

@@ -12,10 +12,17 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
     /// </summary>
     public InputEventHandle<Event> OnEventDispatch;
 
-    //public void AddListener(InputEventHandle<Event> callBack)
-    //{
-    //    AddListener(typeof(Event).Name, callBack);
-    //}
+    public override void AddListener(string eventKey, InputEventHandle<IInputEventBase> callBack)
+    {
+        AddListener(eventKey, (inputEvent) => {
+            callBack((IInputEventBase)inputEvent);
+        });
+    }
+
+    public override void Dispatch( IInputEventBase inputEvent)
+    {
+        Dispatch((Event)inputEvent);
+    }
 
     public void AddListener(string eventKey, InputEventHandle<Event> callBack)
     {
@@ -73,5 +80,3 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
         }
     }
 }
-
-

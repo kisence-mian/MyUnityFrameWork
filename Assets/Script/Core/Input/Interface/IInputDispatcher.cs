@@ -7,6 +7,10 @@ public abstract class IInputDispatcher
 {
     public InputEventCallBack m_OnAllEventDispatch;
 
+    public abstract void AddListener(string eventKey, InputEventHandle<IInputEventBase> callBack);
+
+    public abstract void Dispatch(IInputEventBase inputEvent);
+
     protected void AllEventDispatch(string eventName, IInputEventBase inputEvent)
     {
         if (m_OnAllEventDispatch != null)
@@ -17,13 +21,7 @@ public abstract class IInputDispatcher
             {
                 try
                 {
-
-                    
-                    //eventArray[i](eventName, inputEvent);
                     InputEventCallBack callBack = (InputEventCallBack)eventArray[i];
-
-                    Debug.Log(callBack);
-                    Debug.Log(inputEvent);
                     callBack(eventName, inputEvent);
                 }
                 catch (Exception e)

@@ -6,6 +6,8 @@ public class FirstStatus : IApplicationStatus
 
     public override void OnEnterStatus()
     {
+        Debug.Log("DPI :" + Screen.dpi + " FontSize" + GUIUtil.FontSize);
+
         InputOperationEventProxy.LoadEventCreater<CustomEvent>();
         InputManager.AddListener<CustomEvent>(OnEventCallBack);
 
@@ -23,17 +25,17 @@ public class FirstStatus : IApplicationStatus
 
         Debug.Log("hello");
 
-        //InputManager.LoadDispatcher(typeof(InputOperationEvent).Name);
+        InputManager.LoadDispatcher(typeof(InputNetworkEvent).Name);
 
-        InputManager.LoadDispatcher<InputNetworkEvent>();
+        //InputManager.LoadDispatcher<InputNetworkEvent>();
 
         InputNetworkEvent e = new InputNetworkEvent();
 
         InputManager.AddListener<InputNetworkEvent>(e.EventKey, CallBackTest);
 
-        //InputManager.re
+        ////InputManager.re
 
-        InputManager.Dispatcher<InputNetworkEvent>(e);
+        InputManager.Dispatch<InputNetworkEvent>(e);
     }
 
     public void CallBackTest(InputNetworkEvent e)

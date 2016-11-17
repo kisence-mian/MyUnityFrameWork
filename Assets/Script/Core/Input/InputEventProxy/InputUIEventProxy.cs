@@ -27,7 +27,7 @@ public class InputUIEventProxy : IInputProxyBase
         if (IsAvtive)
         {
             InputUIOnClickEvent eventTmp = new InputUIOnClickEvent(UIName, ComponentName, parm);
-            InputManager.Dispatcher<InputUIOnClickEvent>(eventTmp);
+            InputManager.Dispatch<InputUIOnClickEvent>(eventTmp);
         }
     }
 }

@@ -47,7 +47,7 @@ public abstract class IInputEventBase
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static IInputEventBase Analysis(string data)
+    public  IInputEventBase Analysis(string data)
     {
         return JsonUtility.FromJson<IInputEventBase>(data);
     }

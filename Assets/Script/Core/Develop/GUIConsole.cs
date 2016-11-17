@@ -58,14 +58,8 @@ public class GUIConsole
 #endif
 
     const int margin = 3;
-    const int offset = 180;
+    const int offset = 0;
     static Rect windowRect = new Rect(margin + Screen.width * 0.5f - offset, margin, Screen.width * 0.5f - (2 * margin) + offset, Screen.height - (2 * margin));
-
-    static GUIContent clearLabel = new GUIContent("Clear", "Clear the contents of the console.");
-    static GUIContent collapseLabel = new GUIContent("Collapse", "Hide repeated messages.");
-    static GUIContent scrollToBottomLabel = new GUIContent("ScrollToBottom", "Scroll bar always at bottom");
-
-    static GUIStyle consoleStyle;
 
     public static void Init()
     {
@@ -113,6 +107,8 @@ public class GUIConsole
         if (!showGUI)
             return;
 
+        GUIUtil.SetGUIStyle();
+
         if (onGUICallback != null)
             onGUICallback();
 
@@ -124,7 +120,12 @@ public class GUIConsole
         //    Application.Quit();
         //    #endif
         //}
-        windowRect = GUILayout.Window(100, windowRect, ConsoleWindow, "Console");
+        windowRect = new Rect(margin + Screen.width * 0.5f ,
+                                margin,
+                                Screen.width * 0.5f - (2 * margin),
+                                Screen.height - (2 * margin));
+
+        GUILayout.Window(100, windowRect, ConsoleWindow, "Console");
     }
 
 
@@ -133,16 +134,6 @@ public class GUIConsole
     /// </summary>
     static void ConsoleWindow(int windowID)
     {
-
-        //#if UNITY_ANDROID || UNITY_IOS
-         GUI.skin.label.fontSize = 20;
-         GUI.skin.button.fixedHeight = 50;
-         GUI.skin.verticalScrollbar.fixedWidth = 30;
-         GUI.skin.verticalScrollbarUpButton.fixedWidth = 30;
-         GUI.skin.verticalScrollbarThumb.fixedWidth = 30;
-        //#endif
-
-
 
         if (scrollToBottom)
         {
@@ -189,18 +180,24 @@ public class GUIConsole
         }
         GUI.contentColor = Color.white;
         GUILayout.EndScrollView();
-        GUILayout.BeginHorizontal();
         // Clear button
-        if (GUILayout.Button(clearLabel))
+        if (GUILayout.Button("Clear"))
         {
             entries.Clear();
         }
-        // Collapse toggle
-        collapse = GUILayout.Toggle(collapse, collapseLabel, GUILayout.ExpandWidth(false));
-        scrollToBottom = GUILayout.Toggle(scrollToBottom, scrollToBottomLabel,GUILayout.Height(20), GUILayout.ExpandWidth(false));
-        GUILayout.EndHorizontal();
+
+        if (GUILayout.Button("Collapse:" + collapse))
+        {
+            collapse = !collapse;
+        }
+
+        if (GUILayout.Button("Bottom:" + scrollToBottom))
+        {
+            scrollToBottom = !scrollToBottom;
+        }
+
         // Set the window to be draggable by the top title bar
-        GUI.DragWindow(new Rect(0, 0, 10000, 20));
+        //GUI.DragWindow(new Rect(0, 0, 10000, 20));
     }
 
     static void HandleLog(string message, string stackTrace, LogType type)

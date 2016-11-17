@@ -7,6 +7,9 @@ public class ApplicationManager : MonoBehaviour
 {
     public AppMode m_AppMode = AppMode.Developing;
 
+    //快速启动
+    public bool m_quickLunch = true;
+
     [HideInInspector]
     public string m_Status = "";
 
@@ -37,8 +40,12 @@ public class ApplicationManager : MonoBehaviour
 
         if (m_AppMode != AppMode.Release)
         {
-            GUIConsole.Init();                                    //运行时Debug
-            ApplicationStatusManager.EnterTestModel(m_Status);    //可以从此处进入测试流程
+            GUIConsole.Init(); //运行时Debug
+
+            DevelopReplayManager.OnLunchCallBack += () =>{
+                ApplicationStatusManager.EnterTestModel(m_Status);};//可以从此处进入测试流程
+
+            DevelopReplayManager.Init(m_quickLunch);   //开发者复盘管理器                              
         }
         else
         {

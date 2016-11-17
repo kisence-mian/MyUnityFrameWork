@@ -9,7 +9,7 @@ public class CustomEvent : IInputOperationEventBase, IInputOperationEventCreater
         if(Input.GetKeyDown(KeyCode.Alpha1))
         {
             CustomEvent tmp = new CustomEvent();
-            InputManager.Dispatcher<CustomEvent>(tmp);
+            InputManager.Dispatch<CustomEvent>(tmp);
         }
     }
 }
