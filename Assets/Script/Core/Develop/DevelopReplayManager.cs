@@ -27,8 +27,6 @@ public class DevelopReplayManager
     {
         if (isQuickLunch)
         {
-            Debug.Log(RecordManager.GetData(c_RecordName).GetRecord(c_qucikLunchKey, true));
-
             //复盘模式可以手动开启
             if (!RecordManager.GetData(c_RecordName).GetRecord(c_qucikLunchKey, true))
             {

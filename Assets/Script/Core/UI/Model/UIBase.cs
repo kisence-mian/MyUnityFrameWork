@@ -23,9 +23,22 @@ public class UIBase : MonoBehaviour
     #endregion
 
     #region 继承方法
+    private int m_UIID = -1;
 
-    public void Init()
+    public int UIID
     {
+        get { return m_UIID; }
+        //set { m_UIID = value; }
+    }
+
+    public string UIEventKey
+    {
+        get { return name + m_UIID; }
+        //set { m_UIID = value; }
+    }
+    public void Init(int id)
+    {
+        m_UIID = id;
         CreateObjectTable();
         OnInit();
     }
@@ -62,6 +75,7 @@ public class UIBase : MonoBehaviour
     Dictionary<string, Text> m_texts = new Dictionary<string, Text>();
     Dictionary<string, Button> m_buttons = new Dictionary<string, Button>();
     Dictionary<string, ScrollRect> m_scrollRects = new Dictionary<string, ScrollRect>();
+    Dictionary<string, ReusingScrollRect> m_reusingScrollRects = new Dictionary<string, ReusingScrollRect>();
     Dictionary<string, RawImage> m_rawImages = new Dictionary<string, RawImage>();
     Dictionary<string, RectTransform> m_rectTransforms = new Dictionary<string, RectTransform>();
 
@@ -156,6 +170,18 @@ public class UIBase : MonoBehaviour
         return tmp;
     }
 
+    public ReusingScrollRect GetReusingScrollRect(string name)
+    {
+        if (m_reusingScrollRects.ContainsKey(name))
+        {
+            return m_reusingScrollRects[name];
+        }
+
+        ReusingScrollRect tmp = GetGameObject(name).GetComponent<ReusingScrollRect>();
+        m_reusingScrollRects.Add(name, tmp);
+        return tmp;
+    }
+
     public RawImage GetRawImage(string name)
     {
         if (m_rawImages.ContainsKey(name))
@@ -190,7 +216,7 @@ public class UIBase : MonoBehaviour
 
     protected List<Enum> m_EventNames = new List<Enum>();
 
-    List<InputEventRegisterInfo<InputUIOnClickEvent>> m_OnClickEvents = new List<InputEventRegisterInfo<InputUIOnClickEvent>>();
+    protected List<InputEventRegisterInfo<InputUIOnClickEvent>> m_OnClickEvents = new List<InputEventRegisterInfo<InputUIOnClickEvent>>();
 
     public virtual void RemoveAllListener()
     {
@@ -200,13 +226,12 @@ public class UIBase : MonoBehaviour
         }
 
         m_OnClickEvents.Clear();
-
     }
 
 
-    public void AddOnClickListener(string buttonName,InputEventHandle<InputUIOnClickEvent> callback,string parm = null)
+    public virtual void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
-        InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(GetButton(buttonName), name, buttonName, parm, callback);
+        InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(GetButton(buttonName), UIEventKey, buttonName, parm, callback);
         m_OnClickEvents.Add(info);
     }
 

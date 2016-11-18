@@ -4,18 +4,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Text;
+using System;
 
 public class Log 
 {
     //日志输出线程
     static LogOutPutThread s_LogOutPutThread = new LogOutPutThread();
 
-	public static void Init()
-    {
-        s_LogOutPutThread.Init();
 
-        Application.logMessageReceivedThreaded += UnityLogCallBackThread;
-        Application.logMessageReceived         += UnityLogCallBack;
+	public static void Init(bool isOpenLog = true)
+    {
+        Debug.logger.logEnabled = isOpenLog;
+
+        if (isOpenLog)
+        {
+            s_LogOutPutThread.Init();
+            Application.logMessageReceivedThreaded += UnityLogCallBackThread;
+            Application.logMessageReceived += UnityLogCallBack;
+        }
     }
 
     static void UnityLogCallBackThread(string log, string track, LogType type)

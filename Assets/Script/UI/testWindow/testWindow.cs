@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class testWindow : UIWindowBase 
 {
@@ -8,6 +9,17 @@ public class testWindow : UIWindowBase
     public override void OnInit()
     {
         AddOnClickListener("Button", onCLick);
+
+        GetReusingScrollRect("ScrollRect").Init(UIEventKey,"Image_item");
+
+        List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
+
+        for (int i = 0; i < 100; i++)
+        {
+            data.Add(new Dictionary<string, object>());
+        }
+
+        GetReusingScrollRect("ScrollRect").SetData(data);
     }
 
     //请在这里写UI的更新逻辑，当该UI监听的事件触发时，该函数会被调用

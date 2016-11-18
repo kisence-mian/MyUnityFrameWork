@@ -54,7 +54,8 @@ public class UIManager : MonoBehaviour
         UIWindowBase l_UIbase = l_UItmp.GetComponent<UIWindowBase>();
         UISystemEvent.Dispatch(l_UIbase, UIEvent.OnInit);  //派发OnInit事件
         try{
-            l_UIbase.Init();}
+            l_UIbase.Init(GetUIID(l_UIname));
+        }
         catch(Exception e){
             Debug.LogError("OnInit Exception: " + e.ToString());}
 
@@ -276,6 +277,29 @@ public class UIManager : MonoBehaviour
         else
         {
             s_UIs[l_UI.name].Remove(l_UI);
+        }
+    }
+
+    static int GetUIID(string UIname)
+    {
+        if (!s_UIs.ContainsKey(UIname))
+        {
+            return 0;
+        }
+        else
+        {
+            int id = s_UIs[UIname].Count;
+
+            for (int i = 0; i < s_UIs[UIname].Count; i++)
+			{
+			    if(s_UIs[UIname][i].UIID == id)
+                {
+                    id++;
+                    i = 0;
+                }
+			}
+
+            return id;
         }
     }
 

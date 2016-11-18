@@ -32,7 +32,7 @@ public class GameObjectManager :MonoBehaviour
     /// <returns></returns>
     public static GameObject CreatGameObject(string l_gameObjectName,GameObject l_parent = null)
     {
-        GameObject l_goTmp = (GameObject)ResourceManager.Load(l_gameObjectName);
+        GameObject l_goTmp = ResourceManager.Load<GameObject>(l_gameObjectName);
 
         if (l_goTmp == null)
         {

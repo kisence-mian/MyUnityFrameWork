@@ -41,6 +41,8 @@ public enum InputUIEventType
 {
     Click,
 
+    Scroll,
+
     PressDown,
     PressUp,
 

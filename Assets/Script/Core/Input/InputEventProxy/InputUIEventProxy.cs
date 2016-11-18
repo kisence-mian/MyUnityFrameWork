@@ -30,4 +30,27 @@ public class InputUIEventProxy : IInputProxyBase
             InputManager.Dispatch<InputUIOnClickEvent>(eventTmp);
         }
     }
+
+    public static InputEventRegisterInfo<InputUIOnScrollEvent> AddOnScrollListener(string UIName, string ComponentName, InputEventHandle<InputUIOnScrollEvent> callback)
+    {
+        InputEventRegisterInfo<InputUIOnScrollEvent> info = new InputEventRegisterInfo<InputUIOnScrollEvent>();
+
+        info.eventKey = InputUIOnScrollEvent.GetEventKey(UIName, ComponentName);
+        info.callBack = callback;
+
+        InputManager.AddListener<InputUIOnScrollEvent>(
+            InputUIOnScrollEvent.GetEventKey(UIName, ComponentName), callback);
+
+        return info;
+    }
+
+    public static void DispatchScrollEvent(string UIName, string ComponentName, Vector2 position)
+    {
+        //只有允许输入时才派发事件
+        if (IsAvtive)
+        {
+            InputUIOnScrollEvent e = new InputUIOnScrollEvent(UIName, ComponentName, position);
+            InputManager.Dispatch<InputUIOnScrollEvent>(e);
+        }
+    }
 }

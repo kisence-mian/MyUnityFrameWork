@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
 
-public class ReusingScrollRect : ScrollRect
+public class ReusingScrollRect : ScrollRectInput
 {
     public string m_ItemName = "";
 
@@ -21,8 +21,10 @@ public class ReusingScrollRect : ScrollRect
 
     #region 公共方法
 
-    public void Init(string itemName)
+    public  void Init(string UIEventKey,string itemName)
     {
+        base.Init(UIEventKey);
+
         m_ItemName = itemName;
 
         Rebuild(CanvasUpdate.Layout);
@@ -30,7 +32,7 @@ public class ReusingScrollRect : ScrollRect
         UpdateBounds();
         SetLayout();
 
-        m_itemPrefab = (GameObject)ResourceManager.Load(m_ItemName);
+        m_itemPrefab = ResourceManager.Load<GameObject>(m_ItemName);
         m_itemSize = m_itemPrefab.GetComponent<RectTransform>().sizeDelta;
     }
 
@@ -73,9 +75,17 @@ public class ReusingScrollRect : ScrollRect
     #endregion 
 
     #region 继承方法
-    protected override void SetContentAnchoredPosition(Vector2 position)
+    //protected override void SetContentAnchoredPosition(Vector2 position)
+    //{
+    //    InputUIEventProxy.DispatchScrollEvent("", "", position);
+
+    //    //base.SetContentAnchoredPosition(position);
+    //    //SetItemDisplay();
+    //}
+
+    protected override void OnSetContentAnchoredPosition(InputUIOnScrollEvent e)
     {
-        base.SetContentAnchoredPosition(position);
+        base.OnSetContentAnchoredPosition(e);
         SetItemDisplay();
     }
 
@@ -169,6 +179,7 @@ public class ReusingScrollRect : ScrollRect
             {
                 ReusingScrollItemBase itemTmp = m_items[i];
                 m_items.Remove(itemTmp);
+                itemTmp.OnHide();
 
                 //隐藏并移到缓存
                 itemTmp.gameObject.SetActive(false);
@@ -239,6 +250,7 @@ public class ReusingScrollRect : ScrollRect
         {
             result = m_itemCatchs[0];
             result.gameObject.SetActive(true);
+            result.OnShow();
             m_itemCatchs.RemoveAt(0);
 
             m_items.Add(result);
@@ -246,7 +258,7 @@ public class ReusingScrollRect : ScrollRect
         }
 
         result = GameObjectManager.CreatGameObjectByPool(m_itemPrefab).GetComponent<ReusingScrollItemBase>();
-        result.Init();
+        result.Init(m_items.Count);
         m_items.Add(result);
 
         return result;
@@ -413,6 +425,12 @@ public class ReusingScrollRect : ScrollRect
     //    }
 
     //}
+
+    #endregion
+
+    #region 事件监听与转发
+    
+
 
     #endregion
 
