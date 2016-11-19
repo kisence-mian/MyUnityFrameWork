@@ -13,7 +13,7 @@ public class ItemTest :ReusingScrollItemBase
 
     public override void SetConetnt(int index, Dictionary<string, object> data)
     {
-        GetText("Text").text = index.ToString();
+        GetText("Text").text = index.ToString() + RandomService.Range(0,100);
     }
 
     public void OnClick(InputUIOnClickEvent e)

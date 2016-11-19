@@ -3,7 +3,10 @@ using System.Collections;
 
 public abstract class IInputEventBase 
 {
-    public float m_eventTime = 0;
+    /// <summary>
+    /// 事件产生的时间，为了压缩序列化文本的大小，这里使用t作为名称
+    /// </summary>
+    public float m_t = 0;
 
     protected string m_eventKey;
 
@@ -21,7 +24,7 @@ public abstract class IInputEventBase
 
     public IInputEventBase()
     {
-        m_eventTime = Time.time;
+        m_t = Time.time;
     }
 
     protected virtual string GetEventKey()

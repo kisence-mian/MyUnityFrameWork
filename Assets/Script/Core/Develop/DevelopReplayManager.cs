@@ -3,14 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System;
+using MiniJSON;
 
 public class DevelopReplayManager 
 {
-    const string c_directoryName = "DevelopReplay";
+    const string c_directoryName     = "DevelopReplay";
     public const string c_expandName = "json";
 
-    const string c_RecordName = "DevelopReplay";
+    const string c_recordName    = "DevelopReplay";
     const string c_qucikLunchKey = "qucikLunch";
+
+    const string c_eventStreamKey = "EventStream";
+    const string c_randomListKey = "RandomList";
+
+    const string c_eventNameKey = "e";
+    const string c_serializeInfoKey = "s";
 
     static bool s_isReplay = false;
     static List<IInputEventBase> s_eventStream;
@@ -30,7 +37,7 @@ public class DevelopReplayManager
         if (isQuickLunch)
         {
             //复盘模式可以手动开启
-            if (!RecordManager.GetData(c_RecordName).GetRecord(c_qucikLunchKey, true))
+            if (!RecordManager.GetData(c_recordName).GetRecord(c_qucikLunchKey, true))
             {
                 isQuickLunch = false;
             }
@@ -38,7 +45,7 @@ public class DevelopReplayManager
 
         if (isQuickLunch)
         {
-            choseReplayMode(false);
+            ChoseReplayMode(false);
         }
         else
         {
@@ -47,7 +54,7 @@ public class DevelopReplayManager
         }
     }
 
-    static void choseReplayMode(bool isReplay,string replayFileName = null)
+    static void ChoseReplayMode(bool isReplay,string replayFileName = null)
     {
         s_isReplay = isReplay;
 
@@ -57,15 +64,20 @@ public class DevelopReplayManager
             ApplicationManager.s_OnApplicationUpdate += OnUpdate;
             GUIConsole.onGUICallback += ReplayModeGUI;
 
+            RandomService.SetRandomList(s_randomList);
+
+            //关闭正常输入，保证回放数据准确
             InputUIEventProxy.IsAvtive = false;
             InputOperationEventProxy.IsAvtive = false;
-            
         }
         else
         {
             s_eventStream = new List<IInputEventBase>();
+            s_randomList = new List<int>();
+
             InputManager.OnEveryEventDispatch += OnEveryEventCallBack;
             GUIConsole.onGUICallback += RecordModeGUI;
+            RandomService.OnRandomCreat += OnGetRandomCallBack;
             SaveFileName = GetLogFileName();
         }
 
@@ -97,7 +109,7 @@ public class DevelopReplayManager
     {
         for (int i = 0; i < s_eventStream.Count; i++)
         {
-            if (s_eventStream[i].m_eventTime < Time.time)
+            if (s_eventStream[i].m_t < Time.time)
             {
                 InputManager.Dispatch(s_eventStream[i].GetType().Name, s_eventStream[i]);
 
@@ -110,18 +122,16 @@ public class DevelopReplayManager
 
     public static void SaveReplayFile(string fileName)
     {
-        List<EventSerializeInfo> list = new List<EventSerializeInfo>();
+        List<Dictionary<string,string>> EventStreamContent = SaveEventStream();
+        List<int> randomListContent = SaveRandomList();
 
-        for (int i = 0; i < s_eventStream.Count; i++)
-        {
-            EventSerializeInfo tmp = new EventSerializeInfo();
+        Dictionary<string, object> replayInfo = new Dictionary<string, object>();
 
-            tmp.eventName = s_eventStream[i].GetType().Name;
-            tmp.serializeInfo = s_eventStream[i].Serialize();
-            list.Add(tmp);
-        }
+        replayInfo.Add(c_eventStreamKey, EventStreamContent);
+        replayInfo.Add(c_randomListKey, randomListContent);
 
-        string content = JsonTool.List2Json<EventSerializeInfo>(list);
+        string content = Json.Serialize(replayInfo);
+
         ResourceIOTool.WriteStringByFile(
                 PathTool.GetAbsolutePath(ResLoadType.Persistent,
                                          PathTool.GetRelativelyPath(
@@ -131,35 +141,37 @@ public class DevelopReplayManager
                 , content);
     }
 
-    static string SaveEventStream()
+    static List<Dictionary<string, string>> SaveEventStream()
     {
-        List<EventSerializeInfo> list = new List<EventSerializeInfo>();
+        List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
 
         for (int i = 0; i < s_eventStream.Count; i++)
         {
-            EventSerializeInfo tmp = new EventSerializeInfo();
+            Dictionary<string, string> tmp = new Dictionary<string, string>();
 
-            tmp.eventName = s_eventStream[i].GetType().Name;
-            tmp.serializeInfo = s_eventStream[i].Serialize();
+            tmp.Add(c_eventNameKey, s_eventStream[i].GetType().Name);
+            tmp.Add(c_serializeInfoKey,s_eventStream[i].Serialize());
+
             list.Add(tmp);
         }
 
-        return JsonTool.List2Json<EventSerializeInfo>(list);
+        return list;
     }
 
-    static string SaveRandomList()
+    static List<int> SaveRandomList()
     {
-        return JsonTool.List2Json<int>(s_randomList);
+        List<int> list = new List<int>();
+
+        for (int i = 0; i < s_randomList.Count; i++)
+        {
+            list.Add(s_randomList[i]);
+        }
+
+        return list;
     }
-
-
-
 
     public static void LoadReplayFile(string fileName)
     {
-        List<EventSerializeInfo> list = new List<EventSerializeInfo>();
-        s_eventStream = new List<IInputEventBase>();
-
         string content = ResourceIOTool.ReadStringByFile(
             PathTool.GetAbsolutePath(ResLoadType.Persistent,
                                      PathTool.GetRelativelyPath(
@@ -167,30 +179,36 @@ public class DevelopReplayManager
                                                     fileName,
                                                     c_expandName)));
 
-        list = JsonTool.Json2List<EventSerializeInfo>(content);
+        Dictionary<string, object> replayInfo = (Dictionary<string, object>)Json.Deserialize(content);
 
-        for (int i = 0; i < list.Count; i++)
-        {
-            IInputEventBase eTmp = (IInputEventBase)JsonUtility.FromJson(list[i].serializeInfo, Type.GetType(list[i].eventName));
-            s_eventStream.Add(eTmp);
-        }
+        LoadEventStream((List<object>)replayInfo[c_eventStreamKey]);
+        LoadRandomList((List<object>)replayInfo[c_randomListKey]);
     }
 
-    static void LoadEventStream(string content)
+    static void LoadEventStream(List<object> content)
     {
         s_eventStream = new List<IInputEventBase>();
-        List<EventSerializeInfo> list  = JsonTool.Json2List<EventSerializeInfo>(content);
 
-        for (int i = 0; i < list.Count; i++)
+        for (int i = 0; i < content.Count; i++)
         {
-            IInputEventBase eTmp = (IInputEventBase)JsonUtility.FromJson(list[i].serializeInfo, Type.GetType(list[i].eventName));
+            Dictionary<string, object> info = (Dictionary<string, object>)(content[i]);
+
+            //Debug.Log(info[c_eventNameKey].ToString());
+            //Debug.Log(info[c_eventNameKey].ToString());
+
+            IInputEventBase eTmp = (IInputEventBase)JsonUtility.FromJson(info[c_serializeInfoKey].ToString(), Type.GetType(info[c_eventNameKey].ToString()));
             s_eventStream.Add(eTmp);
         }
     }
 
-    static void LoadRandomList(string content)
+    static void LoadRandomList(List<object> content)
     {
-        s_randomList = JsonTool.Json2List<int>(content);
+        s_randomList = new List<int>();
+
+        for (int i = 0; i < content.Count; i++)
+        {
+            s_randomList.Add(int.Parse(content[i].ToString()));
+        }
     }
 
     public static string[] GetRelpayFileNames()
@@ -235,7 +253,7 @@ public class DevelopReplayManager
         {
             if (GUILayout.Button("正常启动", GUILayout.ExpandHeight(true)))
             {
-                choseReplayMode(false);
+                ChoseReplayMode(false);
             }
 
             if (GUILayout.Button("复盘模式", GUILayout.ExpandHeight(true)))
@@ -252,7 +270,7 @@ public class DevelopReplayManager
             {
                 if (GUILayout.Button(replayFileNameList[i]))
                 {
-                    choseReplayMode(true, replayFileNameList[i]);
+                    ChoseReplayMode(true, replayFileNameList[i]);
                 }
             }
 
@@ -288,18 +306,18 @@ public class DevelopReplayManager
             SaveReplayFile(SaveFileName);
         }
 
-        if (RecordManager.GetData(c_RecordName).GetRecord(c_qucikLunchKey, true))
+        if (RecordManager.GetData(c_recordName).GetRecord(c_qucikLunchKey, true))
         {
             if (GUILayout.Button("开启复盘模式", GUILayout.ExpandHeight(true)))
             {
-                RecordManager.SaveRecord(c_RecordName, c_qucikLunchKey, false);
+                RecordManager.SaveRecord(c_recordName, c_qucikLunchKey, false);
             }
         }
         else
         {
             if (GUILayout.Button("关闭复盘模式", GUILayout.ExpandHeight(true)))
             {
-                RecordManager.SaveRecord(c_RecordName, c_qucikLunchKey, true);
+                RecordManager.SaveRecord(c_recordName, c_qucikLunchKey, true);
             }
         }
 
@@ -323,12 +341,5 @@ public class DevelopReplayManager
             now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
         return logName;
-    }
-
-    [System.Serializable]
-    class EventSerializeInfo
-    {
-        public string eventName;
-        public string serializeInfo;
     }
 }

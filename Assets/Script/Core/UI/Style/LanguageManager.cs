@@ -4,7 +4,7 @@ using System.Text;
 
 public class LanguageManager  
 {
-    const string s_DataFilePrefix = "langData_";
+    const string s_DataFilePrefix = "LangData_";
     static public SystemLanguage s_currentLanguage = SystemLanguage.ChineseSimplified;
     static DataTable s_languageData;
 	public void Init()
