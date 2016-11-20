@@ -34,16 +34,16 @@ public class ApplicationStatusManager
             s_currentAppStatus.OnExitStatus();
         }
 
-        s_currentAppStatus = GetAppStatus(l_statusName);
+        s_currentAppStatus = GetStatus(l_statusName);
         s_currentAppStatus.OnEnterStatus();
     }
 
-    public static IApplicationStatus GetAppStatus<T>() where T:IApplicationStatus
+    public static T GetStatus<T>() where T : IApplicationStatus
     {
-        return GetAppStatus(typeof(T).Name);
+        return (T)GetStatus(typeof(T).Name);
     }
 
-    public static IApplicationStatus GetAppStatus(string l_statusName)
+    public static IApplicationStatus GetStatus(string l_statusName)
     {
         if (s_status.ContainsKey(l_statusName))
         {
@@ -51,10 +51,12 @@ public class ApplicationStatusManager
         }
         else
         {
-            IApplicationStatus l_statusTmp = (IApplicationStatus)Activator.CreateInstance(Type.GetType(l_statusName));
-            s_status.Add(l_statusName, l_statusTmp);
+            throw new Exception("ApplicationStatusManager GetStatus Exception: " + l_statusName + " not Init !");
 
-            return l_statusTmp;
+            //IApplicationStatus l_statusTmp = (IApplicationStatus)Activator.CreateInstance(Type.GetType(l_statusName));
+            //s_status.Add(l_statusName, l_statusTmp);
+
+            //return l_statusTmp;
         }
     }
 
@@ -85,7 +87,7 @@ public class ApplicationStatusManager
             s_currentAppStatus.OnExitStatus();
         }
 
-        s_currentAppStatus = GetAppStatus(l_statusName);
+        s_currentAppStatus = GetStatus(l_statusName);
         s_currentAppStatus.EnterStatusTestData();
         s_currentAppStatus.OnEnterStatus();
     }
