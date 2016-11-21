@@ -19,16 +19,9 @@ public class UIStyleConfigManager
     {
         LoadData();
 
-        //s_StyleData = s_data;
-
         Dictionary<string, object> dataTmp = new Dictionary<string, object>();
 
         dataTmp.Add(DataName, JsonTool.Dictionary2Json<UIStyleInfo>(s_StyleData));
-
-        //foreach (var obj in s_StyleData)
-        //{
-        //    dataTmp.Add(obj.Key, UIStyleInfo.StlyleData2String(obj.Value));
-        //}
 
         ConfigManager.SaveEditorConfigData(ConfigName, dataTmp);
     }

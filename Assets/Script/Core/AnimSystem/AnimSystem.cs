@@ -47,7 +47,7 @@ public class AnimSystem : MonoBehaviour
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
 
         Color fromTmp = from ?? Color.white;
@@ -103,7 +103,7 @@ public class AnimSystem : MonoBehaviour
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
 
         float fromTmp = from ?? 1;
@@ -145,7 +145,7 @@ public class AnimSystem : MonoBehaviour
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
         AnimCallBack callBack = null,
-        params object[] parameter)
+        object[] parameter = null)
     {
 
         Vector3 fromTmp = from ?? animObject.GetComponent<RectTransform>().anchoredPosition;
@@ -177,7 +177,7 @@ public class AnimSystem : MonoBehaviour
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
         AnimCallBack callBack = null, 
-        params object[] parameter)
+        object[] parameter = null)
     {
         Vector2 fromTmp = from ?? animObject.GetComponent<RectTransform>().sizeDelta;
 
@@ -211,7 +211,7 @@ public class AnimSystem : MonoBehaviour
         RepeatType repeatType  = RepeatType.Once,
         int repeatCount        = -1, 
         AnimCallBack callBack  = null, 
-        params object[] parameter)
+        object[] parameter = null)
     {
         AnimParamHash animParnHash = new AnimParamHash(
             AnimParamType.GameObj, animObject,
@@ -239,7 +239,7 @@ public class AnimSystem : MonoBehaviour
       RepeatType repeatType = RepeatType.Once,
       int repeatCount = -1, 
       bool isChild = true,
-      AnimCallBack callBack = null, params object[] parameter)
+      AnimCallBack callBack = null, object[] parameter = null)
     {
 
         AnimParamHash animParnHash = new AnimParamHash(
@@ -287,7 +287,7 @@ public class AnimSystem : MonoBehaviour
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
         AnimCallBack callBack = null,
-        params object[] parameter)
+        object[] parameter = null)
     {
 
         Vector3 fromTmp;
@@ -334,7 +334,7 @@ public class AnimSystem : MonoBehaviour
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
 
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         AnimType animType;
         Vector3 fromTmp ;
@@ -379,7 +379,7 @@ public class AnimSystem : MonoBehaviour
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
 
         Vector3 fromTmp = from ?? animObject.transform.localScale;
@@ -410,7 +410,7 @@ public class AnimSystem : MonoBehaviour
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         AnimParamHash animParnHash = new AnimParamHash(
            AnimParamType.AnimType, AnimType.Custom_Float,
@@ -435,7 +435,7 @@ public class AnimSystem : MonoBehaviour
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         AnimParamHash animParnHash = new AnimParamHash(
            AnimParamType.AnimType, AnimType.Custom_Vector2,
@@ -460,7 +460,7 @@ public class AnimSystem : MonoBehaviour
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         AnimParamHash animParnHash = new AnimParamHash(
            AnimParamType.AnimType, AnimType.Custom_Vector3,
@@ -489,7 +489,7 @@ public class AnimSystem : MonoBehaviour
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
         Vector3[] t_Bezier_contral = null,
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         AnimType animType;
         if (isLocal)
@@ -525,7 +525,7 @@ public class AnimSystem : MonoBehaviour
         bool isLocal = true, 
         PathType bezierMoveType = PathType.Bezier2, 
         Vector3[] t_Bezier_contral = null, 
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         return BezierMove(animObject, from, to, time, RepeatType.Once, interp, isLocal, bezierMoveType, t_Bezier_contral, callBack, parameter);
     }
@@ -538,7 +538,7 @@ public class AnimSystem : MonoBehaviour
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
         Vector3[] t_Bezier_contral = null,
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         Vector3 from;
         if (isLocal)
@@ -559,7 +559,7 @@ public class AnimSystem : MonoBehaviour
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
         float[] t_Bezier_contralRadius = null,
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         AnimType animType;
         if (isLocal)
@@ -593,7 +593,7 @@ public class AnimSystem : MonoBehaviour
         InterpType interp = InterpType.Default, bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
         float[] t_Bezier_contralRadius = null,
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         return BezierMove(animObject, from, to, time, RepeatType.Once, interp, isLocal, bezierMoveType, t_Bezier_contralRadius, callBack, parameter);
     }
@@ -605,7 +605,7 @@ public class AnimSystem : MonoBehaviour
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
         float[] t_Bezier_contralRadius = null,
-        AnimCallBack callBack = null, params object[] parameter)
+        AnimCallBack callBack = null, object[] parameter = null)
     {
         Vector3 from;
         if (isLocal)
@@ -630,7 +630,7 @@ public class AnimSystem : MonoBehaviour
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
         AnimCallBack callBack = null, 
-        params object[] parameter)
+        object[] parameter = null)
     {
         AnimParamHash animParnHash = new AnimParamHash(
             AnimParamType.GameObj, animObject,
@@ -730,45 +730,7 @@ public class AnimSystem : MonoBehaviour
         }
     }
 
-    public enum AnimParamType
-    {
-        GameObj,
 
-        FromV3,
-        FromV2,
-        FromFloat,
-        FromColor,
-
-        ToV3,
-        ToV2,
-        ToFloat,
-        ToColor,
-
-        AnimType,
-        Time,
-        InteType,
-
-        IsIgnoreTimeScale,
-
-        PathType,
-        V3Control,
-        floatControl,
-
-        IsIncludeChild,
-        IsLocal,
-
-        RepeatType,
-        RepeatCount,
-
-        CustomMethodV3,
-        CustomMethodV2,
-        CustomMethodFloat,
-
-        Space,
-
-        CallBack,
-        CallBackParams
-    }
 
     #endregion
 
@@ -923,6 +885,46 @@ public enum InterpType
     OutExpo,
     InOutExpo,
     OutInExpo,
+}
+
+public enum AnimParamType
+{
+    GameObj,
+
+    FromV3,
+    FromV2,
+    FromFloat,
+    FromColor,
+
+    ToV3,
+    ToV2,
+    ToFloat,
+    ToColor,
+
+    AnimType,
+    Time,
+    InteType,
+
+    IsIgnoreTimeScale,
+
+    PathType,
+    V3Control,
+    floatControl,
+
+    IsIncludeChild,
+    IsLocal,
+
+    RepeatType,
+    RepeatCount,
+
+    CustomMethodV3,
+    CustomMethodV2,
+    CustomMethodFloat,
+
+    Space,
+
+    CallBack,
+    CallBackParams
 }
 
 public enum PathType

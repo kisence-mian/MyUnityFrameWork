@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.IO;
 
 public class RecordManager 
 {
@@ -24,12 +25,17 @@ public class RecordManager
 
         string dataJson = "";
 
-        //记录永远从沙盒路径读取
-        dataJson = ResourceIOTool.ReadStringByFile(
-            PathTool.GetAbsolutePath(ResLoadType.Persistent,
+        string fullPath = PathTool.GetAbsolutePath(ResLoadType.Persistent,
                 PathTool.GetRelativelyPath(c_directoryName,
                                             RecordName,
-                                            c_expandName)));
+                                            c_expandName));
+        if (File.Exists(fullPath))
+        {
+            //记录永远从沙盒路径读取
+            dataJson = ResourceIOTool.ReadStringByFile(fullPath);
+        }
+
+        //Debug.Log(RecordName + " dataJson: " + dataJson);
 
         if (dataJson == "")
         {
@@ -42,7 +48,7 @@ public class RecordManager
 
         s_RecordCatch.Add(RecordName, record);
 
-        return new RecordTable();
+        return record;
     }
 
     public static void SaveData(string RecordName, RecordTable data)

@@ -22,6 +22,16 @@ public class RandomService
         s_randomList = list;
     }
 
+    public static int GetRand(int min, int max)
+    {
+        return Range(min, max);
+    }
+
+    public static int GetRandReal(int min, int max)
+    {
+        return Range(min, max + 1);
+    }
+
 	public static int Range(int min,int max)
     {
         if(!s_isFixedRandom)
@@ -77,6 +87,9 @@ public class RandomService
             throw new Exception("RandomService Exception no RandomList!");
         }
     }
+
+
+
 }
 
 public delegate void RandomHandel(int random);

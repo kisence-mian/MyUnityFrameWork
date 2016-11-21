@@ -36,6 +36,9 @@ public class FirstStatus : IApplicationStatus
         ////InputManager.re
 
         InputManager.Dispatch<InputNetworkEvent>(e);
+
+        AnimSystem.Move(go, null, Vector3.one, callBack: (object[] obj) => { }
+            , parameter: new object[] { });
     }
 
     public void CallBackTest(InputNetworkEvent e)

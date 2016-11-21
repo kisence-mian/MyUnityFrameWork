@@ -773,7 +773,7 @@ public class UITemplate
 
     public void FindTemplateName(string path)
     {
-        Debug.Log(path);
+        FileTool.CreatPath(path);
 
         string[] allUIPrefabName = Directory.GetFiles(path);
         foreach (var item in allUIPrefabName)

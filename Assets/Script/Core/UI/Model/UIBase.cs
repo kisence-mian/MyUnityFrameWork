@@ -215,6 +215,7 @@ public class UIBase : MonoBehaviour
     #region 注册监听
 
     protected List<Enum> m_EventNames = new List<Enum>();
+    protected List<EventHandRegisterInfo> m_EventListeners = new List<EventHandRegisterInfo>();
 
     protected List<InputEventRegisterInfo<InputUIOnClickEvent>> m_OnClickEvents = new List<InputEventRegisterInfo<InputUIOnClickEvent>>();
 
@@ -226,13 +227,31 @@ public class UIBase : MonoBehaviour
         }
 
         m_OnClickEvents.Clear();
+
+        for (int i = 0; i < m_EventListeners.Count; i++)
+        {
+            m_EventListeners[i].RemoveListener();
+        }
+
+        m_EventListeners.Clear();
     }
 
 
-    public virtual void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
+    protected void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
         InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(GetButton(buttonName), UIEventKey, buttonName, parm, callback);
         m_OnClickEvents.Add(info);
+    }
+
+    protected void AddEventListener(Enum EventEnum,EventHandle handle)
+    {
+        EventHandRegisterInfo info = new EventHandRegisterInfo();
+        info.m_EventKey = EventEnum;
+        info.m_hande = handle;
+
+        GlobalEvent.AddEvent(EventEnum, handle);
+
+        m_EventListeners.Add(info);
     }
 
     #endregion

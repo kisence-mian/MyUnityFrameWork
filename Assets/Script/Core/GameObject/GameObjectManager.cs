@@ -149,6 +149,14 @@ public class GameObjectManager :MonoBehaviour
         obj.transform.SetParent(s_PoolParent);
     }
 
+    public static void DestroyGameobjectByPool(GameObject go,float time)
+    {
+        Timer.DelayCallBack(time, (object[] obj) =>
+        {
+            DestroyGameobjectByPool(go);
+        });
+    }
+
     /// <summary>
     /// 清空对象池
     /// </summary>

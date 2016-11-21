@@ -29,22 +29,22 @@ public class ApplicationManager : MonoBehaviour
         SetResourceLoadType();               //设置资源加载类型
         ResourcesConfigManager.Initialize(); //资源路径管理器启动
 
-        InputManager.Init();                    //输入管理器启动
-        UIManager.Init();                       //UIManager启动
-        Log.Init(m_AppMode != AppMode.Release); //日志系统启动
+        InputManager.Init();                 //输入管理器启动
+        UIManager.Init();                    //UIManager启动
 
         ApplicationStatusManager.Init();     //游戏流程状态机初始化
 
         //初始化全局逻辑
         GlobalLogicManager.Init();
 
-
         if (m_AppMode != AppMode.Release)
         {
-            GUIConsole.Init(); //运行时Debug
+            GUIConsole.Init(); //运行时Console
 
             DevelopReplayManager.OnLunchCallBack += () =>
             {
+                Log.Init(m_AppMode != AppMode.Release); //日志记录启动
+
                 InitGlobalLogic();//全局逻辑
                 ApplicationStatusManager.EnterTestModel(m_Status);//可以从此处进入测试流程
             };

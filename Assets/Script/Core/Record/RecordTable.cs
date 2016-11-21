@@ -11,10 +11,14 @@ public class RecordTable : Dictionary<string, SingleField>
         RecordTable result = new RecordTable();
         Dictionary<string, SingleField> tmp = JsonTool.Json2Dictionary<SingleField>(data);
 
+        
+
         List<string> keys = new List<string>(tmp.Keys);
 
         for (int i = 0; i < keys.Count; i++)
         {
+            //Debug.Log("Key: " + keys[i]);
+
             result.Add(keys[i],tmp[keys[i]]);
         }
 

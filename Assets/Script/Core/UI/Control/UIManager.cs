@@ -79,6 +79,10 @@ public class UIManager : MonoBehaviour
         {
             l_UIbase = CreateUIWindow(l_UIname);
         }
+        else
+        {
+            l_UIbase.gameObject.SetActive(true);
+        }
 
         RemoveHideUI(l_UIbase);
         AddUI(l_UIbase);
@@ -143,7 +147,7 @@ public class UIManager : MonoBehaviour
             Debug.LogError("OnClose Exception: " + e.ToString());
         }
 
-
+        l_UI.gameObject.SetActive(false);
         AddHideUI(l_UI);
     }
     public static void CloseUIWindow(string l_UIname, bool isPlayAnim = true, UICallBack l_callback = null, params object[] l_objs)
@@ -341,7 +345,7 @@ public class UIManager : MonoBehaviour
             else
             {
                 //默认返回最后创建的那一个
-                return s_hideUIs[l_UIname][s_UIs[l_UIname].Count - 1];
+                return s_hideUIs[l_UIname][s_hideUIs[l_UIname].Count - 1];
             }
         }
     }

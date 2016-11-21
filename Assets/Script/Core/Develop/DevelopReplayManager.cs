@@ -119,6 +119,8 @@ public class DevelopReplayManager
         }
     }
 
+    #region SaveReplayFile
+
 
     public static void SaveReplayFile(string fileName)
     {
@@ -170,6 +172,10 @@ public class DevelopReplayManager
         return list;
     }
 
+    #endregion 
+
+    #region LoadReplayFile
+
     public static void LoadReplayFile(string fileName)
     {
         string content = ResourceIOTool.ReadStringByFile(
@@ -211,23 +217,7 @@ public class DevelopReplayManager
         }
     }
 
-    public static string[] GetRelpayFileNames()
-    {
-        FileTool.CreatPath(PathTool.GetAbsolutePath(ResLoadType.Persistent, c_directoryName));
-
-        List<string> relpayFileNames = new List<string>();
-        string[] allFileName = Directory.GetFiles(PathTool.GetAbsolutePath(ResLoadType.Persistent, c_directoryName));
-        foreach (var item in allFileName)
-        {
-            if (item.EndsWith("." + c_expandName))
-            {
-                string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
-                relpayFileNames.Add(configName);
-            }
-        }
-
-        return relpayFileNames.ToArray() ?? new string[0];
-    }
+    #endregion
 
     #region GUI
 
@@ -237,11 +227,12 @@ public class DevelopReplayManager
 
     static void ReplayMenuGUI()
     {
-        GUILayout.Window(1, windowRect, MenuWindow, "Lunch Menu");
+        GUILayout.Window(1, windowRect, MenuWindow, "Develop Menu");
     }
 
-    static bool isOpenMenu = true;
-    static string[] replayFileNameList = new string[0];
+    static DevMenuEnum MenuStatus = DevMenuEnum.MainMenu;
+    static bool isWatchLog = true;
+    static string[] FileNameList = new string[0];
     static Vector2 scrollPos = Vector2.one;
     static void MenuWindow(int windowID)
     {
@@ -249,7 +240,7 @@ public class DevelopReplayManager
 
         windowRect = new Rect(Screen.width * 0.2f, Screen.height * 0.05f, Screen.width * 0.6f, Screen.height * 0.9f);
 
-        if (isOpenMenu)
+        if (MenuStatus == DevMenuEnum.MainMenu)
         {
             if (GUILayout.Button("正常启动", GUILayout.ExpandHeight(true)))
             {
@@ -258,19 +249,25 @@ public class DevelopReplayManager
 
             if (GUILayout.Button("复盘模式", GUILayout.ExpandHeight(true)))
             {
-                isOpenMenu = false;
-                replayFileNameList = GetRelpayFileNames();
+                MenuStatus = DevMenuEnum.Replay;
+                FileNameList = GetRelpayFileNames();
+            }
+
+            if (GUILayout.Button("查看日志", GUILayout.ExpandHeight(true)))
+            {
+                MenuStatus = DevMenuEnum.Log;
+                FileNameList = LogOutPutThread.GetLogFileNameList();
             }
         }
-        else
+        else if (MenuStatus  == DevMenuEnum.Replay)
         {
             scrollPos = GUILayout.BeginScrollView(scrollPos);
 
-            for (int i = 0; i < replayFileNameList.Length; i++)
+            for (int i = 0; i < FileNameList.Length; i++)
             {
-                if (GUILayout.Button(replayFileNameList[i]))
+                if (GUILayout.Button(FileNameList[i]))
                 {
-                    ChoseReplayMode(true, replayFileNameList[i]);
+                    ChoseReplayMode(true, FileNameList[i]);
                 }
             }
 
@@ -278,10 +275,72 @@ public class DevelopReplayManager
 
             if (GUILayout.Button("返回上层"))
             {
-                isOpenMenu = true;
+                MenuStatus = DevMenuEnum.MainMenu;
             }
         }
+        else if (MenuStatus == DevMenuEnum.Log)
+        {
+            LogGUI();
+        }
     }
+
+    #region LogGUI
+
+    static bool isShowLog = false;
+
+    static void LogGUI()
+    {
+        if (isShowLog)
+        {
+            ShowLog();
+        }
+        else
+        {
+            ShowLogList();
+        }
+    }
+
+    static string LogContent = "";
+
+    static void ShowLogList()
+    {
+        scrollPos = GUILayout.BeginScrollView(scrollPos);
+
+        for (int i = 0; i < FileNameList.Length; i++)
+        {
+            if (GUILayout.Button(FileNameList[i]))
+            {
+                isShowLog = true;
+                scrollPos = Vector2.zero;
+                LogContent = LogOutPutThread.LoadLogContent(FileNameList[i]);
+            }
+        }
+
+        GUILayout.EndScrollView();
+
+        if (GUILayout.Button("返回上层"))
+        {
+            MenuStatus = DevMenuEnum.MainMenu;
+        }
+    }
+
+    static void ShowLog()
+    {
+        scrollPos = GUILayout.BeginScrollView(scrollPos);
+
+        GUILayout.TextArea(LogContent);
+
+        GUILayout.EndScrollView();
+
+        if (GUILayout.Button("返回上层"))
+        {
+            isShowLog = false;
+        }
+    }
+
+
+
+    #endregion
 
     #endregion
 
@@ -308,14 +367,14 @@ public class DevelopReplayManager
 
         if (RecordManager.GetData(c_recordName).GetRecord(c_qucikLunchKey, true))
         {
-            if (GUILayout.Button("开启复盘模式", GUILayout.ExpandHeight(true)))
+            if (GUILayout.Button("开启后台", GUILayout.ExpandHeight(true)))
             {
                 RecordManager.SaveRecord(c_recordName, c_qucikLunchKey, false);
             }
         }
         else
         {
-            if (GUILayout.Button("关闭复盘模式", GUILayout.ExpandHeight(true)))
+            if (GUILayout.Button("关闭后台", GUILayout.ExpandHeight(true)))
             {
                 RecordManager.SaveRecord(c_recordName, c_qucikLunchKey, true);
             }
@@ -334,6 +393,24 @@ public class DevelopReplayManager
 
     #endregion
 
+    public static string[] GetRelpayFileNames()
+    {
+        FileTool.CreatPath(PathTool.GetAbsolutePath(ResLoadType.Persistent, c_directoryName));
+
+        List<string> relpayFileNames = new List<string>();
+        string[] allFileName = Directory.GetFiles(PathTool.GetAbsolutePath(ResLoadType.Persistent, c_directoryName));
+        foreach (var item in allFileName)
+        {
+            if (item.EndsWith("." + c_expandName))
+            {
+                string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
+                relpayFileNames.Add(configName);
+            }
+        }
+
+        return relpayFileNames.ToArray() ?? new string[0];
+    }
+
     static string GetLogFileName()
     {
         DateTime now = System.DateTime.Now;
@@ -341,5 +418,12 @@ public class DevelopReplayManager
             now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
         return logName;
+    }
+
+    enum DevMenuEnum
+    {
+        MainMenu,
+        Replay,
+        Log
     }
 }

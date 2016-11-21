@@ -11,17 +11,10 @@ using System.IO;
 public class LogOutPutThread
 {
 
-	#if UNITY_EDITOR
-		string mDevicePersistentPath = Application.dataPath + "/../";
-		#elif UNITY_STANDALONE_WIN
-		string mDevicePersistentPath = Application.dataPath + "/PersistentPath";
-		#elif UNITY_STANDALONE_OSX
-		string mDevicePersistentPath = Application.dataPath + "/PersistentPath";
-		#else
-		string mDevicePersistentPath = Application.persistentDataPath;
-		#endif
+       string mDevicePersistentPath = Application.persistentDataPath;
 
-		static string LogPath = ".Log";
+		public static string LogPath = ".Log";
+        public static string expandName = "txt";
 
 		private Queue<LogInfo> mWritingLogQueue = null;
 		private Queue<LogInfo> mWaitingLogQueue = null;
@@ -43,8 +36,7 @@ public class LogOutPutThread
             string logName = string.Format("Log{0}{1}{2}#{3}{4}{5}",
                 now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
-
-            string logPath = string.Format("{0}/{1}/{2}.txt", mDevicePersistentPath, LogPath, logName);
+            string logPath = PathTool.GetAbsolutePath(ResLoadType.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
 
             UpLoadLogic(logPath);
 
@@ -167,5 +159,33 @@ public class LogOutPutThread
             //}
 
             //ConfigManager.SaveData(ConfigName, m_logData);
+        }
+
+        public static string[] GetLogFileNameList()
+        {
+            FileTool.CreatPath(PathTool.GetAbsolutePath(ResLoadType.Persistent, LogPath));
+
+            List<string> relpayFileNames = new List<string>();
+            string[] allFileName = Directory.GetFiles(PathTool.GetAbsolutePath(ResLoadType.Persistent, LogPath));
+            foreach (var item in allFileName)
+            {
+                if (item.EndsWith(".txt"))
+                {
+                    string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
+                    relpayFileNames.Add(configName);
+                }
+            }
+
+            return relpayFileNames.ToArray() ?? new string[0];
+        }
+
+        public static string LoadLogContent(string logName)
+        {
+            return ResourceIOTool.ReadStringByFile(GetPath(logName));
+        }
+
+        static string GetPath(string logName)
+        {
+            return PathTool.GetAbsolutePath(ResLoadType.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
         }
 }

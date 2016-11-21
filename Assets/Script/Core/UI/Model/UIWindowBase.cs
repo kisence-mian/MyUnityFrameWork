@@ -74,6 +74,15 @@ public class UIWindowBase : UIBase
         }
     }
 
+    public void AddEventListener(Enum l_Event,EventHandle handle)
+    {
+        if (!m_EventNames.Contains(l_Event))
+        {
+            m_EventNames.Add(l_Event);
+            GlobalEvent.AddEvent(l_Event, handle);
+        }
+    }
+
     public override void RemoveAllListener()
     {
         base.RemoveAllListener();
