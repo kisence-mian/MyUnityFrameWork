@@ -181,11 +181,11 @@ public class UIManager : MonoBehaviour
 
     public static void DestroyUI(UIWindowBase l_UI)
     {
-        if (s_hideUIs.ContainsKey(l_UI.name))
+        if (GetIsExitsHide(l_UI))
         {
             RemoveHideUI(l_UI);
         }
-        else if (s_UIs.ContainsKey(l_UI.name))
+        else if(GetIsExits(l_UI))
         {
             RemoveUI(l_UI);   
         }
@@ -234,14 +234,14 @@ public class UIManager : MonoBehaviour
     {
         if (!s_UIs.ContainsKey(l_UIname))
         {
-            Debug.Log("!ContainsKey " + l_UIname);
+            //Debug.Log("!ContainsKey " + l_UIname);
             return null;
         }
         else
         {
             if (s_UIs[l_UIname].Count == 0)
             {
-                Debug.Log("s_UIs[UIname].Count == 0");
+                //Debug.Log("s_UIs[UIname].Count == 0");
                 return null;
             }
             else
@@ -249,6 +249,18 @@ public class UIManager : MonoBehaviour
                 //默认返回最后创建的那一个
                 return s_UIs[l_UIname][s_UIs[l_UIname].Count - 1];
             }
+        }
+    }
+
+    static bool GetIsExits(UIWindowBase l_UI)
+    {
+        if (!s_UIs.ContainsKey(l_UI.name))
+        {
+            return false;
+        }
+        else
+        {
+            return s_UIs[l_UI.name].Contains(l_UI);
         }
     }
 
@@ -347,6 +359,18 @@ public class UIManager : MonoBehaviour
                 //默认返回最后创建的那一个
                 return s_hideUIs[l_UIname][s_hideUIs[l_UIname].Count - 1];
             }
+        }
+    }
+
+    static bool GetIsExitsHide(UIWindowBase l_UI)
+    {
+        if (!s_hideUIs.ContainsKey(l_UI.name))
+        {
+            return false;
+        }
+        else
+        {
+            return s_hideUIs[l_UI.name].Contains(l_UI);
         }
     }
 
