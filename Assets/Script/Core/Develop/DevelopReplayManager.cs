@@ -72,6 +72,8 @@ public class DevelopReplayManager
         }
         else
         {
+            Log.Init(true); //日志记录启动
+
             s_eventStream = new List<IInputEventBase>();
             s_randomList = new List<int>();
 
