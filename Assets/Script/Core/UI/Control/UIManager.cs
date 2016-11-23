@@ -152,7 +152,17 @@ public class UIManager : MonoBehaviour
     }
     public static void CloseUIWindow(string l_UIname, bool isPlayAnim = true, UICallBack l_callback = null, params object[] l_objs)
     {
-        CloseUIWindow(GetUI(l_UIname), isPlayAnim, l_callback, l_objs);
+        UIWindowBase ui = GetUI(l_UIname);
+
+        if (ui == null)
+        {
+            Debug.LogError("CloseUIWindow Error UI ->" + l_UIname + "<-  not Exist!");
+        }
+        else
+        {
+            CloseUIWindow(GetUI(l_UIname), isPlayAnim, l_callback, l_objs);
+        }
+
     }
     public static void CloseUIWindow<T>(bool isPlayAnim = true, UICallBack l_callback = null, params object[] l_objs) where T : UIWindowBase
     {

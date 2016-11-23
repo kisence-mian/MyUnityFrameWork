@@ -10,6 +10,9 @@ public class testWindow : UIWindowBase
     {
         AddOnClickListener("Button", onCLick);
 
+        AddOnClickListener("Button_open", open);
+        AddOnClickListener("Button_close", close);
+
         GetReusingScrollRect("ScrollRect").Init(UIEventKey,"Image_item");
 
         List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
@@ -56,5 +59,15 @@ public class testWindow : UIWindowBase
         //UIManager.CloseUIWindow(this);
 
         Debug.Log(Screen.width + "  " + Screen.height);
+    }
+
+    public void open(InputUIOnClickEvent Event)
+    {
+        UIManager.OpenUIWindow<test01Window>();
+    }
+
+    public void close(InputUIOnClickEvent Event)
+    {
+        UIManager.CloseUIWindow<test01Window>();
     }
 }

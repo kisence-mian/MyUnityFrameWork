@@ -19,22 +19,12 @@ public class test01Window : UIWindowBase
     //UI的进入动画
     public override IEnumerator EnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
     {
-        AnimSystem.UguiAlpha(gameObject, 0, 1, 1, callBack:(object[] obj)=>
-        {
-            base.EnterAnim(l_animComplete, l_callBack, objs);
-        });
-
-        return null;
+        return base.EnterAnim(l_animComplete, l_callBack, objs);
     }
 
     //UI的退出动画
     public override IEnumerator ExitAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
     {
-        AnimSystem.UguiAlpha(gameObject, 1, 0, 1, callBack: (object[] obj) =>
-        {
-            base.ExitAnim(l_animComplete, l_callBack, objs);
-        });
-
-        return null;
+        return base.ExitAnim(l_animComplete, l_callBack, objs);
     }
 }

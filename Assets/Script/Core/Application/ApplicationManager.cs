@@ -43,6 +43,7 @@ public class ApplicationManager : MonoBehaviour
 
             DevelopReplayManager.OnLunchCallBack += () =>
             {
+                LuaManager.Init();
                 InitGlobalLogic();//全局逻辑
                 ApplicationStatusManager.EnterTestModel(m_Status);//可以从此处进入测试流程
             };
@@ -53,6 +54,7 @@ public class ApplicationManager : MonoBehaviour
         {
             Log.Init(false); //关闭 Debug
 
+            LuaManager.Init();
             //全局逻辑
             InitGlobalLogic();
             //游戏流程状态机，开始第一个状态

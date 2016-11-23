@@ -1,0 +1,9 @@
+逻辑层Lua
+	只能使用：
+	UIManager
+	ApplicationManager
+
+UI层Lua
+
+	必须只控制非性能瓶颈部分
+	
