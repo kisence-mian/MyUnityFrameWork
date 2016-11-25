@@ -78,8 +78,9 @@ public class UIBase : MonoBehaviour
     Dictionary<string, ReusingScrollRect> m_reusingScrollRects = new Dictionary<string, ReusingScrollRect>();
     Dictionary<string, RawImage> m_rawImages = new Dictionary<string, RawImage>();
     Dictionary<string, RectTransform> m_rectTransforms = new Dictionary<string, RectTransform>();
-
     Dictionary<string, InputField> m_inputFields = new Dictionary<string, InputField>();
+
+    Dictionary<string, UGUIJoyStick> m_joySticks = new Dictionary<string, UGUIJoyStick>();
 
     public GameObject GetGameObject(string name)
     {
@@ -170,17 +171,7 @@ public class UIBase : MonoBehaviour
         return tmp;
     }
 
-    public ReusingScrollRect GetReusingScrollRect(string name)
-    {
-        if (m_reusingScrollRects.ContainsKey(name))
-        {
-            return m_reusingScrollRects[name];
-        }
 
-        ReusingScrollRect tmp = GetGameObject(name).GetComponent<ReusingScrollRect>();
-        m_reusingScrollRects.Add(name, tmp);
-        return tmp;
-    }
 
     public RawImage GetRawImage(string name)
     {
@@ -209,6 +200,33 @@ public class UIBase : MonoBehaviour
         }
         set { m_rectTransform = value; }
     }
+
+    #region 自定义组件
+
+    public ReusingScrollRect GetReusingScrollRect(string name)
+    {
+        if (m_reusingScrollRects.ContainsKey(name))
+        {
+            return m_reusingScrollRects[name];
+        }
+
+        ReusingScrollRect tmp = GetGameObject(name).GetComponent<ReusingScrollRect>();
+        m_reusingScrollRects.Add(name, tmp);
+        return tmp;
+    }
+
+    public UGUIJoyStick GetJoyStick(string name)
+    {
+        if (m_joySticks.ContainsKey(name))
+        {
+            return m_joySticks[name];
+        }
+
+        UGUIJoyStick tmp = GetGameObject(name).GetComponent<UGUIJoyStick>();
+        m_joySticks.Add(name, tmp);
+        return tmp;
+    }
+    #endregion
 
     #endregion
 

@@ -7,6 +7,14 @@ public class ApplicationManager : MonoBehaviour
 {
     public AppMode m_AppMode = AppMode.Developing;
 
+    private static ApplicationManager instance;
+
+    public static ApplicationManager Instance
+    {
+        get { return ApplicationManager.instance; }
+        set { ApplicationManager.instance = value; }
+    }
+
     //快速启动
     public bool m_quickLunch = true;
 
@@ -18,6 +26,7 @@ public class ApplicationManager : MonoBehaviour
 
     public void Awake()
     {
+        instance = this;
         AppLaunch();
     }
 
@@ -26,6 +35,7 @@ public class ApplicationManager : MonoBehaviour
     /// </summary>
     public void AppLaunch()
     {
+        DontDestroyOnLoad(this);
         SetResourceLoadType();               //设置资源加载类型
         ResourcesConfigManager.Initialize(); //资源路径管理器启动
 

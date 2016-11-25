@@ -25,6 +25,7 @@ public class LogOutPutThread
 
         public void Init()
         {
+            return;
 
             ApplicationManager.s_OnApplicationQuit += Close;
 

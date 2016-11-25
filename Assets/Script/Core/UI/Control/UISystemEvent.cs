@@ -52,6 +52,13 @@ public class UISystemEvent
 
     public static void Dispatch(UIWindowBase l_UI, UIEvent l_UIEvent,params object[] l_objs)
     {
+        if (l_UI == null)
+        {
+            Debug.LogError("Dispatch l_UI is null!");
+
+            return;
+        }
+
         if (s_allUIEvents.ContainsKey(l_UIEvent))
         {
             //遍历委托链表

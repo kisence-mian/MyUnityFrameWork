@@ -43,7 +43,6 @@ public class InputManager
         return Dispatcher;
     }
 
-    //未实现
     public static IInputDispatcher LoadDispatcher(string DispatcherName)
     {
         if (s_dispatcher.ContainsKey(DispatcherName))

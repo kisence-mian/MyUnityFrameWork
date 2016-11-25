@@ -35,7 +35,11 @@ public class ApplicationStatusManager
         }
 
         s_currentAppStatus = GetStatus(l_statusName);
-        s_currentAppStatus.OnEnterStatus();
+
+        ApplicationManager.Instance.StartCoroutine(s_currentAppStatus.InChangeScene(() =>
+        {
+            s_currentAppStatus.OnEnterStatus();
+        }));
     }
 
     public static T GetStatus<T>() where T : IApplicationStatus
@@ -88,7 +92,11 @@ public class ApplicationStatusManager
         }
 
         s_currentAppStatus = GetStatus(l_statusName);
-        s_currentAppStatus.EnterStatusTestData();
-        s_currentAppStatus.OnEnterStatus();
+
+        ApplicationManager.Instance.StartCoroutine(s_currentAppStatus.InChangeScene(()=>{
+            s_currentAppStatus.EnterStatusTestData();
+            s_currentAppStatus.OnEnterStatus();
+        }));
+
     }
 }

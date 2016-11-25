@@ -49,14 +49,15 @@ public class UILayerManager : MonoBehaviour
             case UIType.PopUp: l_ui.transform.SetParent(m_PopUpLayerParent); break;
         }
 
+        l_rt.localScale = Vector3.one;
+
         if (l_ui.m_UIType != UIType.GameUI)
         {
-            l_rt.anchoredPosition = Vector3.zero;
-            l_rt.sizeDelta = Vector2.zero;
             l_rt.anchorMin = Vector2.zero;
             l_rt.anchorMax = Vector3.one;
-            l_rt.localScale = Vector3.one;
-        }
 
+            l_rt.sizeDelta = Vector2.zero;
+            l_rt.anchoredPosition = Vector3.zero;
+        }
     }
 }

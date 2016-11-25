@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public abstract class IApplicationStatus
 {
@@ -34,4 +35,23 @@ public abstract class IApplicationStatus
     {
 
     }
+
+    public virtual IEnumerator InChangeScene(ChangSceneFinish handle)
+    {
+        if (handle != null)
+        {
+            try
+            {
+                handle();
+            }
+            catch(Exception e)
+            {
+                Debug.Log(e.ToString());
+            }
+        }
+
+        yield  break;
+    }
+
+    public delegate void ChangSceneFinish();
 }

@@ -4,6 +4,8 @@
 /// </summary>
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
 public class UGUITool
 {
     static PointerEventData eventDatas = new PointerEventData(EventSystem.current);
@@ -23,4 +25,9 @@ public class UGUITool
         return false;
     }
     
+    static public void set_icon(Image img,string name)
+    {
+        img.overrideSprite = ResourceManager.Load<Sprite>(name);
+        img.SetNativeSize();
+    }
 }
