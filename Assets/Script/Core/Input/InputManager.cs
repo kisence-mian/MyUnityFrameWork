@@ -91,6 +91,20 @@ public class InputManager
         }
     }
 
+    static InputDispatcher<T> GetDispatcher<T>() where T : IInputEventBase
+    {
+        string DispatcherName = typeof(T).Name;
+
+        if (s_dispatcher.ContainsKey(DispatcherName))
+        {
+            return (InputDispatcher<T>)s_dispatcher[DispatcherName];
+        }
+        else
+        {
+            return LoadDispatcher<T>();
+        }
+    }
+
     public static void RemoveDispatcher(string DispatcherName)
     {
         if (s_dispatcher.ContainsKey(DispatcherName))
@@ -140,18 +154,26 @@ public class InputManager
         dispatcher.AddListener(eventKey, callback);
     }
 
-    /// <summary>
-    /// 添加一个输入事件监听，只有当事件是自定义的操作事件才可以调用这个方法
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="callback"></param>
-    public static void AddListener<T>(InputEventHandle<T> callback) where T : IInputOperationEventBase
+    public static void AddListener<T>(InputEventHandle<T> callback) where T : IInputEventBase
     {
         InputDispatcher<T> dispatcher = GetDispatcher<T>();
         dispatcher.AddListener(typeof(T).Name, callback);
     }
 
+    ///// <summary>
+    ///// 添加一个输入事件监听，只有当事件是自定义的操作事件才可以调用这个方法
+    ///// </summary>
+    ///// <typeparam name="T"></typeparam>
+    ///// <param name="callback"></param>
+    //public static void AddListener<T>(InputEventHandle<T> callback) where T : IInputOperationEventBase
+    //{
+    //    InputDispatcher<T> dispatcher = GetDispatcher<T>();
+    //    dispatcher.AddListener(typeof(T).Name, callback);
+    //}
+
     #endregion
+
+    #region RemoveListener
 
     public static void RemoveListener<T>(string eventKey, InputEventHandle<T> callback) where T : IInputEventBase
     {
@@ -159,25 +181,13 @@ public class InputManager
         dispatcher.RemoveListener(eventKey, callback);
     }
 
-    public static void RemoveListener<T>(InputEventHandle<T> callback) where T : IInputOperationEventBase
+    public static void RemoveListener<T>(InputEventHandle<T> callback) where T : IInputEventBase
     {
         InputDispatcher<T> dispatcher = GetDispatcher<T>();
         dispatcher.RemoveListener(typeof(T).Name, callback);
     }
 
-    static InputDispatcher<T> GetDispatcher<T>() where T : IInputEventBase
-    {
-        string DispatcherName = typeof(T).Name;
-
-        if (s_dispatcher.ContainsKey(DispatcherName))
-        {
-            return (InputDispatcher<T>)s_dispatcher[DispatcherName];
-        }
-        else
-        {
-            return LoadDispatcher<T>();
-        }
-    }
+    #endregion
 
     #endregion
 }

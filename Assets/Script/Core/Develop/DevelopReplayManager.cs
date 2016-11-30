@@ -61,14 +61,16 @@ public class DevelopReplayManager
         if (s_isReplay)
         {
             LoadReplayFile(replayFileName);
-            ApplicationManager.s_OnApplicationUpdate += OnUpdate;
+            ApplicationManager.s_OnApplicationUpdate += OnReplayUpdate;
             GUIConsole.onGUICallback += ReplayModeGUI;
 
+            //传入随机数列
             RandomService.SetRandomList(s_randomList);
 
             //关闭正常输入，保证回放数据准确
-            InputUIEventProxy.IsAvtive = false;
-            InputOperationEventProxy.IsAvtive = false;
+            InputUIEventProxy.IsActive = false;
+            InputOperationEventProxy.IsActive = false;
+            InputNetworkEventProxy.IsActive = false;
         }
         else
         {
@@ -77,6 +79,7 @@ public class DevelopReplayManager
             s_eventStream = new List<IInputEventBase>();
             s_randomList = new List<int>();
 
+            ApplicationManager.s_OnApplicationUpdate += OnRecordUpdate;
             InputManager.OnEveryEventDispatch += OnEveryEventCallBack;
             GUIConsole.onGUICallback += RecordModeGUI;
             RandomService.OnRandomCreat += OnGetRandomCallBack;
@@ -107,19 +110,7 @@ public class DevelopReplayManager
         s_randomList.Add(random);
     }
 
-    public static void OnUpdate()
-    {
-        for (int i = 0; i < s_eventStream.Count; i++)
-        {
-            if (s_eventStream[i].m_t < Time.time)
-            {
-                InputManager.Dispatch(s_eventStream[i].GetType().Name, s_eventStream[i]);
 
-                s_eventStream.RemoveAt(i);
-                i--;
-            }
-        }
-    }
 
     #region SaveReplayFile
 
@@ -233,7 +224,7 @@ public class DevelopReplayManager
     }
 
     static DevMenuEnum MenuStatus = DevMenuEnum.MainMenu;
-    static bool isWatchLog = true;
+    //static bool isWatchLog = true;
     static string[] FileNameList = new string[0];
     static Vector2 scrollPos = Vector2.one;
     static void MenuWindow(int windowID)
@@ -391,6 +382,37 @@ public class DevelopReplayManager
     static void ReplayModeGUI()
     {
 
+    }
+
+    #endregion
+
+    #region Update
+
+    static float s_currentTime = 0;
+
+    public static float CurrentTime
+    {
+        get { return DevelopReplayManager.s_currentTime; }
+        //set { DevelopReplayManager.s_currentTime = value; }
+    }
+
+    public static void OnReplayUpdate()
+    {
+        for (int i = 0; i < s_eventStream.Count; i++)
+        {
+            if (s_eventStream[i].m_t < Time.time)
+            {
+                InputManager.Dispatch(s_eventStream[i].GetType().Name, s_eventStream[i]);
+
+                s_eventStream.RemoveAt(i);
+                i--;
+            }
+        }
+    }
+
+    static void OnRecordUpdate()
+    {
+        s_currentTime += Time.deltaTime;
     }
 
     #endregion

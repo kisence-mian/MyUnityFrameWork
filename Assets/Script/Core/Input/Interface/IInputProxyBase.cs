@@ -6,12 +6,12 @@ public abstract class IInputProxyBase
     /// <summary>
     /// 激活状态
     /// </summary>
-    private static bool s_isAvtive = true;
+    private static bool s_isActive = true;
 
-    public static bool IsAvtive
+    public static bool IsActive
     {
-        get { return IInputProxyBase.s_isAvtive; }
-        set { IInputProxyBase.s_isAvtive = value; }
+        get { return IInputProxyBase.s_isActive; }
+        set { IInputProxyBase.s_isActive = value; }
     }
 }
 
@@ -25,7 +25,7 @@ public class InputEventRegisterInfo<T> where T: IInputEventBase
         InputManager.AddListener<T>(eventKey, callBack);
     }
 
-    public void RemoveListener()
+    public virtual void RemoveListener()
     {
         InputManager.RemoveListener<T>(eventKey, callBack);
     }

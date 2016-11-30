@@ -11,7 +11,7 @@ using System.IO;
 public class LogOutPutThread
 {
 
-       string mDevicePersistentPath = Application.persistentDataPath;
+       //string mDevicePersistentPath = Application.persistentDataPath;
 
 		public static string LogPath = ".Log";
         public static string expandName = "txt";
@@ -19,7 +19,7 @@ public class LogOutPutThread
 		private Queue<LogInfo> mWritingLogQueue = null;
 		private Queue<LogInfo> mWaitingLogQueue = null;
 		private object mLogLock = null;
-		private Thread mFileLogThread = null;
+        //private Thread mFileLogThread = null;
 		private bool mIsRunning = false;
 		private StreamWriter mLogWriter = null;
 
@@ -27,34 +27,34 @@ public class LogOutPutThread
         {
             return;
 
-            ApplicationManager.s_OnApplicationQuit += Close;
+            //ApplicationManager.s_OnApplicationQuit += Close;
 
-            this.mWritingLogQueue = new Queue<LogInfo>();
-            this.mWaitingLogQueue = new Queue<LogInfo>();
+            //this.mWritingLogQueue = new Queue<LogInfo>();
+            //this.mWaitingLogQueue = new Queue<LogInfo>();
             
-            this.mLogLock = new object();
-            System.DateTime now = System.DateTime.Now;
-            string logName = string.Format("Log{0}{1}{2}#{3}{4}{5}",
-                now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+            //this.mLogLock = new object();
+            //System.DateTime now = System.DateTime.Now;
+            //string logName = string.Format("Log{0}{1}{2}#{3}{4}{5}",
+            //    now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
-            string logPath = PathTool.GetAbsolutePath(ResLoadType.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
+            //string logPath = PathTool.GetAbsolutePath(ResLoadType.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
 
-            UpLoadLogic(logPath);
+            //UpLoadLogic(logPath);
 
-            if (File.Exists(logPath))
-                File.Delete(logPath);
-            string logDir = Path.GetDirectoryName(logPath);
+            //if (File.Exists(logPath))
+            //    File.Delete(logPath);
+            //string logDir = Path.GetDirectoryName(logPath);
 
-            if (!Directory.Exists(logDir))
-                Directory.CreateDirectory(logDir);
+            //if (!Directory.Exists(logDir))
+            //    Directory.CreateDirectory(logDir);
 
-            this.mLogWriter = new StreamWriter(logPath);
-            this.mLogWriter.AutoFlush = true;
-            this.mIsRunning = true;
-            this.mFileLogThread = new Thread(new ThreadStart(WriteLog));
-            this.mFileLogThread.Start();
+            //this.mLogWriter = new StreamWriter(logPath);
+            //this.mLogWriter.AutoFlush = true;
+            //this.mIsRunning = true;
+            //this.mFileLogThread = new Thread(new ThreadStart(WriteLog));
+            //this.mFileLogThread.Start();
 
-            //Debug.Log(logPath);
+            ////Debug.Log(logPath);
         }
 
 		void WriteLog()

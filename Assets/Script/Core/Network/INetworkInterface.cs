@@ -6,10 +6,17 @@ public class INetworkInterface
 {
     //消息集合
     // public List<string> mesStr = new List<string>();
-    static public bool isConnect = false;
-    public MessageCallBack m_netWorkCallBack = null;
+    public bool isConnect = false;
 
-    public virtual void connect(string ipAdress, int port)
+    public ConnectStatusCallBack m_ConnectStatusCallback;
+    public MessageCallBack m_messageCallBack;
+
+    public virtual void GetIPAddress()
+    {
+
+    }
+
+    public virtual void Connect()
     {
     }
 
@@ -18,11 +25,12 @@ public class INetworkInterface
 
     }
 
-    public virtual void sendMessage(string str)
+    public virtual void SendMessage(string str)
     {
 
     }
-    public virtual void dealMessage(string s)
+
+    public virtual void DealMessage(string s)
     {
 
     }

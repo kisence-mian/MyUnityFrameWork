@@ -24,7 +24,7 @@ public abstract class IInputEventBase
 
     public IInputEventBase()
     {
-        m_t = Time.time;
+        m_t = DevelopReplayManager.CurrentTime;
     }
 
     protected virtual string GetEventKey()

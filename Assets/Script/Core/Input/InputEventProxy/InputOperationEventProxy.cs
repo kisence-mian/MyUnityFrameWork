@@ -42,7 +42,7 @@ public class InputOperationEventProxy : IInputProxyBase
 
     public static void Update()
     {
-        if(IsAvtive)
+        if(IsActive)
         {
             for (int i = 0; i < s_creates.Count; i++)
             {
