@@ -25,26 +25,26 @@ public class FirstStatus : IApplicationStatus
 
         Debug.Log("hello");
 
-        InputManager.LoadDispatcher(typeof(InputNetworkEvent).Name);
+        //InputManager.LoadDispatcher(typeof(InputNetworkEvent).Name);
 
-        //InputManager.LoadDispatcher<InputNetworkEvent>();
+        ////InputManager.LoadDispatcher<InputNetworkEvent>();
 
-        InputNetworkEvent e = new InputNetworkEvent();
+        //InputNetworkEvent e = new InputNetworkEvent();
 
-        InputManager.AddListener<InputNetworkEvent>(e.EventKey, CallBackTest);
+        //InputManager.AddListener<InputNetworkEvent>(e.EventKey, CallBackTest);
 
-        ////InputManager.re
+        //////InputManager.re
 
-        InputManager.Dispatch<InputNetworkEvent>(e);
+        //InputManager.Dispatch<InputNetworkEvent>(e);
 
         AnimSystem.Move(go, null, Vector3.one, callBack: (object[] obj) => { }
             , parameter: new object[] { });
     }
 
-    public void CallBackTest(InputNetworkEvent e)
-    {
-        Debug.Log(e.Serialize());
-    }
+    //public void CallBackTest(InputNetworkEvent e)
+    //{
+    //    Debug.Log(e.Serialize());
+    //}
 
     public void OnEventCallBack(CustomEvent e)
     {
