@@ -10,6 +10,16 @@ public class NetworkManager
 
     public static bool s_isConnect;
 
+    /// <summary>
+    /// 消息结尾符
+    /// </summary>
+    public const string c_endChar = "&";
+
+    /// <summary>
+    /// 文本中如果有结尾符则替换成这个
+    /// </summary>
+    public const string c_endCharReplaceString = "<FCP:AND>";
+
     public static void Init()
     {
         //提前加载网络事件派发器，避免异步冲突
@@ -42,16 +52,15 @@ public class NetworkManager
     public static void SendMessage(Dictionary<string,object> data)
     {
         string mes = Json.Serialize(data);
-        mes = mes.Replace("&", "<FCP:AND>");
+        mes = mes.Replace(c_endChar, c_endCharReplaceString);
 
-        Debug.Log("SendMessage: " + mes);
-
+        //Debug.Log("SendMessage: " + mes);
         s_network.SendMessage(mes);
     }
 
     static void ReceviceMeaasge(string message)
     {
-        Debug.Log("SendMessage: " + message);
+        //Debug.Log("SendMessage: " + message);
         s_messageList.Add(message);
     }
 
@@ -60,7 +69,7 @@ public class NetworkManager
         try
         {
             message = WWW.UnEscapeURL(message);
-            message = message.Replace("<FCP:AND>", "&");
+            message = message.Replace(c_endCharReplaceString, c_endChar);
             Dictionary<string, object> data = Json.Deserialize(message) as Dictionary<string, object>;
             InputNetworkEventProxy.DispatchMessageEvent(data["MT"].ToString(), message, data);
         }
@@ -118,14 +127,7 @@ public enum NetworkState
 {
     Connected,
     Connecting,
-    NoConnected,
+    ConnectBreak,
     FaildToConnect,
-}
-
-public enum NetworkEvent
-{
-    ReconnectNetworkEvent,//重新连接
-    ConnectSuccess,//网络连接成功
-    // ShowLoadingDialog,//网络连接已断开；
 }
 
