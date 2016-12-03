@@ -14,6 +14,11 @@ public static class ConfigManager
     public const string c_directoryName = "Config";
     public const string c_expandName    = "json";
 
+    /// <summary>
+    /// 配置缓存
+    /// </summary>
+    static Dictionary<string, Dictionary<string, SingleField>> s_configCatch = new Dictionary<string,Dictionary<string, SingleField>>();
+
     public static bool GetIsExistConfig(string ConfigName)
     {
         string dataJson = ResourceManager.ReadTextFile(ConfigName);
@@ -30,6 +35,11 @@ public static class ConfigManager
 
     public static Dictionary<string, SingleField> GetData(string ConfigName)
     {
+        if (s_configCatch.ContainsKey(ConfigName))
+        {
+            return s_configCatch[ConfigName];
+        }
+
         string dataJson = "";
 
         #if UNITY_EDITOR
@@ -43,17 +53,20 @@ public static class ConfigManager
 
         if (dataJson == "")
         {
-            #if !UNITY_EDITOR
-                throw new Exception("ConfigManager GetData not find " + ConfigName);
-            #else
-                return new Dictionary<string, SingleField>();
-            #endif
+            throw new Exception("ConfigManager GetData not find " + ConfigName);
         }
         else
         {
-            return JsonTool.Json2Dictionary<SingleField>(dataJson);
-            //return Json.Deserialize(dataJson) as Dictionary<string, object>;
+            Dictionary<string, SingleField> config = JsonTool.Json2Dictionary<SingleField>(dataJson);
+
+            s_configCatch.Add(ConfigName, config);
+            return config;
         }
+    }
+
+    public static void CleanCatch()
+    {
+        s_configCatch.Clear();
     }
 
 

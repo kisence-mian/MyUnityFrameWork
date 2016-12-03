@@ -65,6 +65,11 @@ public class RecordManager
         #endif
     }
 
+    public static void CleanCatch()
+    {
+        s_RecordCatch.Clear();
+    }
+
     #region 保存封装
 
     public static void SaveRecord(string RecordName, string key, string value)

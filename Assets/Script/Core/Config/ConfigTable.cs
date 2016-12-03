@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class ConfigTable :  Dictionary<string, SingleData> 
 {
@@ -13,6 +14,7 @@ public class SingleField
     public FieldType m_type;
 
     public string m_content;
+    public string m_enumType;
 
     #region 构造函数
 
@@ -22,10 +24,11 @@ public class SingleField
         m_content = "";
     }
 
-    public SingleField(FieldType type,string content)
+    public SingleField(FieldType type,string content,string enumType)
     {
         m_type = type;
         m_content = content;
+        m_enumType = enumType;
 
         if (content == null)
         {
@@ -101,6 +104,17 @@ public class SingleField
             case FieldType.Int:
                 m_content = (0).ToString();
                 break;
+            case FieldType.Enum:
+
+                if (m_enumType != "" && m_enumType != null)
+                {
+                    m_content = Enum.GetValues(GetEnumType()).GetValue(0).ToString();
+                }
+                else
+                {
+                    throw new Exception("EnumType is Null! ");
+                }
+                break;
         }
     }
 
@@ -124,6 +138,8 @@ public class SingleField
                 return  GetFloat().ToString();
             case FieldType.Int:
                 return  GetInt().ToString();
+            case FieldType.Enum:
+                return GetEnum().ToString();
         }
 
         return m_content;
@@ -164,6 +180,40 @@ public class SingleField
         return ParseTool.String2Color(m_content);
     }
 
+    public T GetEnum<T>() where T:struct
+    {
+        return (T)Enum.Parse(typeof(T), m_content);
+    }
+
+    public Enum GetEnum() 
+    {
+        if (m_content == null && m_content == "")
+        {
+            throw new Exception("GetEnum Fail Content is null !");
+        }
+
+        if (GetEnumType() == null)
+        {
+            throw new Exception("GetEnum Fail GetEnumType() is null !　->" + m_enumType + "<-");
+        }
+
+        try
+        {
+            return (Enum)Enum.Parse(GetEnumType(), m_content);
+        }
+        catch(Exception e)
+        {
+            throw new Exception("Enum Parse Fail! EnumType is ->" + m_enumType + "<-  GetEnumType() is ->" + GetEnumType() + "<- Content is ->" + m_content + "<-\n" + e.ToString());
+        }
+
+
+    }
+
+    public Type GetEnumType()
+    {
+        return Type.GetType(m_enumType);
+    }
+
     #endregion
 }
 
@@ -176,4 +226,5 @@ public enum FieldType
     Vector2,
     Vector3,
     Color,
+    Enum,
 }

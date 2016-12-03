@@ -13,15 +13,26 @@ public class DataTable : Dictionary<string, SingleData>
     const string c_noteTableTitle         = "note";
     const string c_fieldTypeTableTitle    = "type";
 
+    const char c_EnumSplit = '|';
+
     /// <summary>
     /// 默认值
     /// </summary>
     public Dictionary<string, string> m_defaultValue = new Dictionary<string,string>();
 
     /// <summary>
+    /// 注释
+    /// </summary>
+    public Dictionary<string, string> m_noteValue = new Dictionary<string, string>();
+
+    /// <summary>
     /// 储存每个字段是什么类型
     /// </summary>
     public Dictionary<string, FieldType> m_tableTypes = new Dictionary<string,FieldType>();
+    /// <summary>
+    /// 如果是枚举类型，这里储存二级类型
+    /// </summary>
+    public Dictionary<string, string> m_tableEnumTypes = new Dictionary<string, string>();
 
     /// <summary>
     /// 单条记录所拥有的字段名
@@ -62,10 +73,10 @@ public class DataTable : Dictionary<string, SingleData>
             {
                 LineData = ConvertStringArray(line[lineIndex]);
 
-                //注释忽略
+                //注释
                 if (LineData[0].Equals(c_noteTableTitle))
                 {
-                    //nothing
+                    AnalysisNoteValue(data, LineData);
                 }
                 //默认值
                 else if (LineData[0].Equals(c_defaultValueTableTitle))
@@ -118,6 +129,24 @@ public class DataTable : Dictionary<string, SingleData>
         }
     }
 
+    /// <summary>
+    /// 解析注释
+    /// </summary>
+    /// <param name="l_data"></param>
+    /// <param name="l_lineData"></param>
+    public static void AnalysisNoteValue(DataTable l_data, string[] l_lineData)
+    {
+        l_data.m_noteValue = new Dictionary<string, string>();
+
+        for (int i = 0; i < l_lineData.Length && i < l_data.TableKeys.Count; i++)
+        {
+            if (!l_lineData[i].Equals(""))
+            {
+                l_data.m_noteValue.Add(l_data.TableKeys[i], l_lineData[i]);
+            }
+        }
+    }
+
     public static void AnalysisDefaultValue(DataTable l_data,string[] l_lineData)
     {
         l_data.m_defaultValue = new Dictionary<string, string>();
@@ -139,7 +168,13 @@ public class DataTable : Dictionary<string, SingleData>
         {
             if (!l_lineData[i].Equals(""))
             {
-                l_data.m_tableTypes.Add(l_data.TableKeys[i], (FieldType)Enum.Parse(typeof(FieldType), l_lineData[i]));
+                string[] content = l_lineData[i].Split(c_EnumSplit);
+                l_data.m_tableTypes.Add(l_data.TableKeys[i], (FieldType)Enum.Parse(typeof(FieldType), content[0]));
+
+                if (content.Length >1)
+                {
+                    l_data.m_tableEnumTypes.Add(l_data.TableKeys[i], content[1]);
+                }
             }
         }
     }
@@ -172,11 +207,17 @@ public class DataTable : Dictionary<string, SingleData>
             {
                 string key = data.TableKeys[i];
                 string typeString = "";
-
+                
                 if (data.m_tableTypes.ContainsKey(key))
                 {
                     typeString = data.m_tableTypes[key].ToString();
+
+                    if (data.m_tableEnumTypes.ContainsKey(key))
+                    {
+                        typeString += c_EnumSplit + data.m_tableEnumTypes[key];
+                    }
                 }
+                //默认字符类型
                 else
                 {
                     typeString = FieldType.String.ToString();
@@ -194,6 +235,41 @@ public class DataTable : Dictionary<string, SingleData>
                 }
             }
         }
+
+        //note
+        List<string> noteValue = new List<string>(data.m_noteValue.Keys);
+        if (noteValue.Count > 0)
+        {
+            build.Append(c_noteTableTitle);
+            build.Append(c_split);
+            for (int i = 1; i < data.TableKeys.Count; i++)
+            {
+                string key = data.TableKeys[i];
+                string defauleNoteTmp = "";
+
+                if (data.m_noteValue.ContainsKey(key))
+                {
+                    defauleNoteTmp = data.m_noteValue[key];
+                }
+                else
+                {
+                    defauleNoteTmp = "";
+                }
+
+                build.Append(defauleNoteTmp);
+
+                if (i != data.TableKeys.Count - 1)
+                {
+                    build.Append(c_split);
+                }
+                else
+                {
+                    build.Append(c_newline);
+                }
+            }
+        }
+
+
 
         //defauleValue
         List<string> defaultValue = new List<string>(data.m_defaultValue.Keys);
@@ -310,7 +386,7 @@ public class DataTable : Dictionary<string, SingleData>
         }
     }
 
-    public void SetFieldType(string key,FieldType type )
+    public void SetFieldType(string key,FieldType type ,string enumType)
     {
         //主键只能是String类型
         if (key == TableKeys[0])
@@ -325,6 +401,31 @@ public class DataTable : Dictionary<string, SingleData>
         else
         {
             m_tableTypes.Add(key,type);
+        }
+
+        //存储二级类型
+        if (enumType != null)
+        {
+            if (m_tableEnumTypes.ContainsKey(key))
+            {
+                m_tableEnumTypes[key] = enumType;
+            }
+            else
+            {
+                m_tableEnumTypes.Add(key, enumType);
+            }
+        }
+    }
+
+    public string GetEnumType(string key)
+    {
+        if (m_tableEnumTypes.ContainsKey(key))
+        {
+            return m_tableEnumTypes[key];
+        }
+        else
+        {
+            return null;
         }
     }
 
@@ -349,6 +450,30 @@ public class DataTable : Dictionary<string, SingleData>
         else
         {
             m_defaultValue[key] = value;
+        }
+    }
+
+    public void SetNote(string key, string note)
+    {
+        if (!m_noteValue.ContainsKey(key))
+        {
+            m_noteValue.Add(key, note);
+        }
+        else
+        {
+            m_noteValue[key] = note;
+        }
+    }
+
+    public string GetNote(string key)
+    {
+        if (!m_noteValue.ContainsKey(key))
+        {
+            return null;
+        }
+        else
+        {
+            return m_noteValue[key];
         }
     }
 
@@ -508,6 +633,21 @@ public class SingleData : Dictionary<string, string>
         if (data.m_defaultValue.ContainsKey(key))
         {
             return ParseTool.String2Color(data.m_defaultValue[key]);
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+    }
+
+    public T GetEnum<T>(string key) where T:struct
+    {
+        if (this.ContainsKey(key))
+        {
+            return (T)Enum.Parse(typeof(T) ,this[key]);
+        }
+
+        if (data.m_defaultValue.ContainsKey(key))
+        {
+            return (T)Enum.Parse(typeof(T), data.m_defaultValue[key]); ;
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  

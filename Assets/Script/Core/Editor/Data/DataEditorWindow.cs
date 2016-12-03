@@ -69,6 +69,8 @@ public class DataEditorWindow : EditorWindow
 
         AddDataGUI();
 
+        CleanCatchGUI();
+
         EditorGUILayout.EndVertical();
     }
 
@@ -165,6 +167,14 @@ public class DataEditorWindow : EditorWindow
         }
     }
 
+    void CleanCatchGUI()
+    {
+        if (GUILayout.Button("清除缓存"))
+        {
+            DataManager.CleanCatch();
+        }
+    }
+
     #endregion
 
     #region 记录相关
@@ -228,7 +238,7 @@ public class DataEditorWindow : EditorWindow
             AddDataPos = EditorGUILayout.BeginScrollView(AddDataPos, GUILayout.ExpandHeight(false));
 
             EditorGUILayout.LabelField("<主键>字段名", key);
-            mianKey = EditorUtilGUI.FieldGUI_TypeValue(FieldType.String, mianKey);
+            mianKey = EditorUtilGUI.FieldGUI_TypeValue(FieldType.String, mianKey,null);
 
             if (mianKey == "")
             {
@@ -294,90 +304,127 @@ public class DataEditorWindow : EditorWindow
 
             List<string> keys = table.TableKeys;
 
+            //这里只显示主键
             for (int i = 0; i < keys.Count; i++)
             {
                 string keyTmp = keys[i];
-
+               
                 if (i == 0)
                 {
+                    EditorGUILayout.LabelField("["+ keyTmp+"]");
+
+                    EditorGUI.indentLevel++;
+                    //EditorGUI.indentLevel++;
+
                     EditorGUILayout.LabelField("<主键>字段名", keyTmp);
                     EditorGUILayout.LabelField("字段值", data[keyTmp]);
+
+                    EditorGUI.indentLevel--;
+                    //EditorGUI.indentLevel--;
                 }
             }
+            //显示其他键
             EditorDataGUI(table, data);
         }
     }
 
     SingleData EditorDataGUI(DataTable table, SingleData data)
     {
-        List<string> keys = table.TableKeys;
-        for (int i = 0; i < keys.Count; i++)
+        try
         {
-            string keyTmp = keys[i];
-            FieldType type = table.GetFieldType(keyTmp);
-
-            if (i != 0)
+            List<string> keys = table.TableKeys;
+            for (int i = 0; i < keys.Count; i++)
             {
-                if (data.ContainsKey(keyTmp))
-                {
-                    EditorGUILayout.BeginHorizontal();
+                string keyTmp = keys[i];
+                FieldType type = table.GetFieldType(keyTmp);
 
-                    EditorGUILayout.LabelField("字段名", keyTmp);
-
-                    if (GUILayout.Button("使用默认值"))
-                    {
-                        data.Remove(keyTmp);
-                        EditorGUILayout.EndHorizontal();
-
-                        continue;
-                    }
-
-                    EditorGUILayout.EndHorizontal();
-
-                    string newContent = EditorUtilGUI.FieldGUI_TypeValue(type, data[keyTmp]);
-
-                    if (newContent != data[keyTmp])
-                    {
-                        data[keyTmp] = newContent;
-                    }
-                }
-                else
+                if (i != 0)
                 {
                     bool cancelDefault = false;
-
                     EditorGUILayout.BeginHorizontal();
-
-                    EditorGUILayout.LabelField("字段名", keyTmp);
-
-                    if (GUILayout.Button("取消默认值"))
+                    
+                    if (data.ContainsKey(keyTmp))
                     {
-                        cancelDefault = true;
-                    }
+                        EditorGUILayout.LabelField("[" + keyTmp + "]");
 
-                    EditorGUILayout.EndHorizontal();
+                        if (GUILayout.Button("使用默认值"))
+                        {
+                            data.Remove(keyTmp);
+                            EditorGUILayout.EndHorizontal();
 
-                    string newContent = "";
-
-                    if (table.m_defaultValue.ContainsKey(keyTmp))
-                    {
-                        newContent = new SingleField(type, table.GetDefault(keyTmp)).m_content;
+                            continue;
+                        }
                     }
                     else
                     {
-                        newContent = new SingleField(type, null).m_content;
+                        EditorGUILayout.LabelField("[" + keyTmp + "] (默认值)");
+                        if (GUILayout.Button("取消默认值"))
+                        {
+                            cancelDefault = true;
+                        }
                     }
 
-                    EditorGUILayout.LabelField("字段类型", type.ToString());
-                    EditorGUILayout.LabelField("(默认值)字段内容", new SingleField(type, newContent).GetShowString());
+                    EditorGUILayout.EndHorizontal();
 
-                    if (cancelDefault)
+                    //EditorGUI.indentLevel++;
+                    EditorGUI.indentLevel++;
+
+                    //非默认值情况
+                    if (data.ContainsKey(keyTmp))
                     {
-                        data.Add(keyTmp, newContent);
-                    }
-                }
-            }
+                        EditorGUILayout.LabelField("字段名", keyTmp);
+                        EditorGUILayout.LabelField("注释", table.GetNote(keyTmp));
 
-            EditorGUILayout.Space();
+                        string newContent = EditorUtilGUI.FieldGUI_TypeValue(type, data[keyTmp], table.GetEnumType(keyTmp));
+
+                        if (newContent != data[keyTmp])
+                        {
+                            data[keyTmp] = newContent;
+                        }
+                    }
+                    //如果是默认值则走这里
+                    else
+                    {
+                        EditorGUILayout.LabelField("字段名", keyTmp);
+                        EditorGUILayout.LabelField("注释", table.GetNote(keyTmp));
+                        string newContent = "";
+
+                        if (table.m_defaultValue.ContainsKey(keyTmp))
+                        {
+                            newContent = new SingleField(type, table.GetDefault(keyTmp), table.GetEnumType(keyTmp)).m_content;
+                        }
+                        else
+                        {
+                            newContent = new SingleField(type, null, table.GetEnumType(keyTmp)).m_content;
+                        }
+
+                        if (type != FieldType.Enum)
+                        {
+                            EditorGUILayout.LabelField("字段类型", type.ToString());
+                        }
+                        else
+                        {
+                            EditorGUILayout.LabelField("字段类型", type.ToString() + "/" + table.GetEnumType(keyTmp));
+                        }
+
+                        EditorGUILayout.LabelField("(默认)字段内容", new SingleField(type, newContent, table.GetEnumType(keyTmp)).GetShowString());
+
+                        if (cancelDefault)
+                        {
+                            data.Add(keyTmp, newContent);
+                        }
+                    }
+
+                    EditorGUI.indentLevel--;
+                    //EditorGUI.indentLevel--;
+                }
+
+                EditorGUILayout.Space();
+            }
+        }
+        catch(Exception e)
+        {
+            EditorGUILayout.TextArea(e.ToString(),EditorGUIStyleData.s_ErrorMessageLabel);
         }
 
         return data;
@@ -387,22 +434,25 @@ public class DataEditorWindow : EditorWindow
 
     #region 字段相关
 
-    bool isEditorFold = false;
-    FieldType newType;
-    Vector2 EditorPos = Vector2.zero;
+    bool m_isEditorFold = false;
+    FieldType m_editorNewType;
+    int m_editorNewEnumIndex = 0;
+    string m_editorNoteContent = "";
+    Vector2 m_EditorPos = Vector2.zero;
     void EditorDataGUI()
     {
-        isEditorFold = EditorGUILayout.Foldout(isEditorFold, "编辑数据");
+        m_isEditorFold = EditorGUILayout.Foldout(m_isEditorFold, "编辑数据");
         EditorGUI.indentLevel ++;
 
-        if (isEditorFold)
+        if (m_isEditorFold)
         {
             List<string> keys = m_currentData.TableKeys;
-            EditorPos = EditorGUILayout.BeginScrollView(EditorPos, GUILayout.ExpandHeight(false));
+            m_EditorPos = EditorGUILayout.BeginScrollView(m_EditorPos, GUILayout.ExpandHeight(false));
             for (int i = 0; i < keys.Count; i++)
             {
                 string key = keys[i];
                 FieldType type = m_currentData.GetFieldType(key);
+                int EnumTypeIndex = EditorTool.GetAllEnumTypeIndex(m_currentData.GetEnumType(key));
 
                 if (i == 0)
                 {
@@ -426,24 +476,53 @@ public class DataEditorWindow : EditorWindow
 
                     EditorGUILayout.EndHorizontal();
 
+                    bool isNewType = false;
 
-                    newType = (FieldType)EditorGUILayout.EnumPopup("字段类型", m_currentData.GetFieldType(keys[i]));
+                    m_editorNoteContent = EditorGUILayout.TextField("注释", m_currentData.GetNote(key));
+                    m_currentData.SetNote(key, m_editorNoteContent);
 
-                    if (type != newType)
+                    m_editorNewType = (FieldType)EditorGUILayout.EnumPopup("字段类型", type);
+
+                    if (m_editorNewType == FieldType.Enum)
+                    {
+                        m_editorNewEnumIndex = EditorGUILayout.Popup("枚举类型", EnumTypeIndex, EditorTool.GetAllEnumType());
+
+                        if (EnumTypeIndex != m_editorNewEnumIndex)
+                        {
+                            isNewType = true;
+                        }
+                    }
+
+                    if (type != m_editorNewType)
+                    {
+                        isNewType = true;
+                    }
+
+                    if (isNewType)
                     {
                         //弹出警告并重置数据
                         if (EditorUtility.DisplayDialog("警告", "改变字段类型会重置该字段的所有数据和默认值\n是否继续？", "是", "取消"))
                         {
-                             m_currentData.SetFieldType(key, newType);
-                             ResetDataField(m_currentData,key, newType);
+                            m_currentData.SetFieldType(key, m_editorNewType, EditorTool.GetAllEnumType()[m_editorNewEnumIndex]);
+                            ResetDataField(m_currentData, key, m_editorNewType, EditorTool.GetAllEnumType()[m_editorNewEnumIndex]);
 
-                             type = newType;
+                             type = m_editorNewType;
+                             EnumTypeIndex = m_editorNewEnumIndex;
                              content = new SingleData();
                         }
                     }
 
-                    string newContent = EditorUtilGUI.FieldGUI_Type(type, m_currentData.GetDefault(key),"默认值");
-                    m_currentData.SetDefault(key,newContent);
+                    string newContent;
+                    if (type == FieldType.Enum)
+                    {
+                        newContent = EditorUtilGUI.FieldGUI_Type(type, EditorTool.GetAllEnumType()[EnumTypeIndex], m_currentData.GetDefault(key), "默认值");
+                    }
+                    else
+                    {
+                        newContent = EditorUtilGUI.FieldGUI_Type(type, null, m_currentData.GetDefault(key), "默认值");
+                    }
+
+                    m_currentData.SetDefault(key, newContent);
                 }
 
                 EditorGUILayout.Space();
@@ -464,66 +543,108 @@ public class DataEditorWindow : EditorWindow
         table.TableKeys.Remove(fieldName);
     }
 
-    bool isAddFoldField = false;
-    string newFieldName = "";
-    FieldType newAddType = FieldType.String;
-    string newFieldDefaultValue = "";
+    bool m_isAddFoldField = false;
+    string m_newFieldName = "";
+    FieldType m_newAddType = FieldType.String;
+    string m_newFieldDefaultValue = "";
+    int m_newEnumTypeIndex = 0;
+    string m_addNoteContent = "";
     void AddFieldGUI()
     {
-        isAddFoldField = EditorGUILayout.Foldout(isAddFoldField, "新增字段");
+        EditorGUILayout.Space();
+        m_isAddFoldField = EditorGUILayout.Foldout(m_isAddFoldField, "新增字段");
         EditorGUI.indentLevel ++;
 
-        if (isAddFoldField)
+        if (m_isAddFoldField)
         {
-            newFieldName = EditorGUILayout.TextField("字段名", newFieldName);
-            FieldType typeTmp = (FieldType)EditorGUILayout.EnumPopup("字段类型", newAddType);
+            m_newFieldName = EditorGUILayout.TextField("字段名", m_newFieldName);
+            FieldType typeTmp = (FieldType)EditorGUILayout.EnumPopup("字段类型", m_newAddType);
 
-            if (typeTmp != newAddType)
+            bool isNewFieldType = false;
+
+            if (typeTmp != m_newAddType)
             {
-                newAddType = typeTmp;
-                newFieldDefaultValue = new SingleField(newAddType, null).m_content;
+                m_newAddType = typeTmp;
+                isNewFieldType = true;
             }
 
+            m_addNoteContent = EditorGUILayout.TextField("注释", m_addNoteContent);
+
+            if (typeTmp == FieldType.Enum) 
+            {
+                int newEnumTypeIndex = EditorGUILayout.Popup("枚举类型", m_newEnumTypeIndex, EditorTool.GetAllEnumType());
+
+                if (newEnumTypeIndex != m_newEnumTypeIndex)
+                {
+                    m_newEnumTypeIndex = newEnumTypeIndex;
+                    isNewFieldType = true;
+                }
+            }
+
+            //更改字段类型重设初始值
+            if (isNewFieldType)
+            {
+                if (typeTmp == FieldType.Enum)
+                {
+                    m_newFieldDefaultValue = new SingleField(m_newAddType, null, EditorTool.GetAllEnumType()[m_newEnumTypeIndex]).m_content;
+                }
+                else
+                {
+                    m_newFieldDefaultValue = new SingleField(m_newAddType, null, null).m_content;
+                }
+            }
+
+            //是否是一个合理的字段名
             bool isShowButton = true;
 
-            if (newFieldName == "")
+            if (m_newFieldName == "")
             {
                 isShowButton = false;
             }
 
-            if (m_currentData.TableKeys.Contains(newFieldName))
+            if (m_currentData.TableKeys.Contains(m_newFieldName))
             {
                 isShowButton = false;
                 EditorGUILayout.TextField("字段名不能重复！",EditorGUIStyleData.s_WarnMessageLabel);
             }
 
-            newFieldDefaultValue = EditorUtilGUI.FieldGUI_Type(newAddType, newFieldDefaultValue, "默认值");
+            m_newFieldDefaultValue = EditorUtilGUI.FieldGUI_Type(m_newAddType, EditorTool.GetAllEnumType()[m_newEnumTypeIndex], m_newFieldDefaultValue, "默认值");
 
             if (isShowButton)
             {
-                if (GUILayout.Button("新增字段"))
+                if (GUILayout.Button("新增字段")) 
                 {
-                    AddField(m_currentData, newFieldName, newAddType, newFieldDefaultValue);
-
-                    newFieldName = "";
-                    newFieldDefaultValue = "";
-                    newAddType = FieldType.String;
+                    if (m_newAddType == FieldType.Enum)
+                    {
+                        AddField(m_currentData, m_newFieldName, m_newAddType, m_newFieldDefaultValue, EditorTool.GetAllEnumType()[m_newEnumTypeIndex], m_addNoteContent);
+                    }
+                    else
+                    {
+                        AddField(m_currentData, m_newFieldName, m_newAddType, m_newFieldDefaultValue, null, m_addNoteContent);
+                    }
+                    
+                    m_newFieldName = "";
+                    m_newFieldDefaultValue = "";
+                    m_addNoteContent = "";
+                    m_newAddType = FieldType.String;
+                    m_newEnumTypeIndex = 0;
                 }
             }
 
         }
     }
 
-    void AddField(DataTable table, string fieldName,FieldType type ,string value)
+    void AddField(DataTable table, string fieldName,FieldType type ,string value,string enumType,string note)
     {
         table.TableKeys.Add(fieldName);
-        table.SetFieldType(fieldName, type);
+        table.SetFieldType(fieldName, type, enumType);
         table.SetDefault(fieldName, value);
+        table.SetNote(fieldName, note);
     }
 
-    void ResetDataField(DataTable data,string key,FieldType type)
+    void ResetDataField(DataTable data,string key,FieldType type,string enumType)
     {
-        string newContent = new SingleField(type,null).m_content;
+        string newContent = new SingleField(type, null, enumType).m_content;
 
         for (int i = 0; i < data.TableIDs.Count; i++)
         {
@@ -585,6 +706,8 @@ public class DataEditorWindow : EditorWindow
     }
 
     #endregion
+
+
 }
 
 

@@ -12,7 +12,7 @@ using System;
 public class DataManager 
 {
     public const string c_directoryName = "Data";
-    public const string c_expandName = "txt";
+    public const string c_expandName    = "txt";
 
     /// <summary>
     /// 数据缓存
@@ -57,7 +57,7 @@ public class DataManager
             dataJson = ResourceManager.ReadTextFile(DataName);
         #endif
 
-            if (dataJson == "")
+        if (dataJson == "")
         {
             throw new Exception("Dont Find " + DataName);
         }
@@ -66,6 +66,14 @@ public class DataManager
         s_dataCatch.Add(DataName, data);
 
         return data;
+    }
+
+    /// <summary>
+    /// 清除缓存
+    /// </summary>
+    public static void CleanCatch()
+    {
+        s_dataCatch.Clear();
     }
 
     //只在编辑器下能够使用

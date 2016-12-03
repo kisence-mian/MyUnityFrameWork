@@ -1,26 +1,34 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
+using System;
 
 public class EditorUtilGUI 
 {
-    public static string FieldGUI_TypeValue(FieldType type, string content)
+    public static string FieldGUI_TypeValue(FieldType type, string content,string enumType)
     {
-        SingleField data = new SingleField(type, content);
+        SingleField data = new SingleField(type, content, enumType);
 
         return EditorUtilGUI.FieldGUI_TypeValue(data);
     }
 
     public static string FieldGUI_TypeValue(SingleField data)
     {
-        EditorGUILayout.LabelField("字段类型：", data.m_type.ToString());
+        if (data.m_type != FieldType.Enum) 
+        {
+            EditorGUILayout.LabelField("字段类型", data.m_type.ToString());
+        }
+        else
+        {
+            EditorGUILayout.LabelField("字段类型", data.m_type.ToString() +"/"+ data.m_enumType);
+        }
+
         return EditorUtilGUI.FieldGUI_Type(data);
-    }
+    } 
 
-    public static string FieldGUI_Type(FieldType type, string content, string labelContent = "字段内容")
+    public static string FieldGUI_Type(FieldType type,string enumType,string content, string labelContent = "字段内容")
     {
-        SingleField data = new SingleField(type, content);
-
+        SingleField data = new SingleField(type, content, enumType);
         return EditorUtilGUI.FieldGUI_Type(data, labelContent);
     }
 
@@ -54,8 +62,14 @@ public class EditorUtilGUI
                 content = EditorGUILayout.Vector2Field(labelContent, data.GetVector2()).ToSaveString();
                 break;
 
-            case FieldType.Color:
+            case FieldType.Color: 
                 content = EditorGUILayout.ColorField(labelContent, data.GetColor()).ToSaveString();
+                break;
+            case FieldType.Enum:
+                if (data.m_enumType != "" && data.m_enumType != null)
+                {
+                    content = EditorGUILayout.EnumPopup(labelContent, data.GetEnum()).ToString();
+                }
                 break;
         }
 

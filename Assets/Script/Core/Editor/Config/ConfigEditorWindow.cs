@@ -44,6 +44,8 @@ public class ConfigEditorWindow : EditorWindow
 
         AddConfigGUI();
 
+        CleanCatchGUI();
+
 
         EditorGUILayout.EndVertical();
     }
@@ -153,6 +155,11 @@ public class ConfigEditorWindow : EditorWindow
         }
     }
 
+    public void CleanCatchGUI()
+    {
+        ConfigManager.CleanCatch();
+    }
+
     #endregion
 
     #region 字段修改与新增
@@ -161,6 +168,7 @@ public class ConfigEditorWindow : EditorWindow
     string fieldName = "";
     FieldType newType;
     SingleField content = new SingleField();
+    int m_newTypeIndex = 0;
     void AddFieldGUI(Dictionary<string, SingleField> dict)
     {
         EditorGUI.indentLevel = 1;
@@ -169,12 +177,32 @@ public class ConfigEditorWindow : EditorWindow
         {
             EditorGUI.indentLevel = 2;
 
+            bool isNewType = false;
+
             fieldName = EditorGUILayout.TextField("字段名",fieldName);
+
             newType = (FieldType)EditorGUILayout.EnumPopup("字段类型", content.m_type);
 
             if (content.m_type != newType)
             {
+                isNewType = true;
+            }
+
+            if (newType == FieldType.Enum)
+            {
+                int newIndex = EditorGUILayout.Popup("枚举类型", m_newTypeIndex, EditorTool.GetAllEnumType());
+
+                if (newIndex != m_newTypeIndex)
+                {
+                    m_newTypeIndex = newIndex;
+                    isNewType = true;
+                }
+            }
+
+            if (isNewType)
+            {
                 content.m_type = newType;
+                content.m_enumType = EditorTool.GetAllEnumType()[m_newTypeIndex];
                 content.Reset();
             }
 
@@ -192,6 +220,7 @@ public class ConfigEditorWindow : EditorWindow
                     fieldName = "";
                     content = new SingleField();
                     newType = content.m_type;
+                    m_newTypeIndex = 0;
                 }
 
                 EditorGUILayout.Space();
@@ -219,7 +248,14 @@ public class ConfigEditorWindow : EditorWindow
 
         EditorGUILayout.BeginHorizontal();
 
-        EditorGUILayout.LabelField("字段类型：" , data.m_type.ToString());
+        if (data.m_type != FieldType.Enum)
+        {
+            EditorGUILayout.LabelField("字段类型：", data.m_type.ToString());
+        }
+        else
+        {
+            EditorGUILayout.LabelField("字段类型：", data.m_type.ToString() +"/"+ data.m_enumType);
+        }
 
         if(GUILayout.Button("删除字段"))
         {
