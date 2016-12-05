@@ -51,7 +51,7 @@ public static class ExpandMethod
         float l_n_dirX = dir.x * Mathf.Cos(angle) + dir.z * Mathf.Sin(angle);
         float l_n_dirZ = -dir.x * Mathf.Sin(angle) + dir.z * Mathf.Cos(angle);
 
-        Vector3 l_dir = new Vector3(l_n_dirX, 0, l_n_dirZ);
+        Vector3 l_dir = new Vector3(l_n_dirX, dir.y, l_n_dirZ);
 
         return l_dir;
     }

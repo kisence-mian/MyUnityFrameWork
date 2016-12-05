@@ -19,42 +19,44 @@ public class LogOutPutThread
 		private Queue<LogInfo> mWritingLogQueue = null;
 		private Queue<LogInfo> mWaitingLogQueue = null;
 		private object mLogLock = null;
-        //private Thread mFileLogThread = null;
+        private Thread mFileLogThread = null;
 		private bool mIsRunning = false;
 		private StreamWriter mLogWriter = null;
 
         public void Init()
         {
-            return;
+        //#if !UNITY_EDITOR
 
-            //ApplicationManager.s_OnApplicationQuit += Close;
+            ApplicationManager.s_OnApplicationQuit += Close;
 
-            //this.mWritingLogQueue = new Queue<LogInfo>();
-            //this.mWaitingLogQueue = new Queue<LogInfo>();
-            
-            //this.mLogLock = new object();
-            //System.DateTime now = System.DateTime.Now;
-            //string logName = string.Format("Log{0}{1}{2}#{3}{4}{5}",
-            //    now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+            this.mWritingLogQueue = new Queue<LogInfo>();
+            this.mWaitingLogQueue = new Queue<LogInfo>();
 
-            //string logPath = PathTool.GetAbsolutePath(ResLoadType.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
+            this.mLogLock = new object();
+            System.DateTime now = System.DateTime.Now;
+            string logName = string.Format("Log{0}{1}{2}#{3}{4}{5}",
+                now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
-            //UpLoadLogic(logPath);
+            string logPath = PathTool.GetAbsolutePath(ResLoadType.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
 
-            //if (File.Exists(logPath))
-            //    File.Delete(logPath);
-            //string logDir = Path.GetDirectoryName(logPath);
+            UpLoadLogic(logPath);
 
-            //if (!Directory.Exists(logDir))
-            //    Directory.CreateDirectory(logDir);
+            if (File.Exists(logPath))
+                File.Delete(logPath);
+            string logDir = Path.GetDirectoryName(logPath);
 
-            //this.mLogWriter = new StreamWriter(logPath);
-            //this.mLogWriter.AutoFlush = true;
-            //this.mIsRunning = true;
-            //this.mFileLogThread = new Thread(new ThreadStart(WriteLog));
-            //this.mFileLogThread.Start();
+            if (!Directory.Exists(logDir))
+                Directory.CreateDirectory(logDir);
 
-            ////Debug.Log(logPath);
+            this.mLogWriter = new StreamWriter(logPath);
+            this.mLogWriter.AutoFlush = true;
+            this.mIsRunning = true;
+            this.mFileLogThread = new Thread(new ThreadStart(WriteLog));
+            this.mFileLogThread.Start();
+
+        //#endif
+
+            //Debug.Log(logPath);
         }
 
 		void WriteLog()

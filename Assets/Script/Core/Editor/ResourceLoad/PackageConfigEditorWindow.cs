@@ -443,6 +443,12 @@ public class BundleConfigEditorWindow : EditorWindow
     //显示到界面上
     private void ShowBundlesByFolder(PathPoint pathPoint, int n_level)
     {
+        if (pathPoint == null)
+        {
+            Debug.LogError("路径数据为空！");
+            return;
+        }
+
         if (pathPoint.s_nowPathPoint != null)
         {
             if (pathPoint.nextPathPoint != null)
@@ -949,6 +955,7 @@ public class BundleConfigEditorWindow : EditorWindow
                 || relativePath.EndsWith(".json")
                 || relativePath.EndsWith(".xml")
                 || relativePath.EndsWith(".csv")
+                || relativePath.EndsWith(".tga")
                 )
             {
                 relativePath = FileTool.RemoveExpandName(relativePath);

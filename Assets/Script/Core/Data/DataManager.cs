@@ -63,6 +63,8 @@ public class DataManager
         }
 
         data = DataTable.Analysis(dataJson);
+        data.m_tableName = DataName;
+
         s_dataCatch.Add(DataName, data);
 
         return data;

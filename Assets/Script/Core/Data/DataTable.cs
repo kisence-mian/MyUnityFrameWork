@@ -7,13 +7,15 @@ using System.Text;
 public class DataTable : Dictionary<string, SingleData>
 {
     const char c_split   = '\t';
-    const char c_newline = '\n';
+    const string c_newline = "\r\n";
 
     const string c_defaultValueTableTitle = "default";
     const string c_noteTableTitle         = "note";
     const string c_fieldTypeTableTitle    = "type";
 
     const char c_EnumSplit = '|';
+
+    public string m_tableName;
 
     /// <summary>
     /// 默认值
@@ -55,7 +57,7 @@ public class DataTable : Dictionary<string, SingleData>
         {
             int lineIndex = 0;
             DataTable data = new DataTable();
-            string[] line = stringData.Split(Environment.NewLine.ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+            string[] line = stringData.Split(c_newline.ToCharArray());
 
             //第一行作为Key
             data.TableKeys = new List<string>();
@@ -71,27 +73,30 @@ public class DataTable : Dictionary<string, SingleData>
             string[] LineData;
             for (lineIndex = 1; lineIndex < line.Length; lineIndex++)
             {
-                LineData = ConvertStringArray(line[lineIndex]);
+                if (line[lineIndex] != "" && line[lineIndex] != null)
+                {
+                    LineData = ConvertStringArray(line[lineIndex]);
 
-                //注释
-                if (LineData[0].Equals(c_noteTableTitle))
-                {
-                    AnalysisNoteValue(data, LineData);
-                }
-                //默认值
-                else if (LineData[0].Equals(c_defaultValueTableTitle))
-                {
-                    AnalysisDefaultValue(data, LineData);
-                }
-                //数据类型
-                else if (LineData[0].Equals(c_fieldTypeTableTitle))
-                {
-                    AnalysisFieldType(data, LineData);
-                }
-                //数据正文
-                else
-                {
-                    break;
+                    //注释
+                    if (LineData[0].Equals(c_noteTableTitle))
+                    {
+                        AnalysisNoteValue(data, LineData);
+                    }
+                    //默认值
+                    else if (LineData[0].Equals(c_defaultValueTableTitle))
+                    {
+                        AnalysisDefaultValue(data, LineData);
+                    }
+                    //数据类型
+                    else if (LineData[0].Equals(c_fieldTypeTableTitle))
+                    {
+                        AnalysisFieldType(data, LineData);
+                    }
+                    //数据正文
+                    else
+                    {
+                        break;
+                    }
                 }
             }    
 
@@ -102,23 +107,23 @@ public class DataTable : Dictionary<string, SingleData>
             {
                 SingleData dataTmp = new SingleData();
                 dataTmp.data = data;
-                string[] row = ConvertStringArray(line[i]);
 
-                for (int j = 0; j < data.TableKeys.Count; j++)
+                if (line[i] != "" && line[i] != null)
                 {
-                    if (!row[j].Equals(""))
-                    {
+                    string[] row = ConvertStringArray(line[i]);
 
-                        //Debug.Log("j:" + j + "  " + data.TableKeys.Count + "  " + row.Length);
-                        dataTmp.Add(data.TableKeys[j], row[j]);
+                    for (int j = 0; j < data.TableKeys.Count; j++)
+                    {
+                        if (!row[j].Equals(""))
+                        {
+                            dataTmp.Add(data.TableKeys[j], row[j]);
+                        }
                     }
+
+                    //第一个数据作为这一个记录的Key
+                    data.AddData(dataTmp);
                 }
 
-                //第一个数据作为这一个记录的Key
-                //data.Add(row[0], dataTmp);
-                //data.TableIDs.Add(row[0]);
-
-                data.AddData(dataTmp);
             }
 
             return data;
@@ -329,7 +334,6 @@ public class DataTable : Dictionary<string, SingleData>
                 }
             }
         }
-
         return build.ToString();
     }
 
@@ -479,6 +483,8 @@ public class DataTable : Dictionary<string, SingleData>
 
     public void AddData(SingleData data)
     {
+        data.m_SingleDataName = data[TableKeys[0]];
+
         if(data.ContainsKey(TableKeys[0]))
         {
             Add(data[TableKeys[0]], data);
@@ -533,6 +539,7 @@ public class DataTable : Dictionary<string, SingleData>
 public class SingleData : Dictionary<string, string>
 {
     public DataTable data;
+    public string m_SingleDataName;
     public int GetInt(string key)
     {
         if (this.ContainsKey(key))
@@ -545,7 +552,7 @@ public class SingleData : Dictionary<string, string>
             return int.Parse(data.m_defaultValue[key]);
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-");// throw  
     }
 
     public float GetFloat(string key)
@@ -560,7 +567,7 @@ public class SingleData : Dictionary<string, string>
             return float.Parse(data.m_defaultValue[key]);
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
     }
 
     public bool GetBool(string key)
@@ -575,7 +582,7 @@ public class SingleData : Dictionary<string, string>
             return bool.Parse(data.m_defaultValue[key]);
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
     }
 
     public string GetString(string key)
@@ -590,7 +597,7 @@ public class SingleData : Dictionary<string, string>
             return data.m_defaultValue[key];
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-");// throw  
     }
 
     public Vector2 GetVector2(string key)
@@ -605,7 +612,7 @@ public class SingleData : Dictionary<string, string>
             return ParseTool.String2Vector2(data.m_defaultValue[key]);
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
     }
 
     public Vector3 GetVector3(string key)
@@ -620,7 +627,7 @@ public class SingleData : Dictionary<string, string>
             return ParseTool.String2Vector3(data.m_defaultValue[key]);
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
     }
 
     public Color GetColor(string key)
@@ -635,7 +642,7 @@ public class SingleData : Dictionary<string, string>
             return ParseTool.String2Color(data.m_defaultValue[key]);
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
     }
 
     public T GetEnum<T>(string key) where T:struct
@@ -650,7 +657,7 @@ public class SingleData : Dictionary<string, string>
             return (T)Enum.Parse(typeof(T), data.m_defaultValue[key]); ;
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by " + key); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
     }
 }
 

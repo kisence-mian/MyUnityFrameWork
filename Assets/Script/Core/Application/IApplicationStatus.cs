@@ -46,7 +46,7 @@ public abstract class IApplicationStatus
             }
             catch(Exception e)
             {
-                Debug.Log(e.ToString());
+                Debug.LogError(e.ToString());
             }
         }
 

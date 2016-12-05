@@ -92,7 +92,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     /// <param name="l_musicName">音乐名</param>
     /// <param name="l_isLoop">是否循环</param>
-    public static AudioSource PlayMusic2D(string l_musicName, bool l_isLoop)
+    public  AudioSource PlayMusic2D(string l_musicName, bool l_isLoop)
     {
         s_MusicIsPlaying = true;
 
@@ -100,7 +100,7 @@ public class AudioManager : MonoBehaviour
         audioTmp.clip = GetAudioClip(l_musicName);
         audioTmp.loop = l_isLoop;
         audioTmp.volume = s_MusicVolume;
-
+        audioTmp.Play();
         return audioTmp;
     }
 

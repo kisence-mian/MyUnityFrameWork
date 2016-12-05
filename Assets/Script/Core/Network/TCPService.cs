@@ -19,8 +19,8 @@ public class TCPService : INetworkInterface
 
     public override void GetIPAddress()
     {
-        m_IPaddress = "127.0.0.1";
-        m_port = 23333;
+        m_IPaddress = "192.168.0.110";
+        m_port = 23333; 
 
     }
 
@@ -64,7 +64,7 @@ public class TCPService : INetworkInterface
             //mSocket.
             m_Socket.Connect(ipe);
             isConnect = true;
-            startReceive();
+            StartReceive();
 
             m_ConnectStatusCallback(NetworkState.Connected);
         }
@@ -76,25 +76,22 @@ public class TCPService : INetworkInterface
         }
 
     }
-    void startReceive()
+    void StartReceive()
     {
         m_stringData = "";
-        m_Socket.BeginReceive(m_readData, 0, m_readData.Length, SocketFlags.None, new AsyncCallback(endReceive), m_Socket);
+        m_Socket.BeginReceive(m_readData, 0, m_readData.Length, SocketFlags.None, new AsyncCallback(EndReceive), m_Socket);
     }
-    void endReceive(IAsyncResult iar) //接收数据
+    void EndReceive(IAsyncResult iar) //接收数据
     {
         Socket remote = (Socket)iar.AsyncState;
         int recv = remote.EndReceive(iar);
         if (recv > 0)
         {
             m_stringData = Encoding.UTF8.GetString(m_readData, 0, recv);
-
-            if (m_messageCallBack != null)
-            {
-                DealMessage(m_stringData);
-            }
+            DealMessage(m_stringData);
         }
-        startReceive();
+
+        StartReceive();
     }
     //发送消息
     public override void SendMessage(String str)
@@ -110,15 +107,42 @@ public class TCPService : INetworkInterface
             //m_netWorkCallBack(e.ToString());
         }
     }
+
+    StringBuilder m_buffer = new StringBuilder();
     public override void DealMessage(string s)
     {
-        string[] str = s.Split('&');
+        bool isEnd = false;
+
+        if(s.Substring(s.Length-1,1) == NetworkManager.c_endChar.ToString())
+        { 
+            isEnd = true;
+        }
+
+        m_buffer.Append(s);
+
+        string buffer = m_buffer.ToString();
+
+        m_buffer.Remove(0,m_buffer.Length);
+
+        string[] str = buffer.Split(NetworkManager.c_endChar);
         for (int i = 0; i < str.Length; i++)
         {
-            if (str[i] != "")
+            if (i != str.Length - 1)
             {
                 m_messageCallBack(str[i]);
             }
+            else
+            {
+                if (isEnd)
+                {
+                    m_messageCallBack(str[i]);
+                }
+                else
+                {
+                    m_buffer.Append(str[i]);
+                }
+            }
         }
+        
     }
 }

@@ -22,7 +22,7 @@ public class InputNetworkMessageEvent : IInputEventBase
         get {
             if (m_data == null)
             {
-                Dictionary<string, object> data = Json.Deserialize(m_content) as Dictionary<string, object>;
+                m_data = Json.Deserialize(m_content) as Dictionary<string, object>;
             }
 
             return m_data;

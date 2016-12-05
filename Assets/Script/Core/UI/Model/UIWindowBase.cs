@@ -82,6 +82,8 @@ public class UIWindowBase : UIBase
         {
             GlobalEvent.RemoveEvent(m_EventNames[i], Refresh);
         }
+
+        m_EventNames.Clear();
     }
 
 

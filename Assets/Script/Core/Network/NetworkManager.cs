@@ -13,7 +13,7 @@ public class NetworkManager
     /// <summary>
     /// 消息结尾符
     /// </summary>
-    public const string c_endChar = "&";
+    public const char c_endChar = '&';
 
     /// <summary>
     /// 文本中如果有结尾符则替换成这个
@@ -52,7 +52,7 @@ public class NetworkManager
     public static void SendMessage(Dictionary<string,object> data)
     {
         string mes = Json.Serialize(data);
-        mes = mes.Replace(c_endChar, c_endCharReplaceString);
+        mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
 
         //Debug.Log("SendMessage: " + mes);
         s_network.SendMessage(mes);
@@ -68,14 +68,17 @@ public class NetworkManager
     {
         try
         {
-            message = WWW.UnEscapeURL(message);
-            message = message.Replace(c_endCharReplaceString, c_endChar);
-            Dictionary<string, object> data = Json.Deserialize(message) as Dictionary<string, object>;
-            InputNetworkEventProxy.DispatchMessageEvent(data["MT"].ToString(), message, data);
+            if (message != null && message != "")
+            {
+                message = WWW.UnEscapeURL(message);
+                message = message.Replace(c_endCharReplaceString, c_endChar.ToString());
+                Dictionary<string, object> data = Json.Deserialize(message) as Dictionary<string, object>;
+                InputNetworkEventProxy.DispatchMessageEvent(data["MT"].ToString(), message, data);
+            }
         }
         catch (Exception e)
         {
-            Debug.LogError("Message Error:" + e.ToString());
+            Debug.LogError("Message Error:->"+message +"<-\n"+ e.ToString());
         }
     }
 

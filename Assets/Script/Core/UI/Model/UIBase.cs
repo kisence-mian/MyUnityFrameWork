@@ -257,6 +257,7 @@ public class UIBase : MonoBehaviour
 
     protected void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
+
         InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(GetButton(buttonName), UIEventKey, buttonName, parm, callback);
         m_OnClickEvents.Add(info);
     }
