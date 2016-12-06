@@ -8,7 +8,13 @@ public class NetworkManager
 {
     static INetworkInterface s_network;
 
-    public static bool s_isConnect;
+    private static bool s_isConnect;
+
+    public static bool IsConnect
+    {
+        get { return NetworkManager.s_isConnect; }
+        set { NetworkManager.s_isConnect = value; }
+    }
 
     /// <summary>
     /// 消息结尾符
@@ -51,11 +57,14 @@ public class NetworkManager
 
     public static void SendMessage(Dictionary<string,object> data)
     {
-        string mes = Json.Serialize(data);
-        mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
+        if(IsConnect)
+        {
+            string mes = Json.Serialize(data);
+            mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
 
-        //Debug.Log("SendMessage: " + mes);
-        s_network.SendMessage(mes);
+            //Debug.Log("SendMessage: " + mes);
+            s_network.SendMessage(mes);
+        }
     }
 
     static void ReceviceMeaasge(string message)
@@ -89,6 +98,16 @@ public class NetworkManager
 
     static void Dispatch(NetworkState status)
     {
+        if (status == NetworkState.Connected)
+        {
+            s_isConnect = true;
+        }
+        else
+        {
+            s_isConnect = false;
+        }
+
+
         InputNetworkEventProxy.DispatchStatusEvent(status);
     }
 

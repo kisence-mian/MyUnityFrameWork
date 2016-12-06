@@ -29,13 +29,15 @@ public class Timer : MonoBehaviour
 
             if(m_timers[i].m_isDone)
             {
-                m_timers[i].CompleteTimer();
+                TimerEvent e = m_timers[i];
 
                 if (m_timers[i].m_repeatCount == 0)
                 {
                     m_timers.Remove(m_timers[i]);
                     i--;
                 }
+
+                e.CompleteTimer();
             }
         }
 	}
