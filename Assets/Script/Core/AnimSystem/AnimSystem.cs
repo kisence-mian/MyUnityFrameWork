@@ -41,7 +41,8 @@ public class AnimSystem : MonoBehaviour
     /// <param name="parameter">动画完成回调函数传参</param>
     /// <returns></returns>
     public static AnimData UguiColor(GameObject animObject, Color? from, Color to, 
-        float time = 0.5f, 
+        float time = 0.5f,
+        float delayTime = 0, 
         InterpType interp = InterpType.Default,
         bool isChild = true,
         bool IsIgnoreTimeScale = false,
@@ -66,6 +67,7 @@ public class AnimSystem : MonoBehaviour
           AnimParamType.FromColor, fromTmp,
           AnimParamType.ToColor, to,
           AnimParamType.Time, time,
+          AnimParamType.DelayTime, delayTime,
           AnimParamType.InteType, interp,
           AnimParamType.IsIncludeChild, isChild,
           AnimParamType.RepeatCount, repeatCount,
@@ -98,6 +100,7 @@ public class AnimSystem : MonoBehaviour
     /// <returns></returns>
     public static AnimData UguiAlpha(GameObject animObject, float? from, float to,
         float time = 0.5f,
+        float delayTime = 0, 
         InterpType interp = InterpType.Default, 
         bool isChild = true,
         bool IsIgnoreTimeScale = false,
@@ -122,6 +125,7 @@ public class AnimSystem : MonoBehaviour
            AnimParamType.FromFloat, fromTmp,
            AnimParamType.ToFloat, to,
            AnimParamType.Time, time,
+           AnimParamType.DelayTime, delayTime,
            AnimParamType.IsIgnoreTimeScale, IsIgnoreTimeScale,
            AnimParamType.RepeatCount, repeatCount,
            AnimParamType.InteType, interp,
@@ -139,7 +143,8 @@ public class AnimSystem : MonoBehaviour
     #region UGUI Move
 
     public static AnimData UguiMove(GameObject animObject, Vector3? from, Vector3 to,
-        float time = 0.5f, 
+        float time = 0.5f,
+        float delayTime = 0, 
         InterpType interp = InterpType.Default,
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
@@ -156,6 +161,7 @@ public class AnimSystem : MonoBehaviour
           AnimParamType.FromV3, fromTmp,
           AnimParamType.ToV3, to,
           AnimParamType.Time, time,
+          AnimParamType.DelayTime, delayTime,
           AnimParamType.InteType, interp,
           AnimParamType.IsIgnoreTimeScale, IsIgnoreTimeScale,
           AnimParamType.RepeatCount, repeatCount,
@@ -172,6 +178,7 @@ public class AnimSystem : MonoBehaviour
     public static AnimData UguiSizeDelta(GameObject animObject, Vector2? from, Vector2 to,
 
         float time = 0.5f,
+        float delayTime = 0, 
         InterpType interp = InterpType.Default,
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
@@ -187,6 +194,7 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.FromV2, fromTmp,
             AnimParamType.ToV2, to,
             AnimParamType.Time, time,
+            AnimParamType.DelayTime, delayTime,
             AnimParamType.InteType, interp,
             AnimParamType.IsIgnoreTimeScale, IsIgnoreTimeScale,
             AnimParamType.RepeatCount, repeatCount,
@@ -205,6 +213,7 @@ public class AnimSystem : MonoBehaviour
     public static AnimData ColorTo(GameObject animObject, Color from, Color to,
 
         float time             = 0.5f,
+        float delayTime = 0, 
         InterpType interp      = InterpType.Default,
         bool isChild           = true,
         bool IsIgnoreTimeScale = false,
@@ -219,6 +228,7 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.FromColor, from,
             AnimParamType.ToColor, to,
             AnimParamType.Time, time,
+            AnimParamType.DelayTime, delayTime,
             AnimParamType.InteType, interp,
             AnimParamType.IsIncludeChild, isChild,
             AnimParamType.RepeatType, repeatType,
@@ -234,6 +244,7 @@ public class AnimSystem : MonoBehaviour
     public static AnimData AlphaTo(GameObject animObject, float from, float to, 
 
       float time = 0.5f,
+      float delayTime = 0, 
       InterpType interp = InterpType.Default,
       bool IsIgnoreTimeScale = false,
       RepeatType repeatType = RepeatType.Once,
@@ -248,6 +259,7 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.FromFloat, from,
             AnimParamType.ToFloat, to,
             AnimParamType.Time, time,
+            AnimParamType.DelayTime, delayTime,
             AnimParamType.InteType, interp,
             AnimParamType.IsIncludeChild, isChild,
             AnimParamType.RepeatType, repeatType,
@@ -279,7 +291,7 @@ public class AnimSystem : MonoBehaviour
     /// <param name="parameter">动画完成回调函数传参</param>
     /// <returns></returns>
     public static AnimData Move(GameObject animObject, Vector3? from, Vector3 to,
-
+        float delayTime = 0, 
         float time = 0.5f,
         bool isLocal = true,
         InterpType interp = InterpType.Default,
@@ -309,6 +321,7 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.FromV3, fromTmp,
             AnimParamType.ToV3, to,
             AnimParamType.Time, time,
+            AnimParamType.DelayTime, delayTime,
             AnimParamType.InteType, interp,
             AnimParamType.IsLocal, isLocal,
             AnimParamType.RepeatType, repeatType,
@@ -328,6 +341,7 @@ public class AnimSystem : MonoBehaviour
     public static void Rotate(GameObject animObject, Vector3? from, Vector3 to, 
 
         float time = 0.5f,
+        float delayTime = 0, 
         bool isLocal = true,
         InterpType interp = InterpType.Default,
         bool IsIgnoreTimeScale = false,
@@ -356,6 +370,7 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.FromV3, fromTmp,
             AnimParamType.ToV3, to,
             AnimParamType.Time, time,
+            AnimParamType.DelayTime, delayTime,
             AnimParamType.InteType, interp,
             AnimParamType.IsLocal, isLocal,
             AnimParamType.RepeatType, repeatType,
@@ -378,7 +393,8 @@ public class AnimSystem : MonoBehaviour
         InterpType interp = InterpType.Default,
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
-        int repeatCount = -1, 
+        int repeatCount = -1,
+        float delayTime = 0, 
         AnimCallBack callBack = null, object[] parameter = null)
     {
 
@@ -390,6 +406,7 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.FromV3, fromTmp,
             AnimParamType.ToV3, to,
             AnimParamType.Time, time,
+            AnimParamType.DelayTime, delayTime,
             AnimParamType.InteType, interp,
             AnimParamType.RepeatType, repeatType,
             AnimParamType.IsIgnoreTimeScale, IsIgnoreTimeScale,
@@ -405,7 +422,8 @@ public class AnimSystem : MonoBehaviour
     #region CustomMethod
 
     public static AnimData CustomMethodToFloat(AnimCustomMethodFloat method, float from, float to,
-        float time = 0.5f, 
+        float time = 0.5f,
+        float delayTime = 0, 
         InterpType interp = InterpType.Default,
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
@@ -417,6 +435,7 @@ public class AnimSystem : MonoBehaviour
            AnimParamType.FromFloat, from,
            AnimParamType.ToFloat, to,
            AnimParamType.Time, time,
+           AnimParamType.DelayTime, delayTime,
            AnimParamType.InteType, interp,
            AnimParamType.RepeatType, repeatType,
            AnimParamType.CustomMethodFloat , method,
@@ -431,6 +450,7 @@ public class AnimSystem : MonoBehaviour
 
     public static AnimData CustomMethodToVector2(AnimCustomMethodVector2 method, Vector2 from, Vector2 to, 
         float time = 0.5f,
+        float delayTime = 0, 
         InterpType interp = InterpType.Default,
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
@@ -442,6 +462,7 @@ public class AnimSystem : MonoBehaviour
            AnimParamType.FromV2, from,
            AnimParamType.ToV2, to,
            AnimParamType.Time, time,
+           AnimParamType.DelayTime, delayTime,
            AnimParamType.InteType, interp,
            AnimParamType.RepeatType , repeatType,
            AnimParamType.CustomMethodV2, method,
@@ -456,6 +477,7 @@ public class AnimSystem : MonoBehaviour
 
     public static AnimData CustomMethodToVector3(AnimCustomMethodVector3 method, Vector3 from, Vector3 to,
         float time =0.5f,
+        float delayTime = 0, 
         InterpType interp = InterpType.Default,
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
@@ -467,6 +489,7 @@ public class AnimSystem : MonoBehaviour
            AnimParamType.FromV3, from,
            AnimParamType.ToV3, to,
            AnimParamType.Time, time,
+           AnimParamType.DelayTime, delayTime,
            AnimParamType.InteType, interp,
            AnimParamType.RepeatType, repeatType,
            AnimParamType.CustomMethodV3, method,
@@ -626,6 +649,7 @@ public class AnimSystem : MonoBehaviour
     public static AnimData Blink(GameObject animObject, float space,
 
         float time =0.5f,
+        float delayTime = 0, 
         bool IsIgnoreTimeScale = false,
         RepeatType repeatType = RepeatType.Once,
         int repeatCount = -1, 
@@ -637,6 +661,7 @@ public class AnimSystem : MonoBehaviour
             AnimParamType.AnimType, AnimType.Blink,
             AnimParamType.Space , space,
             AnimParamType.Time, time,
+            AnimParamType.DelayTime, delayTime,
             AnimParamType.RepeatType, repeatType,
             AnimParamType.IsIgnoreTimeScale, IsIgnoreTimeScale,
             AnimParamType.RepeatCount, repeatCount,
@@ -688,6 +713,7 @@ public class AnimSystem : MonoBehaviour
                     case AnimParamType.InteType: DataTmp.m_interpolationType = (InterpType)hash.Value; break;
                     case AnimParamType.RepeatType: DataTmp.m_repeatType = (RepeatType)hash.Value; break;
                     case AnimParamType.RepeatCount: DataTmp.m_repeatCount = (int)hash.Value; break;
+                    case AnimParamType.DelayTime: DataTmp.m_delayTime = (float)hash.Value; break;
 
                     //From
                     case AnimParamType.FromV3: DataTmp.m_fromV3 = (Vector3)hash.Value; break;
@@ -900,6 +926,8 @@ public enum AnimParamType
     ToV2,
     ToFloat,
     ToColor,
+
+    DelayTime,
 
     AnimType,
     Time,

@@ -18,6 +18,7 @@ public class AnimData
     public bool m_ignoreTimeScale = false;
 
     //进度控制变量
+    public float m_delayTime   = 0;
     public bool  m_isDone      = false;
     public float m_currentTime = 0;
     public float m_totalTime   = 0;
@@ -71,13 +72,27 @@ public class AnimData
 
     public void executeUpdate()
     {
-        if (m_ignoreTimeScale)
+        if (m_delayTime <= 0)
         {
-            m_currentTime += Time.unscaledDeltaTime;
+            if (m_ignoreTimeScale)
+            {
+                m_currentTime += Time.unscaledDeltaTime;
+            }
+            else
+            {
+                m_currentTime += Time.deltaTime;
+            }
         }
         else
         {
-            m_currentTime += Time.deltaTime;
+            if (m_ignoreTimeScale)
+            {
+                m_delayTime -= Time.unscaledDeltaTime;
+            }
+            else
+            {
+                m_delayTime -= Time.deltaTime;
+            }
         }
 
         if (m_currentTime > m_totalTime)

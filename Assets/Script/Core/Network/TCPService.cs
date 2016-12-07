@@ -19,7 +19,7 @@ public class TCPService : INetworkInterface
 
     public override void GetIPAddress()
     {
-        m_IPaddress = "192.168.0.110";
+        m_IPaddress = "192.168.0.100";
         m_port = 23333; 
 
     }
