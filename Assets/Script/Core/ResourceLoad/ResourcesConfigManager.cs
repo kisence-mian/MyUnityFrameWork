@@ -41,7 +41,7 @@ public static class ResourcesConfigManager
         }
         else
         {
-            throw new Exception("RecourcesConfigManager GetBundleConfig : Dont find " + bundleName + " please check BundleConfig!");
+            throw new Exception("RecourcesConfigManager GetBundleConfig : Dont find ->" + bundleName + "<- please check BundleConfig!");
         }
     }
 
