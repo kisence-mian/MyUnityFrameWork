@@ -100,7 +100,16 @@ public class AudioManager : MonoBehaviour
         audioTmp.clip = GetAudioClip(l_musicName);
         audioTmp.loop = l_isLoop;
         audioTmp.volume = s_MusicVolume;
-        audioTmp.Play();
+        if (l_isLoop)
+        {
+            audioTmp.Play();
+        }
+        else
+        {
+            audioTmp.PlayOneShot(audioTmp.clip);
+        }
+            
+        
         return audioTmp;
     }
 
@@ -108,14 +117,36 @@ public class AudioManager : MonoBehaviour
     /// 播放一个2D音效
     /// </summary>
     /// <param name="l_soundName">音效名</param>
-    public static AudioSource PlaySound2D(string l_soundName)
+    public  AudioSource PlaySound2D(string l_soundName)
     {
         AudioSource audioTmp = GetAudioSource2D(SoundType.Sound);
         audioTmp.clip = GetAudioClip(l_soundName);
         audioTmp.loop = false;
         audioTmp.volume = s_SoundVolume;
-
+        audioTmp.PlayOneShot(audioTmp.clip);
         return audioTmp;
+    }
+
+    /// <summary>
+    /// 延时播放一个2D音效
+    /// </summary>
+    /// <param name="l_soundName">音效名</param>
+    public void PlaySound2D(string l_soundName,float l_delay )
+    {
+        if (l_delay == 0)
+        {
+            PlaySound2D(l_soundName);
+        }
+        else
+        {
+            StartCoroutine(DelayPlay(l_soundName, l_delay));
+        }
+    }
+
+    IEnumerator DelayPlay(string l_soundName, float l_delay)
+    {
+        yield return new WaitForSeconds(l_delay);
+        PlaySound2D(l_soundName);
     }
 
     /// <summary>
@@ -129,7 +160,6 @@ public class AudioManager : MonoBehaviour
         audioTmp.clip = GetAudioClip(l_soundName);
         audioTmp.loop = false;
         audioTmp.volume = s_SoundVolume;
-
         return audioTmp;
     }
 

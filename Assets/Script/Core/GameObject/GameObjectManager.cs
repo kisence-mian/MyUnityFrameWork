@@ -77,14 +77,15 @@ public class GameObjectManager :MonoBehaviour
     /// <param name="l_name">对象名</param>
     /// <param name="l_parent">要创建到的父节点</param>
     /// <returns>返回这个对象</returns>
-    public static GameObject CreatGameObjectByPool(string l_name,GameObject l_parent = null)
+    public static GameObject CreatGameObjectByPool(string l_name,GameObject l_parent = null,bool isSetActive = true)
     {
         if (IsExist(l_name))
         {
             GameObject go = s_objectPool[l_name][0];
             s_objectPool[l_name].RemoveAt(0);
 
-            go.SetActive(true);
+            if(isSetActive)
+                go.SetActive(true);
 
             if (l_parent == null)
             {
@@ -103,14 +104,15 @@ public class GameObjectManager :MonoBehaviour
         }
     }
 
-    public static GameObject CreatGameObjectByPool(GameObject l_prefab, GameObject l_parent = null)
+    public static GameObject CreatGameObjectByPool(GameObject l_prefab, GameObject l_parent = null, bool isSetActive = true)
     {
         if (IsExist(l_prefab.name))
         {
             GameObject go = s_objectPool[l_prefab.name][0];
             s_objectPool[l_prefab.name].RemoveAt(0);
 
-            go.SetActive(true);
+            if (isSetActive)
+                go.SetActive(true);
 
             if (l_parent == null)
             {
@@ -129,11 +131,13 @@ public class GameObjectManager :MonoBehaviour
         }
     }
 
+    static Vector3 s_outOfRange = new Vector3(9000, 0, 0);
+
     /// <summary>
     /// 将一个对象放入对象池
     /// </summary>
     /// <param name="obj">目标对象</param>
-    public static void DestroyGameobjectByPool(GameObject obj)
+    public static void DestroyGameobjectByPool(GameObject obj, bool isSetActive = true)
     {
         string key = obj.name.Replace("(Clone)", "");
 
@@ -144,7 +148,13 @@ public class GameObjectManager :MonoBehaviour
 
         s_objectPool[key].Add(obj);
 
-        obj.SetActive(false);
+        if(isSetActive)
+            obj.SetActive(false);
+        else
+        {
+            obj.transform.position = s_outOfRange;
+        }
+
         obj.name = key;
         obj.transform.SetParent(s_PoolParent);
     }

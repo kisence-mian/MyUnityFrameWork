@@ -16,7 +16,7 @@ public class InputNetworkEventProxy : IInputProxyBase
         }
     }
 
-    public static void DispatchMessageEvent(string massageType, string message, Dictionary<string, object> data)
+    public static void DispatchMessageEvent(string massageType, Dictionary<string, object> data)
     {
         //只有允许输入时才派发事件
         if (IsActive)
@@ -24,7 +24,6 @@ public class InputNetworkEventProxy : IInputProxyBase
             InputNetworkMessageEvent e = new InputNetworkMessageEvent();
 
             e.m_MessgaeType = massageType;
-            e.m_content     = message;
             e.Data = data;
 
             InputManager.Dispatch<InputNetworkMessageEvent>(e);

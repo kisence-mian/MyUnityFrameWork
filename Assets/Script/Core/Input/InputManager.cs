@@ -31,7 +31,9 @@ public class InputManager
 
         if (s_dispatcher.ContainsKey(DispatcherName))
         {
-            throw new Exception(DispatcherName + " Dispatcher has exist!");
+            //throw new Exception(DispatcherName + " Dispatcher has exist!");
+
+            return (InputDispatcher<T>)s_dispatcher[DispatcherName];
         }
 
         InputDispatcher<T> Dispatcher = new InputDispatcher<T>();

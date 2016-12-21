@@ -174,11 +174,19 @@ public class DataTable : Dictionary<string, SingleData>
             if (!l_lineData[i].Equals(""))
             {
                 string[] content = l_lineData[i].Split(c_EnumSplit);
-                l_data.m_tableTypes.Add(l_data.TableKeys[i], (FieldType)Enum.Parse(typeof(FieldType), content[0]));
 
-                if (content.Length >1)
+                try
                 {
-                    l_data.m_tableEnumTypes.Add(l_data.TableKeys[i], content[1]);
+                    l_data.m_tableTypes.Add(l_data.TableKeys[i], (FieldType)Enum.Parse(typeof(FieldType), content[0]));
+
+                    if (content.Length > 1)
+                    {
+                        l_data.m_tableEnumTypes.Add(l_data.TableKeys[i], content[1]);
+                    }
+                }
+                catch(Exception e)
+                {
+                    throw new Exception("AnalysisFieldType Exception: " + content + "\n" + e.ToString());
                 }
             }
         }

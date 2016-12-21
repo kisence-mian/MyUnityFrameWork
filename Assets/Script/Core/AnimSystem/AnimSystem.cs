@@ -826,6 +826,7 @@ public class AnimSystem : MonoBehaviour
     {
         for (int i = 0; i < animList.Count; i++)
         {
+            //Debug.Log(animList.Count+">>>"+i);
             //执行Update
             animList[i].executeUpdate();
 

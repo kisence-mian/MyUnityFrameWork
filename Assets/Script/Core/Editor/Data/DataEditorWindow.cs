@@ -6,6 +6,7 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 public class DataEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
@@ -68,6 +69,8 @@ public class DataEditorWindow : EditorWindow
         DataGUI();
 
         AddDataGUI();
+
+        GenerateAllDataClassGUI();
 
         CleanCatchGUI();
 
@@ -210,6 +213,8 @@ public class DataEditorWindow : EditorWindow
 
             EditorGUI.indentLevel = 1;
             EditorDataGUI();
+
+            GenerateDataClassGUI();
 
             SaveDataGUI();
 
@@ -669,6 +674,23 @@ public class DataEditorWindow : EditorWindow
         }
     }
 
+    void GenerateDataClassGUI()
+    {
+        if (GUILayout.Button("生成Data类"))
+        {
+            CreatDataCSharpFile(m_currentDataName, m_currentData);
+            AssetDatabase.Refresh();
+        }
+    }
+
+    void  GenerateAllDataClassGUI()
+    {
+        if (GUILayout.Button("生成全部Data类"))
+        {
+            CreatAllClass();
+        }
+    }
+
     #endregion
 
     #endregion
@@ -707,7 +729,151 @@ public class DataEditorWindow : EditorWindow
 
     #endregion
 
+    #region 自动生成代码
 
+    void CreatAllClass()
+    {
+        for (int i = 0; i < m_dataNameList.Count; i++)
+        {
+            if (m_dataNameList[i] != null && m_dataNameList[i] !="None")
+            {
+                CreatDataCSharpFile(m_dataNameList[i],DataManager.GetData(m_dataNameList[i]));
+            }
+        }
+    }
+
+    void CreatDataCSharpFile(string dataName,DataTable data)
+    {
+        string className = dataName + "Generate";
+        string content = "";
+
+        content += "using UnityEngine;\n\n";
+
+        content += @"//" + className + "类\n";
+        content += @"//该类自动生成请勿修改，以避免不必要的损失";
+        content += "\n";
+
+        content += "public class " + className + " : DataGenerateBase \n";
+        content += "{\n";
+
+        //type
+        List<string> type = new List<string>(data.m_tableTypes.Keys);
+        if (type.Count > 0)
+        {
+            for (int i = 1; i < data.TableKeys.Count; i++)
+            {
+                string key = data.TableKeys[i];
+                string enumType = null;
+
+                if (data.m_tableEnumTypes.ContainsKey(key))
+                {
+                    enumType = data.m_tableEnumTypes[key];
+                }
+
+                string note = ";";
+
+                if (data.m_noteValue.ContainsKey(key))
+                {
+                    note = @"; //" + data.m_noteValue[key];
+                }
+
+                content +="\t";
+
+                if (data.m_tableTypes.ContainsKey(key))
+                {
+                    //访问类型 + 字段类型  + 字段名
+                    content += "public " + OutPutFieldName(data.m_tableTypes[key], enumType) + " m_" + key + note;
+                }
+                //默认字符类型
+                else
+                {
+                    //访问类型 + 字符串类型 + 字段名 
+                    content += "public " + "string" + " m_" + key + note;
+                }
+
+                content += "\n";
+            }
+        }
+
+        content += "\n";
+
+        content += "\tpublic override void LoadData(string key) \n";
+        content += "\t{\n";
+
+        content += "\t\t ";
+
+        content += "SingleData data = DataManager.GetData(\"" + dataName + "\")[key];\n\n";
+
+        if (type.Count > 0)
+        {
+            for (int i = 1; i < data.TableKeys.Count; i++)
+            {
+                string key = data.TableKeys[i];
+
+                content += "\t\t";
+
+                string enumType = null;
+
+                if (data.m_tableEnumTypes.ContainsKey(key))
+                {
+                    enumType = data.m_tableEnumTypes[key];
+                }
+
+                if (data.m_tableTypes.ContainsKey(key))
+                {
+                    content += " m_" + key + " = data." + OutPutFieldFunction(data.m_tableTypes[key], enumType) + "(\"" + key + "\")";
+                }
+                //默认字符类型
+                else
+                {
+                    content += " m_" + key + " = data." + OutPutFieldFunction(data.m_tableTypes[key], enumType) + "(\"" + key + "\")";
+                }
+
+                content += ";\n";
+            }
+        }
+
+        content += "\t}\n";
+        content += "}\n";
+
+        string SavePath = Application.dataPath + "/Script/DataClassGenerate/" + className + ".cs";
+
+        ResourceIOTool.WriteStringByFile(SavePath, content.ToString());
+    }
+
+    string OutPutFieldFunction(FieldType fileType,string enumType)
+    {
+        switch (fileType)
+        {
+            case FieldType.Bool: return "GetBool";
+            case FieldType.Color: return "GetColor";
+            case FieldType.Float: return "GetFloat";
+            case FieldType.Int: return "GetInt";
+            case FieldType.String: return "GetString";
+            case FieldType.Vector2: return "GetVector2";
+            case FieldType.Vector3: return "GetVector3";
+            case FieldType.Enum: return "GetEnum<" + enumType + ">";
+            default: return "";
+        }
+    }
+
+    string OutPutFieldName(FieldType fileType, string enumType)
+    {
+        switch (fileType)
+        {
+            case FieldType.Bool: return "bool";
+            case FieldType.Color: return "Color";
+            case FieldType.Float: return "float";
+            case FieldType.Int: return "int";
+            case FieldType.String: return "string";
+            case FieldType.Vector2: return "Vector2";
+            case FieldType.Vector3: return "Vector3";
+            case FieldType.Enum: return enumType;
+            default: return "";
+        }
+    }
+
+    #endregion
 }
 
 

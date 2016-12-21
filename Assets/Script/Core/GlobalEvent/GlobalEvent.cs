@@ -10,6 +10,8 @@ public class GlobalEvent {
     private static Dictionary<Enum, List<EventHandle>> mEventDic = new Dictionary<Enum, List<EventHandle>>();
     private static Dictionary<Enum, List<EventHandle>> mUseOnceEventDic = new Dictionary<Enum, List<EventHandle>>();
 
+    private static Dictionary<string, List<EventHandle>> m_stringEventDic = new Dictionary<string, List<EventHandle>>();
+    private static Dictionary<string, List<EventHandle>> m_stringOnceEventDic = new Dictionary<string, List<EventHandle>>();
     /// <summary>
     /// 添加事件及回调
     /// </summary>
@@ -53,6 +55,48 @@ public class GlobalEvent {
     }
 
     /// <summary>
+    /// 添加事件及回调
+    /// </summary>
+    /// <param name="type">事件枚举</param>
+    /// <param name="handle">回调</param>
+    /// <param name="isUseOnce"></param>
+    public static void AddEvent(string eventKey, EventHandle handle, bool isUseOnce = false)
+    {
+        if (isUseOnce)
+        {
+            if (m_stringOnceEventDic.ContainsKey(eventKey))
+            {
+                if (!m_stringOnceEventDic[eventKey].Contains(handle))
+                    m_stringOnceEventDic[eventKey].Add(handle);
+                else
+                    Debug.LogWarning("already existing EventType: " + eventKey + " handle: " + handle);
+            }
+            else
+            {
+                List<EventHandle> temp = new List<EventHandle>();
+                temp.Add(handle);
+                m_stringOnceEventDic.Add(eventKey, temp);
+            }
+        }
+        else
+        {
+            if (m_stringEventDic.ContainsKey(eventKey))
+            {
+                if (!m_stringEventDic[eventKey].Contains(handle))
+                    m_stringEventDic[eventKey].Add(handle);
+                else
+                    Debug.LogWarning("already existing EventType: " + eventKey + " handle: " + handle);
+            }
+            else
+            {
+                List<EventHandle> temp = new List<EventHandle>();
+                temp.Add(handle);
+                m_stringEventDic.Add(eventKey, temp);
+            }
+        }
+    }
+
+    /// <summary>
     /// 移除某类事件的一个回调
     /// </summary>
     /// <param name="type"></param>
@@ -85,6 +129,38 @@ public class GlobalEvent {
     }
 
     /// <summary>
+    /// 移除某类事件的一个回调
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="handle"></param>
+    public static void RemoveEvent(string eventKey, EventHandle handle)
+    {
+        if (m_stringEventDic.ContainsKey(eventKey))
+        {
+            if (m_stringEventDic[eventKey].Contains(handle))
+            {
+                m_stringEventDic[eventKey].Remove(handle);
+                //if (m_stringEventDic[eventKey].Count == 0)
+                //{
+                //    m_stringEventDic.Remove(eventKey);
+                //}
+            }
+        }
+
+        if (m_stringOnceEventDic.ContainsKey(eventKey))
+        {
+            if (m_stringOnceEventDic[eventKey].Contains(handle))
+            {
+                m_stringOnceEventDic[eventKey].Remove(handle);
+                //if (m_stringOnceEventDic[eventKey].Count == 0)
+                //{
+                //    m_stringOnceEventDic.Remove(eventKey);
+                //}
+            }
+        }
+    }
+
+    /// <summary>
     /// 移除某类事件
     /// </summary>
     /// <param name="type"></param>
@@ -104,13 +180,34 @@ public class GlobalEvent {
     }
 
     /// <summary>
+    /// 移除某类事件
+    /// </summary>
+    /// <param name="eventKey"></param>
+    public static void RemoveEvent(string eventKey)
+    {
+        if (m_stringEventDic.ContainsKey(eventKey))
+        {
+
+            m_stringEventDic.Remove(eventKey);
+        }
+
+        if (m_stringOnceEventDic.ContainsKey(eventKey))
+        {
+
+            m_stringOnceEventDic.Remove(eventKey);
+        }
+    }
+
+    /// <summary>
     /// 移除所有事件
     /// </summary>
     public static void RemoveAllEvent()
     {   
-            mUseOnceEventDic.Clear();
+        mUseOnceEventDic.Clear();
 
-            mEventDic.Clear();
+        mEventDic.Clear();
+
+        m_stringEventDic.Clear();
     }
 
     /// <summary>
@@ -157,6 +254,53 @@ public class GlobalEvent {
                 }
             }
             RemoveEvent(type);
+        }
+    }
+
+    /// <summary>
+    /// 触发事件
+    /// </summary>
+    /// <param name="eventKey"></param>
+    /// <param name="args"></param>
+    public static void DispatchEvent(string eventKey, params object[] args)
+    {
+        if (m_stringEventDic.ContainsKey(eventKey))
+        {
+            for (int i = 0; i < m_stringEventDic[eventKey].Count; i++)
+            {
+                //遍历委托链表
+                foreach (EventHandle callBack in m_stringEventDic[eventKey][i].GetInvocationList())
+                {
+                    try
+                    {
+                        callBack(args);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e.ToString());
+                    }
+                }
+            }
+        }
+
+        if (m_stringOnceEventDic.ContainsKey(eventKey))
+        {
+            for (int i = 0; i < m_stringOnceEventDic[eventKey].Count; i++)
+            {
+                //遍历委托链表
+                foreach (EventHandle callBack in m_stringOnceEventDic[eventKey][i].GetInvocationList())
+                {
+                    try
+                    {
+                        callBack(args);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e.ToString());
+                    }
+                }
+            }
+            RemoveEvent(eventKey);
         }
     }
 	

@@ -16,27 +16,29 @@ public class NetworkManager
         set { NetworkManager.s_isConnect = value; }
     }
 
-    /// <summary>
-    /// 消息结尾符
-    /// </summary>
-    public const char c_endChar = '&';
-
-    /// <summary>
-    /// 文本中如果有结尾符则替换成这个
-    /// </summary>
-    public const string c_endCharReplaceString = "<FCP:AND>";
-
-    public static void Init()
+    public static void Init<T>() where T : INetworkInterface,new ()
     {
         //提前加载网络事件派发器，避免异步冲突
         InputManager.LoadDispatcher<InputNetworkConnectStatusEvent>();
         InputManager.LoadDispatcher<InputNetworkMessageEvent>();
 
-        s_network = new TCPService();
+        s_network = new T();
         s_network.m_messageCallBack = ReceviceMeaasge;
         s_network.m_ConnectStatusCallback = ConnectStatusChange;
 
         ApplicationManager.s_OnApplicationUpdate += Update;
+    }
+
+    public static void Dispose()
+    {
+        InputManager.UnLoadDispatcher<InputNetworkConnectStatusEvent>();
+        InputManager.UnLoadDispatcher<InputNetworkMessageEvent>();
+
+        s_network.m_messageCallBack = null;
+        s_network.m_ConnectStatusCallback = null;
+        s_network = null;
+
+        ApplicationManager.s_OnApplicationUpdate -= Update;
     }
 
     public static void Connect()
@@ -50,44 +52,36 @@ public class NetworkManager
         s_network.Close();
     }
 
-    public static void SendMessage(string message)
-    {
-        s_network.SendMessage(message);
-    }
-
-    public static void SendMessage(Dictionary<string,object> data)
+    public static void SendMessage(string messageType ,Dictionary<string,object> data)
     {
         if(IsConnect)
         {
-            string mes = Json.Serialize(data);
-            mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
-
-            //Debug.Log("SendMessage: " + mes);
-            s_network.SendMessage(mes);
+            s_network.SendMessage(messageType,data);
         }
     }
 
-    static void ReceviceMeaasge(string message)
+    public static void SendMessage(Dictionary<string, object> data)
     {
-        //Debug.Log("SendMessage: " + message);
+        if (IsConnect)
+        {
+            s_network.SendMessage(data["MT"].ToString(), data);
+        }
+    }
+
+    static void ReceviceMeaasge(NetWorkMessage message)
+    {
         s_messageList.Add(message);
     }
 
-    static void Dispatch(string message)
+    static void Dispatch(NetWorkMessage msg)
     {
         try
         {
-            if (message != null && message != "")
-            {
-                message = WWW.UnEscapeURL(message);
-                message = message.Replace(c_endCharReplaceString, c_endChar.ToString());
-                Dictionary<string, object> data = Json.Deserialize(message) as Dictionary<string, object>;
-                InputNetworkEventProxy.DispatchMessageEvent(data["MT"].ToString(), message, data);
-            }
+            InputNetworkEventProxy.DispatchMessageEvent(msg.m_MessageType, msg.m_data);
         }
         catch (Exception e)
         {
-            Debug.LogError("Message Error:->"+message +"<-\n"+ e.ToString());
+            Debug.LogError("Message Error:->" + Json.Serialize(msg.m_data) + "<-\n" + e.ToString());
         }
     }
 
@@ -115,7 +109,7 @@ public class NetworkManager
     #region Update
 
     static List<NetworkState> s_statusList = new List<NetworkState>();
-    static List<string> s_messageList      = new List<string>();
+    static List<NetWorkMessage> s_messageList = new List<NetWorkMessage>();
 
     //将消息的处理并入主线程
     static void Update()
@@ -142,7 +136,7 @@ public class NetworkManager
     #endregion
 }
 
-public delegate void MessageCallBack(string receStr);
+public delegate void MessageCallBack(NetWorkMessage receStr);
 public delegate void ConnectStatusCallBack(NetworkState connectStstus);
 
 public enum NetworkState
@@ -151,5 +145,12 @@ public enum NetworkState
     Connecting,
     ConnectBreak,
     FaildToConnect,
+}
+
+public class NetWorkMessage
+{
+   public string m_MessageType;
+
+   public Dictionary<string, object> m_data;
 }
 

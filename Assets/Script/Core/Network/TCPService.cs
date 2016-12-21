@@ -5,23 +5,30 @@ using System.Threading;
 using System;
 using System.Net;
 using System.Text;
+using System.Collections.Generic;
+using MiniJSON;
 
 public class TCPService : INetworkInterface 
 {
+    /// <summary>
+    /// 消息结尾符
+    /// </summary>
+    public const char c_endChar = '&';
+
+    /// <summary>
+    /// 文本中如果有结尾符则替换成这个
+    /// </summary>
+    public const string c_endCharReplaceString = "<FCP:AND>";
+
     private Socket m_Socket;
-    string m_stringData = "";
     private byte[] m_readData = new byte[1024];
 
-    public string m_IPaddress = "";
-    public int m_port = 0; 
     private Thread m_connThread;
-
 
     public override void GetIPAddress()
     {
         m_IPaddress = "192.168.0.105";
         m_port = 23333; 
-
     }
 
     //连接服务器
@@ -78,7 +85,6 @@ public class TCPService : INetworkInterface
     }
     void StartReceive()
     {
-        m_stringData = "";
         m_Socket.BeginReceive(m_readData, 0, m_readData.Length, SocketFlags.None, new AsyncCallback(EndReceive), m_Socket);
     }
     void EndReceive(IAsyncResult iar) //接收数据
@@ -87,18 +93,26 @@ public class TCPService : INetworkInterface
         int recv = remote.EndReceive(iar);
         if (recv > 0)
         {
-            m_stringData = Encoding.UTF8.GetString(m_readData, 0, recv);
-            DealMessage(m_stringData);
+            DealMessage(Encoding.UTF8.GetString(m_readData, 0, recv));
         }
 
         StartReceive();
     }
+
     //发送消息
-    public override void SendMessage(String str)
+    public override void SendMessage(string MessageType, Dictionary<string, object> data)
     {
         try
         {
-            byte[] bytes = Encoding.UTF8.GetBytes(str + "&");
+            if (!data.ContainsKey("MT"))
+            {
+                data.Add("MT", MessageType);
+            }
+
+            string mes = Json.Serialize(data);
+            mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
+            byte[] bytes = Encoding.UTF8.GetBytes(mes + "&");
+
             m_Socket.Send(bytes);
         }
         catch (Exception e)
@@ -109,11 +123,11 @@ public class TCPService : INetworkInterface
     }
 
     StringBuilder m_buffer = new StringBuilder();
-    public override void DealMessage(string s)
+    public void DealMessage(string s)
     {
         bool isEnd = false;
 
-        if(s.Substring(s.Length-1,1) == NetworkManager.c_endChar.ToString())
+        if(s.Substring(s.Length-1,1) == c_endChar.ToString())
         { 
             isEnd = true;
         }
@@ -124,18 +138,19 @@ public class TCPService : INetworkInterface
 
         m_buffer.Remove(0,m_buffer.Length);
 
-        string[] str = buffer.Split(NetworkManager.c_endChar);
+        string[] str = buffer.Split(c_endChar);
+
         for (int i = 0; i < str.Length; i++)
         {
             if (i != str.Length - 1)
             {
-                m_messageCallBack(str[i]);
+                CallBack(str[i]);
             }
             else
             {
                 if (isEnd)
                 {
-                    m_messageCallBack(str[i]);
+                    CallBack(str[i]);
                 }
                 else
                 {
@@ -143,6 +158,26 @@ public class TCPService : INetworkInterface
                 }
             }
         }
-        
+    }
+
+    public void CallBack(string s)
+    {
+        try
+        {
+            NetWorkMessage msg = new NetWorkMessage();
+
+            s = WWW.UnEscapeURL(s);
+            s = s.Replace(c_endCharReplaceString, c_endChar.ToString());
+            Dictionary<string, object> data = Json.Deserialize(s) as Dictionary<string, object>;
+
+            msg.m_data = data;
+            msg.m_MessageType = data["MT"].ToString();
+
+            m_messageCallBack(msg);
+        }
+        catch(Exception e)
+        {
+            Debug.LogError("Message error ->" + s +"<-\n" + e.ToString());
+        }
     }
 }

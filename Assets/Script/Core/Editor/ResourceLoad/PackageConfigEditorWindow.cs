@@ -445,7 +445,7 @@ public class BundleConfigEditorWindow : EditorWindow
     {
         if (pathPoint == null)
         {
-            Debug.LogError("路径数据为空！");
+            //Debug.LogError("路径数据为空！");
             return;
         }
 
@@ -952,6 +952,7 @@ public class BundleConfigEditorWindow : EditorWindow
                 || relativePath.EndsWith(".mp3")
                 || relativePath.EndsWith(".wav")
                 || relativePath.EndsWith(".txt")
+                || relativePath.EndsWith(".proto")
                 || relativePath.EndsWith(".json")
                 || relativePath.EndsWith(".xml")
                 || relativePath.EndsWith(".csv")
@@ -978,6 +979,12 @@ public class BundleConfigEditorWindow : EditorWindow
         else
         {
             EditPackageConfig EditPackageConfigTmp = new EditPackageConfig();
+
+            if (obj == null)
+            {
+                Debug.LogError("AddAssetBundle ERROR : path: " + path);
+                return;
+            }
             EditPackageConfigTmp.name = obj.name;
 
             EditorObject mainObjTmp = new EditorObject();
