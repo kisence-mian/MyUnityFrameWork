@@ -160,7 +160,14 @@ public static class AssetsBundleManager
         }
         else
         {
-            return LoadBundle(name).mainAsset;
+            if (MemoryManager.s_allowDynamicLoad)
+            {
+                return LoadBundle(name).mainAsset;
+            }
+            else
+            {
+                throw new Exception("已禁止资源动态加载，请检查静态资源加载列表 ->" + name + "<-");
+            }
         }
     }
 
@@ -172,7 +179,14 @@ public static class AssetsBundleManager
         }
         else
         {
-            return (T)LoadBundle(name).mainAsset;
+            if (MemoryManager.s_allowDynamicLoad)
+            {
+                return (T)LoadBundle(name).mainAsset;
+            }
+            else
+            {
+                throw new Exception("已禁止资源动态加载，请检查静态资源加载列表 ->" + name + "<-");
+            }
         }
     }
 
@@ -279,7 +293,7 @@ public static class AssetsBundleManager
         }
     }
 
-    public static Bundle AddBundle(string bundleName, AssetBundle aess)
+    static Bundle AddBundle(string bundleName, AssetBundle aess)
     {
         Bundle bundleTmp = new Bundle();
         ResourcesConfig configTmp = ResourcesConfigManager.GetBundleConfig(bundleName);
@@ -323,7 +337,7 @@ public static class AssetsBundleManager
         return bundleTmp;
     }
 
-    public static RelyBundle AddRelyBundle(string relyBundleName, AssetBundle aess)
+    static RelyBundle AddRelyBundle(string relyBundleName, AssetBundle aess)
     {
         RelyBundle tmp = new RelyBundle();
 
@@ -353,7 +367,7 @@ public static class AssetsBundleManager
     /// </summary>
     /// <param name="bundleName"></param>
     /// <returns></returns>
-    public static string GetBundlePath(ResourcesConfig config)
+    static string GetBundlePath(ResourcesConfig config)
     {
         bool isLoadByPersistent = RecordManager.GetData(c_HotUpdateRecordName).GetRecord(config.name, false);
 

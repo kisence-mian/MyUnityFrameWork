@@ -27,8 +27,8 @@ public class TCPService : INetworkInterface
 
     public override void GetIPAddress()
     {
-        m_IPaddress = "192.168.0.105";
-        m_port = 23333; 
+        m_IPaddress = "114.215.131.149";
+        m_port = 6666; 
     }
 
     //连接服务器
@@ -164,20 +164,26 @@ public class TCPService : INetworkInterface
     {
         try
         {
-            NetWorkMessage msg = new NetWorkMessage();
+            if(s != null && s != "")
+            {
+                NetWorkMessage msg = GetMessageByPool();
 
-            s = WWW.UnEscapeURL(s);
-            s = s.Replace(c_endCharReplaceString, c_endChar.ToString());
-            Dictionary<string, object> data = Json.Deserialize(s) as Dictionary<string, object>;
+                s = WWW.UnEscapeURL(s);
+                s = s.Replace(c_endCharReplaceString, c_endChar.ToString());
+                Dictionary<string, object> data = Json.Deserialize(s) as Dictionary<string, object>;
 
-            msg.m_data = data;
-            msg.m_MessageType = data["MT"].ToString();
+                msg.m_data = data;
+                msg.m_MessageType = data["MT"].ToString();
 
-            m_messageCallBack(msg);
+                m_messageCallBack(msg);
+            }
+
         }
         catch(Exception e)
         {
             Debug.LogError("Message error ->" + s +"<-\n" + e.ToString());
         }
     }
+
+
 }

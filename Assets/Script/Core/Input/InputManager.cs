@@ -81,11 +81,13 @@ public class InputManager
         }
     }
 
+    static string m_DispatcherName;
+    static IInputDispatcher dispatcher;
     static IInputDispatcher GetDispatcher(string DispatcherName)
     {
-        if (s_dispatcher.ContainsKey(DispatcherName))
+        if (s_dispatcher.TryGetValue(DispatcherName,out dispatcher))
         {
-            return s_dispatcher[DispatcherName];
+            return dispatcher;
         }
         else
         {
@@ -95,11 +97,11 @@ public class InputManager
 
     static InputDispatcher<T> GetDispatcher<T>() where T : IInputEventBase
     {
-        string DispatcherName = typeof(T).Name;
+        m_DispatcherName = typeof(T).Name;
 
-        if (s_dispatcher.ContainsKey(DispatcherName))
+        if (s_dispatcher.TryGetValue(m_DispatcherName, out dispatcher))
         {
-            return (InputDispatcher<T>)s_dispatcher[DispatcherName];
+            return (InputDispatcher<T>)dispatcher;
         }
         else
         {

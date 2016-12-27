@@ -62,6 +62,7 @@ public class AudioManager : MonoBehaviour
     public static void Init()
     {
         s_instance = new GameObject("AudioManager").AddComponent<AudioManager>();
+        DontDestroyOnLoad(s_instance.gameObject);
     }
 
     public void Update()

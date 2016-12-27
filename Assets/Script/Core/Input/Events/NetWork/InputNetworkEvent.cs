@@ -22,7 +22,15 @@ public class InputNetworkMessageEvent : IInputEventBase
         get {
             if (m_data == null)
             {
-                m_data = Json.Deserialize(m_content) as Dictionary<string, object>;
+                if (m_content != null && m_content != "")
+                {
+                    m_data = Json.Deserialize(m_content) as Dictionary<string, object>;
+                }
+                else
+                {
+                    m_data = new Dictionary<string, object>();
+                }
+
             }
 
             return m_data;
@@ -38,11 +46,26 @@ public class InputNetworkMessageEvent : IInputEventBase
         return m_MessgaeType;
     }
 
+    public override string Serialize()
+    {
+        if (m_content == null || m_content == "")
+        {
+            m_content = Json.Serialize(Data);
+        }
+
+        return base.Serialize();
+    }
+
 }
 
 public class InputNetworkConnectStatusEvent : IInputEventBase
 {
     public NetworkState m_status;
+
+    public InputNetworkConnectStatusEvent()
+    {
+        m_status = NetworkState.ConnectBreak;
+    }
 
     public InputNetworkConnectStatusEvent(NetworkState status)
     {

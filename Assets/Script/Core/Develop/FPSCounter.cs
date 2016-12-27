@@ -22,8 +22,14 @@ using System.Collections;
 
         public void Init()
         {
-            GUIConsole.onUpdateCallback += Update;
-            GUIConsole.onGUICallback += OnGUI;
+            //GUIConsole.onUpdateCallback += Update;
+            //GUIConsole.onGUICallback += OnGUI;
+
+            if (ApplicationManager.AppMode != AppMode.Release)
+            {
+                ApplicationManager.s_OnApplicationUpdate += Update;
+                ApplicationManager.s_OnApplicationOnGUI += OnGUI2;
+            }
         }
 
 		void Start()
@@ -50,5 +56,12 @@ using System.Collections;
 		{
             //GUI.color = Color.black;
             GUI.Label(new Rect(3, 3, 1200, GUIUtil.FontSize), "fps:" + this.fps.ToString());		
+        }
+
+        void OnGUI2()
+        {
+            //GUI.color = Color.black;
+
+            GUILayout.TextField("FPS:" + fps.ToString());
         }
 	}

@@ -15,19 +15,13 @@ public abstract class IInputDispatcher
     {
         if (m_OnAllEventDispatch != null)
         {
-            Delegate[] eventArray = m_OnAllEventDispatch.GetInvocationList();
-
-            for (int i = 0; i < eventArray.Length; i++)
+            try
             {
-                try
-                {
-                    InputEventCallBack callBack = (InputEventCallBack)eventArray[i];
-                    callBack(eventName, inputEvent);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e.ToString());
-                }
+                m_OnAllEventDispatch(eventName, inputEvent);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
             }
         }
     }

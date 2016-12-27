@@ -23,6 +23,7 @@ public class NetworkManager
         InputManager.LoadDispatcher<InputNetworkMessageEvent>();
 
         s_network = new T();
+        s_network.InitMessagePool(50);
         s_network.m_messageCallBack = ReceviceMeaasge;
         s_network.m_ConnectStatusCallback = ConnectStatusChange;
 
@@ -81,7 +82,19 @@ public class NetworkManager
         }
         catch (Exception e)
         {
-            Debug.LogError("Message Error:->" + Json.Serialize(msg.m_data) + "<-\n" + e.ToString());
+            if (msg!= null )
+            {
+                string messageContent = "";
+                if(msg.m_data != null)
+                {
+                    messageContent = Json.Serialize(msg.m_data);
+                }
+                Debug.LogError("Message Error: MessageType is ->" + msg.m_MessageType + "<- MessageContent is ->" + messageContent + "<-\n" + e.ToString());
+            }
+            else
+            {
+                Debug.LogError("Message Error: Message is null" );
+            }
         }
     }
 
@@ -104,7 +117,6 @@ public class NetworkManager
 
         InputNetworkEventProxy.DispatchStatusEvent(status);
     }
-
 
     #region Update
 

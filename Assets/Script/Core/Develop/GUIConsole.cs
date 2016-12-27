@@ -65,8 +65,8 @@ public class GUIConsole
     {
         fpsCounter = new FPSCounter();
         fpsCounter.Init();
-        memoryDetector = new MemoryDetector();
-        memoryDetector.Init();
+        //memoryDetector = new MemoryDetector();
+        //memoryDetector.Init();
 
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationOnGUI += OnGUI;

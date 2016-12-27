@@ -813,6 +813,25 @@ public class AnimSystem : MonoBehaviour
         GetInstance().animList.Remove(animData);
     }
 
+    public static void ClearAllAnim(bool isCallBack = false)
+    {
+        if (isCallBack)
+        {
+            for (int i = 0; i < GetInstance().animList.Count; i++)
+            {
+                AnimData dataTmp = GetInstance().animList[i];
+                dataTmp.executeCallBack();
+
+                GetInstance().animList.RemoveAt(i);
+                i--;
+            }
+        }
+        else
+        {
+            GetInstance().animList.Clear();
+        }
+    }
+
     #endregion
 
     #endregion

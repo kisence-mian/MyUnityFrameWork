@@ -44,13 +44,16 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
         }
     }
 
+    InputEventHandle<Event> m_handle;
+    string m_eventKey;
+
     public void Dispatch(Event inputEvent)
     {
-        string eventKey = inputEvent.EventKey;
+        m_eventKey = inputEvent.EventKey;
 
-        if (m_Listeners.ContainsKey(eventKey))
+        if (m_Listeners.TryGetValue(m_eventKey,out m_handle))
         {
-            DispatchSingleEvent(inputEvent, m_Listeners[eventKey]);
+            DispatchSingleEvent(inputEvent, m_handle);
         }
 
         //此类事件派发时调用
@@ -64,18 +67,13 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
     {
         if (callBack != null)
         {
-            Delegate[] eventArray = callBack.GetInvocationList();
-            for (int i = 0; i < eventArray.Length; i++)
+            try
             {
-                try
-                {
-                    InputEventHandle<Event> tmp = (InputEventHandle<Event>)eventArray[i];
-                    tmp(inputEvent);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError(e.ToString());
-                }
+                callBack(inputEvent);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
             }
         }
     }

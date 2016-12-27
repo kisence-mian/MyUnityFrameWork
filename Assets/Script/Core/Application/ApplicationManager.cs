@@ -7,6 +7,12 @@ public class ApplicationManager : MonoBehaviour
 {
     public AppMode m_AppMode = AppMode.Developing;
 
+    public static AppMode AppMode
+    {
+        get { return instance.m_AppMode; }
+        //set { m_AppMode = value; }
+    }
+
     private static ApplicationManager instance;
 
     public static ApplicationManager Instance
@@ -35,9 +41,10 @@ public class ApplicationManager : MonoBehaviour
     /// </summary>
     public void AppLaunch()
     {
-        DontDestroyOnLoad(this);
+        DontDestroyOnLoad(gameObject);
         SetResourceLoadType();               //设置资源加载类型
         ResourcesConfigManager.Initialize(); //资源路径管理器启动
+        MemoryManager.Init();                //内存管理初始化
 
         InputManager.Init();                 //输入管理器启动
         UIManager.Init();                    //UIManager启动
@@ -73,8 +80,7 @@ public class ApplicationManager : MonoBehaviour
     }
 
     #region 程序生命周期事件派发
-
-        
+ 
     public static ApplicationVoidCallback s_OnApplicationQuit = null;
     public static ApplicationBoolCallback s_OnApplicationPause = null;
     public static ApplicationBoolCallback s_OnApplicationFocus = null;
@@ -165,8 +171,6 @@ public class ApplicationManager : MonoBehaviour
     /// </summary>
     void InitGlobalLogic()
     {
-
-
         for (int i = 0; i < m_globalLogic.Count; i++)
         {
             GlobalLogicManager.InitLogic(m_globalLogic[i]);

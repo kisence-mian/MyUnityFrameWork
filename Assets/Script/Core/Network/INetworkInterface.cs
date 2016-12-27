@@ -33,6 +33,31 @@ public class INetworkInterface
     {
 
     }
+
+    NetWorkMessage[] m_messagePool;
+    int m_msgPoolIndex = 0;
+    protected NetWorkMessage GetMessageByPool()
+    {
+        NetWorkMessage result = m_messagePool[m_msgPoolIndex];
+        m_msgPoolIndex++;
+
+        if (m_msgPoolIndex >= m_messagePool.Length)
+        {
+            m_msgPoolIndex = 0;
+        }
+
+        return result;
+    }
+
+    public void InitMessagePool(int poolSize)
+    {
+        m_messagePool = new NetWorkMessage[poolSize];
+
+        for (int i = 0; i < poolSize; i++)
+        {
+            m_messagePool[i] = new NetWorkMessage();
+        }
+    }
 }
 
 

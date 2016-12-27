@@ -61,9 +61,15 @@ public class GameObjectManager :MonoBehaviour
     }
 
 
-    public static bool IsExist(string l_objectName)
+    public static bool IsExist(string objectName)
     {
-        if (s_objectPool.ContainsKey(l_objectName) && s_objectPool[l_objectName].Count > 0)
+        if (objectName == null)
+        {
+            Debug.LogError("GameObjectManager objectName is null!");
+            return false;
+        }
+
+        if (s_objectPool.ContainsKey(objectName) && s_objectPool[objectName].Count > 0)
         {
             return true;
         }

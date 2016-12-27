@@ -20,6 +20,8 @@ public class DevelopReplayManager
     const string c_serializeInfoKey = "s";
 
     static bool s_isReplay = false;
+
+    static List<Dictionary<string, string>> s_eventStreamSerialize;
     static List<IInputEventBase> s_eventStream;
 
     static List<int> s_randomList;
@@ -76,7 +78,7 @@ public class DevelopReplayManager
         {
             Log.Init(true); //日志记录启动
 
-            s_eventStream = new List<IInputEventBase>();
+            s_eventStreamSerialize = new List<Dictionary<string, string>>();
             s_randomList = new List<int>();
 
             ApplicationManager.s_OnApplicationUpdate += OnRecordUpdate;
@@ -102,7 +104,12 @@ public class DevelopReplayManager
 
     public static void OnEveryEventCallBack(string eventName, IInputEventBase inputEvent)
     {
-        s_eventStream.Add(inputEvent);
+        //Dictionary<string, string> tmp = new Dictionary<string, string>();
+
+        //tmp.Add(c_eventNameKey, inputEvent.GetType().Name);
+        //tmp.Add(c_serializeInfoKey, inputEvent.Serialize());
+
+        //s_eventStreamSerialize.Add(tmp);
     }
 
     public static void OnGetRandomCallBack(int random)
@@ -138,19 +145,21 @@ public class DevelopReplayManager
 
     static List<Dictionary<string, string>> SaveEventStream()
     {
-        List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
+        //List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
 
-        for (int i = 0; i < s_eventStream.Count; i++)
-        {
-            Dictionary<string, string> tmp = new Dictionary<string, string>();
+        //for (int i = 0; i < s_eventStream.Count; i++)
+        //{
+        //    Dictionary<string, string> tmp = new Dictionary<string, string>();
 
-            tmp.Add(c_eventNameKey, s_eventStream[i].GetType().Name);
-            tmp.Add(c_serializeInfoKey,s_eventStream[i].Serialize());
+        //    tmp.Add(c_eventNameKey, s_eventStream[i].GetType().Name);
+        //    tmp.Add(c_serializeInfoKey,s_eventStream[i].Serialize());
 
-            list.Add(tmp);
-        }
+        //    list.Add(tmp);
+        //}
 
-        return list;
+        //return list;
+
+        return s_eventStreamSerialize;
     }
 
     static List<int> SaveRandomList()

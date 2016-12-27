@@ -24,6 +24,12 @@ public abstract class IInputEventBase
 
     public IInputEventBase()
     {
+        Reset();
+    }
+
+    public void Reset()
+    {
+        m_eventKey = null;
         m_t = DevelopReplayManager.CurrentTime;
     }
 
