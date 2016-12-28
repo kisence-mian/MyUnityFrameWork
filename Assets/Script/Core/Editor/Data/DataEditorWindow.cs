@@ -747,6 +747,7 @@ public class DataEditorWindow : EditorWindow
         string className = dataName + "Generate";
         string content = "";
 
+        content += "using System;\n";
         content += "using UnityEngine;\n\n";
 
         content += @"//" + className + "类\n";
@@ -799,10 +800,13 @@ public class DataEditorWindow : EditorWindow
 
         content += "\tpublic override void LoadData(string key) \n";
         content += "\t{\n";
-
-        content += "\t\t ";
-
-        content += "SingleData data = DataManager.GetData(\"" + dataName + "\")[key];\n\n";
+        content += "\t\tDataTable table =  DataManager.GetData(\"" + dataName + "\");\n\n";
+        content += "\t\tif (!table.ContainsKey(key))\n";
+        content += "\t\t{\n";
+        content += "\t\t\tthrow new Exception(\"" + className + " LoadData Exception Not Fond key ->\" + key + \"<-\");\n";
+        content += "\t\t}\n";
+        content += "\n";
+        content += "\t\tSingleData data = table[key];\n\n";
 
         if (type.Count > 0)
         {
@@ -821,12 +825,12 @@ public class DataEditorWindow : EditorWindow
 
                 if (data.m_tableTypes.ContainsKey(key))
                 {
-                    content += " m_" + key + " = data." + OutPutFieldFunction(data.m_tableTypes[key], enumType) + "(\"" + key + "\")";
+                    content += "m_" + key + " = data." + OutPutFieldFunction(data.m_tableTypes[key], enumType) + "(\"" + key + "\")";
                 }
                 //默认字符类型
                 else
                 {
-                    content += " m_" + key + " = data." + OutPutFieldFunction(data.m_tableTypes[key], enumType) + "(\"" + key + "\")";
+                    content += "m_" + key + " = data." + OutPutFieldFunction(data.m_tableTypes[key], enumType) + "(\"" + key + "\")";
                 }
 
                 content += ";\n";
@@ -853,6 +857,7 @@ public class DataEditorWindow : EditorWindow
             case FieldType.Vector2: return "GetVector2";
             case FieldType.Vector3: return "GetVector3";
             case FieldType.Enum: return "GetEnum<" + enumType + ">";
+            case FieldType.StringArray: return "GetStringArray";
             default: return "";
         }
     }
@@ -869,6 +874,7 @@ public class DataEditorWindow : EditorWindow
             case FieldType.Vector2: return "Vector2";
             case FieldType.Vector3: return "Vector3";
             case FieldType.Enum: return enumType;
+            case FieldType.StringArray: return "string[]";
             default: return "";
         }
     }

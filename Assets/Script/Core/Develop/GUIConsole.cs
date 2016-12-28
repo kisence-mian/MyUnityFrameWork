@@ -46,7 +46,7 @@ public class GUIConsole
     /// <summary>
     /// 内存监视器
     /// </summary>
-    static private MemoryDetector memoryDetector = null;
+    //static private MemoryDetector memoryDetector = null;
     static private bool showGUI = false;
     static List<ConsoleMessage> entries = new List<ConsoleMessage>();
     static Vector2 scrollPos;

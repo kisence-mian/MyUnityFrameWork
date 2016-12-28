@@ -667,5 +667,20 @@ public class SingleData : Dictionary<string, string>
 
         throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
     }
+
+    public string[] GetStringArray(string key)
+    {
+        if (this.ContainsKey(key))
+        {
+            return ParseTool.String2StringArray(this[key]);
+        }
+
+        if (data.m_defaultValue.ContainsKey(key))
+        {
+            return ParseTool.String2StringArray(data.m_defaultValue[key]);
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-");// throw  
+    }
 }
 

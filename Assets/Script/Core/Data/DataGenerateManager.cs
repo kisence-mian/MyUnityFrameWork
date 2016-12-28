@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class DataGenerateManager<T> where T : DataGenerateBase, new()
 {
@@ -10,6 +11,11 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
 
     public static T GetData(string key) 
     {
+        if (key == null)
+        {
+            throw new Exception("DataGenerateManager GetData key is Null !");
+        }
+
         //清理缓存
         if (!s_isInit)
         {

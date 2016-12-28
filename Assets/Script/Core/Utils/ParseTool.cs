@@ -61,6 +61,26 @@ public class ParseTool : MonoBehaviour
         }
     }
 
+    static string[] c_NullStringArray = new string[0];
+
+    public static string[] String2StringArray(string value)
+    {
+        if (value != null
+                && value != ""
+                && value != "null"
+                && value != "Null"
+                && value != "NULL"
+                && value != "None")
+        {
+            return value.Split('|');
+        }
+        else
+        {
+            return c_NullStringArray;
+        }
+
+    }
+
 
 
 }

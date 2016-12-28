@@ -39,6 +39,7 @@ public class EditorUtilGUI
         switch (data.m_type)
         {
             case FieldType.String:
+            case FieldType.StringArray:
                 content = EditorGUILayout.TextField(labelContent, data.GetString());
                 break;
 

@@ -165,6 +165,11 @@ public class SingleField
         return m_content;
     }
 
+    public string[] GetStringArray()
+    {
+        return ParseTool.String2StringArray(m_content);
+    }
+
     public Vector2 GetVector2()
     {
        return ParseTool.String2Vector2(m_content);
@@ -227,4 +232,5 @@ public enum FieldType
     Vector3,
     Color,
     Enum,
+    StringArray,
 }

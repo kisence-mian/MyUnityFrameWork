@@ -84,6 +84,7 @@ public class MemoryManager
         {
             s_loadCallBack += callBack;
             s_LoadList.AddRange(resList);
+            s_loadCount += resList.Count;
         }
     }
 
@@ -105,6 +106,8 @@ public class MemoryManager
     static List<string> s_LoadList = new List<string>();
     static LoadProgressCallBack s_loadCallBack;
 
+    static LoadState s_loadStatus = new LoadState();
+
     static void LoadResources()
     {
         if (!isLoading)
@@ -122,6 +125,7 @@ public class MemoryManager
                         Debug.LogError("Load Finsih CallBack Error : " + e.ToString());
                     }
                     s_loadCallBack = null;
+                    s_loadCount = 0;
                 }
             }
             else
@@ -129,6 +133,19 @@ public class MemoryManager
                 AssetsBundleManager.LoadBundleAsync(s_LoadList[0], LoadResourcesFinishCallBack);
                 s_LoadList.RemoveAt(0);
                 isLoading = true;
+
+                s_loadStatus.isDone = false;
+                s_loadStatus.progress = (1- (s_LoadList.Count / s_loadCount));
+
+                try
+                {
+                    s_loadCallBack(s_loadStatus);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Load Finsih CallBack Error : " + e.ToString());
+                }
+                
             }
         }
     }
