@@ -5,14 +5,6 @@ using System.Collections.Generic;
 
 public class ApplicationManager : MonoBehaviour 
 {
-    public AppMode m_AppMode = AppMode.Developing;
-
-    public static AppMode AppMode
-    {
-        get { return instance.m_AppMode; }
-        //set { m_AppMode = value; }
-    }
-
     private static ApplicationManager instance;
 
     public static ApplicationManager Instance
@@ -21,8 +13,20 @@ public class ApplicationManager : MonoBehaviour
         set { ApplicationManager.instance = value; }
     }
 
+    public AppMode m_AppMode = AppMode.Developing;
+
+    public static AppMode AppMode
+    {
+        get { return instance.m_AppMode; }
+        //set { m_AppMode = value; }
+    }
+
+
     //快速启动
     public bool m_quickLunch = true;
+
+    //启用Lua
+    public bool m_useLua = false;
 
     [HideInInspector]
     public string m_Status = "";
@@ -54,13 +58,18 @@ public class ApplicationManager : MonoBehaviour
         //初始化全局逻辑
         GlobalLogicManager.Init();
 
+        if (m_useLua)
+        {
+            LuaManager.Init();
+        }
+
         if (m_AppMode != AppMode.Release)
         {
             GUIConsole.Init(); //运行时Console
 
             DevelopReplayManager.OnLunchCallBack += () =>
             {
-                LuaManager.Init();
+
                 InitGlobalLogic();//全局逻辑
                 ApplicationStatusManager.EnterTestModel(m_Status);//可以从此处进入测试流程
             };
@@ -71,7 +80,6 @@ public class ApplicationManager : MonoBehaviour
         {
             Log.Init(false); //关闭 Debug
 
-            LuaManager.Init();
             //全局逻辑
             InitGlobalLogic();
             //游戏流程状态机，开始第一个状态

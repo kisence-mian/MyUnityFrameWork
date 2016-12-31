@@ -21,21 +21,6 @@ public class FirstStatus : IApplicationStatus
 
         AnimSystem.Move(go, null, new Vector3(0, 0, 600), time:1,repeatType: RepeatType.PingPang);
 
-        //ConfigManager.GetData("adasda")["qqq"].GetString();
-
-        Debug.Log("hello");
-
-        //InputManager.LoadDispatcher(typeof(InputNetworkEvent).Name);
-
-        ////InputManager.LoadDispatcher<InputNetworkEvent>();
-
-        //InputNetworkEvent e = new InputNetworkEvent();
-
-        //InputManager.AddListener<InputNetworkEvent>(e.EventKey, CallBackTest);
-
-        //////InputManager.re
-
-        //InputManager.Dispatch<InputNetworkEvent>(e);
 
         AnimSystem.Move(go, null, Vector3.one, callBack: (object[] obj) => { }
             , parameter: new object[] { });

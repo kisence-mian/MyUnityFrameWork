@@ -21,7 +21,16 @@ public static class ConfigManager
 
     public static bool GetIsExistConfig(string ConfigName)
     {
-        string dataJson = ResourceManager.ReadTextFile(ConfigName);
+        string dataJson = "";
+
+        #if UNITY_EDITOR
+            dataJson = ResourceIOTool.ReadStringByResource(
+                PathTool.GetRelativelyPath(c_directoryName,
+                                            ConfigName,
+                                            c_expandName));
+        #else
+             dataJson = ResourceManager.ReadTextFile(ConfigName);
+        #endif
 
         if (dataJson == "")
         {

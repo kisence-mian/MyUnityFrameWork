@@ -1,0 +1,5 @@
+print("hello world!")
+
+local UIManager = UIManager;
+
+UIManager.OpenUIWindow("testWindow");

@@ -135,64 +135,64 @@ namespace LuaInterface
             return objs;
         }
 
-        public bool IsBegin()
-        {
-            return oldTop != -1;
-        }
+        //public bool IsBegin()
+        //{
+        //    return oldTop != -1;
+        //}
 
-        public void Push(double num)
-        {
-            luaState.Push(num);
-            ++argCount;
-        }
+        //public void Push(double num)
+        //{
+        //    luaState.Push(num);
+        //    ++argCount;
+        //}
 
-        public void Push(int n)
-        {
-            luaState.Push(n);
-            ++argCount;
-        }
+        //public void Push(int n)
+        //{
+        //    luaState.Push(n);
+        //    ++argCount;
+        //}
 
-        public void Push(uint un)
-        {
-            luaState.Push(un);
-            ++argCount;
-        }
+        //public void Push(uint un)
+        //{
+        //    luaState.Push(un);
+        //    ++argCount;
+        //}
 
-        public void Push(long num)
-        {
-            luaState.Push(num);
-            ++argCount;
-        }
+        //public void Push(long num)
+        //{
+        //    luaState.Push(num);
+        //    ++argCount;
+        //}
 
-        public void Push(ulong un)
-        {
-            luaState.Push(un);
-            ++argCount;
-        }
+        //public void Push(ulong un)
+        //{
+        //    luaState.Push(un);
+        //    ++argCount;
+        //}
 
-        public void Push(bool b)
-        {
-            luaState.Push(b);
-            ++argCount;
-        }
+        //public void Push(bool b)
+        //{
+        //    luaState.Push(b);
+        //    ++argCount;
+        //}
 
-        public void Push(string str)
-        {
-            luaState.Push(str);
-            ++argCount;
-        }
+        //public void Push(string str)
+        //{
+        //    luaState.Push(str);
+        //    ++argCount;
+        //}
 
-        public void Push(IntPtr ptr)
-        {
-            luaState.Push(ptr);
-            ++argCount;
-        }
+        //public void Push(IntPtr ptr)
+        //{
+        //    luaState.Push(ptr);
+        //    ++argCount;
+        //}
 
-        public void Push(LuaBaseRef lbr)
-        {
-            luaState.Push(lbr);
-            ++argCount;
-        }
+        //public void Push(LuaBaseRef lbr)
+        //{
+        //    luaState.Push(lbr);
+        //    ++argCount;
+        //}
 
         public void Push(object o)
         {
@@ -200,141 +200,141 @@ namespace LuaInterface
             ++argCount;
         }
 
-        public void Push(UnityEngine.Object o)
-        {
-            luaState.Push(o);
-            ++argCount;
-        }
+        //public void Push(UnityEngine.Object o)
+        //{
+        //    luaState.Push(o);
+        //    ++argCount;
+        //}
 
-        public void Push(Type t)
-        {
-            luaState.Push(t);
-            ++argCount;
-        }
+        //public void Push(Type t)
+        //{
+        //    luaState.Push(t);
+        //    ++argCount;
+        //}
 
-        public void Push(Enum e)
-        {
-            luaState.Push(e);
-            ++argCount;
-        }
+        //public void Push(Enum e)
+        //{
+        //    luaState.Push(e);
+        //    ++argCount;
+        //}
 
-        public void Push(Array array)
-        {
-            luaState.Push(array);
-            ++argCount;
-        }
+        //public void Push(Array array)
+        //{
+        //    luaState.Push(array);
+        //    ++argCount;
+        //}
 
-        public void Push(Vector3 v3)
-        {
-            luaState.Push(v3);
-            ++argCount;
-        }
+        //public void Push(Vector3 v3)
+        //{
+        //    luaState.Push(v3);
+        //    ++argCount;
+        //}
 
-        public void Push(Vector2 v2)
-        {
-            luaState.Push(v2);
-            ++argCount;
-        }
+        //public void Push(Vector2 v2)
+        //{
+        //    luaState.Push(v2);
+        //    ++argCount;
+        //}
 
-        public void Push(Vector4 v4)
-        {
-            luaState.Push(v4);
-            ++argCount;
-        }
+        //public void Push(Vector4 v4)
+        //{
+        //    luaState.Push(v4);
+        //    ++argCount;
+        //}
 
-        public void Push(Quaternion quat)
-        {
-            luaState.Push(quat);
-            ++argCount;
-        }
+        //public void Push(Quaternion quat)
+        //{
+        //    luaState.Push(quat);
+        //    ++argCount;
+        //}
 
-        public void Push(Color clr)
-        {
-            luaState.Push(clr);
-            ++argCount;
-        }
+        //public void Push(Color clr)
+        //{
+        //    luaState.Push(clr);
+        //    ++argCount;
+        //}
 
-        public void PushLayerMask(LayerMask mask)
-        {
-            luaState.PushLayerMask(mask);
-            ++argCount;
-        }
+        //public void PushLayerMask(LayerMask mask)
+        //{
+        //    luaState.PushLayerMask(mask);
+        //    ++argCount;
+        //}
 
-        public void Push(Ray ray)
-        {
-            try
-            {
-                luaState.Push(ray);
-                ++argCount;
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+        //public void Push(Ray ray)
+        //{
+        //    try
+        //    {
+        //        luaState.Push(ray);
+        //        ++argCount;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        EndPCall();
+        //        throw e;
+        //    }
+        //}
 
-        public void Push(Bounds bounds)
-        {
-            try
-            {
-                luaState.Push(bounds);
-                ++argCount;
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+        //public void Push(Bounds bounds)
+        //{
+        //    try
+        //    {
+        //        luaState.Push(bounds);
+        //        ++argCount;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        EndPCall();
+        //        throw e;
+        //    }
+        //}
 
-        public void Push(RaycastHit hit)
-        {
-            try
-            {
-                luaState.Push(hit);
-                ++argCount;
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+        //public void Push(RaycastHit hit)
+        //{
+        //    try
+        //    {
+        //        luaState.Push(hit);
+        //        ++argCount;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        EndPCall();
+        //        throw e;
+        //    }
+        //}
 
-        public void Push(Touch t)
-        {
-            try
-            {
-                luaState.Push(t);
-                ++argCount;
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+        //public void Push(Touch t)
+        //{
+        //    try
+        //    {
+        //        luaState.Push(t);
+        //        ++argCount;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        EndPCall();
+        //        throw e;
+        //    }
+        //}
 
-        public void Push(LuaByteBuffer buffer)
-        {
-            try
-            {
-                luaState.Push(buffer);
-                ++argCount;
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+        //public void Push(LuaByteBuffer buffer)
+        //{
+        //    try
+        //    {
+        //        luaState.Push(buffer);
+        //        ++argCount;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        EndPCall();
+        //        throw e;
+        //    }
+        //}
 
-        public void PushValue(ValueType value)
-        {
-            luaState.PushValue(value);
-            ++argCount;
-        }
+        //public void PushValue(ValueType value)
+        //{
+        //    luaState.PushValue(value);
+        //    ++argCount;
+        //}
 
         public void PushObject(object o)
         {
@@ -353,283 +353,283 @@ namespace LuaInterface
             luaState.PushArgs(args);
         }
 
-        public void PushByteBuffer(byte[] buffer)
-        {
-            try
-            {
-                luaState.PushByteBuffer(buffer);
-                ++argCount;
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public void PushByteBuffer(byte[] buffer)
+    //    {
+    //        try
+    //        {
+    //            luaState.PushByteBuffer(buffer);
+    //            ++argCount;
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public double CheckNumber()
-        {
-            try
-            {
-                return luaState.LuaCheckNumber(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public double CheckNumber()
+    //    {
+    //        try
+    //        {
+    //            return luaState.LuaCheckNumber(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public bool CheckBoolean()
-        {
-            try
-            {
-                return luaState.LuaCheckBoolean(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public bool CheckBoolean()
+    //    {
+    //        try
+    //        {
+    //            return luaState.LuaCheckBoolean(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public string CheckString()
-        {
-            try
-            {
-                return luaState.CheckString(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public string CheckString()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckString(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public Vector3 CheckVector3()
-        {
-            try
-            {
-                return luaState.CheckVector3(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public Vector3 CheckVector3()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckVector3(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public Quaternion CheckQuaternion()
-        {
-            try
-            {
-                return luaState.CheckQuaternion(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public Quaternion CheckQuaternion()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckQuaternion(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public Vector2 CheckVector2()
-        {
-            try
-            {
-                return luaState.CheckVector2(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public Vector2 CheckVector2()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckVector2(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public Vector4 CheckVector4()
-        {
-            try
-            {
-                return luaState.CheckVector4(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public Vector4 CheckVector4()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckVector4(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public Color CheckColor()
-        {
-            try
-            {
-                return luaState.CheckColor(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public Color CheckColor()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckColor(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public Ray CheckRay()
-        {
-            try
-            {
-                return luaState.CheckRay(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public Ray CheckRay()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckRay(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public Bounds CheckBounds()
-        {
-            try
-            {
-                return luaState.CheckBounds(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public Bounds CheckBounds()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckBounds(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public LayerMask CheckLayerMask()
-        {
-            try
-            {
-                return luaState.CheckLayerMask(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public LayerMask CheckLayerMask()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckLayerMask(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public long CheckLong()
-        {
-            try
-            {
-                return luaState.CheckLong(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public long CheckLong()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckLong(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public ulong CheckULong()
-        {
-            try
-            {
-                return luaState.CheckULong(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public ulong CheckULong()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckULong(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public Delegate CheckDelegate()
-        {
-            try
-            {
-                return luaState.CheckDelegate(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public Delegate CheckDelegate()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckDelegate(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public object CheckVariant()
-        {
-            return luaState.ToVariant(stackPos++);
-        }
+    //    public object CheckVariant()
+    //    {
+    //        return luaState.ToVariant(stackPos++);
+    //    }
 
-        public char[] CheckCharBuffer()
-        {
-            try
-            {
-                return luaState.CheckCharBuffer(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public char[] CheckCharBuffer()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckCharBuffer(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public byte[] CheckByteBuffer()
-        {
-            try
-            {
-                return luaState.CheckByteBuffer(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public byte[] CheckByteBuffer()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckByteBuffer(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public object CheckObject(Type t)
-        {
-            try
-            {
-                return luaState.CheckObject(stackPos++, t);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public object CheckObject(Type t)
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckObject(stackPos++, t);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public LuaFunction CheckLuaFunction()
-        {
-            try
-            {
-                return luaState.CheckLuaFunction(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public LuaFunction CheckLuaFunction()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckLuaFunction(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public LuaTable CheckLuaTable()
-        {
-            try
-            {
-                return luaState.CheckLuaTable(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public LuaTable CheckLuaTable()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckLuaTable(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
 
-        public LuaThread CheckLuaThread()
-        {
-            try
-            {
-                return luaState.CheckLuaThread(stackPos++);
-            }
-            catch (Exception e)
-            {
-                EndPCall();
-                throw e;
-            }
-        }
+    //    public LuaThread CheckLuaThread()
+    //    {
+    //        try
+    //        {
+    //            return luaState.CheckLuaThread(stackPos++);
+    //        }
+    //        catch (Exception e)
+    //        {
+    //            EndPCall();
+    //            throw e;
+    //        }
+    //    }
     }
 }

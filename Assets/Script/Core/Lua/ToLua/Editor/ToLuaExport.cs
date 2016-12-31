@@ -271,7 +271,7 @@ public static class ToLuaExport
             return;
         }
 
-        Debugger.Log("Begin Generate lua Wrap for class {0}", className);        
+        //Debugger.Log("Begin Generate lua Wrap for class {0}", className);        
         sb = new StringBuilder();
         usingList.Add("System");                
 
@@ -3546,7 +3546,7 @@ public static class ToLuaExport
         }
 
         sb.AppendLineEx("}\r\n");        
-        SaveFile(CustomSettings.saveDir + "DelegateFactory.cs");
+        SaveFile(CustomSettings.saveDir + "/DelegateFactory.cs");
 
         Clear();
     }

@@ -957,6 +957,7 @@ public class BundleConfigEditorWindow : EditorWindow
                 || relativePath.EndsWith(".xml")
                 || relativePath.EndsWith(".csv")
                 || relativePath.EndsWith(".tga")
+                //|| relativePath.EndsWith(".lua")
                 )
             {
                 relativePath = FileTool.RemoveExpandName(relativePath);

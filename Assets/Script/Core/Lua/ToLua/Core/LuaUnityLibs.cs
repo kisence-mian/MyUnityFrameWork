@@ -35,23 +35,23 @@ namespace LuaInterface
 
         public static void OpenLuaLibs(IntPtr L)
         {                        
-            if (LuaDLL.tolua_openlualibs(L) != 0)
-            {
-                string error = LuaDLL.lua_tostring(L, -1);
-                LuaDLL.lua_pop(L, 1);
-                throw new LuaException(error);
-            }
+            //if (LuaDLL.tolua_openlualibs(L) != 0)
+            //{
+            //    string error = LuaDLL.lua_tostring(L, -1);
+            //    LuaDLL.lua_pop(L, 1);
+            //    throw new LuaException(error);
+            //}
 
-            SetOutMethods(L, "Vector3", GetOutVector3);
-            SetOutMethods(L, "Vector2", GetOutVector2);
-            SetOutMethods(L, "Vector4", GetOutVector4);
-            SetOutMethods(L, "Color", GetOutColor);
-            SetOutMethods(L, "Quaternion", GetOutQuaternion);
-            SetOutMethods(L, "Ray", GetOutRay);
-            SetOutMethods(L, "Bounds", GetOutBounds);
-            SetOutMethods(L, "Touch", GetOutTouch);
-            SetOutMethods(L, "RaycastHit", GetOutRaycastHit);
-            SetOutMethods(L, "LayerMask", GetOutLayerMask);            
+            //SetOutMethods(L, "Vector3", GetOutVector3);
+            //SetOutMethods(L, "Vector2", GetOutVector2);
+            //SetOutMethods(L, "Vector4", GetOutVector4);
+            //SetOutMethods(L, "Color", GetOutColor);
+            //SetOutMethods(L, "Quaternion", GetOutQuaternion);
+            //SetOutMethods(L, "Ray", GetOutRay);
+            //SetOutMethods(L, "Bounds", GetOutBounds);
+            //SetOutMethods(L, "Touch", GetOutTouch);
+            //SetOutMethods(L, "RaycastHit", GetOutRaycastHit);
+            //SetOutMethods(L, "LayerMask", GetOutLayerMask);            
         }
 
         static void InitMathf(IntPtr L)

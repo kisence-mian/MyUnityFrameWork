@@ -102,14 +102,21 @@ namespace LuaInterface
                 mainState = this;
             }
             
-            LuaException.Init();            
+            LuaException.Init();   
+         
             L = LuaNewState();
-            stateMap.Add(L, this);                        
+            stateMap.Add(L, this);
             OpenToLuaLibs();
             ToLua.OpenLibs(L);
-            //OpenBaseLibs();                        
+            LuaBinder.Bind(this);
+
             LuaSetTop(0);
+
+
+            
+            //OpenBaseLibs();     
             //InitLuaPath();
+
         }
 
         //void OpenBaseLibs()
@@ -168,7 +175,7 @@ namespace LuaInterface
 
         void OpenBaseLuaLibs()
         {
-            DoFile("tolua.lua");            //tolua table名字已经存在了,不能用require
+            //DoFile("tolua.lua");            //tolua table名字已经存在了,不能用require
             LuaUnityLibs.OpenLuaLibs(L);
         }
 
@@ -177,14 +184,14 @@ namespace LuaInterface
 #if UNITY_EDITOR
             beStart = true;
 #endif
-            Debugger.Log("LuaState start");
-            OpenBaseLuaLibs();
-            PackBounds = GetFuncRef("Bounds.New");
-            UnpackBounds = GetFuncRef("Bounds.Get");
-            PackRay = GetFuncRef("Ray.New");
-            UnpackRay = GetFuncRef("Ray.Get");
-            PackRaycastHit = GetFuncRef("RaycastHit.New");
-            PackTouch = GetFuncRef("Touch.New");
+            //Debugger.Log("LuaState start");
+            //OpenBaseLuaLibs();
+            //PackBounds = GetFuncRef("Bounds.New");
+            //UnpackBounds = GetFuncRef("Bounds.Get");
+            //PackRay = GetFuncRef("Ray.New");
+            //UnpackRay = GetFuncRef("Ray.Get");
+            //PackRaycastHit = GetFuncRef("RaycastHit.New");
+            //PackTouch = GetFuncRef("Touch.New");
         }
 
         public int OpenLibs(LuaCSFunction open)
@@ -394,23 +401,23 @@ namespace LuaInterface
             LuaDLL.tolua_endclass(L);
         }
 
-        public int BeginEnum(Type t)
-        {
-            if (beginCount == 0)
-            {
-                throw new LuaException("must call BeginModule first");
-            }
+        //public int BeginEnum(Type t)
+        //{
+        //    if (beginCount == 0)
+        //    {
+        //        throw new LuaException("must call BeginModule first");
+        //    }
 
-            int reference = LuaDLL.tolua_beginenum(L, t.Name);
-            RegFunction("__gc", Collect);            
-            BindTypeRef(reference, t);
-            return reference;
-        }
+        //    int reference = LuaDLL.tolua_beginenum(L, t.Name);
+        //    RegFunction("__gc", Collect);            
+        //    BindTypeRef(reference, t);
+        //    return reference;
+        //}
 
-        public void EndEnum()
-        {
-            LuaDLL.tolua_endenum(L);
-        }
+        //public void EndEnum()
+        //{
+        //    LuaDLL.tolua_endenum(L);
+        //}
 
         public void BeginStaticLibs(string name)
         {
@@ -523,105 +530,7 @@ namespace LuaInterface
             byte[] buffer = Encoding.UTF8.GetBytes(chunk);
             return LuaLoadBuffer(buffer, chunkName);
         }        
-
-        public object[] DoFile(string fileName)
-        {
-#if UNITY_EDITOR
-            if (!beStart)
-            {
-                throw new LuaException("you must call Start() first to initialize LuaState");
-            }
-#endif                        
-            byte[] buffer = LuaFileUtils.Instance.ReadFile(fileName);
-
-            if (buffer == null)
-            {
-                string error = string.Format("cannot open {0}: No such file or directory", fileName);
-                error += LuaFileUtils.Instance.FindFileError(fileName);
-                throw new LuaException(error);
-            }
-
-            if (LuaConst.openZbsDebugger)
-            {
-                fileName = LuaFileUtils.Instance.FindFile(fileName);
-            }
-
-            return LuaLoadBuffer(buffer, fileName);
-        }
-
-        //注意fileName与lua文件中require一致。
-        public void Require(string fileName)
-        {
-            int top = LuaGetTop();
-            int ret = LuaRequire(fileName);
-
-            if (ret != 0)
-            {                
-                string err = LuaToString(-1);
-                LuaSetTop(top);
-                throw new LuaException(err, LuaException.GetLastError());
-            }
-
-            LuaSetTop(top);            
-        }
-
-        public void InitPackagePath()
-        {
-            LuaGetGlobal("package");
-            LuaGetField(-1, "path");
-            string current = LuaToString(-1);
-            string[] paths = current.Split(';');
-
-            for (int i = 0; i < paths.Length; i++)
-            {
-                if (!string.IsNullOrEmpty(paths[i]))
-                {
-                    string path = paths[i].Replace('\\', '/');
-                    LuaFileUtils.Instance.AddSearchPath(path);
-                }
-            }
-
-            LuaPushString("");            
-            LuaSetField(-3, "path");
-            LuaPop(2);
-        }
-
-        string ToPackagePath(string path)
-        {
-            StringBuilder sb = StringBuilderCache.Acquire();
-            sb.Append(path);
-            sb.Replace('\\', '/');
-
-            if (sb.Length > 0 && sb[sb.Length - 1] != '/')
-            {
-                sb.Append('/');
-            }
-
-            sb.Append("?.lua");
-            return StringBuilderCache.GetStringAndRelease(sb);
-        }
-
-        public void AddSearchPath(string fullPath)
-        {
-            if (!Path.IsPathRooted(fullPath))
-            {
-                throw new LuaException(fullPath + " is not a full path");
-            }
-
-            fullPath = ToPackagePath(fullPath);
-            LuaFileUtils.Instance.AddSearchPath(fullPath);        
-        }
-
-        public void RemoveSeachPath(string fullPath)
-        {
-            if (!Path.IsPathRooted(fullPath))
-            {
-                throw new LuaException(fullPath + " is not a full path");
-            }
-
-            fullPath = ToPackagePath(fullPath);
-            LuaFileUtils.Instance.RemoveSearchPath(fullPath);
-        }        
+     
 
         public int BeginPCall(int reference)
         {                        
@@ -1771,15 +1680,15 @@ namespace LuaInterface
             return t.BaseType;
         }
 
-        void CloseBaseRef()
-        {
-            LuaUnRef(PackBounds);
-            LuaUnRef(UnpackBounds);
-            LuaUnRef(PackRay);
-            LuaUnRef(UnpackRay);
-            LuaUnRef(PackRaycastHit);
-            LuaUnRef(PackTouch);   
-        }
+        //void CloseBaseRef()
+        //{
+        //    LuaUnRef(PackBounds);
+        //    LuaUnRef(UnpackBounds);
+        //    LuaUnRef(PackRay);
+        //    LuaUnRef(UnpackRay);
+        //    LuaUnRef(PackRaycastHit);
+        //    LuaUnRef(PackTouch);   
+        //}
         
         public void Dispose()
         {
@@ -1808,7 +1717,7 @@ namespace LuaInterface
                     list[i].Dispose(true);
                 }
 
-                CloseBaseRef();
+                //CloseBaseRef();
                 delegateMap.Clear();
                 funcRefMap.Clear();
                 funcMap.Clear();
@@ -1836,7 +1745,7 @@ namespace LuaInterface
             beStart = false;
 #endif
 
-            LuaFileUtils.Instance.Dispose();
+            //LuaFileUtils.Instance.Dispose();
             System.GC.SuppressFinalize(this);            
         }
 

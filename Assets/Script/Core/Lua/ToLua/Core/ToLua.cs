@@ -42,8 +42,8 @@ namespace LuaInterface
         static Type monoType = typeof(Type).GetType();
 
 #if UNITY_EDITOR
-        static int _instanceID = -1;
-        static int _line = 182;
+        //static int _instanceID = -1;
+        //static int _line = 182;
         private static object consoleWindow;
         private static object logListView;
         private static FieldInfo logListViewCurrentRow;
@@ -54,14 +54,14 @@ namespace LuaInterface
 
         public static void OpenLibs(IntPtr L)
         {
-            AddLuaLoader(L);
+            //AddLuaLoader(L);
             LuaDLL.tolua_atpanic(L, Panic);
             LuaDLL.tolua_pushcfunction(L, Print);
             LuaDLL.lua_setglobal(L, "print");
-            LuaDLL.tolua_pushcfunction(L, DoFile);
-            LuaDLL.lua_setglobal(L, "dofile");
-            LuaDLL.tolua_pushcfunction(L, LoadFile);
-            LuaDLL.lua_setglobal(L, "loadfile");
+            //LuaDLL.tolua_pushcfunction(L, DoFile);
+            //LuaDLL.lua_setglobal(L, "dofile");
+            //LuaDLL.tolua_pushcfunction(L, LoadFile);
+            //LuaDLL.lua_setglobal(L, "loadfile");
 
             LuaDLL.lua_getglobal(L, "tolua");
 
@@ -103,21 +103,21 @@ namespace LuaInterface
 
         /*--------------------------------对于tolua扩展函数------------------------------------------*/
         #region TOLUA_EXTEND_FUNCTIONS
-        static void AddLuaLoader(IntPtr L)
-        {
-            LuaDLL.lua_getglobal(L, "package");
-            LuaDLL.lua_getfield(L, -1, "loaders");
-            LuaDLL.tolua_pushcfunction(L, Loader);
+        //static void AddLuaLoader(IntPtr L)
+        //{
+        //    LuaDLL.lua_getglobal(L, "package");
+        //    LuaDLL.lua_getfield(L, -1, "loaders");
+        //    LuaDLL.tolua_pushcfunction(L, Loader);
 
-            for (int i = LuaDLL.lua_objlen(L, -2) + 1; i > 2; i--)
-            {
-                LuaDLL.lua_rawgeti(L, -2, i - 1);
-                LuaDLL.lua_rawseti(L, -3, i);
-            }
+        //    for (int i = LuaDLL.lua_objlen(L, -2) + 1; i > 2; i--)
+        //    {
+        //        LuaDLL.lua_rawgeti(L, -2, i - 1);
+        //        LuaDLL.lua_rawseti(L, -3, i);
+        //    }
 
-            LuaDLL.lua_rawseti(L, -2, 2);
-            LuaDLL.lua_pop(L, 2);
-        }
+        //    LuaDLL.lua_rawseti(L, -2, 2);
+        //    LuaDLL.lua_pop(L, 2);
+        //}
 
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
         static int Panic(IntPtr L)
@@ -188,103 +188,103 @@ namespace LuaInterface
             }
         }
 
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        static int Loader(IntPtr L)
-        {
-            try
-            {
-                string fileName = LuaDLL.lua_tostring(L, 1);
-                fileName = fileName.Replace(".", "/");
-                byte[] buffer = LuaFileUtils.Instance.ReadFile(fileName);
+        //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        //static int Loader(IntPtr L)
+        //{
+        //    try
+        //    {
+        //        string fileName = LuaDLL.lua_tostring(L, 1);
+        //        fileName = fileName.Replace(".", "/");
+        //        byte[] buffer = LuaFileUtils.Instance.ReadFile(fileName);
 
-                if (buffer == null)
-                {
-                    string error = LuaFileUtils.Instance.FindFileError(fileName);
-                    LuaDLL.lua_pushstring(L, error);
-                    return 1;
-                }
+        //        if (buffer == null)
+        //        {
+        //            string error = LuaFileUtils.Instance.FindFileError(fileName);
+        //            LuaDLL.lua_pushstring(L, error);
+        //            return 1;
+        //        }
 
-                if (LuaConst.openZbsDebugger)
-                {
-                    fileName = LuaFileUtils.Instance.FindFile(fileName);
-                }
+        //        //if (LuaConst.openZbsDebugger)
+        //        //{
+        //        //    fileName = LuaFileUtils.Instance.FindFile(fileName);
+        //        //}
 
-                if (LuaDLL.luaL_loadbuffer(L, buffer, buffer.Length, fileName) != 0)
-                {
-                    string err = LuaDLL.lua_tostring(L, -1);
-                    throw new LuaException(err, LuaException.GetLastError());
-                }
+        //        if (LuaDLL.luaL_loadbuffer(L, buffer, buffer.Length, fileName) != 0)
+        //        {
+        //            string err = LuaDLL.lua_tostring(L, -1);
+        //            throw new LuaException(err, LuaException.GetLastError());
+        //        }
 
-                return 1;
-            }
-            catch (Exception e)
-            {
-                return LuaDLL.toluaL_exception(L, e);
-            }
-        }
+        //        return 1;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return LuaDLL.toluaL_exception(L, e);
+        //    }
+        //}
 
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        public static int DoFile(IntPtr L)
-        {
-            try
-            {
-                string fileName = LuaDLL.lua_tostring(L, 1);
-                int n = LuaDLL.lua_gettop(L);
-                byte[] buffer = LuaFileUtils.Instance.ReadFile(fileName);
+        //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        //public static int DoFile(IntPtr L)
+        //{
+        //    try
+        //    {
+        //        string fileName = LuaDLL.lua_tostring(L, 1);
+        //        int n = LuaDLL.lua_gettop(L);
+        //        byte[] buffer = LuaFileUtils.Instance.ReadFile(fileName);
 
-                if (buffer == null)
-                {
-                    string error = string.Format("cannot open {0}: No such file or directory", fileName);
-                    error += LuaFileUtils.Instance.FindFileError(fileName);
-                    throw new LuaException(error);
-                }
+        //        if (buffer == null)
+        //        {
+        //            string error = string.Format("cannot open {0}: No such file or directory", fileName);
+        //            error += LuaFileUtils.Instance.FindFileError(fileName);
+        //            throw new LuaException(error);
+        //        }
 
-                if (LuaDLL.luaL_loadbuffer(L, buffer, buffer.Length, fileName) == 0)
-                {
-                    if (LuaDLL.lua_pcall(L, 0, LuaDLL.LUA_MULTRET, 0) != 0)
-                    {
-                        string error = LuaDLL.lua_tostring(L, -1);
-                        throw new LuaException(error, LuaException.GetLastError());
-                    }
-                }
+        //        if (LuaDLL.luaL_loadbuffer(L, buffer, buffer.Length, fileName) == 0)
+        //        {
+        //            if (LuaDLL.lua_pcall(L, 0, LuaDLL.LUA_MULTRET, 0) != 0)
+        //            {
+        //                string error = LuaDLL.lua_tostring(L, -1);
+        //                throw new LuaException(error, LuaException.GetLastError());
+        //            }
+        //        }
 
-                return LuaDLL.lua_gettop(L) - n;
-            }
-            catch (Exception e)
-            {
-                return LuaDLL.toluaL_exception(L, e);
-            }
-        }
+        //        return LuaDLL.lua_gettop(L) - n;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return LuaDLL.toluaL_exception(L, e);
+        //    }
+        //}
 
-        [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-        public static int LoadFile(IntPtr L)
-        {
-            try
-            {
-                string fileName = LuaDLL.lua_tostring(L, 1);
-                byte[] buffer = LuaFileUtils.Instance.ReadFile(fileName);
+        //[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+        //public static int LoadFile(IntPtr L)
+        //{
+        //    try
+        //    {
+        //        string fileName = LuaDLL.lua_tostring(L, 1);
+        //        byte[] buffer = LuaFileUtils.Instance.ReadFile(fileName);
 
-                if (buffer == null)
-                {
-                    string error = string.Format("cannot open {0}: No such file or directory", fileName);
-                    error += LuaFileUtils.Instance.FindFileError(fileName);
-                    throw new LuaException(error);
-                }
+        //        if (buffer == null)
+        //        {
+        //            string error = string.Format("cannot open {0}: No such file or directory", fileName);
+        //            error += LuaFileUtils.Instance.FindFileError(fileName);
+        //            throw new LuaException(error);
+        //        }
 
-                if (LuaDLL.luaL_loadbuffer(L, buffer, buffer.Length, fileName) == 0)
-                {
-                    return 1;
-                }
+        //        if (LuaDLL.luaL_loadbuffer(L, buffer, buffer.Length, fileName) == 0)
+        //        {
+        //            return 1;
+        //        }
 
-                LuaDLL.lua_pushnil(L);
-                LuaDLL.lua_insert(L, -2);  /* put before error message */
-                return 2;
-            }
-            catch (Exception e)
-            {
-                return LuaDLL.toluaL_exception(L, e);
-            }
-        }
+        //        LuaDLL.lua_pushnil(L);
+        //        LuaDLL.lua_insert(L, -2);  /* put before error message */
+        //        return 2;
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        return LuaDLL.toluaL_exception(L, e);
+        //    }
+        //}
 
 
         [MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
