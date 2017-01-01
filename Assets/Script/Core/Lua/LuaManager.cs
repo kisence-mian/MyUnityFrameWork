@@ -2,13 +2,22 @@
 using System.Collections;
 using LuaInterface;
 using System;
+using System.Collections.Generic;
 
 public class LuaManager
 {
-    static LuaState state = new LuaState();
+    private static LuaState s_state = new LuaState();
+
+    public static LuaState LuaState
+    {
+        get { return LuaManager.s_state; }
+        //set { LuaManager.s_state = value; }
+    }
 
     public const string c_LuaConfigName = "LuaConfig";
+    public const string c_LuaLibraryListKey = "LuaLibList";
     public const string c_LuaListKey = "LuaList";
+
     //public const string c_MainName = "LuaConfig";
 
     /// <summary>
@@ -18,7 +27,7 @@ public class LuaManager
     {
         try
         {
-            state.Start();
+            s_state.Start();
             ApplicationManager.s_OnApplicationUpdate += Update;
 
         }
@@ -35,9 +44,17 @@ public class LuaManager
     {
         try
         {
-            //取出所有的Lua文件并执行
-            string[] luaList = ConfigManager.GetData(c_LuaConfigName)[c_LuaListKey].GetStringArray();
+            Dictionary<string,SingleField> data = ConfigManager.GetData(c_LuaConfigName);
 
+            //先取出所有库文件执行
+            string[] luaLibList = data[c_LuaLibraryListKey].GetStringArray();
+            for (int i = 0; i < luaLibList.Length; i++)
+            {
+                DoLuaFile(luaLibList[i]);
+            }
+
+            //再取出所有的Lua文件并执行
+            string[] luaList = data[c_LuaListKey].GetStringArray();
             for (int i = 0; i < luaList.Length; i++)
             {
                 DoLuaFile(luaList[i]);
@@ -57,11 +74,6 @@ public class LuaManager
     public static void DoLuaFile(string fileName)
     {
         string content = ResourceManager.ReadTextFile(fileName);
-        state.DoString(content, fileName);
-    }
-
-    static void UIEventHandle(UIEvent e)
-    {
-
+        s_state.DoString(content, fileName);
     }
 }

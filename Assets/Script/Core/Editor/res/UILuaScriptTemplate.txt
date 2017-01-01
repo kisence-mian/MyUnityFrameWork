@@ -1,0 +1,33 @@
+{0} = UIWindowMetaTable:New();
+
+function {0}:OnInit()
+end
+
+function {0}:OnOpen()
+end
+
+function {0}:OnClose()
+end
+
+function {0}:EnterAnim()
+	return 0;
+end
+
+function {0}:OnCompleteEnterAnim()
+end
+
+function {0}:OnRefresh()
+end
+
+function {0}:OnClose()
+end
+
+function {0}:ExitAnim()
+	return 0;
+end
+
+function {0}:OnCompleteExitAnim()
+end
+
+function {0}:OnDestroy()
+end

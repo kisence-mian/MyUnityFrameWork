@@ -36,6 +36,12 @@ public class UIBase : MonoBehaviour
         get { return name + m_UIID; }
         //set { m_UIID = value; }
     }
+
+    public string UIName
+    {
+        get { return name; }
+    }
+
     public void Init(int id)
     {
         m_UIID = id;

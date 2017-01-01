@@ -6,8 +6,11 @@ using System.Collections.Generic;
 
 public class LuaEditorWindow : EditorWindow
 {
-    string m_path = "Lua";
+    const string c_LuaFilePath = "Lua";
+    const string c_LuaLibFilePath = "LuaLib";
+
     List<string> m_LuaFileList;
+    List<string> m_LuaLibFileList;
     Dictionary<string, SingleField> m_luaConfig;
 
     [MenuItem("Window/Lua设置编辑器")]
@@ -19,8 +22,7 @@ public class LuaEditorWindow : EditorWindow
     void OnEnable()
     {
         EditorGUIStyleData.Init();
-        InitLuaConfig();
-
+        LoadLuaConfig();
     }
 
     #region GUI
@@ -40,7 +42,6 @@ public class LuaEditorWindow : EditorWindow
         }
 
         EditorGUILayout.Space();
-
     }
 
     #endregion
@@ -59,7 +60,8 @@ public class LuaEditorWindow : EditorWindow
     {
         ToLuaMenu.GenLuaAll();
         //创建Lua目录
-        Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadType.Resource,m_path));
+        Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadType.Resource, c_LuaLibFilePath));
+        Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadType.Resource, c_LuaFilePath));
 
         //复制lua初始库文件
 
@@ -67,16 +69,72 @@ public class LuaEditorWindow : EditorWindow
 
     #endregion
 
+    #region 读取Lua配置
+    void LoadLuaConfig()
+    {
+        if (ConfigManager.GetIsExistConfig(LuaManager.c_LuaConfigName))
+        {
+            m_luaConfig = ConfigManager.GetData(LuaManager.c_LuaConfigName);
+        }
+        else
+        {
+            m_luaConfig = new Dictionary<string, SingleField>();
+        }
+
+        LoadLuaList();
+    }
+
+    void LoadLuaList()
+    {
+        if (m_luaConfig.ContainsKey(LuaManager.c_LuaListKey))
+        {
+            m_LuaFileList = new List<string>();
+            m_LuaLibFileList = new List<string>();
+
+            m_LuaFileList.AddRange(m_luaConfig[LuaManager.c_LuaListKey].GetStringArray());
+            m_LuaLibFileList.AddRange(m_luaConfig[LuaManager.c_LuaLibraryListKey].GetStringArray());
+        }
+        else
+        {
+            m_LuaFileList = new List<string>();
+            m_LuaLibFileList = new List<string>();
+        }
+    }
+    #endregion
+
     #region Lua信息检视
+
     bool m_isFold = false;
+    bool m_isFoldLib = false;
     Vector2 m_pos = Vector2.zero;
+    Vector2 m_posLib = Vector2.zero;
     void LuaFileGUI()
     {
+        m_isFoldLib = EditorGUILayout.Foldout(m_isFoldLib, "Lua库列表");
+
+        if (m_isFoldLib)
+        {
+            m_posLib = EditorGUILayout.BeginScrollView(m_posLib,GUILayout.ExpandHeight(false));
+            EditorGUI.indentLevel = 1;
+            if (m_LuaLibFileList != null)
+            {
+                for (int i = 0; i < m_LuaLibFileList.Count; i++)
+                {
+                    EditorGUILayout.LabelField(m_LuaLibFileList[i]);
+                }
+            }
+            EditorGUILayout.EndScrollView();
+        }
+
+
+        EditorGUI.indentLevel = 0;
         m_isFold = EditorGUILayout.Foldout(m_isFold, "Lua列表");
         m_pos = EditorGUILayout.BeginScrollView(m_pos);
         if (m_isFold)
         {
             EditorGUI.indentLevel = 1;
+
+            
             if (m_LuaFileList != null)
             {
                 for (int i = 0; i < m_LuaFileList.Count; i++)
@@ -86,9 +144,9 @@ public class LuaEditorWindow : EditorWindow
             }
 
             
-            //EditorGUI.indentLevel--;
         }
         EditorGUILayout.EndScrollView();
+        EditorGUI.indentLevel--;
     }
 
     #endregion
@@ -126,36 +184,20 @@ public class LuaEditorWindow : EditorWindow
         }
     }
 
-    void InitLuaConfig()
-    {
-        if (ConfigManager.GetIsExistConfig(LuaManager.c_LuaConfigName))
-        {
-            m_luaConfig = ConfigManager.GetData(LuaManager.c_LuaConfigName);
-        }
-        else
-        {
-            m_luaConfig = new Dictionary<string, SingleField>();
-        }
-
-        InitLuaList();
-    }
-
-    void InitLuaList()
-    {
-        m_LuaFileList = new List<string>();
-
-        if (m_luaConfig.ContainsKey(LuaManager.c_LuaListKey))
-        {
-            m_LuaFileList.AddRange(m_luaConfig[LuaManager.c_LuaListKey].GetStringArray());
-        }
-        else
-        {
-            m_LuaFileList = new List<string>();
-        }
-    }
-
     void SaveLuaConfig()
     {
+        //Lua库文件
+        string luaLibConfig = "";
+        for (int i = 0; i < m_LuaLibFileList.Count; i++)
+        {
+            luaLibConfig += m_LuaLibFileList[i];
+            if (i != m_LuaLibFileList.Count - 1)
+            {
+                luaLibConfig += "|";
+            }
+        }
+
+        //Lua文件
         string luaConfig = "";
         for (int i = 0; i < m_LuaFileList.Count; i++)
         {
@@ -175,16 +217,28 @@ public class LuaEditorWindow : EditorWindow
             m_luaConfig[LuaManager.c_LuaListKey].m_content = luaConfig;
         }
 
+        if (!m_luaConfig.ContainsKey(LuaManager.c_LuaLibraryListKey))
+        {
+            m_luaConfig.Add(LuaManager.c_LuaLibraryListKey, new SingleField(luaLibConfig));
+        }
+        else
+        {
+            m_luaConfig[LuaManager.c_LuaLibraryListKey].m_content = luaLibConfig;
+        }
+
         ConfigManager.SaveData(LuaManager.c_LuaConfigName, m_luaConfig);
     }
 
     void GetLuaFileList()
     {
+        m_LuaLibFileList = new List<string>();
         m_LuaFileList= new List<string>();
-        FindConfigName(PathTool.GetAbsolutePath(ResLoadType.Resource, m_path));
+
+        FindLuaLibFile(PathTool.GetAbsolutePath(ResLoadType.Resource, c_LuaLibFilePath));
+        FindLuaFile(PathTool.GetAbsolutePath(ResLoadType.Resource, c_LuaFilePath));
     }
 
-    public void FindConfigName(string path)
+    public void FindLuaFile(string path)
     {
         string[] allUIPrefabName = Directory.GetFiles(path);
         foreach (var item in allUIPrefabName)
@@ -199,7 +253,26 @@ public class LuaEditorWindow : EditorWindow
         string[] dires = Directory.GetDirectories(path);
         for (int i = 0; i < dires.Length; i++)
         {
-            FindConfigName(dires[i]);
+            FindLuaFile(dires[i]);
+        }
+    }
+
+    public void FindLuaLibFile(string path)
+    {
+        string[] allUIPrefabName = Directory.GetFiles(path);
+        foreach (var item in allUIPrefabName)
+        {
+            if (item.EndsWith(".txt"))
+            {
+                string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
+                m_LuaLibFileList.Add(configName);
+            }
+        }
+
+        string[] dires = Directory.GetDirectories(path);
+        for (int i = 0; i < dires.Length; i++)
+        {
+            FindLuaFile(dires[i]);
         }
     }
 

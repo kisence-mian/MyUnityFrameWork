@@ -1,0 +1,53 @@
+LuaTestWindow = UIWindowMetaTable:New();
+
+function LuaTestWindow:OnInit()
+
+	print("OnInit");
+
+	self.UIWindow_ui:GetText("Text").text = "Hello !";
+
+	print(tostring( DataManager.GetData("item"):get_Item("111"):GetColor("asdasd")));
+end
+
+function LuaTestWindow:OnOpen()
+	print("0");
+end
+
+function LuaTestWindow:OnClose()
+end
+
+function LuaTestWindow:EnterAnim()
+
+    local t = {};
+    t[1] = 1;
+    t[2] = 3;
+
+	AnimSystem.UguiAlpha(self.UIWindow_ui.m_uiRoot,0,1,2,0,InterpType.Default,true,false,RepeatType.Once,1,aaa,t);
+	return 2;
+end
+
+function aaa(x_1,x_2,x_3)
+	print("lua CallBack");
+	print(x_1);
+	print(x_2);
+	print(x_3);
+end
+
+function LuaTestWindow:OnCompleteEnterAnim()
+	print("2");
+end
+
+function LuaTestWindow:OnRefresh()
+end
+
+function LuaTestWindow:OnClose()
+end
+
+function LuaTestWindow:ExitAnim()
+end
+
+function LuaTestWindow:OnCompleteExitAnim()
+end
+
+function LuaTestWindow:OnDestroy()
+end

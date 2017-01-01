@@ -340,7 +340,7 @@ public class UIManager : MonoBehaviour
     {
         foreach (List<UIWindowBase> l_uis in s_hideUIs.Values)
         {
-            for (int i = 0; i < s_hideUIs.Count; i++)
+            for (int i = 0; i < l_uis.Count; i++)
             {
                 DestroyUI(l_uis[i]);
             }

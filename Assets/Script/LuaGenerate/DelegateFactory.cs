@@ -19,11 +19,12 @@ public static class DelegateFactory
 		dict.Clear();
 		dict.Add(typeof(UnityEngine.Events.UnityAction), UnityEngine_Events_UnityAction);
 		dict.Add(typeof(AnimCallBack), AnimCallBack);
-		dict.Add(typeof(AnimCustomMethodFloat), AnimCustomMethodFloat);
-		dict.Add(typeof(AnimCustomMethodVector2), AnimCustomMethodVector2);
 		dict.Add(typeof(AnimCustomMethodVector3), AnimCustomMethodVector3);
-		dict.Add(typeof(LoadCallBack), LoadCallBack);
+		dict.Add(typeof(AnimCustomMethodVector2), AnimCustomMethodVector2);
+		dict.Add(typeof(AnimCustomMethodFloat), AnimCustomMethodFloat);
+		dict.Add(typeof(UIAnimCallBack), UIAnimCallBack);
 		dict.Add(typeof(UICallBack), UICallBack);
+		dict.Add(typeof(LoadCallBack), LoadCallBack);
 		dict.Add(typeof(ApplicationVoidCallback), ApplicationVoidCallback);
 		dict.Add(typeof(ApplicationBoolCallback), ApplicationBoolCallback);
 	}
@@ -241,12 +242,12 @@ public static class DelegateFactory
 		}
 	}
 
-	class AnimCustomMethodFloat_Event : LuaDelegate
+	class AnimCustomMethodVector3_Event : LuaDelegate
 	{
-		public AnimCustomMethodFloat_Event(LuaFunction func) : base(func) { }
-		public AnimCustomMethodFloat_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+		public AnimCustomMethodVector3_Event(LuaFunction func) : base(func) { }
+		public AnimCustomMethodVector3_Event(LuaFunction func, LuaTable self) : base(func, self) { }
 
-		public void Call(float param0)
+		public void Call(UnityEngine.Vector3 param0)
 		{
 			func.BeginPCall();
 			func.Push(param0);
@@ -254,7 +255,7 @@ public static class DelegateFactory
 			func.EndPCall();
 		}
 
-		public void CallWithSelf(float param0)
+		public void CallWithSelf(UnityEngine.Vector3 param0)
 		{
 			func.BeginPCall();
 			func.Push(self);
@@ -264,25 +265,25 @@ public static class DelegateFactory
 		}
 	}
 
-	public static Delegate AnimCustomMethodFloat(LuaFunction func, LuaTable self, bool flag)
+	public static Delegate AnimCustomMethodVector3(LuaFunction func, LuaTable self, bool flag)
 	{
 		if (func == null)
 		{
-			AnimCustomMethodFloat fn = delegate(float param0) { };
+			AnimCustomMethodVector3 fn = delegate(UnityEngine.Vector3 param0) { };
 			return fn;
 		}
 
 		if(!flag)
 		{
-			AnimCustomMethodFloat_Event target = new AnimCustomMethodFloat_Event(func);
-			AnimCustomMethodFloat d = target.Call;
+			AnimCustomMethodVector3_Event target = new AnimCustomMethodVector3_Event(func);
+			AnimCustomMethodVector3 d = target.Call;
 			target.method = d.Method;
 			return d;
 		}
 		else
 		{
-			AnimCustomMethodFloat_Event target = new AnimCustomMethodFloat_Event(func, self);
-			AnimCustomMethodFloat d = target.CallWithSelf;
+			AnimCustomMethodVector3_Event target = new AnimCustomMethodVector3_Event(func, self);
+			AnimCustomMethodVector3 d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
@@ -335,12 +336,12 @@ public static class DelegateFactory
 		}
 	}
 
-	class AnimCustomMethodVector3_Event : LuaDelegate
+	class AnimCustomMethodFloat_Event : LuaDelegate
 	{
-		public AnimCustomMethodVector3_Event(LuaFunction func) : base(func) { }
-		public AnimCustomMethodVector3_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+		public AnimCustomMethodFloat_Event(LuaFunction func) : base(func) { }
+		public AnimCustomMethodFloat_Event(LuaFunction func, LuaTable self) : base(func, self) { }
 
-		public void Call(UnityEngine.Vector3 param0)
+		public void Call(float param0)
 		{
 			func.BeginPCall();
 			func.Push(param0);
@@ -348,7 +349,7 @@ public static class DelegateFactory
 			func.EndPCall();
 		}
 
-		public void CallWithSelf(UnityEngine.Vector3 param0)
+		public void CallWithSelf(float param0)
 		{
 			func.BeginPCall();
 			func.Push(self);
@@ -358,74 +359,86 @@ public static class DelegateFactory
 		}
 	}
 
-	public static Delegate AnimCustomMethodVector3(LuaFunction func, LuaTable self, bool flag)
+	public static Delegate AnimCustomMethodFloat(LuaFunction func, LuaTable self, bool flag)
 	{
 		if (func == null)
 		{
-			AnimCustomMethodVector3 fn = delegate(UnityEngine.Vector3 param0) { };
+			AnimCustomMethodFloat fn = delegate(float param0) { };
 			return fn;
 		}
 
 		if(!flag)
 		{
-			AnimCustomMethodVector3_Event target = new AnimCustomMethodVector3_Event(func);
-			AnimCustomMethodVector3 d = target.Call;
+			AnimCustomMethodFloat_Event target = new AnimCustomMethodFloat_Event(func);
+			AnimCustomMethodFloat d = target.Call;
 			target.method = d.Method;
 			return d;
 		}
 		else
 		{
-			AnimCustomMethodVector3_Event target = new AnimCustomMethodVector3_Event(func, self);
-			AnimCustomMethodVector3 d = target.CallWithSelf;
+			AnimCustomMethodFloat_Event target = new AnimCustomMethodFloat_Event(func, self);
+			AnimCustomMethodFloat d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
 	}
 
-	class LoadCallBack_Event : LuaDelegate
+	class UIAnimCallBack_Event : LuaDelegate
 	{
-		public LoadCallBack_Event(LuaFunction func) : base(func) { }
-		public LoadCallBack_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+		public UIAnimCallBack_Event(LuaFunction func) : base(func) { }
+		public UIAnimCallBack_Event(LuaFunction func, LuaTable self) : base(func, self) { }
 
-		public void Call(LoadState param0, object param1)
+		public void Call(UIWindowBase param0, UICallBack param1, object[] param2)
 		{
 			func.BeginPCall();
-			func.PushObject(param0);
+			func.Push(param0);
 			func.Push(param1);
+
+			for (int i = 0; i < param2.Length; i++)
+			{
+				func.Push(param2[i]);
+			}
+
 			func.PCall();
 			func.EndPCall();
 		}
 
-		public void CallWithSelf(LoadState param0, object param1)
+		public void CallWithSelf(UIWindowBase param0, UICallBack param1, object[] param2)
 		{
 			func.BeginPCall();
 			func.Push(self);
-			func.PushObject(param0);
+			func.Push(param0);
 			func.Push(param1);
+
+			for (int i = 0; i < param2.Length; i++)
+			{
+				func.Push(param2[i]);
+			}
+
 			func.PCall();
 			func.EndPCall();
 		}
 	}
 
-	public static Delegate LoadCallBack(LuaFunction func, LuaTable self, bool flag)
+	public static Delegate UIAnimCallBack(LuaFunction func, LuaTable self, bool flag)
 	{
 		if (func == null)
 		{
-			LoadCallBack fn = delegate(LoadState param0, object param1) { };
+			UIAnimCallBack fn = delegate(UIWindowBase param0, UICallBack param1, object[] param2) { };
 			return fn;
 		}
 
 		if(!flag)
 		{
-			LoadCallBack_Event target = new LoadCallBack_Event(func);
-			LoadCallBack d = target.Call;
+			UIAnimCallBack_Event target = new UIAnimCallBack_Event(func);
+			UIAnimCallBack d = target.Call;
 			target.method = d.Method;
 			return d;
 		}
 		else
 		{
-			LoadCallBack_Event target = new LoadCallBack_Event(func, self);
-			LoadCallBack d = target.CallWithSelf;
+			UIAnimCallBack_Event target = new UIAnimCallBack_Event(func, self);
+			UIAnimCallBack d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
@@ -485,6 +498,55 @@ public static class DelegateFactory
 		{
 			UICallBack_Event target = new UICallBack_Event(func, self);
 			UICallBack d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class LoadCallBack_Event : LuaDelegate
+	{
+		public LoadCallBack_Event(LuaFunction func) : base(func) { }
+		public LoadCallBack_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(LoadState param0, object param1)
+		{
+			func.BeginPCall();
+			func.PushObject(param0);
+			func.Push(param1);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(LoadState param0, object param1)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PushObject(param0);
+			func.Push(param1);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate LoadCallBack(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			LoadCallBack fn = delegate(LoadState param0, object param1) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			LoadCallBack_Event target = new LoadCallBack_Event(func);
+			LoadCallBack d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			LoadCallBack_Event target = new LoadCallBack_Event(func, self);
+			LoadCallBack d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

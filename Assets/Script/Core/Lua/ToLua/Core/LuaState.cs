@@ -401,23 +401,23 @@ namespace LuaInterface
             LuaDLL.tolua_endclass(L);
         }
 
-        //public int BeginEnum(Type t)
-        //{
-        //    if (beginCount == 0)
-        //    {
-        //        throw new LuaException("must call BeginModule first");
-        //    }
+        public int BeginEnum(Type t)
+        {
+            if (beginCount == 0)
+            {
+                throw new LuaException("must call BeginModule first");
+            }
 
-        //    int reference = LuaDLL.tolua_beginenum(L, t.Name);
-        //    RegFunction("__gc", Collect);            
-        //    BindTypeRef(reference, t);
-        //    return reference;
-        //}
+            int reference = LuaDLL.tolua_beginenum(L, t.Name);
+            RegFunction("__gc", Collect);
+            BindTypeRef(reference, t);
+            return reference;
+        }
 
-        //public void EndEnum()
-        //{
-        //    LuaDLL.tolua_endenum(L);
-        //}
+        public void EndEnum()
+        {
+            LuaDLL.tolua_endenum(L);
+        }
 
         public void BeginStaticLibs(string name)
         {

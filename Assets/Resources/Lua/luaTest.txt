@@ -2,4 +2,6 @@ print("hello world!")
 
 local UIManager = UIManager;
 
-UIManager.OpenUIWindow("testWindow");
+-- UIManagerLuaHelper.OpenUIWindow("qqqWindow");
+-- UIManagerLuaHelper.OpenUIWindow("qqqWindow");
+-- UIManagerLuaHelper.OpenUIWindow("qqqWindow");

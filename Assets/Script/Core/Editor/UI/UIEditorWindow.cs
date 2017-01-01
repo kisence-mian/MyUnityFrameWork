@@ -97,6 +97,8 @@ public class UIEditorWindow : EditorWindow
     #region createUI
 
     bool isAutoCreatePrefab = true;
+    bool isAutoCreateLuaFile = true;
+    bool isUseLua = true;
     bool isFoldCreateUI = false;
     string m_UIname = "";
     UIType m_UIType = UIType.Normal;
@@ -105,42 +107,74 @@ public class UIEditorWindow : EditorWindow
     {
         EditorGUI.indentLevel = 0;
         isFoldCreateUI = EditorGUILayout.Foldout(isFoldCreateUI, "创建UI:");
+
         if (isFoldCreateUI)
         {
             EditorGUI.indentLevel = 1;
             EditorGUILayout.LabelField("提示： 脚本和 UI 名称会自动添加Window后缀");
             m_UIname = EditorGUILayout.TextField("UI Name:", m_UIname);
             m_UIType = (UIType)EditorGUILayout.EnumPopup("UI Type:", m_UIType);
-            isAutoCreatePrefab = EditorGUILayout.Toggle("自动生成 Prefab",isAutoCreatePrefab);
+            
+            isUseLua = EditorGUILayout.Toggle("使用 Lua", isUseLua);
+            if (isUseLua)
+            {
+                EditorGUI.indentLevel ++;
+                isAutoCreateLuaFile = EditorGUILayout.Toggle("自动创建Lua脚本", isAutoCreateLuaFile);
+                EditorGUI.indentLevel --;
+            }
+
+            isAutoCreatePrefab = EditorGUILayout.Toggle("自动生成 Prefab", isAutoCreatePrefab);
+
             if (m_UIname != "")
             {
                 string l_nameTmp = m_UIname + "Window";
-                Type l_typeTmp = EditorTool.GetType(l_nameTmp);
-                if (l_typeTmp != null)
+
+                if (!isUseLua)
                 {
-                    if(l_typeTmp.BaseType.Equals(typeof(UIWindowBase)))
+                    Type l_typeTmp = EditorTool.GetType(l_nameTmp);
+                    if (l_typeTmp != null)
                     {
-                        if (GUILayout.Button("创建UI"))
+                        if (l_typeTmp.BaseType.Equals(typeof(UIWindowBase)))
                         {
-                            UICreateService.CreatUI(l_nameTmp, m_UIType,m_UILayerManager,isAutoCreatePrefab);
-                            m_UIname = "";
+                            if (GUILayout.Button("创建UI"))
+                            {
+                                UICreateService.CreatUI(l_nameTmp, m_UIType, m_UILayerManager, isAutoCreatePrefab);
+                                m_UIname = "";
+                            }
+                        }
+                        else
+                        {
+                            EditorGUILayout.LabelField("该类没有继承UIWindowBase");
                         }
                     }
                     else
                     {
-                        EditorGUILayout.LabelField("该类没有继承UIWindowBase");
+                        if (GUILayout.Button("创建UI脚本"))
+                        {
+                            UICreateService.CreatUIScript(l_nameTmp);
+                        }
                     }
                 }
                 else
                 {
-                    if (GUILayout.Button("创建UI脚本"))
+                    if (GUILayout.Button("创建UI"))
                     {
-                        UICreateService.CreatUIScript(l_nameTmp);
+                        UICreateService.CreatUIbyLua(l_nameTmp, m_UIType, m_UILayerManager, isAutoCreatePrefab);
+                        if (isAutoCreateLuaFile)
+                        {
+                            UICreateService.CreatUILuaScript(l_nameTmp);
+                        }
+
+                        m_UIname = "";
                     }
                 }
+
+
             }
         }
     }
+
+
     #endregion
 
     #region UITemplate

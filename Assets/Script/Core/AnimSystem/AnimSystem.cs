@@ -50,7 +50,6 @@ public class AnimSystem : MonoBehaviour
         int repeatCount = -1, 
         AnimCallBack callBack = null, object[] parameter = null)
     {
-
         Color fromTmp = from ?? Color.white;
 
         if (from == null)
@@ -108,6 +107,8 @@ public class AnimSystem : MonoBehaviour
         int repeatCount = -1, 
         AnimCallBack callBack = null, object[] parameter = null)
     {
+
+
 
         float fromTmp = from ?? 1;
 

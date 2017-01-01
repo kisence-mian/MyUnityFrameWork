@@ -1121,6 +1121,7 @@ public class BundleConfigEditorWindow : EditorWindow
     {
         if (bundleName.ContainsKey(pack.name))
         {
+            Debug.LogError(pack.name + "包名重复! ");
             pack.errorMsg.Add("包名重复! ");
             errorCount++;
         }
@@ -1233,6 +1234,7 @@ public class BundleConfigEditorWindow : EditorWindow
         {
             if (pack.objects[i].obj == null)
             {
+                Debug.LogError(pack.name +" "+ i + "号资源丢失！");
                 pack.errorMsg.Add(i + "号资源丢失！");
                 errorCount++;
             }
@@ -1241,6 +1243,7 @@ public class BundleConfigEditorWindow : EditorWindow
         //将来加入资源缺失检测
         if (pack.mainObject == null)
         {
+            Debug.LogError(pack.name + "没有主资源！");
             pack.errorMsg.Add("没有主资源！");
             errorCount++;
             return; 
@@ -1284,6 +1287,7 @@ public class BundleConfigEditorWindow : EditorWindow
     {
         if(pack.objects.Count == 0)
         {
+            Debug.LogError(pack.name + " 依赖包无资源 ！");
             pack.errorMsg.Add(pack.name + " 依赖包无资源 ！");
             errorCount++;
         }

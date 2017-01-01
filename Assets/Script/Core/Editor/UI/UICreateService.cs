@@ -180,10 +180,76 @@ public class UICreateService
         ProjectWindowUtil.ShowCreatedAsset(l_uiGo);
     }
 
+    public static void CreatUIbyLua(string l_UIWindowName, UIType l_UIType, UILayerManager l_UILayerManager, bool l_isAutoCreatePrefab)
+    {
+        GameObject l_uiGo = new GameObject(l_UIWindowName);
+
+        UIWindowLuaHelper l_uiBaseTmp = l_uiGo.AddComponent<UIWindowLuaHelper>();
+
+        l_uiGo.layer = LayerMask.NameToLayer("UI");
+
+        l_uiBaseTmp.m_UIType = l_UIType;
+
+        l_uiGo.AddComponent<Canvas>();
+        l_uiGo.AddComponent<GraphicRaycaster>();
+
+        RectTransform l_ui = l_uiGo.GetComponent<RectTransform>();
+        l_ui.sizeDelta = Vector2.zero;
+        l_ui.anchorMin = Vector2.zero;
+        l_ui.anchorMax = Vector2.one;
+
+        GameObject l_BgGo = new GameObject("BG");
+
+        l_BgGo.layer = LayerMask.NameToLayer("UI");
+        RectTransform l_Bg = l_BgGo.AddComponent<RectTransform>();
+        l_Bg.SetParent(l_ui);
+        l_Bg.sizeDelta = Vector2.zero;
+        l_Bg.anchorMin = Vector2.zero;
+        l_Bg.anchorMax = Vector2.one;
+
+        GameObject l_rootGo = new GameObject("root");
+        l_rootGo.layer = LayerMask.NameToLayer("UI");
+        RectTransform l_root = l_rootGo.AddComponent<RectTransform>();
+        l_root.SetParent(l_ui);
+        l_root.sizeDelta = Vector2.zero;
+        l_root.anchorMin = Vector2.zero;
+        l_root.anchorMax = Vector2.one;
+
+        l_uiBaseTmp.m_bgMask = l_BgGo;
+        l_uiBaseTmp.m_uiRoot = l_rootGo;
+
+        if (l_UILayerManager)
+        {
+            l_UILayerManager.SetLayer(l_uiBaseTmp);
+        }
+
+        if (l_isAutoCreatePrefab)
+        {
+            string Path = "Resources/UI/" + l_UIWindowName + "/" + l_UIWindowName + ".prefab";
+            FileTool.CreatFilePath(Application.dataPath + "/" + Path);
+            PrefabUtility.CreatePrefab("Assets/" + Path, l_uiGo, ReplacePrefabOptions.ConnectToPrefab);
+        }
+
+        ProjectWindowUtil.ShowCreatedAsset(l_uiGo);
+    }
+
     public static void CreatUIScript(string l_UIWindowName)
     {
         string LoadPath = Application.dataPath + "/Script/Core/Editor/res/UIWindowClassTemplate.txt";
         string SavePath = Application.dataPath + "/Script/UI/" + l_UIWindowName + "/" + l_UIWindowName + ".cs";
+
+        string l_UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
+        string l_classContent = l_UItemplate.Replace("{0}", l_UIWindowName);
+
+        ResourceIOTool.WriteStringByFile(SavePath, l_classContent);
+
+        AssetDatabase.Refresh();
+    }
+
+    public static void CreatUILuaScript(string l_UIWindowName)
+    {
+        string LoadPath = Application.dataPath + "/Script/Core/Editor/res/UILuaScriptTemplate.txt";
+        string SavePath = Application.dataPath + "/Resources/Lua/UI/Lua" + l_UIWindowName + ".txt";
 
         string l_UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
         string l_classContent = l_UItemplate.Replace("{0}", l_UIWindowName);

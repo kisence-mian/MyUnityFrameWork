@@ -72,9 +72,39 @@ public static class CustomSettings
     #endregion
 
     #region Framework
-         _GT(typeof(AnimSystem)),
+
+        #region AnimSystem
+
+            _GT(typeof(InterpType)),
+            _GT(typeof(RepeatType)),
+            _GT(typeof(AnimData)),
+            _GT(typeof(AnimSystem)),
+
+        #endregion
+
+        #region UI
+
+            _GT(typeof(UIBase)),
+            _GT(typeof(UIWindowBase)),
+            _GT(typeof(UIManager)),
+            _GT(typeof(UIWindowLuaHelper)),
+
+        #endregion
+
+        #region Data
+
+            _GT(typeof(DataTable)),
+            _GT(typeof(SingleData)),
+            _GT(typeof(SingleField)),
+
+            _GT(typeof(DataManager)),
+            _GT(typeof(ConfigManager)),
+            _GT(typeof(RecordManager)),
+
+        #endregion
+
+         _GT(typeof(NetworkManager)),
          _GT(typeof(ResourceManager)),
-         _GT(typeof(UIManager)),
          _GT(typeof(ApplicationManager)),
          _GT(typeof(ApplicationStatusManager)),
 

@@ -12,17 +12,31 @@ public static class LuaBinder
 		LuaInterface_DebuggerWrap.Register(L);
 		ScrollRectInputWrap.Register(L);
 		ReusingScrollRectWrap.Register(L);
+		InterpTypeWrap.Register(L);
+		RepeatTypeWrap.Register(L);
+		AnimDataWrap.Register(L);
 		AnimSystemWrap.Register(L);
-		ResourceManagerWrap.Register(L);
+		UIBaseWrap.Register(L);
+		UIWindowBaseWrap.Register(L);
 		UIManagerWrap.Register(L);
+		UIWindowLuaHelperWrap.Register(L);
+		DataTableWrap.Register(L);
+		SingleDataWrap.Register(L);
+		SingleFieldWrap.Register(L);
+		DataManagerWrap.Register(L);
+		ConfigManagerWrap.Register(L);
+		RecordManagerWrap.Register(L);
+		NetworkManagerWrap.Register(L);
+		ResourceManagerWrap.Register(L);
 		ApplicationManagerWrap.Register(L);
 		ApplicationStatusManagerWrap.Register(L);
 		L.RegFunction("AnimCallBack", AnimCallBack);
-		L.RegFunction("AnimCustomMethodFloat", AnimCustomMethodFloat);
-		L.RegFunction("AnimCustomMethodVector2", AnimCustomMethodVector2);
 		L.RegFunction("AnimCustomMethodVector3", AnimCustomMethodVector3);
-		L.RegFunction("LoadCallBack", LoadCallBack);
+		L.RegFunction("AnimCustomMethodVector2", AnimCustomMethodVector2);
+		L.RegFunction("AnimCustomMethodFloat", AnimCustomMethodFloat);
+		L.RegFunction("UIAnimCallBack", UIAnimCallBack);
 		L.RegFunction("UICallBack", UICallBack);
+		L.RegFunction("LoadCallBack", LoadCallBack);
 		L.RegFunction("ApplicationVoidCallback", ApplicationVoidCallback);
 		L.RegFunction("ApplicationBoolCallback", ApplicationBoolCallback);
 		L.BeginModule("UnityEngine");
@@ -47,6 +61,14 @@ public static class LuaBinder
 		L.RegFunction("UnityAction", UnityEngine_Events_UnityAction);
 		L.EndModule();
 		L.EndModule();
+		L.BeginModule("System");
+		L.BeginModule("Collections");
+		L.BeginModule("Generic");
+		System_Collections_Generic_Dictionary_string_SingleDataWrap.Register(L);
+		System_Collections_Generic_Dictionary_string_stringWrap.Register(L);
+		L.EndModule();
+		L.EndModule();
+		L.EndModule();
 		L.EndModule();
 		Debugger.Log("Register lua type cost time: {0}", Time.realtimeSinceStartup - t);
 	}
@@ -68,60 +90,6 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AnimCallBack), func, self);
-				ToLua.Push(L, arg1);
-			}
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int AnimCustomMethodFloat(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
-
-			if (count == 1)
-			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodFloat), func);
-				ToLua.Push(L, arg1);
-			}
-			else
-			{
-				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodFloat), func, self);
-				ToLua.Push(L, arg1);
-			}
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int AnimCustomMethodVector2(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
-
-			if (count == 1)
-			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodVector2), func);
-				ToLua.Push(L, arg1);
-			}
-			else
-			{
-				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodVector2), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;
@@ -160,7 +128,7 @@ public static class LuaBinder
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int LoadCallBack(IntPtr L)
+	static int AnimCustomMethodVector2(IntPtr L)
 	{
 		try
 		{
@@ -169,13 +137,67 @@ public static class LuaBinder
 
 			if (count == 1)
 			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(LoadCallBack), func);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodVector2), func);
 				ToLua.Push(L, arg1);
 			}
 			else
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(LoadCallBack), func, self);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodVector2), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int AnimCustomMethodFloat(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodFloat), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodFloat), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int UIAnimCallBack(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIAnimCallBack), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UIAnimCallBack), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;
@@ -203,6 +225,33 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UICallBack), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int LoadCallBack(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(LoadCallBack), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(LoadCallBack), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

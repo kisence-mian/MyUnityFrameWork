@@ -30,6 +30,22 @@ public class NetworkManager
         ApplicationManager.s_OnApplicationUpdate += Update;
     }
 
+    public static void Init(string networkInterfaceName)
+    {
+        //提前加载网络事件派发器，避免异步冲突
+        InputManager.LoadDispatcher<InputNetworkConnectStatusEvent>();
+        InputManager.LoadDispatcher<InputNetworkMessageEvent>();
+
+        Type type = Type.GetType(networkInterfaceName);
+
+        s_network = Activator.CreateInstance(type) as INetworkInterface;
+        s_network.InitMessagePool(50);
+        s_network.m_messageCallBack = ReceviceMeaasge;
+        s_network.m_ConnectStatusCallback = ConnectStatusChange;
+
+        ApplicationManager.s_OnApplicationUpdate += Update;
+    }
+
     public static void Dispose()
     {
         InputManager.UnLoadDispatcher<InputNetworkConnectStatusEvent>();
