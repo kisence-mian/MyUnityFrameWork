@@ -19,7 +19,7 @@ public class ApplicationManagerComponentEditor : Editor
 
         m_app = (ApplicationManager)target;
 
-        m_statusList         = GetStatusList();
+        m_statusList = GetStatusList();
         m_currentSelectIndex = GetStatusIndex();
 
         m_currentSelectIndex = EditorGUILayout.Popup("First Status:", m_currentSelectIndex, m_statusList);
@@ -37,8 +37,8 @@ public class ApplicationManagerComponentEditor : Editor
                 GUILayout.Label("  " + m_app.m_globalLogic[i]);
             }
         }
-
     }
+   
 
     public string[] GetStatusList()
     {

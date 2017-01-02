@@ -1,7 +1,0 @@
-print("hello world!")
-
-local UIManager = UIManager;
-
--- UIManagerLuaHelper.OpenUIWindow("qqqWindow");
--- UIManagerLuaHelper.OpenUIWindow("qqqWindow");
--- UIManagerLuaHelper.OpenUIWindow("qqqWindow");

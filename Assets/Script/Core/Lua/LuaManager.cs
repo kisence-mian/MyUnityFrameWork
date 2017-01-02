@@ -38,9 +38,9 @@ public class LuaManager
     }
 
     /// <summary>
-    /// 加载全部Lua文件并执行
+    /// 加载全部Lua文件
     /// </summary>
-    public static void StartLua()
+    public static void LoadLua()
     {
         try
         {
@@ -63,6 +63,21 @@ public class LuaManager
         catch (Exception e)
         {
             Debug.LogError("Lua Start Execption " + e.ToString());
+        }
+    }
+
+    /// <summary>
+    /// 启动Lua
+    /// </summary>
+    public static void LaunchLua()
+    {
+        try
+        {
+            s_state.GetFunction("Main").Call();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("Lua Lunch Execption " + e.ToString());
         }
     }
 

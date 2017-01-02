@@ -48,13 +48,13 @@ public class UIManager : MonoBehaviour
     {
         return (T)CreateUIWindow(typeof(T).Name);
     }
-    public static UIWindowBase CreateUIWindow(string l_UIname)
+    public static UIWindowBase CreateUIWindow(string UIName)
     {
-        GameObject l_UItmp = GameObjectManager.CreatGameObject(l_UIname, s_UIManagerGo);
+        GameObject l_UItmp = GameObjectManager.CreatGameObject(UIName, s_UIManagerGo);
         UIWindowBase l_UIbase = l_UItmp.GetComponent<UIWindowBase>();
         UISystemEvent.Dispatch(l_UIbase, UIEvent.OnInit);  //派发OnInit事件
         try{
-            l_UIbase.Init(GetUIID(l_UIname));
+            l_UIbase.Init(GetUIID(UIName));
         }
         catch(Exception e){
             Debug.LogError("OnInit Exception: " + e.ToString());}
@@ -67,37 +67,37 @@ public class UIManager : MonoBehaviour
     /// <summary>
     /// 打开UI
     /// </summary>
-    /// <param name="l_UIname">UI名</param>
-    /// <param name="l_callback">动画播放完毕回调</param>
-    /// <param name="l_objs">回调传参</param>
+    /// <param name="UIName">UI名</param>
+    /// <param name="callback">动画播放完毕回调</param>
+    /// <param name="objs">回调传参</param>
     /// <returns>返回打开的UI</returns>
-    public static UIWindowBase OpenUIWindow(string l_UIname, UICallBack l_callback = null, params object[] l_objs)
+    public static UIWindowBase OpenUIWindow(string UIName, UICallBack callback = null, params object[] objs)
     {
-        UIWindowBase l_UIbase = GetHideUI(l_UIname);
+        UIWindowBase UIbase = GetHideUI(UIName);
 
-        if (l_UIbase == null)
+        if (UIbase == null)
         {
-            l_UIbase = CreateUIWindow(l_UIname);
+            UIbase = CreateUIWindow(UIName);
         }
         else
         {
-            l_UIbase.gameObject.SetActive(true);
+            UIbase.gameObject.SetActive(true);
         }
 
-        RemoveHideUI(l_UIbase);
-        AddUI(l_UIbase);
+        RemoveHideUI(UIbase);
+        AddUI(UIbase);
 
-        UISystemEvent.Dispatch(l_UIbase, UIEvent.OnOpen);  //派发OnOpen事件
+        UISystemEvent.Dispatch(UIbase, UIEvent.OnOpen);  //派发OnOpen事件
         try{
-            l_UIbase.OnOpen();}
+            UIbase.OnOpen();}
         catch (Exception e)
         {
             Debug.LogError("OnOpen Exception: " + e.ToString());
         }
 
-        s_UILayerManager.SetLayer(l_UIbase);      //设置层级
-        s_UIAnimManager.StartEnterAnim(l_UIbase, l_callback, l_objs); //播放动画
-        return l_UIbase;
+        s_UILayerManager.SetLayer(UIbase);      //设置层级
+        s_UIAnimManager.StartEnterAnim(UIbase, callback, objs); //播放动画
+        return UIbase;
     }
     public static T OpenUIWindow<T>() where T : UIWindowBase
     {

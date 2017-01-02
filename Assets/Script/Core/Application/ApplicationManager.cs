@@ -53,15 +53,13 @@ public class ApplicationManager : MonoBehaviour
         InputManager.Init();                 //输入管理器启动
         UIManager.Init();                    //UIManager启动
 
-        ApplicationStatusManager.Init();     //游戏流程状态机初始化
-
-        //初始化全局逻辑
-        GlobalLogicManager.Init();
-
         if (m_useLua)
         {
             LuaManager.Init();
         }
+
+        ApplicationStatusManager.Init();     //游戏流程状态机初始化
+        GlobalLogicManager.Init();           //初始化全局逻辑
 
         if (m_AppMode != AppMode.Release)
         {
@@ -69,8 +67,7 @@ public class ApplicationManager : MonoBehaviour
 
             DevelopReplayManager.OnLunchCallBack += () =>
             {
-
-                InitGlobalLogic();//全局逻辑
+                InitGlobalLogic();                                //全局逻辑
                 ApplicationStatusManager.EnterTestModel(m_Status);//可以从此处进入测试流程
             };
 
@@ -80,10 +77,8 @@ public class ApplicationManager : MonoBehaviour
         {
             Log.Init(false); //关闭 Debug
 
-            //全局逻辑
-            InitGlobalLogic();
-            //游戏流程状态机，开始第一个状态
-            ApplicationStatusManager.EnterStatus(m_Status);
+            InitGlobalLogic();                             //全局逻辑
+            ApplicationStatusManager.EnterStatus(m_Status);//游戏流程状态机，开始第一个状态
         }
     }
 
