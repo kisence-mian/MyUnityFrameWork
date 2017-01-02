@@ -26,16 +26,27 @@ public static class LuaBinder
 		DataManagerWrap.Register(L);
 		ConfigManagerWrap.Register(L);
 		RecordManagerWrap.Register(L);
+		InputUIEventTypeWrap.Register(L);
+		InputUIEventBaseWrap.Register(L);
+		InputUIOnScrollEventWrap.Register(L);
+		InputUIOnClickEventWrap.Register(L);
+		NetworkStateWrap.Register(L);
+		InputManagerWrap.Register(L);
 		NetworkManagerWrap.Register(L);
 		ResourceManagerWrap.Register(L);
 		ApplicationManagerWrap.Register(L);
 		ApplicationStatusManagerWrap.Register(L);
+		IInputEventBaseWrap.Register(L);
 		L.RegFunction("AnimCallBack", AnimCallBack);
 		L.RegFunction("AnimCustomMethodVector3", AnimCustomMethodVector3);
 		L.RegFunction("AnimCustomMethodVector2", AnimCustomMethodVector2);
 		L.RegFunction("AnimCustomMethodFloat", AnimCustomMethodFloat);
+		L.RegFunction("InputEventHandle_InputUIOnClickEvent", InputEventHandle_InputUIOnClickEvent);
+		L.RegFunction("EventHandle", EventHandle);
 		L.RegFunction("UIAnimCallBack", UIAnimCallBack);
 		L.RegFunction("UICallBack", UICallBack);
+		L.RegFunction("InputEventCallBack", InputEventCallBack);
+		L.RegFunction("InputEventHandle_IInputEventBase", InputEventHandle_IInputEventBase);
 		L.RegFunction("LoadCallBack", LoadCallBack);
 		L.RegFunction("ApplicationVoidCallback", ApplicationVoidCallback);
 		L.RegFunction("ApplicationBoolCallback", ApplicationBoolCallback);
@@ -182,6 +193,60 @@ public static class LuaBinder
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InputEventHandle_InputUIOnClickEvent(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUIOnClickEvent>), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUIOnClickEvent>), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int EventHandle(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(EventHandle), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(EventHandle), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int UIAnimCallBack(IntPtr L)
 	{
 		try
@@ -225,6 +290,60 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UICallBack), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InputEventCallBack(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventCallBack), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventCallBack), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InputEventHandle_IInputEventBase(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<IInputEventBase>), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<IInputEventBase>), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

@@ -261,14 +261,14 @@ public class UIBase : MonoBehaviour
     }
 
 
-    protected void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
+    public void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
 
         InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(GetButton(buttonName), UIEventKey, buttonName, parm, callback);
         m_OnClickEvents.Add(info);
     }
 
-    protected void AddEventListener(Enum EventEnum,EventHandle handle)
+    public void AddEventListener(Enum EventEnum, EventHandle handle)
     {
         EventHandRegisterInfo info = new EventHandRegisterInfo();
         info.m_EventKey = EventEnum;

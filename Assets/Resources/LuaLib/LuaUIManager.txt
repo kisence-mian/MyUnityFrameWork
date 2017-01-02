@@ -102,3 +102,10 @@ function LuaUIManager.UIOnDestroy(UIWindow_window)
 		error("UIOnDestroy Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
 	end
 end
+
+function LuaUIManager:GetUITable(UIEvent_e)
+
+	if UIEvent_e ~= nil then
+		return LuaUIManager.t_UIs[UIEvent_e.m_name];
+	end
+end

@@ -215,11 +215,39 @@ public class UIWindowBaseWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 2);
-			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
-			System.Enum arg0 = (System.Enum)ToLua.CheckObject(L, 2, typeof(System.Enum));
-			obj.AddEventListener(arg0);
-			return 0;
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UIWindowBase), typeof(System.Enum)))
+			{
+				UIWindowBase obj = (UIWindowBase)ToLua.ToObject(L, 1);
+				System.Enum arg0 = (System.Enum)ToLua.ToObject(L, 2);
+				obj.AddEventListener(arg0);
+				return 0;
+			}
+			else if (count == 3 && TypeChecker.CheckTypes(L, 1, typeof(UIWindowBase), typeof(System.Enum), typeof(EventHandle)))
+			{
+				UIWindowBase obj = (UIWindowBase)ToLua.ToObject(L, 1);
+				System.Enum arg0 = (System.Enum)ToLua.ToObject(L, 2);
+				EventHandle arg1 = null;
+				LuaTypes funcType3 = LuaDLL.lua_type(L, 3);
+
+				if (funcType3 != LuaTypes.LUA_TFUNCTION)
+				{
+					 arg1 = (EventHandle)ToLua.ToObject(L, 3);
+				}
+				else
+				{
+					LuaFunction func = ToLua.ToLuaFunction(L, 3);
+					arg1 = DelegateFactory.CreateDelegate(typeof(EventHandle), func) as EventHandle;
+				}
+
+				obj.AddEventListener(arg0, arg1);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UIWindowBase.AddEventListener");
+			}
 		}
 		catch(Exception e)
 		{

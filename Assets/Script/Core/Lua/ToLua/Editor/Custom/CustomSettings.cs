@@ -103,7 +103,20 @@ public static class CustomSettings
 
         #endregion
 
-         _GT(typeof(NetworkManager)),
+        #region Input
+            
+            
+            _GT(typeof(IInputEventBase)),
+            _GT(typeof(InputUIEventType)),
+            _GT(typeof(InputUIEventBase)),
+            _GT(typeof(InputUIOnScrollEvent)),
+            _GT(typeof(InputUIOnClickEvent)),
+            _GT(typeof(NetworkState)),
+            _GT(typeof(InputManager)),
+            _GT(typeof(NetworkManager)),
+
+        #endregion
+
          _GT(typeof(ResourceManager)),
          _GT(typeof(ApplicationManager)),
          _GT(typeof(ApplicationStatusManager)),

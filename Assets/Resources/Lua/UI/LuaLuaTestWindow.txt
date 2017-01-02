@@ -6,15 +6,27 @@ function LuaTestWindow:OnInit()
 
 	self.UIWindow_ui:GetText("Text").text = "Hello !";
 
-	print(tostring( DataManager.GetData("item"):get_Item("111"):GetColor("asdasd")));
+	print(tostring( DataManager.GetData("item"):get_Item("111"):GetString("asdasd")));
+
+	self.UIWindow_ui:AddOnClickListener("Button",self.OnClick,nil);
 end
 
 function LuaTestWindow:OnOpen()
-	print("0");
+
 end
 
-function LuaTestWindow:OnClose()
+function LuaTestWindow.OnClick(UIEvent_e,T_2)
+
+	local t_self = LuaUIManager:GetUITable(UIEvent_e);
+
+	print("OnClick "..tostring(UIEvent_e.m_pram));
+	print(UIEvent_e.m_name);
+	print(UIEvent_e.m_compName);
+	print((UIEvent_e.m_type == InputUIEventType.Click));
+
+	print("self.UIWindow_ui "..t_self.UIWindow_ui.UIName);
 end
+
 
 function LuaTestWindow:EnterAnim()
 
@@ -33,21 +45,3 @@ function aaa(x_1,x_2,x_3)
 	print(x_3);
 end
 
-function LuaTestWindow:OnCompleteEnterAnim()
-	print("2");
-end
-
-function LuaTestWindow:OnRefresh()
-end
-
-function LuaTestWindow:OnClose()
-end
-
-function LuaTestWindow:ExitAnim()
-end
-
-function LuaTestWindow:OnCompleteExitAnim()
-end
-
-function LuaTestWindow:OnDestroy()
-end

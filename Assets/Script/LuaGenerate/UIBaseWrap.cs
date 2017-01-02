@@ -22,6 +22,8 @@ public class UIBaseWrap
 		L.RegFunction("GetReusingScrollRect", GetReusingScrollRect);
 		L.RegFunction("GetJoyStick", GetJoyStick);
 		L.RegFunction("RemoveAllListener", RemoveAllListener);
+		L.RegFunction("AddOnClickListener", AddOnClickListener);
+		L.RegFunction("AddEventListener", AddEventListener);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("m_objectList", get_m_objectList, set_m_objectList);
@@ -285,6 +287,67 @@ public class UIBaseWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
 			obj.RemoveAllListener();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int AddOnClickListener(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 4);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			string arg0 = ToLua.CheckString(L, 2);
+			InputEventHandle<InputUIOnClickEvent> arg1 = null;
+			LuaTypes funcType3 = LuaDLL.lua_type(L, 3);
+
+			if (funcType3 != LuaTypes.LUA_TFUNCTION)
+			{
+				 arg1 = (InputEventHandle<InputUIOnClickEvent>)ToLua.CheckObject(L, 3, typeof(InputEventHandle<InputUIOnClickEvent>));
+			}
+			else
+			{
+				LuaFunction func = ToLua.ToLuaFunction(L, 3);
+				arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUIOnClickEvent>), func) as InputEventHandle<InputUIOnClickEvent>;
+			}
+
+			string arg2 = ToLua.CheckString(L, 4);
+			obj.AddOnClickListener(arg0, arg1, arg2);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int AddEventListener(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			System.Enum arg0 = (System.Enum)ToLua.CheckObject(L, 2, typeof(System.Enum));
+			EventHandle arg1 = null;
+			LuaTypes funcType3 = LuaDLL.lua_type(L, 3);
+
+			if (funcType3 != LuaTypes.LUA_TFUNCTION)
+			{
+				 arg1 = (EventHandle)ToLua.CheckObject(L, 3, typeof(EventHandle));
+			}
+			else
+			{
+				LuaFunction func = ToLua.ToLuaFunction(L, 3);
+				arg1 = DelegateFactory.CreateDelegate(typeof(EventHandle), func) as EventHandle;
+			}
+
+			obj.AddEventListener(arg0, arg1);
 			return 0;
 		}
 		catch(Exception e)
