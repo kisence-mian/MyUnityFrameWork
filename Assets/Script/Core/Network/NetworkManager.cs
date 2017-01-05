@@ -58,9 +58,13 @@ public class NetworkManager
         ApplicationManager.s_OnApplicationUpdate -= Update;
     }
 
+    public static void SetServer(string IP, int port)
+    {
+        s_network.SetIPAddress(IP, port);
+    }
     public static void Connect()
     {
-        s_network.GetIPAddress();
+        //s_network.GetIPAddress();
         s_network.Connect();
     }
 
@@ -75,13 +79,23 @@ public class NetworkManager
         {
             s_network.SendMessage(messageType,data);
         }
+        else
+        {
+            Debug.LogError("socket 未连接！");
+        }
     }
 
     public static void SendMessage(Dictionary<string, object> data)
     {
         if (IsConnect)
         {
+            //Debug.Log("===sendmessage====");
+            //foreach (var item in data.Values) Debug.Log(item);
             s_network.SendMessage(data["MT"].ToString(), data);
+        }
+        else
+        {
+            Debug.LogError("socket 未连接！");
         }
     }
 

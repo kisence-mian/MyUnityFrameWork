@@ -27,8 +27,14 @@ public class TCPService : INetworkInterface
 
     public override void GetIPAddress()
     {
-        m_IPaddress = "114.215.131.149";
-        m_port = 6666; 
+        //m_IPaddress = DataManager.GetData("ServerData")["1"].GetString("Address");
+        //m_port = DataManager.GetData("ServerData")["1"].GetInt("port");
+    }
+
+    public override void SetIPAddress(string IP,int port)
+    {
+        m_IPaddress = IP;
+        m_port = port;
     }
 
     //连接服务器

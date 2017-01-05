@@ -236,9 +236,9 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public static UIWindowBase GetUI<T>() where T : UIWindowBase
+    public static T GetUI<T>() where T : UIWindowBase
     {
-        return GetUI(typeof(T).Name);
+        return (T)GetUI(typeof(T).Name);
     }
     public static UIWindowBase GetUI(string l_UIname)
     {

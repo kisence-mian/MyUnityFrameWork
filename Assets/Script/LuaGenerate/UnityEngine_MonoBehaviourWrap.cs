@@ -174,7 +174,7 @@ public class UnityEngine_MonoBehaviourWrap
 			ToLua.CheckArgsCount(L, 2);
 			UnityEngine.MonoBehaviour obj = (UnityEngine.MonoBehaviour)ToLua.CheckObject(L, 1, typeof(UnityEngine.MonoBehaviour));
 			System.Collections.IEnumerator arg0 = (System.Collections.IEnumerator)ToLua.CheckObject(L, 2, typeof(System.Collections.IEnumerator));
-			UnityEngine.Coroutine o = obj.StartCoroutine_Auto(arg0);
+			UnityEngine.Coroutine o = obj.StartCoroutine(arg0);
 			ToLua.PushObject(L, o);
 			return 1;
 		}

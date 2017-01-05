@@ -11,12 +11,13 @@ using UnityEngine.EventSystems;
 public static class CustomSettings
 {
     public static string saveDir = Application.dataPath + "/Script/LuaGenerate";
-    public static string toluaBaseType = Application.dataPath + "/Script/LuaGenerate/BaseType/";    
+    public static string toluaBaseType = Application.dataPath + "/Script/LuaGenerate/BaseType/";
 
     //导出时强制做为静态类的类型(注意customTypeList 还要添加这个类型才能导出)
     //unity 有些类作为sealed class, 其实完全等价于静态类
     public static List<Type> staticClassTypes = new List<Type>
-    {    
+    {
+        
         //typeof(UnityEngine.Application),
         //typeof(UnityEngine.Time),
         //typeof(UnityEngine.Screen),
@@ -30,7 +31,7 @@ public static class CustomSettings
     };
 
     //附加导出委托类型(在导出委托时, customTypeList 中牵扯的委托类型都会导出， 无需写在这里)
-    public static DelegateType[] customDelegateList = 
+    public static DelegateType[] customDelegateList =
     {        
         //_DT(typeof(Action)),                
         //_DT(typeof(UnityEngine.Events.UnityAction)),
@@ -41,8 +42,8 @@ public static class CustomSettings
 
     //在这里添加你要导出注册到lua的类型列表
     public static BindType[] customTypeList =
-    {                
-     
+    {
+
         _GT(typeof(Debugger)).SetNameSpace(null),        
 
     #region Base
@@ -117,14 +118,20 @@ public static class CustomSettings
 
         #endregion
 
+         _GT(typeof(HeapObjectPool)),
          _GT(typeof(ResourceManager)),
          _GT(typeof(ApplicationManager)),
          _GT(typeof(ApplicationStatusManager)),
+         _GT(typeof(GameObjectManager)),
 
     #endregion
 
     #region Custom
+         _GT(typeof(Dictionary<string,object>)),   
+         _GT(typeof(GameLogic)), 
+         _GT(typeof(List<PlayerInfo>)), 
 
+         
     #endregion
 
     #region Note
@@ -214,7 +221,7 @@ public static class CustomSettings
     //使用方法参见例子14
     public static List<Type> outList = new List<Type>()
     {
-        
+
     };
 
     public static BindType _GT(Type t)
@@ -225,5 +232,5 @@ public static class CustomSettings
     public static DelegateType _DT(Type t)
     {
         return new DelegateType(t);
-    }    
+    }
 }

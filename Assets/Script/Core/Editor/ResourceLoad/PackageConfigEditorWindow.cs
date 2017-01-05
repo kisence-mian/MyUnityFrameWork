@@ -31,11 +31,27 @@ public class BundleConfigEditorWindow : EditorWindow
         //Debug.Log("初始化");
         EditorGUIStyleData.Init();
 
+        float time = Time.realtimeSinceStartup;
+
         LoadAndAnalysisJson();
+
+        Debug.Log("加载时间 1: " + (Time.realtimeSinceStartup - time));
+        time = Time.realtimeSinceStartup;
+
         AnalysisVersionFile();
+
+        Debug.Log("解析时间 2: " + (Time.realtimeSinceStartup - time));
+        time = Time.realtimeSinceStartup;
+
         UpdateRelyPackageNames();
 
+        Debug.Log("更新依赖包 3: " + (Time.realtimeSinceStartup - time));
+        time = Time.realtimeSinceStartup;
+
         ArrangeBundlesByLayer();
+
+        Debug.Log("分析目录时间 4: " + (Time.realtimeSinceStartup - time));
+        time = Time.realtimeSinceStartup;
     }
 
     #endregion
@@ -101,6 +117,8 @@ public class BundleConfigEditorWindow : EditorWindow
         checkMaterial = EditorGUILayout.Toggle("检查材质球和贴图", checkMaterial);
 
         GUILayout.EndHorizontal();
+
+        HotUpdateConfigGUI();
 
         if (GUILayout.Button("检查依赖关系"))
         {
@@ -691,6 +709,8 @@ public class BundleConfigEditorWindow : EditorWindow
 
     #region 各种判断存在
 
+    Dictionary<string, EditPackageConfig> m_BundleDictCatch = new Dictionary<string,EditPackageConfig>();
+
     /// <summary>
     /// 判断一个资源是否已经在bundle列表中
     /// </summary>
@@ -698,27 +718,29 @@ public class BundleConfigEditorWindow : EditorWindow
     /// <returns>是否存在</returns>
     bool isExist_AllBundle(EditorObject obj)
     {
-        for (int i = 0; i < bundles.Count; i++)
+        if (m_BundleDictCatch.ContainsKey(obj.obj.name))
         {
-            if (EqualsEditorObject(bundles[i].mainObject,obj))
-            {
-                return true;
-            }
-
-            if (isExist_Bundle(obj, bundles[i]))
-            {
-                return true;
-            }
+            return true;
+        }
+        else
+        {
+            return false;
         }
 
-        //for (int i = 0; i < relyPackages.Count; i++)
+
+        //for (int i = 0; i < bundles.Count; i++)
         //{
-        //    if (isExist_Bundle(obj, relyPackages[i]))
+        //    if (EqualsEditorObject(bundles[i].mainObject,obj))
+        //    {
+        //        return true;
+        //    }
+
+        //    if (isExist_Bundle(obj, bundles[i]))
         //    {
         //        return true;
         //    }
         //}
-        return false;
+        //return false;
     }
 
     bool isExist_Bundle(EditorObject obj, EditPackageConfig package)
@@ -921,9 +943,14 @@ public class BundleConfigEditorWindow : EditorWindow
         direIndex = resourcePath.LastIndexOf(resourceParentPath);
         direIndex += resourceParentPath.Length;
 
+        float time = Time.realtimeSinceStartup;
+
+        bundles.Clear();
+        m_BundleDictCatch.Clear();
+
         RecursionDirectory(resourcePath);
 
-        ShowMessage("添加完成! 详情请看输出日志。");
+        ShowMessage("添加完成! 用时" + (Time.realtimeSinceStartup - time) + "s 详情请看输出日志。");
     }
 
     //递归所有目录
@@ -933,11 +960,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
         for (int i = 0; i < dires.Length;i++ )
         {
-            ////配置不打包
-            //if (!dires[i].Equals(resourcePath + ConfigManager.c_directoryName))
-            //{
-                RecursionDirectory(dires[i]);
-            //}
+            RecursionDirectory(dires[i]);
         }
 
         string[] files = Directory.GetFiles(path);
@@ -979,6 +1002,7 @@ public class BundleConfigEditorWindow : EditorWindow
         }
         else
         {
+            
             EditPackageConfig EditPackageConfigTmp = new EditPackageConfig();
 
             if (obj == null)
@@ -1029,18 +1053,11 @@ public class BundleConfigEditorWindow : EditorWindow
                         break;
                     }
                 }
-
-                ////该资源不在依赖包中，并且也与主资源不同时，放入包中
-                //if (isExistRelyPackage == false
-                //    &&!EqualsEditorObject(EditPackageConfigTmp.mainObject,tmp)
-                //    )
-                //{
-                    
-                //    EditPackageConfigTmp.objects.Add(tmp);
-                //}
             }
 
             bundles.Add(EditPackageConfigTmp);
+
+            m_BundleDictCatch.Add(EditPackageConfigTmp.name, EditPackageConfigTmp);
         }
     }
 
@@ -1665,39 +1682,39 @@ public class BundleConfigEditorWindow : EditorWindow
     //生成版本文件
     public void CreatVersionFile()
     {
-        Dictionary<string, SingleField> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
+        Dictionary<string, SingleField> VersionData = ConfigManager.GetData(HotUpdateManager.c_versionConfigName);
 
         if (VersionData == null)
         {
             VersionData = new Dictionary<string, SingleField>();
         }
 
-        if (VersionData.ContainsKey(UpdateManager.key_largeVersion))
+        if (VersionData.ContainsKey(HotUpdateManager.c_largeVersionKey))
         {
-            VersionData[UpdateManager.key_largeVersion] = new SingleField(largeVersion);
+            VersionData[HotUpdateManager.c_largeVersionKey] = new SingleField(largeVersion);
         }
         else
         {
-            VersionData.Add(UpdateManager.key_largeVersion, new SingleField(largeVersion));
+            VersionData.Add(HotUpdateManager.c_largeVersionKey, new SingleField(largeVersion));
         }
 
-        if (VersionData.ContainsKey(UpdateManager.key_smallVerson))
+        if (VersionData.ContainsKey(HotUpdateManager.c_smallVersonKey))
         {
-            VersionData[UpdateManager.key_smallVerson] = new SingleField(smallVersion);
+            VersionData[HotUpdateManager.c_smallVersonKey] = new SingleField(smallVersion);
         }
         else
         {
-            VersionData.Add(UpdateManager.key_smallVerson, new SingleField(smallVersion));
+            VersionData.Add(HotUpdateManager.c_smallVersonKey, new SingleField(smallVersion));
         }
 
-        ConfigManager.SaveData(UpdateManager.versionFileName, VersionData);
+        ConfigManager.SaveData(HotUpdateManager.c_versionConfigName, VersionData);
         AssetDatabase.Refresh();
     }
 
     //解析版本号文件
     public void AnalysisVersionFile()
     {
-        Dictionary<string, SingleField> VersionData = ConfigManager.GetData(UpdateManager.versionFileName);
+        Dictionary<string, SingleField> VersionData = ConfigManager.GetData(HotUpdateManager.c_versionConfigName);
 
         if (VersionData == null)
         {
@@ -1707,24 +1724,44 @@ public class BundleConfigEditorWindow : EditorWindow
             return;
         }
 
-        if (VersionData.ContainsKey(UpdateManager.key_largeVersion))
+        if (VersionData.ContainsKey(HotUpdateManager.c_largeVersionKey))
         {
-            largeVersion = VersionData[UpdateManager.key_largeVersion].GetInt();
+            largeVersion = VersionData[HotUpdateManager.c_largeVersionKey].GetInt();
         }
         else
         {
             largeVersion = -1;
         }
 
-        if (VersionData.ContainsKey(UpdateManager.key_smallVerson))
+        if (VersionData.ContainsKey(HotUpdateManager.c_smallVersonKey))
         {
-            smallVersion = VersionData[UpdateManager.key_smallVerson].GetInt();
+            smallVersion = VersionData[HotUpdateManager.c_smallVersonKey].GetInt();
         }
         else
         {
             smallVersion = -1;
         }
     }
+    #endregion
+
+    #region 热更新设置初始化
+
+    void HotUpdateConfigGUI()
+    {
+        if(!ConfigManager.GetIsExistConfig(HotUpdateManager.c_HotUpdateConfigName))
+        {
+            if(GUILayout.Button("热更新设置初始化"))
+            {
+                Dictionary<string, SingleField> hotUpdateConfig = new Dictionary<string, SingleField>();
+                hotUpdateConfig.Add(HotUpdateManager.c_testDownLoadPathKey, new SingleField(""));
+                hotUpdateConfig.Add(HotUpdateManager.c_downLoadPathKey, new SingleField(""));
+                hotUpdateConfig.Add(HotUpdateManager.c_UseTestDownLoadPathKey, new SingleField(false));
+                
+                ConfigManager.SaveData(HotUpdateManager.c_HotUpdateConfigName, hotUpdateConfig);
+            }
+        }
+    }
+
     #endregion
 
 }

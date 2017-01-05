@@ -30,7 +30,6 @@ public class UIWindowBase : UIBase
 
     public virtual IEnumerator EnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack,params object[] objs)
     {
-        Debug.Log("112233");
         //默认无动画
         l_animComplete(this, l_callBack, objs);
 

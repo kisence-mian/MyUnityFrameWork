@@ -13,7 +13,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
     {
         if (key == null)
         {
-            throw new Exception("DataGenerateManager GetData key is Null !");
+            throw new Exception("DataGenerateManager<" + typeof(T).Name + "> GetData key is Null !");
         }
 
         //清理缓存

@@ -757,6 +757,8 @@ public class DataEditorWindow : EditorWindow
         content += "public class " + className + " : DataGenerateBase \n";
         content += "{\n";
 
+        content += "\tpublic string m_key;\n";
+
         //type
         List<string> type = new List<string>(data.m_tableTypes.Keys);
         if (type.Count > 0)
@@ -807,6 +809,8 @@ public class DataEditorWindow : EditorWindow
         content += "\t\t}\n";
         content += "\n";
         content += "\t\tSingleData data = table[key];\n\n";
+
+        content += "\t\tm_key = key;\n";
 
         if (type.Count > 0)
         {

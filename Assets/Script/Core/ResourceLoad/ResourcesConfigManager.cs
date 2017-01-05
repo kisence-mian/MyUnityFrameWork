@@ -63,7 +63,7 @@ public static class ResourcesConfigManager
     }
 
     //资源路径数据不依赖任何其他数据
-    static Dictionary<string, SingleField> GetResourcesConfig()
+    public static Dictionary<string, SingleField> GetResourcesConfig()
     {
         string dataJson = "";
 
@@ -78,7 +78,7 @@ public static class ResourcesConfigManager
         {
             ResLoadType type = ResLoadType.Streaming;
 
-            if(RecordManager.GetData(AssetsBundleManager.c_HotUpdateRecordName).GetRecord(c_configFileName,false))
+            if (RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(c_configFileName, false))
             {
                 type = ResLoadType.Persistent;
             }

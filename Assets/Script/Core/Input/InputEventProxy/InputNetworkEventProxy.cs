@@ -15,7 +15,6 @@ public class InputNetworkEventProxy : IInputProxyBase
         {
             InitPool();
             InputNetworkConnectStatusEvent e = GetConnectMsgEvent(status);
-
             InputManager.Dispatch<InputNetworkConnectStatusEvent>(e);
         }
     }
@@ -30,7 +29,6 @@ public class InputNetworkEventProxy : IInputProxyBase
 
             e.m_MessgaeType = massageType;
             e.Data = data;
-
             InputManager.Dispatch<InputNetworkMessageEvent>(e);
         }
     }

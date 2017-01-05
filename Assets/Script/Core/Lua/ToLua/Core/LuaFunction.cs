@@ -367,31 +367,31 @@ namespace LuaInterface
     //        }
     //    }
 
-    //    public double CheckNumber()
-    //    {
-    //        try
-    //        {
-    //            return luaState.LuaCheckNumber(stackPos++);
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            EndPCall();
-    //            throw e;
-    //        }
-    //    }
+        public double CheckNumber()
+        {
+            try
+            {
+                return luaState.LuaCheckNumber(stackPos++);
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
+        }
 
-    //    public bool CheckBoolean()
-    //    {
-    //        try
-    //        {
-    //            return luaState.LuaCheckBoolean(stackPos++);
-    //        }
-    //        catch (Exception e)
-    //        {
-    //            EndPCall();
-    //            throw e;
-    //        }
-    //    }
+        public bool CheckBoolean()
+        {
+            try
+            {
+                return luaState.LuaCheckBoolean(stackPos++);
+            }
+            catch (Exception e)
+            {
+                EndPCall();
+                throw e;
+            }
+        }
 
     //    public string CheckString()
     //    {

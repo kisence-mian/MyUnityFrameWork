@@ -9,5 +9,5 @@ end
 
 function UIOpenCallBack( ... )
 	print("Open Callback")
-	UIManager.CloseUIWindow("LuaTestWindow",true,nil);
+	-- UIManager.CloseUIWindow("LuaTestWindow",true,nil);
 end

@@ -20,6 +20,11 @@ public class INetworkInterface
 
     }
 
+    public virtual void SetIPAddress(string IP, int port)
+    {
+
+    }
+
     public virtual void Connect()
     {
     }
