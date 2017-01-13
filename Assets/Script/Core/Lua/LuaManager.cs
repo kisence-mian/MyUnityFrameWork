@@ -11,14 +11,13 @@ public class LuaManager
     public static LuaState LuaState
     {
         get { return LuaManager.s_state; }
-        //set { LuaManager.s_state = value; }
     }
 
     public const string c_LuaConfigName = "LuaConfig";
     public const string c_LuaLibraryListKey = "LuaLibList";
     public const string c_LuaListKey = "LuaList";
 
-    //public const string c_MainName = "LuaConfig";
+    public static bool s_isUpdate = false;
 
     /// <summary>
     /// 这里仅仅初始化LuaState,热更新结束后调用StartLua正式启动Lua
@@ -29,6 +28,7 @@ public class LuaManager
         {
             s_state.Start();
             //LuaBinder.Bind(s_state);
+
             ApplicationManager.s_OnApplicationUpdate += Update;
 
         }
@@ -75,6 +75,7 @@ public class LuaManager
         try
         {
             s_state.GetFunction("Main").Call();
+            s_isUpdate = true;
         }
         catch (Exception e)
         {
@@ -82,9 +83,19 @@ public class LuaManager
         }
     }
 
+    static LuaFunction s_updateFunction;
+
     static void Update()
     {
+        if(s_isUpdate)
+        {
+            if (s_updateFunction == null)
+            {
+                s_updateFunction = s_state.GetFunction("LuaUpdate");
+            }
 
+            s_updateFunction.Call(Time.deltaTime);
+        }
     }
 
     public static void DoLuaFile(string fileName)

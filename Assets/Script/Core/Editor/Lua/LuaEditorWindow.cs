@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 public class LuaEditorWindow : EditorWindow
 {
@@ -21,6 +22,8 @@ public class LuaEditorWindow : EditorWindow
 
     void OnEnable()
     {
+        Debug.Log(Application.dataPath);
+
         EditorGUIStyleData.Init();
         LoadLuaConfig();
     }
@@ -63,8 +66,11 @@ public class LuaEditorWindow : EditorWindow
         Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaLibFilePath));
         Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaFilePath));
 
-        //复制lua初始库文件
+        string resPath = Application.dataPath + "/Script/Core/Editor/res/LuaLib";
+        string aimPath = Application.dataPath + "/Resources/LuaLib";
 
+        //复制lua初始库文件
+        FileTool.CopyDirectory(resPath, aimPath);
     }
 
     #endregion
@@ -157,10 +163,14 @@ public class LuaEditorWindow : EditorWindow
     {
         if (Directory.Exists(CustomSettings.saveDir))
         {
-            if (GUILayout.Button("清除Lua Warp脚本"))
+            if (!File.Exists(CustomSettings.saveDir + "/LuaBinderCatch.cs"))
             {
-                Directory.Delete(CustomSettings.saveDir, true);
-                AssetDatabase.Refresh();
+                if (GUILayout.Button("清除Lua Warp脚本"))
+                {
+                    FileTool.DeleteDirectory(CustomSettings.saveDir);
+                    CreateLuaBinder();
+                    AssetDatabase.Refresh();
+                }
             }
 
             if (GUILayout.Button("重新生成Lua Warp脚本"))
@@ -169,6 +179,27 @@ public class LuaEditorWindow : EditorWindow
                 ToLuaMenu.GenLuaAll();
             }
         }
+
+    }
+
+    /// <summary>
+    /// 生成LuaBinder文件
+    /// </summary>
+    void CreateLuaBinder()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("using System;");
+        sb.AppendLine("using LuaInterface;");
+        sb.AppendLine();
+        sb.AppendLine("public static class LuaBinder");
+        sb.AppendLine("{");
+        sb.AppendLine("\tpublic static void Bind(LuaState L)");
+        sb.AppendLine("\t{");
+        sb.AppendLine("\t\tthrow new LuaException(\"Please generate LuaBinder files first!\");");
+        sb.AppendLine("\t}");
+        sb.AppendLine("}");
+
+        ResourceIOTool.WriteStringByFile(CustomSettings.saveDir + "/LuaBinderCatch.cs", sb.ToString());
     }
 
     #endregion
