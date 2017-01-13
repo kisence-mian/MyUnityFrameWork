@@ -15,7 +15,7 @@ public class LanguageManager
     static DataTable s_languageData;
 	public static void Init()
     {
-        Debug.Log("当前语言: " + Application.systemLanguage);
+        //Debug.Log("当前语言: " + Application.systemLanguage);
 
         SetLanguage(Application.systemLanguage);
     }

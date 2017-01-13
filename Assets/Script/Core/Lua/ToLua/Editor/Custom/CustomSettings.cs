@@ -135,15 +135,19 @@ public static class CustomSettings
 
     #region Custom
 
-         //_GT(typeof(GameLogic)), 
-         //_GT(typeof(List<PlayerInfo>)), 
-         //_GT(typeof(RouteRule)),
-         //_GT(typeof(InputCmdHelper)),
-         //_GT(typeof(SyncService)),
-         //_GT(typeof(PVPMatchService)),
-         //_GT(typeof(UserData)),
+         _GT(typeof(GameLogic)), 
+         _GT(typeof(List<PlayerInfo>)), 
+         _GT(typeof(RouteRule)),
+         _GT(typeof(InputCmdHelper)),
+         _GT(typeof(SyncService)),
+         _GT(typeof(PVPMatchService)),
+         _GT(typeof(UserData)),
+         _GT(typeof(Camp)),
+         _GT(typeof( CharacterManager)),
+         _GT(typeof( CharacterEventType)),
+         _GT(typeof(CharacterBase)),
+          _GT(typeof(SkillData)),
 
-         
     #endregion
 
     #region Note

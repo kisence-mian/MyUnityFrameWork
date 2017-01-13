@@ -22,8 +22,6 @@ public class LuaEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        Debug.Log(Application.dataPath);
-
         EditorGUIStyleData.Init();
         LoadLuaConfig();
     }
@@ -175,7 +173,7 @@ public class LuaEditorWindow : EditorWindow
 
             if (GUILayout.Button("重新生成Lua Warp脚本"))
             {
-                Directory.Delete(CustomSettings.saveDir, true);
+                FileTool.DeleteDirectory(CustomSettings.saveDir);
                 ToLuaMenu.GenLuaAll();
             }
         }
