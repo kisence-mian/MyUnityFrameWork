@@ -48,18 +48,27 @@ public class DataManager
 
         string dataJson = "";
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
+
+        if (Application.isPlaying)
+        {
+            dataJson = ResourceManager.ReadTextFile(DataName);
+        }
+        else
+        {
+
             dataJson = ResourceIOTool.ReadStringByResource(
                     PathTool.GetRelativelyPath(c_directoryName,
                                                 DataName,
                                                 c_expandName));
-        #else
+        }
+#else
             dataJson = ResourceManager.ReadTextFile(DataName);
-        #endif
+#endif
 
         if (dataJson == "")
         {
-            throw new Exception("Dont Find " + DataName);
+            throw new Exception("Dont Find ->" + DataName + "<-");
         }
 
         data = DataTable.Analysis(dataJson);
@@ -85,7 +94,7 @@ public class DataManager
     {
         ResourceIOTool.WriteStringByFile(
             PathTool.GetAbsolutePath(
-                ResLoadType.Resource,
+                ResLoadLocation.Resource,
                 PathTool.GetRelativelyPath(
                     c_directoryName,
                     ConfigName,

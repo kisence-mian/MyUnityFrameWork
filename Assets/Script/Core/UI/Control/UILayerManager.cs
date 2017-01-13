@@ -50,6 +50,7 @@ public class UILayerManager : MonoBehaviour
         }
 
         l_rt.localScale = Vector3.one;
+        l_rt.sizeDelta = Vector2.zero;
 
         if (l_ui.m_UIType != UIType.GameUI)
         {

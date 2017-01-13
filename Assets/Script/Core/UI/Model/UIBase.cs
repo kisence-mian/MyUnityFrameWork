@@ -15,7 +15,15 @@ public class UIBase : MonoBehaviour
 
     }
 
-    public virtual void OnDestroy()
+
+    public void DestroyUI()
+    {
+        RemoveAllListener();
+        CleanItem();
+        OnDestroy();
+    }
+
+    protected virtual void OnDestroy()
     {
 
     }
@@ -33,13 +41,25 @@ public class UIBase : MonoBehaviour
 
     public string UIEventKey
     {
-        get { return name + m_UIID; }
+        get { return UIName + m_UIID; }
         //set { m_UIID = value; }
     }
 
+    string m_UIName = null;
     public string UIName
     {
-        get { return name; }
+        get {
+            if (m_UIName == null)
+            {
+                m_UIName = name;
+            }
+
+            return m_UIName; 
+        }
+        set 
+        {
+            m_UIName = value; 
+        }
     }
 
     public void Init(int id)
@@ -76,6 +96,8 @@ public class UIBase : MonoBehaviour
         }
     }
 
+    Dictionary<string, UIBase> m_uiBases = new Dictionary<string, UIBase>();
+
     Dictionary<string, GameObject> m_objects;
     Dictionary<string, Image> m_images = new Dictionary<string, Image>();
     Dictionary<string, Text> m_texts = new Dictionary<string, Text>();
@@ -85,6 +107,7 @@ public class UIBase : MonoBehaviour
     Dictionary<string, RawImage> m_rawImages = new Dictionary<string, RawImage>();
     Dictionary<string, RectTransform> m_rectTransforms = new Dictionary<string, RectTransform>();
     Dictionary<string, InputField> m_inputFields = new Dictionary<string, InputField>();
+    Dictionary<string, Slider> m_Sliders = new Dictionary<string, Slider>();
 
     Dictionary<string, UGUIJoyStick> m_joySticks = new Dictionary<string, UGUIJoyStick>();
 
@@ -114,6 +137,18 @@ public class UIBase : MonoBehaviour
 
         RectTransform tmp = GetGameObject(name).GetComponent<RectTransform>();
         m_rectTransforms.Add(name, tmp);
+        return tmp;
+    }
+
+    public UIBase GetUIBase(string name)
+    {
+        if (m_uiBases.ContainsKey(name))
+        {
+            return m_uiBases[name];
+        }
+
+        UIBase tmp = GetGameObject(name).GetComponent<UIBase>();
+        m_uiBases.Add(name, tmp);
         return tmp;
     }
 
@@ -177,8 +212,6 @@ public class UIBase : MonoBehaviour
         return tmp;
     }
 
-
-
     public RawImage GetRawImage(string name)
     {
         if (m_rawImages.ContainsKey(name))
@@ -188,6 +221,18 @@ public class UIBase : MonoBehaviour
 
         RawImage tmp = GetGameObject(name).GetComponent<RawImage>();
         m_rawImages.Add(name, tmp);
+        return tmp;
+    }
+
+    public Slider GetSlider(string name)
+    {
+        if (m_Sliders.ContainsKey(name))
+        {
+            return m_Sliders[name];
+        }
+
+        Slider tmp = GetGameObject(name).GetComponent<Slider>();
+        m_Sliders.Add(name, tmp);
         return tmp;
     }
 
@@ -260,11 +305,15 @@ public class UIBase : MonoBehaviour
         m_EventListeners.Clear();
     }
 
-
     public void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
-
         InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(GetButton(buttonName), UIEventKey, buttonName, parm, callback);
+        m_OnClickEvents.Add(info);
+    }
+
+    public void AddOnClickListenerByCreate(Button button, string compName,InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
+    {
+        InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(button, UIEventKey, compName, parm, callback);
         m_OnClickEvents.Add(info);
     }
 
@@ -277,6 +326,47 @@ public class UIBase : MonoBehaviour
         GlobalEvent.AddEvent(EventEnum, handle);
 
         m_EventListeners.Add(info);
+    }
+
+    #endregion
+
+    #region 创建对象
+
+    List<UIBase> m_ChildList = new List<UIBase>();
+    int m_childUIIndex = 0;
+    public UIBase CreateItem(string itemName,string prantName)
+    {
+        GameObject item = GameObjectManager.CreatGameObjectByPool(itemName, GetGameObject(prantName), true);
+        UIBase UIItem = item.GetComponent<UIBase>();
+
+        UIItem.Init(m_childUIIndex++);
+        UIItem.UIName = UIEventKey + UIItem.UIName;
+
+        m_ChildList.Add(UIItem);
+
+        return UIItem;
+    }
+
+    public void DestroyItem(UIBase item)
+    {
+        if(m_ChildList.Contains(item))
+        {
+            m_ChildList.Remove(item);
+            item.OnDestroy();
+            GameObjectManager.DestroyGameobjectByPool(item.gameObject);
+        }
+    }
+
+    public void CleanItem()
+    {
+        for (int i = 0; i < m_ChildList.Count; i++)
+        {
+            m_ChildList[i].OnDestroy();
+            GameObjectManager.DestroyGameobjectByPool(m_ChildList[i].gameObject);
+        }
+
+        m_ChildList.Clear();
+        m_childUIIndex = 0;
     }
 
     #endregion

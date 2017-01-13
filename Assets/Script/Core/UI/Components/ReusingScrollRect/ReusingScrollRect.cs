@@ -29,7 +29,7 @@ public class ReusingScrollRect : ScrollRectInput
 
         Rebuild(CanvasUpdate.Layout);
 
-        UpdateBounds();
+        UpdateBound();
         SetLayout();
 
         m_itemPrefab = ResourceManager.Load<GameObject>(m_ItemName);
@@ -93,7 +93,7 @@ public class ReusingScrollRect : ScrollRectInput
     {
         base.Rebuild(executing);
 
-        UpdateBounds();
+        UpdateBound();
         SetItemDisplay();
     }
 
@@ -109,7 +109,7 @@ public class ReusingScrollRect : ScrollRectInput
         content.anchoredPosition3D = Vector3.zero;
     }
 
-    void UpdateBounds()
+    void UpdateBound()
     {
         m_viewBounds = new Bounds(viewRect.rect.center, viewRect.rect.size);
     }

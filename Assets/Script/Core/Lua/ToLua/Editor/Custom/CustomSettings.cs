@@ -94,6 +94,10 @@ public static class CustomSettings
 
         #region Data
 
+            _GT(typeof(List<string>)),
+            _GT(typeof(Dictionary<string,object>)),   
+
+            _GT(typeof(JsonLuaHelper)),
             _GT(typeof(DataTable)),
             _GT(typeof(SingleData)),
             _GT(typeof(SingleField)),
@@ -112,6 +116,9 @@ public static class CustomSettings
             _GT(typeof(InputUIEventBase)),
             _GT(typeof(InputUIOnScrollEvent)),
             _GT(typeof(InputUIOnClickEvent)),
+
+            _GT(typeof(InputNetworkMessageEvent)),
+            _GT(typeof(InputNetworkConnectStatusEvent)),
             _GT(typeof(NetworkState)),
             _GT(typeof(InputManager)),
             _GT(typeof(NetworkManager)),
@@ -127,9 +134,14 @@ public static class CustomSettings
     #endregion
 
     #region Custom
-         _GT(typeof(Dictionary<string,object>)),   
-         _GT(typeof(GameLogic)), 
-         _GT(typeof(List<PlayerInfo>)), 
+
+         //_GT(typeof(GameLogic)), 
+         //_GT(typeof(List<PlayerInfo>)), 
+         //_GT(typeof(RouteRule)),
+         //_GT(typeof(InputCmdHelper)),
+         //_GT(typeof(SyncService)),
+         //_GT(typeof(PVPMatchService)),
+         //_GT(typeof(UserData)),
 
          
     #endregion

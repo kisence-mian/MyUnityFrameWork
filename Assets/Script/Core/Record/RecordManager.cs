@@ -25,7 +25,7 @@ public class RecordManager
 
         string dataJson = "";
 
-        string fullPath = PathTool.GetAbsolutePath(ResLoadType.Persistent,
+        string fullPath = PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
                 PathTool.GetRelativelyPath(c_directoryName,
                                             RecordName,
                                             c_expandName));
@@ -54,7 +54,7 @@ public class RecordManager
     public static void SaveData(string RecordName, RecordTable data)
     {
         ResourceIOTool.WriteStringByFile(
-            PathTool.GetAbsolutePath(ResLoadType.Persistent,
+            PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
                 PathTool.GetRelativelyPath(c_directoryName,
                                                     RecordName,
                                                     c_expandName)),
@@ -63,6 +63,13 @@ public class RecordManager
         #if UNITY_EDITOR
                 UnityEditor.AssetDatabase.Refresh();
         #endif
+    }
+
+    public static void CleanRecord(string recordName)
+    {
+        RecordTable table = GetData(recordName);
+        table.Clear();
+        SaveData(recordName, table);
     }
 
     public static void CleanCatch()

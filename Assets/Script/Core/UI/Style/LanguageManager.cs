@@ -4,56 +4,64 @@ using System.Text;
 
 public class LanguageManager  
 {
-    const string s_DataFilePrefix = "LangData_";
+    public const string c_DataFilePrefix = "LangData_";
+    public const string c_configFileName = "LanguageConfig";
+    public const string c_defaultLanguageKey = "DefaultLanguage";
+
+    public const string c_mainKey = "key";
+    public const string c_valueKey = "value";
+
     static public SystemLanguage s_currentLanguage = SystemLanguage.ChineseSimplified;
     static DataTable s_languageData;
-	public void Init()
+	public static void Init()
     {
+        Debug.Log("当前语言: " + Application.systemLanguage);
+
         SetLanguage(Application.systemLanguage);
     }
 
     public static void SetLanguage(SystemLanguage l_lang)
     {
         s_currentLanguage = l_lang;
-        s_languageData = DataManager.GetData(s_DataFilePrefix + s_languageData.ToString());
-    }
 
-    public static string GetContent(string l_contentID)
-    {
-        if (s_languageData.ContainsKey(l_contentID))
+        string languageDataName = c_DataFilePrefix + l_lang.ToString();
+
+        if(DataManager.GetIsExistData(languageDataName))
         {
-            return s_languageData[l_contentID].GetString("value");
+            s_languageData = DataManager.GetData(languageDataName);
         }
         else
         {
-            Debug.LogError("Dont find language :" + l_contentID);
-            return l_contentID;
+            string defaultLanguage = ConfigManager.GetData(c_configFileName)[c_defaultLanguageKey].GetString();
+            s_languageData = DataManager.GetData(defaultLanguage);
         }
     }
 
-    public static string GetContent(string l_contentID, params object[] l_contents)
+    public static string GetContent(string contentID, params object[] contentParams)
     {
-        string l_content = GetContent(l_contentID);
-        if (l_content.Equals(l_contentID))
+        string content = null;
+
+        if (s_languageData.ContainsKey(contentID))
         {
-            Debug.LogError("Dont find language :" + l_contentID);
-            return l_content;
+            content = s_languageData[contentID].GetString("value");
+        }
+        else
+        {
+            Debug.LogError("Dont find language : ->" + contentID + "<-");
+            return "Dont find language : ->" + contentID + "<-";
         }
 
-        if (l_contents == null || l_contents.Length == 0)
-            return l_content;
+        if (contentParams == null || contentParams.Length == 0)
+            return content;
         else
         { 
-            for (int i = 0; i < l_contents.Length; i++)
+            for (int i = 0; i < contentParams.Length; i++)
             {
-                StringBuilder builder = new StringBuilder();
-                builder.Append("{");
-                builder.Append(i);
-                builder.Append("}");
-                l_content = l_content.Replace(builder.ToString(), l_contents[i].ToString());
+                string replaceTmp = "{" + i + "}";
+                content = content.Replace(replaceTmp, contentParams[i].ToString());
             }
 
-            return l_content;
+            return content;
         }
     }
 }

@@ -87,15 +87,20 @@ public class NetworkManager
 
     public static void SendMessage(Dictionary<string, object> data)
     {
-        if (IsConnect)
+        try
         {
-            //Debug.Log("===sendmessage====");
-            //foreach (var item in data.Values) Debug.Log(item);
-            s_network.SendMessage(data["MT"].ToString(), data);
+            if (IsConnect)
+            {
+                s_network.SendMessage(data["MT"].ToString(), data);
+            }
+            else
+            {
+                Debug.LogError("socket 未连接！");
+            }
         }
-        else
+        catch(Exception e)
         {
-            Debug.LogError("socket 未连接！");
+            Debug.LogError("SendMessage Error " + e.ToString());
         }
     }
 

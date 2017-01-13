@@ -84,7 +84,7 @@ public static class ConfigManager
 
     public static void SaveData(string ConfigName, Dictionary<string, SingleField> data)
     {
-        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadType.Resource,
+        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Resource,
             PathTool.GetRelativelyPath(c_directoryName,
                                                 ConfigName,
                                                 c_expandName)),

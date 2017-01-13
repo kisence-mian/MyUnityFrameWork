@@ -108,7 +108,7 @@ namespace LuaInterface
             stateMap.Add(L, this);
             OpenToLuaLibs();
             ToLua.OpenLibs(L);
-            LuaBinder.Bind(this);
+
 
             LuaSetTop(0);
 

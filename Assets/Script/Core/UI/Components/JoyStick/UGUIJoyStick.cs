@@ -50,17 +50,17 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler
     {
         if (onJoyStick != null)
         {
-            try
-            {
+            //try
+            //{
                 if (GetDir() != Vector3.zero)
                 {
                     onJoyStick(GetDir());
                 }
-            }
-            catch(Exception e)
-            {
-                Debug.LogError(e.ToString());
-            }
+            //}
+            //catch(Exception e)
+            //{
+            //    Debug.LogError(e.ToString());
+            //}
         }
 
     }

@@ -86,7 +86,7 @@ public class DataEditorWindow : EditorWindow
         m_currentSelectIndex = EditorGUILayout.Popup("当前数据：", m_currentSelectIndex, mask);
         if (mask.Length !=0 )
         {
-            LoadData(mask[m_currentSelectIndex]);
+            LoadData(  mask[m_currentSelectIndex]);
         }
     }
 
@@ -697,6 +697,8 @@ public class DataEditorWindow : EditorWindow
 
     #region FindData
 
+    string m_directoryPath;
+
     void FindAllDataName()
     {
         AssetDatabase.Refresh();
@@ -704,7 +706,9 @@ public class DataEditorWindow : EditorWindow
 
         m_dataNameList.Add("None");
 
-        FindConfigName(Application.dataPath + "/Resources/" + DataManager.c_directoryName  );
+        m_directoryPath = Application.dataPath + "/Resources/" + DataManager.c_directoryName;
+
+        FindConfigName(m_directoryPath);
     }
 
     public void FindConfigName(string path)
@@ -712,19 +716,18 @@ public class DataEditorWindow : EditorWindow
         string[] allUIPrefabName = Directory.GetFiles(path);
         foreach (var item in allUIPrefabName)
         {
-            
             if (item.EndsWith(".txt"))
             {
-                string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
-                m_dataNameList.Add(configName);
+                //string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
+                m_dataNameList.Add(FileTool.RemoveExpandName(PathTool.GetDirectoryRelativePath(m_directoryPath + "/",item)));
             }
         }
 
-        //string[] dires = Directory.GetDirectories(path);
-        //for (int i = 0; i < dires.Length; i++)
-        //{
-        //    FindConfigName(dires[i]);
-        //}
+        string[] dires = Directory.GetDirectories(path);
+        for (int i = 0; i < dires.Length; i++)
+        {
+            FindConfigName(dires[i]);
+        }
     }
 
     #endregion

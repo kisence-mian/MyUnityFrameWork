@@ -15,6 +15,8 @@ public class ApplicationManager : MonoBehaviour
 
     public AppMode m_AppMode = AppMode.Developing;
 
+    public bool m_useAssetsBundle = false;
+
     public static AppMode AppMode
     {
         get { return instance.m_AppMode; }
@@ -53,11 +55,6 @@ public class ApplicationManager : MonoBehaviour
         InputManager.Init();                 //输入管理器启动
         UIManager.Init();                    //UIManager启动
 
-        if (m_useLua)
-        {
-            LuaManager.Init();
-        }
-
         ApplicationStatusManager.Init();     //游戏流程状态机初始化
         GlobalLogicManager.Init();           //初始化全局逻辑
 
@@ -67,6 +64,11 @@ public class ApplicationManager : MonoBehaviour
 
             DevelopReplayManager.OnLunchCallBack += () =>
             {
+                if (m_useLua)
+                {
+                    LuaManager.Init();
+                }
+
                 InitGlobalLogic();                                //全局逻辑
                 ApplicationStatusManager.EnterTestModel(m_Status);//可以从此处进入测试流程
             };
@@ -76,6 +78,11 @@ public class ApplicationManager : MonoBehaviour
         else
         {
             Log.Init(false); //关闭 Debug
+
+            if (m_useLua)
+            {
+                LuaManager.Init();
+            }
 
             InitGlobalLogic();                             //全局逻辑
             ApplicationStatusManager.EnterStatus(m_Status);//游戏流程状态机，开始第一个状态
@@ -159,13 +166,13 @@ public class ApplicationManager : MonoBehaviour
     /// </summary>
     void SetResourceLoadType()
     {
-        if (m_AppMode == AppMode.Developing)
+        if (m_useAssetsBundle)
         {
-            ResourceManager.m_gameLoadType = ResLoadType.Resource;
+            ResourceManager.m_gameLoadType = ResLoadLocation.Streaming;
         }
         else
         {
-            ResourceManager.m_gameLoadType = ResLoadType.HotUpdate;
+            ResourceManager.m_gameLoadType = ResLoadLocation.Resource;
         }
     }
 

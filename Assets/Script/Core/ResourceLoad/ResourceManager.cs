@@ -11,14 +11,14 @@ public static class ResourceManager
     /// <summary>
     /// 游戏内资源读取类型
     /// </summary>
-    public static ResLoadType m_gameLoadType = ResLoadType.Resource; //默认从resourcePath中读取
+    public static ResLoadLocation m_gameLoadType = ResLoadLocation.Resource; //默认从resourcePath中读取
 
-    public static ResLoadType GetLoadType(ResLoadType loadType)
+    public static ResLoadLocation GetLoadType(ResLoadLocation loadType)
     {
         //如果设置从Resource中加载则忽略打包设置
-        if (m_gameLoadType == ResLoadType.Resource)
+        if (m_gameLoadType == ResLoadLocation.Resource)
         {
-            return ResLoadType.Resource;
+            return ResLoadLocation.Resource;
         }
 
         return loadType;
@@ -40,7 +40,7 @@ public static class ResourceManager
     }
 
     //保存一个文本
-    public static void WriteTextFile(string path,string content ,ResLoadType type)
+    public static void WriteTextFile(string path,string content ,ResLoadLocation type)
     {
         #if UNITY_EDITOR
             ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(type, path), content);
@@ -58,7 +58,7 @@ public static class ResourceManager
             throw new Exception("Load Exception not find " + name);
         }
 
-        if (m_gameLoadType == ResLoadType.Resource)
+        if (m_gameLoadType == ResLoadLocation.Resource)
         {
             return Resources.Load(packData.path);
         }
@@ -77,7 +77,7 @@ public static class ResourceManager
             throw new Exception("Load Exception not find " + name);
         }
 
-        if (m_gameLoadType == ResLoadType.Resource)
+        if (m_gameLoadType == ResLoadLocation.Resource)
         {
             return Resources.Load<T>(packData.path);
         }
@@ -96,7 +96,7 @@ public static class ResourceManager
             return ;
         }
 
-        if (m_gameLoadType == ResLoadType.Resource)
+        if (m_gameLoadType == ResLoadLocation.Resource)
         {
             ResourceIOTool.ResourceLoadAsync(packData.path, callBack);
         }
@@ -114,14 +114,12 @@ public static class ResourceManager
     //}
 }
 
-public enum ResLoadType
+public enum ResLoadLocation
 {
     Resource,
     Streaming,
     Persistent,
     Catch,
-
-    HotUpdate
 }
 
 

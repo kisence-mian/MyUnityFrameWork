@@ -398,6 +398,7 @@ public class DataTable : Dictionary<string, SingleData>
         }
     }
 
+
     public void SetFieldType(string key,FieldType type ,string enumType)
     {
         //主键只能是String类型
@@ -428,6 +429,13 @@ public class DataTable : Dictionary<string, SingleData>
             }
         }
     }
+
+    public SingleData GetLineFromKey(string key)
+    {
+        //主键只能是String类型
+        return this[key];
+    }
+
 
     public string GetEnumType(string key)
     {

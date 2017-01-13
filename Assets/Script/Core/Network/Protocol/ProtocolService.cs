@@ -39,7 +39,14 @@ public class ProtocolService : INetworkInterface
         m_IPaddress = "192.168.0.10";
         m_port = 7001;
     }
+    public override void SetIPAddress(string IP, int port)
+    {
+        ReadProtocolInfo();
+        ReadMethodNameInfo();
 
+        m_IPaddress = IP;
+        m_port = port;
+    }
     public override void Close()
     {
         isConnect = false;
@@ -73,7 +80,9 @@ public class ProtocolService : INetworkInterface
             m_ConnectStatusCallback(NetworkState.Connecting);
 
             m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            Debug.Log(m_IPaddress);
             IPAddress ip = IPAddress.Parse(m_IPaddress);
+            
             IPEndPoint ipe = new IPEndPoint(ip, m_port);
             //mSocket.
             m_Socket.Connect(ipe);

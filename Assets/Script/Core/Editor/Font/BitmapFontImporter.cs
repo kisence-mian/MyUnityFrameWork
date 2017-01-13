@@ -9,7 +9,7 @@ using System.Xml;
 public static class BitmapFontImporter
 {
 	
-	[MenuItem("Tool/Generate Bitmap Font")]
+    //[MenuItem("Tool/Generate Bitmap Font")]
 	public static void GenerateFont ()
 	{
 		TextAsset selected = (TextAsset)Selection.activeObject;

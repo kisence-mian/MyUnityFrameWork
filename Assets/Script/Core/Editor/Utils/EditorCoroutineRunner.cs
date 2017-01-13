@@ -86,6 +86,14 @@ public static class EditorCoroutineRunner
         return iterator;
     }
 
+    public static void StopAllEditorCoroutine()
+    {
+        if (editorCoroutineList != null)
+        {
+            editorCoroutineList.Clear();
+        }
+    }
+
     private static bool Find(IEnumerator iterator)
     {
         // If this iterator is already added

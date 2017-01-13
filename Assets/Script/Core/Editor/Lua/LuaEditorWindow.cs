@@ -60,8 +60,8 @@ public class LuaEditorWindow : EditorWindow
     {
         ToLuaMenu.GenLuaAll();
         //创建Lua目录
-        Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadType.Resource, c_LuaLibFilePath));
-        Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadType.Resource, c_LuaFilePath));
+        Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaLibFilePath));
+        Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaFilePath));
 
         //复制lua初始库文件
 
@@ -234,8 +234,8 @@ public class LuaEditorWindow : EditorWindow
         m_LuaLibFileList = new List<string>();
         m_LuaFileList= new List<string>();
 
-        FindLuaLibFile(PathTool.GetAbsolutePath(ResLoadType.Resource, c_LuaLibFilePath));
-        FindLuaFile(PathTool.GetAbsolutePath(ResLoadType.Resource, c_LuaFilePath));
+        FindLuaLibFile(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaLibFilePath));
+        FindLuaFile(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaFilePath));
     }
 
     public void FindLuaFile(string path)
@@ -272,7 +272,7 @@ public class LuaEditorWindow : EditorWindow
         string[] dires = Directory.GetDirectories(path);
         for (int i = 0; i < dires.Length; i++)
         {
-            FindLuaFile(dires[i]);
+            FindLuaLibFile(dires[i]);
         }
     }
 

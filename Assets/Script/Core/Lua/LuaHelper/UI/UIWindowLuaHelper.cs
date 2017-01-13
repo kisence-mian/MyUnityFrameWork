@@ -70,7 +70,7 @@ public class UIWindowLuaHelper : UIWindowBase
         UIEventCallBackHelper.CallOnCompleteExitAnim(this);
     }
 
-    public override void OnDestroy()
+    protected override void OnDestroy()
     {
         UIEventCallBackHelper.CallOnUIDestroy(this);
     }

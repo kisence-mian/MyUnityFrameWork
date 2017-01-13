@@ -37,10 +37,10 @@ public class LogOutPutThread
 
                 this.mLogLock = new object();
                 System.DateTime now = System.DateTime.Now;
-                string logName = string.Format("Log{0}{1}{2}#{3}:{4}_{5}",
+                string logName = string.Format("Log{0}{1}{2}#{3}_{4}_{5}",
                     now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
-                string logPath = PathTool.GetAbsolutePath(ResLoadType.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
+                string logPath = PathTool.GetAbsolutePath(ResLoadLocation.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
 
                 UpLoadLogic(logPath);
 
@@ -172,10 +172,10 @@ public class LogOutPutThread
 
         public static string[] GetLogFileNameList()
         {
-            FileTool.CreatPath(PathTool.GetAbsolutePath(ResLoadType.Persistent, LogPath));
+            FileTool.CreatPath(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, LogPath));
 
             List<string> relpayFileNames = new List<string>();
-            string[] allFileName = Directory.GetFiles(PathTool.GetAbsolutePath(ResLoadType.Persistent, LogPath));
+            string[] allFileName = Directory.GetFiles(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, LogPath));
             foreach (var item in allFileName)
             {
                 if (item.EndsWith(".txt"))
@@ -195,6 +195,6 @@ public class LogOutPutThread
 
         static string GetPath(string logName)
         {
-            return PathTool.GetAbsolutePath(ResLoadType.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
+            return PathTool.GetAbsolutePath(ResLoadLocation.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
         }
 }

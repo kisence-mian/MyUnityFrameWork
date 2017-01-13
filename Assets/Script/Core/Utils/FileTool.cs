@@ -78,4 +78,10 @@ public class FileTool
         FileInfo fi = new FileInfo(path);
         return fi.Name; // text.txt
     }
+
+    public static string GetFileNameBySring(string path)
+    {
+        string[] paths = path.Split('/');
+        return paths[paths.Length - 1];
+    }
 }

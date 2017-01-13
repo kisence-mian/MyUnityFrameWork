@@ -28,6 +28,7 @@ public class LuaManager
         try
         {
             s_state.Start();
+            //LuaBinder.Bind(s_state);
             ApplicationManager.s_OnApplicationUpdate += Update;
 
         }

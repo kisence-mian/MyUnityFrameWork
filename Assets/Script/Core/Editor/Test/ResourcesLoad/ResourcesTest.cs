@@ -13,7 +13,7 @@ namespace Framework
         {
             ResourcesConfigManager.Initialize();
 
-            bool isExist = ConfigManager.GetIsExistConfig(ResourcesConfigManager.c_configFileName);
+            bool isExist = ConfigManager.GetIsExistConfig(ResourcesConfigManager.c_ManifestFileName);
 
             Assert.AreEqual(isExist, true);
         }

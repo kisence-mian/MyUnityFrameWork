@@ -28,7 +28,10 @@ public static class AssetsBundleManager
         //加载依赖包
         for(int i = 0;i<configTmp.relyPackages.Length;i++ )
         {
-            LoadRelyBundle(configTmp.relyPackages[i]);
+            if (configTmp.relyPackages[i] != "")
+            {
+                LoadRelyBundle(configTmp.relyPackages[i]);
+            }
         }
 
         return AddBundle(bundleName,AssetBundle.LoadFromFile(path));
@@ -369,15 +372,15 @@ public static class AssetsBundleManager
     /// <returns></returns>
     static string GetBundlePath(ResourcesConfig config)
     {
-        bool isLoadByPersistent = RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(config.name, false);
+        bool isLoadByPersistent = RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(config.name, "null") =="null" ? false:true;
 
-        ResLoadType loadType = ResLoadType.Streaming;
+        ResLoadLocation loadType = ResLoadLocation.Streaming;
 
         //加载路径由 加载根目录 和 相对路径 合并而成
         //加载根目录由配置决定
         if (isLoadByPersistent)
         {
-            loadType = ResLoadType.Persistent;
+            loadType = ResLoadLocation.Persistent;
         }
 
         return PathTool.GetAbsolutePath(loadType, config.path + "." + c_AssetsBundlesExpandName);

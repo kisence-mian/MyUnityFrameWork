@@ -8,7 +8,8 @@ using MiniJSON;
 public class DevelopReplayManager 
 {
     const string c_directoryName     = "DevelopReplay";
-    public const string c_expandName = "json";
+    public const string c_eventExpandName = "inputEvent";
+    public const string c_randomExpandName = "random";
 
     const string c_recordName    = "DevelopReplay";
     const string c_qucikLunchKey = "qucikLunch";
@@ -27,6 +28,9 @@ public class DevelopReplayManager
     static List<int> s_randomList;
 
     private static Action s_onLunchCallBack;
+
+    private static StreamWriter m_EventWriter = null;
+    private static StreamWriter m_RandomWriter = null;
 
     public static Action OnLunchCallBack
     {
@@ -78,14 +82,12 @@ public class DevelopReplayManager
         {
             Log.Init(true); //日志记录启动
 
-            s_eventStreamSerialize = new List<Dictionary<string, string>>();
-            s_randomList = new List<int>();
-
             ApplicationManager.s_OnApplicationUpdate += OnRecordUpdate;
             InputManager.OnEveryEventDispatch += OnEveryEventCallBack;
             GUIConsole.onGUICallback += RecordModeGUI;
             RandomService.OnRandomCreat += OnGetRandomCallBack;
-            SaveFileName = GetLogFileName();
+
+            OpenWriteFileStream(GetLogFileName());
         }
 
         ApplicationManager.s_OnApplicationOnGUI -= ReplayMenuGUI;
@@ -104,74 +106,79 @@ public class DevelopReplayManager
 
     public static void OnEveryEventCallBack(string eventName, IInputEventBase inputEvent)
     {
-        //Dictionary<string, string> tmp = new Dictionary<string, string>();
+        Dictionary<string, object> tmp = HeapObjectPool.GetSODict();
 
-        //tmp.Add(c_eventNameKey, inputEvent.GetType().Name);
-        //tmp.Add(c_serializeInfoKey, inputEvent.Serialize());
+        tmp.Add(c_eventNameKey, inputEvent.GetType().Name);
+        tmp.Add(c_serializeInfoKey, inputEvent.Serialize());
 
-        //s_eventStreamSerialize.Add(tmp);
+        WriteInputEvent(Json.Serialize(tmp));
     }
 
     public static void OnGetRandomCallBack(int random)
     {
-        s_randomList.Add(random);
+        WriteRandomRecord(random);
     }
-
-
 
     #region SaveReplayFile
 
-
-    public static void SaveReplayFile(string fileName)
+    static void OpenWriteFileStream(string fileName)
     {
-        List<Dictionary<string,string>> EventStreamContent = SaveEventStream();
-        List<int> randomListContent = SaveRandomList();
 
-        Dictionary<string, object> replayInfo = new Dictionary<string, object>();
-
-        replayInfo.Add(c_eventStreamKey, EventStreamContent);
-        replayInfo.Add(c_randomListKey, randomListContent);
-
-        string content = Json.Serialize(replayInfo);
-
-        ResourceIOTool.WriteStringByFile(
-                PathTool.GetAbsolutePath(ResLoadType.Persistent,
+        try
+        {
+            string path = PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
                                          PathTool.GetRelativelyPath(
                                                         c_directoryName,
                                                         fileName,
-                                                        c_expandName))
-                , content);
-    }
+                                                        c_randomExpandName));
 
-    static List<Dictionary<string, string>> SaveEventStream()
-    {
-        //List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
+            string dirPath = Path.GetDirectoryName(path);
 
-        //for (int i = 0; i < s_eventStream.Count; i++)
-        //{
-        //    Dictionary<string, string> tmp = new Dictionary<string, string>();
+            if (!Directory.Exists(dirPath))
+                Directory.CreateDirectory(dirPath);
 
-        //    tmp.Add(c_eventNameKey, s_eventStream[i].GetType().Name);
-        //    tmp.Add(c_serializeInfoKey,s_eventStream[i].Serialize());
 
-        //    list.Add(tmp);
-        //}
+            //Debug.Log("EventStream Name: " + PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
+            //                             PathTool.GetRelativelyPath(
+            //                                            c_directoryName,
+            //                                            fileName,
+            //                                            c_randomExpandName)));
 
-        //return list;
+            m_RandomWriter = new StreamWriter(PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
+                                         PathTool.GetRelativelyPath(
+                                                        c_directoryName,
+                                                        fileName,
+                                                        c_randomExpandName)));
+            m_RandomWriter.AutoFlush = true;
 
-        return s_eventStreamSerialize;
-    }
+            m_EventWriter = new StreamWriter(PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
+                                         PathTool.GetRelativelyPath(
+                                                        c_directoryName,
+                                                        fileName,
+                                                        c_eventExpandName)));
+            m_EventWriter.AutoFlush = true;
 
-    static List<int> SaveRandomList()
-    {
-        List<int> list = new List<int>();
-
-        for (int i = 0; i < s_randomList.Count; i++)
-        {
-            list.Add(s_randomList[i]);
         }
+        catch(Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
+    }
 
-        return list;
+    static void WriteRandomRecord(int random)
+    {
+        if (m_RandomWriter != null)
+        {
+            m_RandomWriter.WriteLine(random.ToString());
+        }
+    }
+
+    static void WriteInputEvent(string EventSerializeContent)
+    {
+        if (m_EventWriter != null)
+        {
+            m_EventWriter.WriteLine(EventSerializeContent);
+        }
     }
 
     #endregion 
@@ -180,42 +187,48 @@ public class DevelopReplayManager
 
     public static void LoadReplayFile(string fileName)
     {
-        string content = ResourceIOTool.ReadStringByFile(
-            PathTool.GetAbsolutePath(ResLoadType.Persistent,
+        string eventContent = ResourceIOTool.ReadStringByFile(
+            PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
                                      PathTool.GetRelativelyPath(
                                                     c_directoryName,
                                                     fileName,
-                                                    c_expandName)));
+                                                    c_eventExpandName)));
 
-        Dictionary<string, object> replayInfo = (Dictionary<string, object>)Json.Deserialize(content);
+        string randomContent = ResourceIOTool.ReadStringByFile(
+            PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
+                                     PathTool.GetRelativelyPath(
+                                                    c_directoryName,
+                                                    fileName,
+                                                    c_randomExpandName)));
 
-        LoadEventStream((List<object>)replayInfo[c_eventStreamKey]);
-        LoadRandomList((List<object>)replayInfo[c_randomListKey]);
+        LoadEventStream(eventContent.Split('\n'));
+        LoadRandomList(randomContent.Split('\n'));
     }
 
-    static void LoadEventStream(List<object> content)
+    static void LoadEventStream(string[] content)
     {
         s_eventStream = new List<IInputEventBase>();
-
-        for (int i = 0; i < content.Count; i++)
+        for (int i = 0; i < content.Length; i++)
         {
-            Dictionary<string, object> info = (Dictionary<string, object>)(content[i]);
-
-            //Debug.Log(info[c_eventNameKey].ToString());
-            //Debug.Log(info[c_eventNameKey].ToString());
-
-            IInputEventBase eTmp = (IInputEventBase)JsonUtility.FromJson(info[c_serializeInfoKey].ToString(), Type.GetType(info[c_eventNameKey].ToString()));
-            s_eventStream.Add(eTmp);
+            if (content[i] != "")
+            {
+                Dictionary<string, object> info = (Dictionary<string, object>)(Json.Deserialize(content[i]));
+                IInputEventBase eTmp = (IInputEventBase)JsonUtility.FromJson(info[c_serializeInfoKey].ToString(), Type.GetType(info[c_eventNameKey].ToString()));
+                s_eventStream.Add(eTmp);
+            }
         }
     }
 
-    static void LoadRandomList(List<object> content)
+    static void LoadRandomList(string[] content)
     {
         s_randomList = new List<int>();
 
-        for (int i = 0; i < content.Count; i++)
+        for (int i = 0; i < content.Length; i++)
         {
-            s_randomList.Add(int.Parse(content[i].ToString()));
+            if (content[i] != "")
+            {
+                s_randomList.Add(int.Parse(content[i].ToString()));
+            }
         }
     }
 
@@ -350,8 +363,6 @@ public class DevelopReplayManager
 
     static Rect consoleRect = new Rect(margin, Screen.height * 0.6f, Screen.width * 0.3f, Screen.height * 0.4f - margin);
 
-    static string SaveFileName = "";
-
     static void RecordModeGUI()
     {
         consoleRect = new Rect(margin, Screen.height * 0.5f, Screen.width * 0.4f, Screen.height * 0.5f - margin);
@@ -360,13 +371,6 @@ public class DevelopReplayManager
     }
     static void RecordModeGUIWindow(int id)
     {
-        SaveFileName = GUILayout.TextField(SaveFileName,GUILayout.ExpandHeight(true));
-
-        if (GUILayout.Button("保存录像文件", GUILayout.ExpandHeight(true)))
-        {
-            SaveReplayFile(SaveFileName);
-        }
-
         if (RecordManager.GetData(c_recordName).GetRecord(c_qucikLunchKey, true))
         {
             if (GUILayout.Button("开启后台", GUILayout.ExpandHeight(true)))
@@ -428,13 +432,13 @@ public class DevelopReplayManager
 
     public static string[] GetRelpayFileNames()
     {
-        FileTool.CreatPath(PathTool.GetAbsolutePath(ResLoadType.Persistent, c_directoryName));
+        FileTool.CreatPath(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, c_directoryName));
 
         List<string> relpayFileNames = new List<string>();
-        string[] allFileName = Directory.GetFiles(PathTool.GetAbsolutePath(ResLoadType.Persistent, c_directoryName));
+        string[] allFileName = Directory.GetFiles(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, c_directoryName));
         foreach (var item in allFileName)
         {
-            if (item.EndsWith("." + c_expandName))
+            if (item.EndsWith("." + c_eventExpandName))
             {
                 string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
                 relpayFileNames.Add(configName);

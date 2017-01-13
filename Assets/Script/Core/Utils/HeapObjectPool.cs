@@ -47,11 +47,8 @@ public class HeapObjectPool
     #region object列表
 
     const int c_ObjListSize = 20;
-    const int c_PlayerInfoListSize = 20;
     static List<object>[] s_ObjListPool;
-    static List<PlayerInfo>[] s_PlayerInfoListPool;
     static int s_ObjListIndex = 0;
-    static int s_PlayerInfoListIndex = 0;
 
     /// <summary>
     /// 获取string, object字典
@@ -73,22 +70,6 @@ public class HeapObjectPool
         return dict;
     }
 
-    public static List<PlayerInfo> GetPlayerInfoList()
-    {
-        InitPlayerInfoList();
-        List<PlayerInfo> dict = s_PlayerInfoListPool[s_PlayerInfoListIndex];
-        dict.Clear();
-
-        s_PlayerInfoListIndex++;
-
-        if (s_PlayerInfoListIndex >= s_PlayerInfoListPool.Length)
-        {
-            s_PlayerInfoListIndex = 0;
-        }
-
-        return dict;
-    }
-
     static void InitObjList()
     {
         if (s_ObjListPool == null)
@@ -97,18 +78,6 @@ public class HeapObjectPool
             for (int i = 0; i < c_SODictSize; i++)
             {
                 s_ObjListPool[i] = new List<object>();
-            }
-        }
-    }
-
-    static void InitPlayerInfoList()
-    {
-        if (s_PlayerInfoListPool == null)
-        {
-            s_PlayerInfoListPool = new List<PlayerInfo>[c_PlayerInfoListSize];
-            for (int i = 0; i < c_PlayerInfoListSize; i++)
-            {
-                s_PlayerInfoListPool[i] = new List<PlayerInfo>();
             }
         }
     }
