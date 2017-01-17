@@ -264,6 +264,8 @@ public class ProtocolService : INetworkInterface
 
                         AddName(currentLine, currentFeidInfo);
                         AddType(currentLine, currentFeidInfo);
+
+                        msgInfo.Add(currentFeidInfo);
                     }
                 }
             }
@@ -391,6 +393,8 @@ public class ProtocolService : INetworkInterface
 
         for (int i = 0; i < tableInfo.Count; i++)
         {
+            //Debug.Log(tableInfo[i]["name"]);
+
             int vts = (int)tableInfo[i]["type"];
             int spl = (int)tableInfo[i]["spl"];
 

@@ -6,8 +6,7 @@ using System.Text;
 using System;
 
 /// <summary>
-/// 配置管理器，可读可写，可同步，有默认值
-/// 不通过ResourceManager加载,也不受热更新影响
+/// 配置管理器，可读可写，可同步
 /// </summary>
 public static class ConfigManager 
 {
