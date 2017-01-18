@@ -15,6 +15,11 @@ public class INetworkInterface
     public ConnectStatusCallBack m_ConnectStatusCallback;
     public MessageCallBack m_messageCallBack;
 
+    public virtual void Init()
+    {
+
+    }
+
     public virtual void GetIPAddress()
     {
 

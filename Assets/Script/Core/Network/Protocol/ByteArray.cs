@@ -7,9 +7,7 @@ using System.Text;
 public class ByteArray
 {
     private List<byte> bytes = new List<byte>();
-    //private MemoryStream m_Stream = new MemoryStream();
-    //private BinaryReader m_Reader = null;
-    //private BinaryWriter m_Writer = null;
+
     public ByteArray()
     {
     }
@@ -21,11 +19,14 @@ public class ByteArray
         }
     }
 
-    public ByteArray(MemoryStream ms)
+    public void Add(byte[] buffer)
     {
-        //m_Stream = ms;
-        Init();
+        for (int i = 0; i < buffer.Length; i++)
+        {
+            bytes.Add(buffer[i]);
+        }
     }
+
     private void Init()
     {
         //m_Writer = new BinaryWriter(m_Stream);
@@ -40,6 +41,7 @@ public class ByteArray
     }
     public void clear()
     {
+        Postion = 0;
         bytes.Clear();
     }
     public int Postion

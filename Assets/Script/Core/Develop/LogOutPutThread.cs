@@ -67,41 +67,49 @@ public class LogOutPutThread
 
 		void WriteLog()
 		{
-			while (this.mIsRunning)
-			{
-				if (this.mWritingLogQueue.Count == 0)
-				{
-					lock (this.mLogLock)
-					{
-						while (this.mWaitingLogQueue.Count == 0)
-							Monitor.Wait(this.mLogLock);
-						Queue<LogInfo> tmpQueue = this.mWritingLogQueue;
-						this.mWritingLogQueue = this.mWaitingLogQueue;
-						this.mWaitingLogQueue = tmpQueue;
-					}
-				}
-				else
-				{
-					while (this.mWritingLogQueue.Count > 0)
-					{
-						LogInfo log = this.mWritingLogQueue.Dequeue();
-						if (log.m_logType == LogType.Error
-                            ||log.m_logType == LogType.Exception
-                            ||log.m_logType == LogType.Assert
-                            )
-						{
-							this.mLogWriter.WriteLine("---------------------------------------------------------------------------------------------------------------------");
-							this.mLogWriter.WriteLine(System.DateTime.Now.ToString() + "\t" + log.m_logContent + "\n");
-							this.mLogWriter.WriteLine(log.m_logTrack);
-							this.mLogWriter.WriteLine("---------------------------------------------------------------------------------------------------------------------"); 
-						}
-						else
-						{
-							this.mLogWriter.WriteLine(System.DateTime.Now.ToString() + "\t" + log.m_logContent);
-						}
-					}
-				}
-			}
+            try
+            {
+
+                while (this.mIsRunning)
+                {
+                    if (this.mWritingLogQueue.Count == 0)
+                    {
+                        lock (this.mLogLock)
+                        {
+                            while (this.mWaitingLogQueue.Count == 0)
+                                Monitor.Wait(this.mLogLock);
+                            Queue<LogInfo> tmpQueue = this.mWritingLogQueue;
+                            this.mWritingLogQueue = this.mWaitingLogQueue;
+                            this.mWaitingLogQueue = tmpQueue;
+                        }
+                    }
+                    else
+                    {
+                        while (this.mWritingLogQueue.Count > 0)
+                        {
+                            LogInfo log = this.mWritingLogQueue.Dequeue();
+                            if (log.m_logType == LogType.Error
+                                || log.m_logType == LogType.Exception
+                                || log.m_logType == LogType.Assert
+                                )
+                            {
+                                this.mLogWriter.WriteLine("---------------------------------------------------------------------------------------------------------------------");
+                                this.mLogWriter.WriteLine(System.DateTime.Now.ToString() + "\t" + log.m_logContent + "\n");
+                                this.mLogWriter.WriteLine(log.m_logTrack);
+                                this.mLogWriter.WriteLine("---------------------------------------------------------------------------------------------------------------------");
+                            }
+                            else
+                            {
+                                this.mLogWriter.WriteLine(System.DateTime.Now.ToString() + "\t" + log.m_logContent);
+                            }
+                        }
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
 		}
 
 		public void Log(LogInfo logData)

@@ -23,11 +23,12 @@ public class NetworkManager
         InputManager.LoadDispatcher<InputNetworkMessageEvent>();
 
         s_network = new T();
-        s_network.InitMessagePool(50);
+        s_network.Init();
         s_network.m_messageCallBack = ReceviceMeaasge;
         s_network.m_ConnectStatusCallback = ConnectStatusChange;
 
         ApplicationManager.s_OnApplicationUpdate += Update;
+        ApplicationManager.s_OnApplicationQuit += DisConnect;
     }
 
     public static void Init(string networkInterfaceName)
@@ -39,11 +40,12 @@ public class NetworkManager
         Type type = Type.GetType(networkInterfaceName);
 
         s_network = Activator.CreateInstance(type) as INetworkInterface;
-        s_network.InitMessagePool(50);
+        s_network.Init();
         s_network.m_messageCallBack = ReceviceMeaasge;
         s_network.m_ConnectStatusCallback = ConnectStatusChange;
 
         ApplicationManager.s_OnApplicationUpdate += Update;
+        ApplicationManager.s_OnApplicationQuit += DisConnect;
     }
 
     public static void Dispose()
@@ -70,6 +72,7 @@ public class NetworkManager
 
     public static void DisConnect()
     {
+        Debug.Log("断开连接");
         s_network.Close();
     }
 

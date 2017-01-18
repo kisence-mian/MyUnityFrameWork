@@ -27,9 +27,23 @@ public class ProtocolService : INetworkInterface
     Dictionary<string, int> m_methodIndexInfo;
 
     private Socket m_Socket;
-    private byte[] m_readData = new byte[1024];
+    private byte[] m_readData;
+
+    AsyncCallback m_acb = null;
+    
 
     private Thread m_connThread;
+
+    public override void Init()
+    {
+        InitMessagePool(50);
+        m_acb = new AsyncCallback(EndReceive);
+        m_readData = new byte[1024];
+        m_messageBuffer = new byte[2048];
+
+        m_head = 0;
+        m_total = 0;
+    }
 
     public override void GetIPAddress()
     {
@@ -102,7 +116,7 @@ public class ProtocolService : INetworkInterface
 
     void StartReceive()
     {
-        m_Socket.BeginReceive(m_readData, 0, m_readData.Length, SocketFlags.None, new AsyncCallback(EndReceive), m_Socket);
+        m_Socket.BeginReceive(m_readData, 0, m_readData.Length, SocketFlags.None, m_acb, m_Socket);
     }
     void EndReceive(IAsyncResult iar) //接收数据
     {
@@ -110,38 +124,10 @@ public class ProtocolService : INetworkInterface
         int recv = remote.EndReceive(iar);
         if (recv > 0)
         {
-            ReceiveDataLoad(m_readData);
+            SpiltMessage(m_readData, recv);
         }
 
         StartReceive();
-    }
-
-    //接收Socket数据
-    private int head = 0;
-    private void ReceiveSorket()
-    {
-        //在这个线程中接受服务器返回的数据
-        byte[] buff = new byte[2];
-        while (true)
-        {
-            if (m_Socket == null) break;
-            if (!m_Socket.Connected) break;
-
-            if (head == 0)
-            {
-                if ((m_Socket.Available) < 2) continue;
-
-                m_Socket.Receive(buff);
-                head = (int)buff[1] | ((int)buff[0] << 8);
-            }
-
-            if (m_Socket.Available < head) continue;
-
-            byte[] ba = new byte[head];
-            m_Socket.Receive(ba);
-            head = 0;
-            ReceiveDataLoad(ba);
-        }
     }
 
     //发包
@@ -153,14 +139,15 @@ public class ProtocolService : INetworkInterface
         }
         catch (Exception e)
         {
-            Debug.Log("Send Message Error" + e.Message);
+            Debug.LogError("Send Message Error : " + e.Message);
         }
     }
 
 
     public override void SendMessage(string MessageType,Dictionary<string, object> data)
     {
-        ByteArray msg = new ByteArray();
+        ByteArray msg = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+        msg.clear();
 
         byte[] message = GetSendByte(MessageType, data);
 
@@ -179,16 +166,115 @@ public class ProtocolService : INetworkInterface
         Send(msg.Buffer);
     }
 
+    #region 缓冲区
+
+    byte[] m_messageBuffer;
+    int m_head = 0;
+    int m_total = 0;
+
+    void SpiltMessage(byte[] bytes,int length)
+    {
+        //Debug.Log("SpiltMessage : " + BitConverter.ToString(bytes));
+
+        //Debug.Log("1 GetLength() " + GetBufferLength() + " ReadLength() " + ReadLength() + " bytes " + length);
+
+        WriteBytes(bytes, length);
+
+        //Debug.Log("2 GetLength() " + GetBufferLength() + " ReadLength() " + ReadLength());
+
+        //while (GetBufferLength() != 0 && ReadLength() < GetBufferLength())
+        {
+            ReceiveDataLoad(ReadByte(ReadLength()));
+        }
+    }
+
+    void WriteBytes(byte[] bytes,int length)
+    {
+        for (int i = 0; i < length; i++)
+        {
+            int pos = m_total + i;
+
+            if (pos >= m_messageBuffer.Length)
+            {
+                pos -= m_messageBuffer.Length;
+            }
+
+            m_messageBuffer[pos] = bytes[i];
+        }
+
+        m_total += length;
+
+        if (m_total >= m_messageBuffer.Length)
+        {
+            m_total -= m_messageBuffer.Length;
+        }
+    }
+
+    int ReadLength()
+    {
+        int result = (int)m_messageBuffer[m_head] << 8;
+
+        int nextPos = m_head + 1;
+
+        if (nextPos >= m_messageBuffer.Length)
+        {
+            nextPos = 0;
+        }
+
+        result += (int)m_messageBuffer[nextPos];
+        return result + 2;
+    }
+
+    int GetBufferLength()
+    {
+        if(m_total >= m_head)
+        {
+            return m_total - m_head;
+        }
+        else
+        {
+            return m_total + (m_messageBuffer.Length - m_head);
+        }
+    }
+
+    byte[] ReadByte(int length)
+    {
+        byte[] bytes = new byte[length];
+
+        if (m_head + length < m_messageBuffer.Length)
+        {
+            Array.Copy(m_messageBuffer, m_head, bytes, 0, length);
+            m_head += length;
+        }
+        else
+        {
+            int cutLength = m_messageBuffer.Length - m_head;
+
+            Array.Copy(m_messageBuffer, m_head, bytes, 0, cutLength);
+            Array.Copy(m_messageBuffer, 0, bytes, cutLength, length - cutLength);
+
+            m_head = length - cutLength;
+        }
+        return bytes;
+    }
+
+    #endregion
+
 
     //解包
     private void ReceiveDataLoad(byte[] bytes)
     {
         try
         {
-            //用于做数据处理,加解密,或者压缩于解压缩        
-            ByteArray bas = new ByteArray(bytes);
+            //Debug.Log("ReceiveDataLoad : " + BitConverter.ToString(bytes));
 
-            NetWorkMessage msg = Analysis(bas);
+            ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+
+            //用于做数据处理,加解密,或者压缩于解压缩    
+            ba.clear();
+            ba.Add(bytes);
+
+            NetWorkMessage msg = Analysis(ba);
             m_messageCallBack(msg);
         }
         catch(Exception e)
@@ -368,7 +454,7 @@ public class ProtocolService : INetworkInterface
 
     NetWorkMessage  Analysis(ByteArray bytes)
     {
-        NetWorkMessage msg = new NetWorkMessage();
+        NetWorkMessage msg = GetMessageByPool();
 
         bytes.ReadShort(); //消息长度
         bytes.ReadByte();  //模块名
@@ -386,8 +472,11 @@ public class ProtocolService : INetworkInterface
 
     Dictionary<string, object> AnalysisData(string MessageType, byte[] bytes)
     {
-        Dictionary<string, object> data = new Dictionary<string, object>();
-        ByteArray ba = new ByteArray(bytes);
+        Dictionary<string, object> data = HeapObjectPool.GetSODict();
+        ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+
+        ba.clear();
+        ba.Add(bytes);
 
         List<Dictionary<string, object>> tableInfo = m_protocolInfo["m_"+MessageType+"_c"];
 
@@ -465,7 +554,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<string> ReadStringList(ByteArray ba)
     {
-        List<string> tbl = new List<string>();
+        List<string> tbl = HeapObjectPoolTool<List<string>>.GetHeapObject();
 
         int len1 = ba.ReadShort();
         ba.ReadInt();
@@ -482,7 +571,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<bool> ReadBoolList(ByteArray ba)
     {
-        List<bool> tbl = new List<bool>();
+        List<bool> tbl = HeapObjectPoolTool<List<bool>>.GetHeapObject();
 
         int len1 = ba.ReadShort();
         ba.ReadInt();
@@ -499,7 +588,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<int> ReadIntList(ByteArray ba)
     {
-        List<int> tbl = new List<int>();
+        List<int> tbl = HeapObjectPoolTool<List<int>>.GetHeapObject();
 
         int len1 = ba.ReadShort();
         ba.ReadInt();
@@ -520,7 +609,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<double> ReadDoubleList(ByteArray ba)
     {
-        List<double> tbl = new List<double>();
+        List<double> tbl = HeapObjectPoolTool<List<double>>.GetHeapObject();
 
         int len1 = ba.ReadShort();
         ba.ReadInt();
@@ -536,7 +625,7 @@ public class ProtocolService : INetworkInterface
     {
         int st_len = ba.ReadInt();
 
-        Dictionary<string, object> tbl = new Dictionary<string, object>();
+        Dictionary<string, object> tbl = HeapObjectPool.GetSODict();
 
         if (st_len == 0)
         {
@@ -611,7 +700,7 @@ public class ProtocolService : INetworkInterface
 
     private List<Dictionary<string, object>> ReadDictionaryList(string str, ByteArray ba)
     {
-        List<Dictionary<string, object>> stbl = new List<Dictionary<string, object>>();
+        List<Dictionary<string, object>> stbl = HeapObjectPoolTool<List<Dictionary<string, object>>>.GetHeapObject();
         int len1 = ba.ReadShort();
         ba.ReadInt();
 
@@ -630,7 +719,8 @@ public class ProtocolService : INetworkInterface
 
     byte[] GetSendByte(string messageType, Dictionary<string, object> data)
     {
-        ByteArray Bytes = new ByteArray();
+        ByteArray Bytes = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+        Bytes.clear();
 
         string messageTypeTemp = "m_" + messageType + "_s";
 
@@ -693,12 +783,6 @@ public class ProtocolService : INetworkInterface
 
         return Bytes.Buffer;
     }
-
-    #region 序列化数据
-
-
-
-    #endregion
 
     #endregion
 }

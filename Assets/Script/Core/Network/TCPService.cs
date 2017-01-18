@@ -25,6 +25,11 @@ public class TCPService : INetworkInterface
 
     private Thread m_connThread;
 
+    public override void Init()
+    {
+        InitMessagePool(50);
+    }
+
     public override void GetIPAddress()
     {
         //m_IPaddress = DataManager.GetData("ServerData")["1"].GetString("Address");
