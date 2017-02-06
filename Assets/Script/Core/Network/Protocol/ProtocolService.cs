@@ -36,6 +36,9 @@ public class ProtocolService : INetworkInterface
 
     public override void Init()
     {
+        ReadProtocolInfo();
+        ReadMethodNameInfo();
+
         InitMessagePool(50);
         m_acb = new AsyncCallback(EndReceive);
         m_readData = new byte[1024];
@@ -47,17 +50,11 @@ public class ProtocolService : INetworkInterface
 
     public override void GetIPAddress()
     {
-        ReadProtocolInfo();
-        ReadMethodNameInfo();
-
         m_IPaddress = "192.168.0.10";
         m_port = 7001;
     }
     public override void SetIPAddress(string IP, int port)
     {
-        ReadProtocolInfo();
-        ReadMethodNameInfo();
-
         m_IPaddress = IP;
         m_port = port;
     }
@@ -174,17 +171,18 @@ public class ProtocolService : INetworkInterface
 
     void SpiltMessage(byte[] bytes,int length)
     {
-        //Debug.Log("SpiltMessage : " + BitConverter.ToString(bytes));
-
-        //Debug.Log("1 GetLength() " + GetBufferLength() + " ReadLength() " + ReadLength() + " bytes " + length);
-
         WriteBytes(bytes, length);
 
-        //Debug.Log("2 GetLength() " + GetBufferLength() + " ReadLength() " + ReadLength());
+        int i = 0;
 
-        //while (GetBufferLength() != 0 && ReadLength() < GetBufferLength())
+        while (GetBufferLength() != 0 && ReadLength() <= GetBufferLength())
         {
             ReceiveDataLoad(ReadByte(ReadLength()));
+
+            if (i>100)
+            {
+                break;
+            }
         }
     }
 
@@ -300,6 +298,7 @@ public class ProtocolService : INetworkInterface
         string content = ResourceManager.ReadTextFile(m_ProtocolFileName);
         AnalysisProtocolStatus currentStatus = AnalysisProtocolStatus.None;
         List<Dictionary<string, object>> msgInfo = new List<Dictionary<string, object>>();
+        Regex rgx = new Regex(@"^message\s(\w+)");
 
         string[] lines = content.Split('\n');
 
@@ -311,8 +310,7 @@ public class ProtocolService : INetworkInterface
             {
                 if (currentLine.Contains("message"))
                 {
-                    Regex rgx = new Regex(@"^message\s(\w+)");
-
+                    
                     string msgName = rgx.Match(currentLine).Groups[1].Value;
 
                     //Debug.Log("message :->" + msgName + "<-");
@@ -382,22 +380,11 @@ public class ProtocolService : INetworkInterface
         }
     }
 
+    Regex m_NameRgx = new Regex(@"^\s+\w+\s+\w+\s+(\w+)");
+
     void AddName(string currentLine, Dictionary<string, object> currentFeidInfo)
     {
-        Regex rgx = new Regex(@"^\s+\w+\s+\w+\s+(\w+)");
-
-        //Debug.Log(rgx.Match(currentLine).Value);
-
-
-        //for (int i = 0; i < rgx.Match(currentLine).Groups.Count; i++)
-        //{
-        //    Debug.Log(rgx.Match(currentLine).Groups[i]);
-        //}
-
-        //Debug.Log(rgx.Match(currentLine).Groups[1]);
-        
-
-        currentFeidInfo.Add("name", rgx.Match(currentLine).Groups[1].Value);
+        currentFeidInfo.Add("name", m_NameRgx.Match(currentLine).Groups[1].Value);
     }
 
     enum AnalysisProtocolStatus
@@ -416,6 +403,7 @@ public class ProtocolService : INetworkInterface
         m_methodIndexInfo = new Dictionary<string, int>();
 
         string content = ResourceManager.ReadTextFile(m_methodNameInfoFileName);
+        Regex rgx = new Regex(@"^(\d+),(\w+)");
 
         string[] lines = content.Split('\n');
 
@@ -423,8 +411,6 @@ public class ProtocolService : INetworkInterface
         {
             if (lines[i].Contains(","))
             {
-                Regex rgx = new Regex(@"^(\d+),(\w+)");
-
                 var res = rgx.Match(lines[i]);
 
                 string index = res.Groups[1].Value;

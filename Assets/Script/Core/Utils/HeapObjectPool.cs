@@ -6,7 +6,7 @@ public class HeapObjectPool
 {
     #region string, object字典
 
-    const int c_SODictSize = 100;
+    const int c_SODictSize = 200;
     static Dictionary<string, object>[] s_SODict;
     static int s_SODictIndex = 0;
 

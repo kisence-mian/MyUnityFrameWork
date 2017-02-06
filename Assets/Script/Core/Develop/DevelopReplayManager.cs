@@ -106,12 +106,19 @@ public class DevelopReplayManager
 
     public static void OnEveryEventCallBack(string eventName, IInputEventBase inputEvent)
     {
-        Dictionary<string, object> tmp = HeapObjectPool.GetSODict();
+        Dictionary<string, object> tmp = new Dictionary<string, object>();
 
         tmp.Add(c_eventNameKey, inputEvent.GetType().Name);
         tmp.Add(c_serializeInfoKey, inputEvent.Serialize());
-
-        WriteInputEvent(Json.Serialize(tmp));
+        try
+        {
+            WriteInputEvent(Json.Serialize(tmp));
+        }
+        catch(Exception e)
+        {
+            Debug.LogError("Write Dev Log Error! : " + e.ToString());
+        }
+        
     }
 
     public static void OnGetRandomCallBack(int random)

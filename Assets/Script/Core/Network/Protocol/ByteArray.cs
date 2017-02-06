@@ -8,29 +8,12 @@ public class ByteArray
 {
     private List<byte> bytes = new List<byte>();
 
-    public ByteArray()
-    {
-    }
-    public ByteArray(byte[] buffer)
-    {
-        for (int i = 0; i < buffer.Length; i++)
-        {
-            bytes.Add(buffer[i]);
-        }
-    }
-
     public void Add(byte[] buffer)
     {
         for (int i = 0; i < buffer.Length; i++)
         {
             bytes.Add(buffer[i]);
         }
-    }
-
-    private void Init()
-    {
-        //m_Writer = new BinaryWriter(m_Stream);
-        //m_Reader = new BinaryReader(m_Stream);
     }
 
     public int Length
@@ -75,52 +58,56 @@ public class ByteArray
         Postion += len;
         return result;
     }
-    public void addpos(int len)
-    {
-        Postion += len;
-    }
-    public int getpos()
-    {
-        return Postion;
-    }
+
     public void WriteInt(int value)
     {
-        byte[] bs = new byte[4];
-        bs[0] = (byte)(value >> 24);
-        bs[1] = (byte)(value >> 16);
-        bs[2] = (byte)(value >> 8);
-        bs[3] = (byte)(value);
-        bytes.AddRange(bs);
+        //byte[] bs = new byte[4];
+        //bs[0] = (byte)(value >> 24);
+        //bs[1] = (byte)(value >> 16);
+        //bs[2] = (byte)(value >> 8);
+        //bs[3] = (byte)(value);
+
+        bytes.Add((byte)(value >> 24));
+        bytes.Add((byte)(value >> 16));
+        bytes.Add((byte)(value >> 8));
+        bytes.Add((byte)(value));
     }
     public void WriteShort(int value)
     {
-        byte[] bs = new byte[2];
-        bs[0] = (byte)(value >> 8);
-        bs[1] = (byte)(value);
-        bytes.AddRange(bs);
+        //byte[] bs = new byte[2];
+        //bs[0] = (byte)(value >> 8);
+        //bs[1] = (byte)(value);
+        //bytes.AddRange(bs);
+
+        bytes.Add((byte)(value >> 8));
+        bytes.Add((byte)(value));
     }
     public int ReadInt()
     {
-        byte[] bs = new byte[4];
-        for (int i = 0; i < 4; i++)
-        {
-            bs[i] = bytes[i + Postion];
-        }
+        //byte[] bs = new byte[4];
+        //for (int i = 0; i < 4; i++)
+        //{
+        //    bs[i] = bytes[i + Postion];
+        //}
+
+        int result = (int)bytes[3 + Postion] | ((int)bytes[2 + Postion] << 8) | ((int)bytes[1 + Postion] << 16) | ((int)bytes[0 + Postion] << 24);
+
         Postion += 4;
-        int result = (int)bs[3] | ((int)bs[2] << 8) | ((int)bs[1] << 16) | ((int)bs[0] << 24);
         return result;
     }
     public int ReadShort()
     {
-        byte[] bs = new byte[2];
-        for (int i = 0; i < 2; i++)
-        {
-            bs[i] = bytes[i + Postion];
-        }
+        //byte[] bs = new byte[2];
+        //for (int i = 0; i < 2; i++)
+        //{
+        //    bs[i] = bytes[i + Postion];
+        //}
+        
+        int result = (int)bytes[1 + Postion] | ((int)bytes[0 + Postion] << 8);
         Postion += 2;
-        int result = (int)bs[1] | ((int)bs[0] << 8);
         return result;
     }
+
     public double ReadDouble()
     {
         byte[] b = new byte[8];
@@ -131,35 +118,30 @@ public class ByteArray
         Postion += 8;
         Array.Reverse(b);
         double dbl = BitConverter.ToDouble(b, 0);
+
         return dbl;
     }
     public string ReadUTFBytes(uint length)
     {
         if (length == 0)
             return string.Empty;
+
         byte[] b = new byte[length];
         for (int i = 0; i < length; i++)
         {
             b[i] = bytes[i + Postion];
         }
         Postion += (int)length;
+
         string decodedString = Encoding.UTF8.GetString(b);
         return decodedString;
     }
-    public void WriteUTFBytes(string value)
-    {
-        byte[] bs = Encoding.UTF8.GetBytes(value);
-        bytes.AddRange(bs);
-    }
+
     public void WriteALLBytes(byte[] bs)
     {
         bytes.AddRange(bs);
     }
-    public void WriteNullBytes(int num)
-    {
-        byte[] bs = new byte[num];
-        bytes.AddRange(bs);
-    }
+
     public void WriteBoolean(bool value)
     {
         bytes.Add(value ? ((byte)1) : ((byte)0));
@@ -168,17 +150,7 @@ public class ByteArray
     {
         bytes.Add(value);
     }
-    public void WriteBytes(byte[] value, int offset, int length)
-    {
-        for (int i = 0; i < length; i++)
-        {
-            bytes.Add(value[i + offset]);
-        }
-    }
-    public void WriteBytes(byte[] value)
-    {
-        bytes.AddRange(value);
-    }
+
     public void WriteDouble(double v)
     {
         byte[] temp = BitConverter.GetBytes(v);

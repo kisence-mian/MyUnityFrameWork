@@ -178,10 +178,15 @@ public class Timer : MonoBehaviour
         return l_te;
     }
 
-    public static void DestroyTimer(TimerEvent l_timer)
+    public static void DestroyTimer(TimerEvent l_timer,bool isCallBack = false)
     {
         if(s_instance.m_timers.Contains(l_timer))
         {
+            if (isCallBack)
+            {
+                l_timer.CallBackTimer();
+            }
+
             s_instance.m_timers.Remove(l_timer);
         }
         else
@@ -190,22 +195,22 @@ public class Timer : MonoBehaviour
         }
     }
 
-    public static void DestroyTimer(string l_timerName)
+    public static void DestroyTimer(string l_timerName, bool isCallBack = false)
     {
         for (int i = 0; i < s_instance.m_timers.Count;i++ )
         {
             if (s_instance.m_timers[i].m_timerName.Equals(l_timerName))
             {
-                DestroyTimer(s_instance.m_timers[i]);
+                DestroyTimer(s_instance.m_timers[i], isCallBack);
             }
         }
     }
 
-    public static void DestroyAllTimer(string l_timerName)
+    public static void DestroyAllTimer(bool isCallBack = false)
     {
         for (int i = 0; i < s_instance.m_timers.Count; i++)
         {
-            DestroyTimer(s_instance.m_timers[i]);
+            DestroyTimer(s_instance.m_timers[i], isCallBack);
         }
     }
 

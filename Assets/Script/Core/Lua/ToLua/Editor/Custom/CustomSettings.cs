@@ -147,6 +147,8 @@ public static class CustomSettings
          //_GT(typeof( CharacterEventType)),
          //_GT(typeof(CharacterBase)),
          // _GT(typeof(SkillData)),
+          _GT(typeof(UGUITool)),
+          
 
     #endregion
 

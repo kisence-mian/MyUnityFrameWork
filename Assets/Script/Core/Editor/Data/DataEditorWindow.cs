@@ -743,10 +743,18 @@ public class DataEditorWindow : EditorWindow
                 CreatDataCSharpFile(m_dataNameList[i],DataManager.GetData(m_dataNameList[i]));
             }
         }
+
+        UnityEditor.AssetDatabase.Refresh();
     }
 
     void CreatDataCSharpFile(string dataName,DataTable data)
     {
+        if (dataName.Contains("/"))
+        {
+            string[] tmp = dataName.Split('/');
+            dataName = tmp[tmp.Length - 1];
+        }
+
         string className = dataName + "Generate";
         string content = "";
 

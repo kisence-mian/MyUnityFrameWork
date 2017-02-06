@@ -44,17 +44,7 @@ public class TimerEvent
 
     public void CompleteTimer()
     {
-        if (m_callBack != null)
-        {
-            try
-            {
-                m_callBack(m_objs);
-            }
-            catch(Exception e)
-            {
-                Debug.LogError(e.ToString());
-            }
-        }
+        CallBackTimer();
         
         if(m_repeatCount>0)
         {
@@ -65,6 +55,21 @@ public class TimerEvent
         {
             m_isDone = false;
             m_currentTimer = 0;
+        }
+    }
+
+    public void CallBackTimer()
+    {
+        if (m_callBack != null)
+        {
+            try
+            {
+                m_callBack(m_objs);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
+            }
         }
     }
 
