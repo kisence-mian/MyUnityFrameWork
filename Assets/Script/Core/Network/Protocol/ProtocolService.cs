@@ -14,6 +14,7 @@ public class ProtocolService : INetworkInterface
     private const int TYPE_int32 = 2;
     private const int TYPE_double = 3;
     private const int TYPE_bool = 4;
+    private const int TYPE_custom = 5;
     private const int RT_repeated = 1;
     private const int RT_equired = 0;
 
@@ -356,6 +357,8 @@ public class ProtocolService : INetworkInterface
         }
     }
 
+    Regex m_TypeRgx = new Regex(@"^\s+\w+\s+(\w+)\s+\w+");
+
     void AddType(string currentLine, Dictionary<string, object> currentFeidInfo)
     {
         if (currentLine.Contains("int32"))
@@ -376,7 +379,9 @@ public class ProtocolService : INetworkInterface
         }
         else
         {
-            currentFeidInfo.Add("type", currentLine.Split(' ')[1]);
+            currentFeidInfo.Add("type", TYPE_custom);
+            currentFeidInfo.Add("vp", m_TypeRgx.Match(currentLine).Groups[1].Value);
+
         }
     }
 
@@ -468,7 +473,8 @@ public class ProtocolService : INetworkInterface
 
         for (int i = 0; i < tableInfo.Count; i++)
         {
-            //Debug.Log(tableInfo[i]["name"]);
+            //Debug.Log("--------->"+tableInfo[i]["name"]);
+            //Debug.Log(tableInfo[i]["type"]);
 
             int vts = (int)tableInfo[i]["type"];
             int spl = (int)tableInfo[i]["spl"];

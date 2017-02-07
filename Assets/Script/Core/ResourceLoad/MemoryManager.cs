@@ -23,6 +23,8 @@ public class MemoryManager
     /// </summary>
     public static int s_MaxHeapMemoryUse = 50;
 
+    public static bool s_enable = true;
+
     public static void Init()
     {
         ApplicationManager.s_OnApplicationUpdate += Update;
@@ -36,14 +38,27 @@ public class MemoryManager
         //资源加载
         LoadResources();
 
+        #if !UNITY_EDITOR
         //内存管理
         MonitorMemorySize();
+
+        #else
+
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            s_enable = !s_enable;
+        }
+
+        #endif
     }
 
     static void GUI()
     {
-        GUILayout.TextField("总内存：" + ByteToM( Profiler.GetTotalAllocatedMemory() ) + "M");
-        GUILayout.TextField("堆内存：" + ByteToM( Profiler.GetMonoUsedSize() ) + "M");
+        if (s_enable)
+        {
+            GUILayout.TextField("总内存：" + ByteToM(Profiler.GetTotalAllocatedMemory()) + "M");
+            GUILayout.TextField("堆内存：" + ByteToM(Profiler.GetMonoUsedSize()) + "M");
+        }
     }
 
     /// <summary>

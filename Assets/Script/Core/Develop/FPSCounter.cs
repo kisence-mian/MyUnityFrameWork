@@ -15,6 +15,8 @@ using System.Collections;
 		// 显示帧率
 		private int fps = 0;
 
+        public static bool s_enable = true;
+
         //public FPSCounter()
         //{
 
@@ -50,18 +52,26 @@ using System.Collections;
 				this.frameCount = 0;
 				this.rateDuration = 0f;
 			}
+
+            if (Input.GetKeyDown(KeyCode.F2))
+            {
+                s_enable = !s_enable;
+            }
 		}
 
 		void OnGUI()
 		{
             //GUI.color = Color.black;
-            GUI.Label(new Rect(3, 3, 1200, GUIUtil.FontSize), "fps:" + this.fps.ToString());		
+
+            GUI.Label(new Rect(3, 3, 1200, GUIUtil.FontSize), "FPS:" + this.fps.ToString());
         }
 
         void OnGUI2()
         {
             //GUI.color = Color.black;
-
-            GUILayout.TextField("FPS:" + fps.ToString());
+            if (s_enable)
+            {
+                GUILayout.TextField("FPS:" + fps.ToString());
+            }
         }
 	}
