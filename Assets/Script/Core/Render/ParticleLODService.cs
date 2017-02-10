@@ -11,16 +11,24 @@ public class ParticleLODService : PoolObject
     public Transform m_LOD_2;
     public Transform m_LOD_3;
 
+    #if UNITY_EDITOR
     public void Reset()
     {
         m_LOD_1 = transform.Find("LOD_1");
         m_LOD_2 = transform.Find("LOD_2");
         m_LOD_3 = transform.Find("LOD_3");
     }
+    #endif
 
     public override void OnCreate()
     {
         ResetLOD(RenderManager.LOD);
+        GlobalEvent.AddEvent(RenderEventEnum.UpdateLOD, ReceviceUpdateLOD);
+    }
+
+    public override void OnDistroy()
+    {
+        GlobalEvent.RemoveEvent(RenderEventEnum.UpdateLOD, ReceviceUpdateLOD);
     }
 
     public void ResetLOD(int LOD)
@@ -34,10 +42,10 @@ public class ParticleLODService : PoolObject
         {
             m_LOD_2.gameObject.SetActive(LOD >= 2);
         }
+    }
 
-        //if (m_LOD_3 != null)
-        //{
-        //    m_LOD_3.gameObject.SetActive(LOD >= 3);
-        //}
+    public void ReceviceUpdateLOD(params object[] objs)
+    {
+        ResetLOD(RenderManager.LOD);
     }
 }

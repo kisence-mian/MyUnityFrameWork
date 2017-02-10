@@ -463,8 +463,13 @@ public class ProtocolService : INetworkInterface
 
     Dictionary<string, object> AnalysisData(string MessageType, byte[] bytes)
     {
+        string fieldName = "";
+        string customType = "";
+        int fieldType = 0;
+        int repeatType = 0;
         try
         {
+            Dictionary<string, object> data = HeapObjectPool.GetSODict();
             ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
 
             ba.clear();
@@ -476,7 +481,74 @@ public class ProtocolService : INetworkInterface
                 throw new Exception("ProtocolInfo NOT Exist ->" + messageTypeTemp + "<-");
             }
 
-            return ReadDictionary(messageTypeTemp, ba);
+            List<Dictionary<string, object>> tableInfo = m_protocolInfo["m_" + MessageType + "_c"];
+
+            for (int i = 0; i < tableInfo.Count; i++)
+            {
+                fieldType = (int)tableInfo[i]["type"];
+                repeatType = (int)tableInfo[i]["spl"];
+                fieldName = (string)tableInfo[i]["name"];
+
+                if (fieldType == TYPE_string)
+                {
+                    if (repeatType == RT_repeated)
+                    {
+                        data[fieldName] = ReadStringList(ba);
+                    }
+                    else
+                    {
+                        data[fieldName] = ReadString(ba);
+                    }
+                }
+                else if (fieldType == TYPE_bool)
+                {
+                    if (repeatType == RT_repeated)
+                    {
+                        data[fieldName] = ReadBoolList(ba);
+                    }
+                    else
+                    {
+                        data[fieldName] = ReadBool(ba);
+                    }
+                }
+                else if (fieldType == TYPE_double)
+                {
+                    if (repeatType == RT_repeated)
+                    {
+                        data[fieldName] = ReadDoubleList(ba);
+                    }
+                    else
+                    {
+                        data[fieldName] = ReadDouble(ba);
+                    }
+                }
+                else if (fieldType == TYPE_int32)
+                {
+                    if (repeatType == RT_repeated)
+                    {
+                        data[fieldName] = ReadIntList(ba);
+                    }
+                    else
+                    {
+                        data[fieldName] = ReadInt(ba);
+                    }
+                }
+                else
+                {
+                    customType = (string)tableInfo[i]["vp"];
+
+                    if (repeatType == RT_repeated)
+                    {
+                        data[fieldName] = ReadDictionaryList(customType, ba);
+                    }
+                    else
+                    {
+                        data[fieldName] = ReadDictionary(customType, ba);
+                    }
+                }
+            }
+
+            return data;
         }
         catch(Exception e)
         {

@@ -69,6 +69,7 @@ public class AnimSystem : MonoBehaviour
           AnimParamType.DelayTime, delayTime,
           AnimParamType.InteType, interp,
           AnimParamType.IsIncludeChild, isChild,
+          AnimParamType.RepeatType, repeatType,
           AnimParamType.RepeatCount, repeatCount,
           AnimParamType.IsIgnoreTimeScale, IsIgnoreTimeScale,
           AnimParamType.CallBack, callBack,
@@ -165,6 +166,7 @@ public class AnimSystem : MonoBehaviour
           AnimParamType.DelayTime, delayTime,
           AnimParamType.InteType, interp,
           AnimParamType.IsIgnoreTimeScale, IsIgnoreTimeScale,
+          AnimParamType.RepeatType, repeatType,
           AnimParamType.RepeatCount, repeatCount,
           AnimParamType.CallBack, callBack,
           AnimParamType.CallBackParams, parameter

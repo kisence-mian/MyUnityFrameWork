@@ -4,21 +4,38 @@ using UnityEngine;
 
 public class RenderManager  
 {
+    /// <summary>
+    /// 细节等级，值目前在1-3之间
+    /// </summary>
     static int s_LOD = 3;
 
     public static int LOD
     {
         get { return RenderManager.s_LOD; }
-        //set { RenderManager.s_LOD = value; }
+        set {
+            s_LOD = value;
+
+            if (s_LOD > 3)
+            {
+                s_LOD = 3;
+            }
+
+            if (s_LOD < 1)
+            {
+                s_LOD = 1;
+            }
+
+            GlobalEvent.DispatchEvent(RenderEventEnum.UpdateLOD);
+        }
     }
 
     public static void Init()
     {
         
     }
+}
 
-    public static void SetLOD(int LOD)
-    {
-        //QualitySettings.
-    }
+public enum RenderEventEnum
+{
+    UpdateLOD
 }
