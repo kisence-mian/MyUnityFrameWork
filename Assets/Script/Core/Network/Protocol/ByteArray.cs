@@ -157,4 +157,11 @@ public class ByteArray
         Array.Reverse(temp);
         bytes.AddRange(temp);
     }
+
+    public void WriteString(string content)
+    {
+        byte[] bs = Encoding.UTF8.GetBytes(content);
+        WriteShort(bs.Length);
+        WriteALLBytes(bs);
+    }
 }

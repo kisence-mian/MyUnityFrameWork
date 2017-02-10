@@ -25,9 +25,10 @@ public class UGUITool
         return false;
     }
     
-    static public void set_icon(Image img,string name)
+    static public void set_icon(Image img,string name,bool is_nativesize = true)
     {
         img.overrideSprite = ResourceManager.Load<Sprite>(name);
-        img.SetNativeSize();
+        if (is_nativesize)
+            img.SetNativeSize();
     }
 }

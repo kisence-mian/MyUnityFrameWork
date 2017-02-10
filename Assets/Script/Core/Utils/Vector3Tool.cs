@@ -15,4 +15,15 @@ public class Vector3Tool {
         if (hit.transform!=null) _y = hit.transform.position.y;
         return _y;
     }
+    public static Vector3 new_v3(float xx,float yy,float zz)
+    {
+        return new Vector3(xx,yy,zz);
+    }
+
+    public static void pic_reverse(GameObject go)
+    {
+        go.transform.localScale = new Vector3(-1f, 1f, 1f);
+        go.transform.localPosition = go.transform.localPosition - new Vector3(512f, 0, 0);
+        
+    }
 }

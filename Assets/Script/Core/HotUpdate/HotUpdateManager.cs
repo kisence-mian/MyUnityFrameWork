@@ -384,6 +384,7 @@ public struct HotUpdateStatusInfo
 {
     public HotUpdateStatusEnum m_status;
     public LoadState m_loadState;
+    public bool isFailed;
 
     static HotUpdateStatusInfo s_info = new HotUpdateStatusInfo();
     public static HotUpdateStatusInfo GetUpdateInfo(HotUpdateStatusEnum status,float progress)
@@ -403,6 +404,18 @@ public struct HotUpdateStatusInfo
         {
             s_info.m_loadState.isDone = false;
         }
+
+        if (status == HotUpdateStatusEnum.Md5FileDownLoadFail ||
+            status == HotUpdateStatusEnum.UpdateFail || 
+            status == HotUpdateStatusEnum.VersionFileDownLoadFail)
+        {
+            s_info.isFailed = true;
+        }
+        else
+        {
+            s_info.isFailed = false;
+        }
+
 
         s_info.m_loadState.progress = progress;
 

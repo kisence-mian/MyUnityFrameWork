@@ -52,7 +52,7 @@ public static class CustomSettings
         _GT(typeof(Transform)),
         _GT(typeof(Component)),
         _GT(typeof(Behaviour)),
-        _GT(typeof(MonoBehaviour)),
+        //_GT(typeof(MonoBehaviour)),
         
     #endregion
 
@@ -147,7 +147,10 @@ public static class CustomSettings
          //_GT(typeof( CharacterEventType)),
          //_GT(typeof(CharacterBase)),
          // _GT(typeof(SkillData)),
-          _GT(typeof(UGUITool)),
+          //_GT(typeof(UGUITool)),
+          //_GT(typeof(PVPMatchService)),
+
+          //_GT(typeof(StoryServiceLuaHelper)),
           
 
     #endregion

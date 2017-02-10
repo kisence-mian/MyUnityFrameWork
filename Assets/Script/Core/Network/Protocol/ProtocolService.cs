@@ -463,80 +463,26 @@ public class ProtocolService : INetworkInterface
 
     Dictionary<string, object> AnalysisData(string MessageType, byte[] bytes)
     {
-        Dictionary<string, object> data = HeapObjectPool.GetSODict();
-        ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
-
-        ba.clear();
-        ba.Add(bytes);
-
-        List<Dictionary<string, object>> tableInfo = m_protocolInfo["m_"+MessageType+"_c"];
-
-        for (int i = 0; i < tableInfo.Count; i++)
+        try
         {
-            //Debug.Log("--------->"+tableInfo[i]["name"]);
-            //Debug.Log(tableInfo[i]["type"]);
+            ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
 
-            int vts = (int)tableInfo[i]["type"];
-            int spl = (int)tableInfo[i]["spl"];
+            ba.clear();
+            ba.Add(bytes);
 
-            if (vts == TYPE_string)
+            string messageTypeTemp = "m_" + MessageType + "_c";
+            if (!m_protocolInfo.ContainsKey(messageTypeTemp))
             {
-                if (spl == RT_repeated)
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadStringList(ba);
-                }
-                else
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadString(ba);
-                }
+                throw new Exception("ProtocolInfo NOT Exist ->" + messageTypeTemp + "<-");
             }
-            else if (vts == TYPE_bool)
-            {
-                if (spl == RT_repeated)
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadBoolList(ba);
-                }
-                else
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadBool(ba);
-                }
-            }
-            else if (vts == TYPE_double)
-            {
-                if (spl == RT_repeated)
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadDoubleList(ba);
-                }
-                else
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadDouble(ba);
-                }
-            }
-            else if (vts == TYPE_int32)
-            {
-                if (spl == RT_repeated)
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadIntList(ba);
-                }
-                else
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadInt(ba);
-                }
-            }
-            else
-            {
-                if (spl == RT_repeated)
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadDictionaryList((string)tableInfo[i]["vp"], ba);
-                }
-                else
-                {
-                    data[(string)tableInfo[i]["name"]] = ReadDictionary((string)tableInfo[i]["vp"], ba);
-                }
-            }
+
+            return ReadDictionary(messageTypeTemp, ba);
         }
-
-        return data;
+        catch(Exception e)
+        {
+            throw new Exception(@"ProtocolService AnalysisData Excepiton : MessageType is ->" + MessageType
+                                 + "<-\n" + e.ToString());
+        }
     }
 
     private string ReadString(ByteArray ba)
@@ -615,79 +561,100 @@ public class ProtocolService : INetworkInterface
 
     private Dictionary<string, object> ReadDictionary(string dictName, ByteArray ba)
     {
-        int st_len = ba.ReadInt();
+        int fieldType = 0;
+        int repeatType = 0;
+        string fieldName = null;
+        string customType = null;
 
-        Dictionary<string, object> tbl = HeapObjectPool.GetSODict();
-
-        if (st_len == 0)
+        try
         {
+            int st_len = ba.ReadInt();
+
+            Dictionary<string, object> tbl = HeapObjectPool.GetSODict();
+
+            if (st_len == 0)
+            {
+                return tbl;
+            }
+
+            List<Dictionary<string, object>> tableInfo = m_protocolInfo[dictName];
+
+            for (int i = 0; i < tableInfo.Count; i++)
+            {
+                fieldType = (int)tableInfo[i]["type"];
+                repeatType = (int)tableInfo[i]["spl"];
+                fieldName = (string)tableInfo[i]["name"];
+
+                if (fieldType == TYPE_string)
+                {
+                    if (repeatType == RT_repeated)
+                    {
+                        tbl[fieldName] = ReadStringList(ba);
+                    }
+                    else
+                    {
+                        tbl[fieldName] = ReadString(ba);
+                    }
+                }
+                else if (fieldType == TYPE_bool)
+                {
+                    if (repeatType == RT_repeated)
+                    {
+                        tbl[fieldName] = ReadBoolList(ba);
+                    }
+                    else
+                    {
+                        tbl[fieldName] = ReadBool(ba);
+                    }
+                }
+                else if (fieldType == TYPE_double)
+                {
+                    if (repeatType == RT_repeated)
+                    {
+                        tbl[fieldName] = ReadDoubleList(ba);
+                    }
+                    else
+                    {
+                        tbl[fieldName] = ReadDouble(ba);
+                    }
+                }
+                else if (fieldType == TYPE_int32)
+                {
+                    if (repeatType == RT_repeated)
+                    {
+                        tbl[fieldName] = ReadIntList(ba);
+                    }
+                    else
+                    {
+                        tbl[fieldName] = ReadInt(ba);
+                    }
+                }
+                else
+                {
+                    customType = (string)tableInfo[i]["vp"];
+
+                    if (repeatType == RT_repeated)
+                    {
+                        tbl[fieldName] = ReadDictionaryList(customType, ba);
+                    }
+                    else
+                    {
+                        tbl[fieldName] = ReadDictionary(customType, ba);
+                    }
+                }
+            }
             return tbl;
+
         }
-
-        List<Dictionary<string, object>> tableInfo = m_protocolInfo[dictName];
-
-        for (int i = 0; i < tableInfo.Count; i++)
+        catch(Exception e)
         {
-            int vts = (int)tableInfo[i]["type"];
-            int spl = (int)tableInfo[i]["spl"];
-            if (vts == TYPE_string)
-            {
-                if (spl == RT_repeated)
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadStringList(ba);
-                }
-                else
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadString(ba);
-                }
-            }
-            else if (vts == TYPE_bool)
-            {
-                if (spl == RT_repeated)
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadBoolList(ba);
-                }
-                else
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadBool(ba);
-                }
-            }
-            else if (vts == TYPE_double)
-            {
-                if (spl == RT_repeated)
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadDoubleList(ba);
-                }
-                else
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadDouble(ba);
-                }
-            }
-            else if (vts == TYPE_int32)
-            {
-
-                if (spl == RT_repeated)
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadIntList(ba);
-                }
-                else
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadInt(ba);
-                }
-            }
-            else
-            {
-                if (spl == RT_repeated)
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadDictionaryList((string)tableInfo[i]["vp"], ba);
-                }
-                else
-                {
-                    tbl[(string)tableInfo[i]["name"]] = ReadDictionary((string)tableInfo[i]["vp"], ba);
-                }
-            }
+            throw new Exception(@"ReadDictionary Excepiton DictName is ->" + dictName
+                        + "<-\nFieldName:->" + fieldName
+                        + "<-\nFieldType:->" + GetFieldType(fieldType)
+                        + "<-\nRepeatType:->" + GetRepeatType(repeatType)
+                        + "<-\nCustomType:->" + customType
+                        + "<-\n" + e.ToString());
         }
-        return tbl;
     }
 
     private List<Dictionary<string, object>> ReadDictionaryList(string str, ByteArray ba)
@@ -711,69 +678,216 @@ public class ProtocolService : INetworkInterface
 
     byte[] GetSendByte(string messageType, Dictionary<string, object> data)
     {
-        ByteArray Bytes = HeapObjectPoolTool<ByteArray>.GetHeapObject();
-        Bytes.clear();
-
-        string messageTypeTemp = "m_" + messageType + "_s";
-
-        if (!m_protocolInfo.ContainsKey(messageTypeTemp))
+        try
         {
-            //foreach (var item in m_protocolInfo)
-            //{
-            //    Debug.Log("->"+ item.Key+"<-");
-            //}
-            throw new Exception("ProtocolInfo NOT Exist ->" + messageTypeTemp + "<-");
-        }
-
-        List<Dictionary<string, object>> tableInfo = m_protocolInfo[messageTypeTemp];
-
-        for (int i = 0; i < tableInfo.Count; i++)
-        {
-            Dictionary<string, object> currentField = tableInfo[i];
-            int vts = (int)currentField["type"];
-            string jt_name = (string)currentField["name"];
-            if (vts == TYPE_string)
+            string messageTypeTemp = "m_" + messageType + "_s";
+            if (!m_protocolInfo.ContainsKey(messageTypeTemp))
             {
-                if (data.ContainsKey(jt_name))
+                throw new Exception("ProtocolInfo NOT Exist ->" + messageTypeTemp + "<-");
+            }
+
+            return GetCustomTypeByte(messageTypeTemp, data);
+        }
+        catch (Exception e)
+        {
+            throw new Exception(@"ProtocolService GetSendByte Excepiton messageType is ->" + messageType
+                + "<-\n" + e.ToString());
+        }
+    }
+
+    int GetStringListLength(List<object> list)
+    {
+        int len = 0;
+        for (int i = 0; i < list.Count; i++)
+        {
+            byte[] bs = Encoding.UTF8.GetBytes((string)list[i]);
+            len = len + bs.Length;
+
+        }
+        return len;
+    }
+
+    int GetCustomListLength(string customType,List<object> list)
+    {
+        int len = 0;
+        for (int i = 0; i < list.Count; i++)
+        {
+            byte[] bs = GetCustomTypeByte(customType, (Dictionary<string, object>)list[i]);
+            len = len + bs.Length + 4;
+        }
+        return len;
+    }
+
+    private byte[] GetCustomTypeByte(string customType, Dictionary<string, object> data)
+    {
+        string fieldName = null;
+        int fieldType = 0;
+        int repeatType = 0;
+
+        try
+        {
+            ByteArray Bytes = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+            Bytes.clear();
+
+            if (!m_protocolInfo.ContainsKey(customType))
+            {
+                throw new Exception("ProtocolInfo NOT Exist ->" + customType + "<-");
+            }
+
+            List<Dictionary<string, object>> tableInfo = m_protocolInfo[customType];
+
+            for (int i = 0; i < tableInfo.Count; i++)
+            {
+                Dictionary<string, object> currentField = tableInfo[i];
+                fieldType = (int)currentField["type"];
+                fieldName = (string)currentField["name"];
+                repeatType = (int)currentField["spl"];
+
+                if (fieldType == TYPE_string)
                 {
-                    byte[] bs = Encoding.UTF8.GetBytes((string)data[jt_name]);
-                    Bytes.WriteShort(bs.Length);
-                    Bytes.WriteALLBytes(bs);
+                    if (data.ContainsKey(fieldName))
+                    {
+                        if (repeatType == RT_equired)
+                        {
+                            Bytes.WriteString((string)data[fieldName]);
+                        }
+                        else
+                        {
+                            List<object> list = (List<object>)data[fieldName];
+
+                            Bytes.WriteShort(list.Count);
+                            Bytes.WriteInt(GetStringListLength(list));
+                            for (int i2 = 0; i2 < list.Count; i2++)
+                            {
+                                Bytes.WriteString((string)list[i2]);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        Bytes.WriteShort(0);
+                    }
+                }
+                else if (fieldType == TYPE_bool)
+                {
+                    if (data.ContainsKey(fieldName))
+                    {
+                        if (repeatType == RT_equired)
+                        {
+                            Bytes.WriteBoolean((bool)data[fieldName]);
+                        }
+                        else
+                        {
+                            List<object> tb = (List<object>)data[fieldName];
+                            Bytes.WriteShort(tb.Count);
+                            Bytes.WriteInt(tb.Count);
+                            for (int i2 = 0; i2 < tb.Count; i2++)
+                            {
+                                Bytes.WriteBoolean((bool)tb[i2]);
+                            }
+                        }
+                    }
+                }
+                else if (fieldType == TYPE_double)
+                {
+                    if (data.ContainsKey(fieldName))
+                    {
+                        if (repeatType == RT_equired)
+                        {
+                            Bytes.WriteDouble(Convert.ToDouble(data[fieldName].ToString()));
+                        }
+                        else
+                        {
+                            List<object> tb = (List<object>)data[fieldName];
+                            Bytes.WriteShort(tb.Count);
+                            Bytes.WriteInt(tb.Count * 8);
+                            for (int i2 = 0; i2 < tb.Count; i2++)
+                            {
+                                Bytes.WriteDouble((double)tb[i2]);
+                            }
+                        }
+                    }
+                }
+                else if (fieldType == TYPE_int32)
+                {
+                    if (data.ContainsKey(fieldName))
+                    {
+                        if (repeatType == RT_equired)
+                        {
+                            Bytes.WriteInt(Convert.ToInt32(Convert.ToDouble(data[fieldName].ToString())));
+                        }
+                        else
+                        {
+                            List<object> tb = (List<object>)data[fieldName];
+                            Bytes.WriteShort(tb.Count);
+                            Bytes.WriteInt(tb.Count * 4);
+                            for (int i2 = 0; i2 < tb.Count; i2++)
+                            {
+                                Bytes.WriteDouble((int)tb[i2]);
+                            }
+                        }
+                    }
                 }
                 else
                 {
-                    Bytes.WriteShort(0);
-                }
-            }
-            else if (vts == TYPE_bool)
-            {
-                if (data.ContainsKey(jt_name))
-                {
-                    Bytes.WriteBoolean((bool)data[jt_name]);
-                }
-            }
-            else if (vts == TYPE_double)
-            {
+                    if (data.ContainsKey(fieldName))
+                    {
+                        if (repeatType == RT_equired)
+                        {
+                            customType = (string)currentField["vp"];
+                            Bytes.WriteALLBytes(GetSendByte(customType, (Dictionary<string, object>)data[fieldName]));
+                        }
+                        else
+                        {
+                            List<object> tb = (List<object>)data[fieldName];
+                            Bytes.WriteShort(tb.Count);
+                            Bytes.WriteInt(GetCustomListLength(customType, tb));
 
-                if (data.ContainsKey(jt_name))
-                {
-                    Bytes.WriteDouble(Convert.ToDouble(data[jt_name].ToString()));
+                            for (int i2 = 0; i2 < tb.Count; i2++)
+                            {
+                                byte[] tempb = GetCustomTypeByte(customType, (Dictionary<string, object>)tb[i2]);
+                                Bytes.WriteInt(tempb.Length);
+                                Bytes.WriteALLBytes(tempb);
+                            }
+                        }
+                    }
                 }
             }
-            else if (vts == TYPE_int32)
-            {
-                if (data.ContainsKey(jt_name))
-                {
-                    Bytes.WriteInt(Convert.ToInt32(Convert.ToDouble(data[jt_name].ToString())));
-                }
-            }
-            else
-            {
-                Bytes.WriteALLBytes(GetSendByte((string)currentField["vp"], (Dictionary<string, object>)data[jt_name]));
-            }
+
+            return Bytes.Buffer;
         }
+        catch(Exception e)
+        {
+            throw new Exception(@"GetCustomTypeByte Excepiton CustomType is ->" + customType
+               + "<-\nFieldName:->" + fieldName
+               + "<-\nFieldType:->" + GetFieldType(fieldType)
+               + "<-\nRepeatType:->" + GetRepeatType(repeatType)
+               + "<-\nCustomType:->" + customType
+               + "<-\n" + e.ToString());
+        }
+    }
 
-        return Bytes.Buffer;
+    string GetFieldType(int fieldType)
+    {
+        switch(fieldType)
+        {
+            case TYPE_string:return"TYPE_string";
+            case TYPE_int32:return"TYPE_int32";
+            case TYPE_double:return"TYPE_double";
+            case TYPE_bool:return"TYPE_bool";
+            case TYPE_custom:return"TYPE_custom";
+            default: return "Error";
+        }
+    }
+
+    string GetRepeatType(int repeatType)
+    {
+        switch (repeatType)
+        {
+            case RT_repeated: return "RT_repeated";
+            case RT_equired: return "RT_equired";
+            default: return "Error";
+        }
     }
 
     #endregion

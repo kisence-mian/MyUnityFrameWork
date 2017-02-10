@@ -74,4 +74,16 @@ public class UIWindowLuaHelper : UIWindowBase
     {
         UIEventCallBackHelper.CallOnUIDestroy(this);
     }
+
+    public void SetText(string TextID,string content)
+    {
+        GetText(TextID).text = content;
+    }
+
+    public void SetTextByLangeage(string textID,string langeageID,params object[] objs)
+    {
+        GetText(textID).text = LanguageManager.GetContent(langeageID,objs);
+    }
+
+
 }

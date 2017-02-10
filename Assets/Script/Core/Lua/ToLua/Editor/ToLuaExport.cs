@@ -953,6 +953,7 @@ public static class ToLuaExport
         return true;
     }
 
+    //返回true跳过
     static bool IsGenericMethod(MethodInfo md)
     {
         if (md.IsGenericMethod)
@@ -989,6 +990,11 @@ public static class ToLuaExport
                 }
             }
         }
+
+        //if (md.GetCustomAttributes(typeof(NoExportToLuaAttribute),true).Length > 0)
+        //{
+        //    return true;
+        //}
 
         return false;
     }

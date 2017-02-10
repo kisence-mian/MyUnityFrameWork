@@ -94,7 +94,7 @@ public class LuaManager
                 s_updateFunction = s_state.GetFunction("LuaUpdate");
             }
 
-            s_updateFunction.Call(Time.deltaTime);
+            s_updateFunction.Call(Time.deltaTime * 1000);
         }
     }
 

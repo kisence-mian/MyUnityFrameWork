@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using MiniJSON;
 using System.Text;
 using System;
+using LuaInterface;
 
 /*
  * 数据管理器，只读，可热更新，可使用默认值
@@ -90,6 +91,7 @@ public class DataManager
     //只在编辑器下能够使用
     #if UNITY_EDITOR
 
+    [NoToLuaAttribute]
     public static void SaveData(string ConfigName, DataTable data)
     {
         ResourceIOTool.WriteStringByFile(
@@ -108,6 +110,7 @@ public class DataManager
     /// 读取编辑器数据
     /// </summary>
     /// <param name="ConfigName">数据名称</param>
+    [NoToLuaAttribute]
     public static Dictionary<string, object> GetEditorData(string dataName)
     {
         UnityEditor.AssetDatabase.Refresh();
@@ -130,6 +133,7 @@ public class DataManager
     /// </summary>
     /// <param name="ConfigName">数据名称</param>
     /// <param name="data">数据表</param>
+    [NoToLuaAttribute]
     public static void SaveEditorData(string ConfigName, Dictionary<string, object> data)
     {
         string configDataJson = Json.Serialize(data);
@@ -138,5 +142,5 @@ public class DataManager
 
         UnityEditor.AssetDatabase.Refresh();
     }
-    #endif
+#endif
 }

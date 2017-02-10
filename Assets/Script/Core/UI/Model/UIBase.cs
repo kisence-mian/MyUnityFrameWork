@@ -339,6 +339,11 @@ public class UIBase : MonoBehaviour
         GameObject item = GameObjectManager.CreatGameObjectByPool(itemName, GetGameObject(prantName), true);
         UIBase UIItem = item.GetComponent<UIBase>();
 
+        if(UIItem == null)
+        {
+            throw new Exception("CreateItem Error : ->" + itemName + "<- don't have UIBase Component!");
+        }
+
         UIItem.Init(m_childUIIndex++);
         UIItem.UIName = UIEventKey + UIItem.UIName;
 

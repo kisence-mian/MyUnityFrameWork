@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using MiniJSON;
 using System.Text;
 using System;
+using LuaInterface;
 
 /// <summary>
 /// 配置管理器，可读可写，可同步
@@ -80,7 +81,7 @@ public static class ConfigManager
 
 //只在编辑器下能够使用
 #if UNITY_EDITOR
-
+    [NoToLuaAttribute]
     public static void SaveData(string ConfigName, Dictionary<string, SingleField> data)
     {
         ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Resource,
@@ -91,7 +92,7 @@ public static class ConfigManager
 
         UnityEditor.AssetDatabase.Refresh();
     }
-
+    [NoToLuaAttribute]
     public static Dictionary<string, object> GetEditorConfigData(string ConfigName)
     {
         UnityEditor.AssetDatabase.Refresh();
@@ -108,6 +109,7 @@ public static class ConfigManager
         }
     }
 
+    [NoToLuaAttribute]
     public static void SaveEditorConfigData(string ConfigName, Dictionary<string, object> data)
     {
         string configDataJson = Json.Serialize(data);
