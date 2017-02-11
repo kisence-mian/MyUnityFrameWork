@@ -64,7 +64,7 @@ public class UnityEngine_UI_TextWrap
 		{
 			ToLua.CheckArgsCount(L, 2);
 			UnityEngine.UI.Text obj = (UnityEngine.UI.Text)ToLua.CheckObject(L, 1, typeof(UnityEngine.UI.Text));
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			UnityEngine.TextGenerationSettings o = obj.GetGenerationSettings(arg0);
 			ToLua.PushValue(L, o);
 			return 1;

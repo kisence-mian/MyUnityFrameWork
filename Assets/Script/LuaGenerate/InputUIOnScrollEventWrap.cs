@@ -31,7 +31,7 @@ public class InputUIOnScrollEventWrap
 			{
 				string arg0 = ToLua.CheckString(L, 1);
 				string arg1 = ToLua.CheckString(L, 2);
-				UnityEngine.Vector2 arg2 = ToLua.ToVector2(L, 3);
+				UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector2));
 				InputUIOnScrollEvent obj = new InputUIOnScrollEvent(arg0, arg1, arg2);
 				ToLua.PushObject(L, obj);
 				return 1;
@@ -94,7 +94,7 @@ public class InputUIOnScrollEventWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			InputUIOnScrollEvent obj = (InputUIOnScrollEvent)o;
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			obj.m_pos = arg0;
 			return 0;
 		}

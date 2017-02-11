@@ -1646,26 +1646,26 @@ public static class ToLuaExport
         {
             sb.AppendFormat("{0}LuaTable {1} = ToLua.{2}LuaTable(L, {3});\r\n", head, arg, checkStr, stackPos);
         }
-        else if (varType == typeof(Vector2))
-        {
-            sb.AppendFormat("{0}UnityEngine.Vector2 {1} = ToLua.ToVector2(L, {2});\r\n", head, arg, stackPos);
-        }
-        else if (varType == typeof(Vector3))
-        {
-            sb.AppendFormat("{0}UnityEngine.Vector3 {1} = ToLua.ToVector3(L, {2});\r\n", head, arg, stackPos);
-        }
-        else if (varType == typeof(Vector4))
-        {
-            sb.AppendFormat("{0}UnityEngine.Vector4 {1} = ToLua.ToVector4(L, {2});\r\n", head, arg, stackPos);
-        }
-        else if (varType == typeof(Quaternion))
-        {
-            sb.AppendFormat("{0}UnityEngine.Quaternion {1} = ToLua.ToQuaternion(L, {2});\r\n", head, arg, stackPos);
-        }
-        else if (varType == typeof(Color))
-        {
-            sb.AppendFormat("{0}UnityEngine.Color {1} = ToLua.ToColor(L, {2});\r\n", head, arg, stackPos);
-        }
+        //else if (varType == typeof(Vector2))
+        //{
+        //    sb.AppendFormat("{0}UnityEngine.Vector2 {1} = ToLua.ToVector2(L, {2});\r\n", head, arg, stackPos);
+        //}
+        //else if (varType == typeof(Vector3))
+        //{
+        //    sb.AppendFormat("{0}UnityEngine.Vector3 {1} = ToLua.ToVector3(L, {2});\r\n", head, arg, stackPos);
+        //}
+        //else if (varType == typeof(Vector4))
+        //{
+        //    sb.AppendFormat("{0}UnityEngine.Vector4 {1} = ToLua.ToVector4(L, {2});\r\n", head, arg, stackPos);
+        //}
+        //else if (varType == typeof(Quaternion))
+        //{
+        //    sb.AppendFormat("{0}UnityEngine.Quaternion {1} = ToLua.ToQuaternion(L, {2});\r\n", head, arg, stackPos);
+        //}
+        //else if (varType == typeof(Color))
+        //{
+        //    sb.AppendFormat("{0}UnityEngine.Color {1} = ToLua.ToColor(L, {2});\r\n", head, arg, stackPos);
+        //}
         else if (varType == typeof(Ray))
         {
             sb.AppendFormat("{0}UnityEngine.Ray {1} = ToLua.ToRay(L, {2});\r\n", head, arg, stackPos);

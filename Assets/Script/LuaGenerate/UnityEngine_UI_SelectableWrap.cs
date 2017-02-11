@@ -60,7 +60,7 @@ public class UnityEngine_UI_SelectableWrap
 		{
 			ToLua.CheckArgsCount(L, 2);
 			UnityEngine.UI.Selectable obj = (UnityEngine.UI.Selectable)ToLua.CheckObject(L, 1, typeof(UnityEngine.UI.Selectable));
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
 			UnityEngine.UI.Selectable o = obj.FindSelectable(arg0);
 			ToLua.Push(L, o);
 			return 1;

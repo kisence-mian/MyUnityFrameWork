@@ -363,26 +363,11 @@ namespace LuaInterface
 
                 switch (ret)
                 {
-                    case LuaValueType.Vector3:
-                        Push(L, typeof(Vector3));
-                        break;
-                    case LuaValueType.Quaternion:
-                        Push(L, typeof(Quaternion));
-                        break;
-                    case LuaValueType.Vector4:
-                        Push(L, typeof(Vector4));
-                        break;
-                    case LuaValueType.Color:
-                        Push(L, typeof(Color));
-                        break;
                     case LuaValueType.Ray:
                         Push(L, typeof(Ray));
                         break;
                     case LuaValueType.Bounds:
                         Push(L, typeof(Bounds));
-                        break;
-                    case LuaValueType.Vector2:
-                        Push(L, typeof(Vector2));
                         break;
                     case LuaValueType.LayerMask:
                         Push(L, typeof(LayerMask));
@@ -1101,26 +1086,6 @@ namespace LuaInterface
                     double d = LuaDLL.luaL_checknumber(L, stackPos);
                     return Convert.ChangeType(d, t);
                 }
-                else if (t == typeof(Vector3))
-                {
-                    return CheckVector3(L, stackPos);
-                }
-                else if (t == typeof(Quaternion))
-                {
-                    return CheckQuaternion(L, stackPos);
-                }
-                else if (t == typeof(Vector2))
-                {
-                    return CheckVector2(L, stackPos);
-                }
-                else if (t == typeof(Vector4))
-                {
-                    return CheckVector4(L, stackPos);
-                }
-                else if (t == typeof(Color))
-                {
-                    return CheckColor(L, stackPos);
-                }
                 else if (t == typeof(Ray))
                 {
                     return CheckRay(L, stackPos);
@@ -1751,31 +1716,6 @@ namespace LuaInterface
             return list;
         }
 
-        public static void Push(IntPtr L, Vector3 v3)
-        {
-            LuaDLL.tolua_pushvec3(L, v3.x, v3.y, v3.z);
-        }
-
-        public static void Push(IntPtr L, Vector2 v2)
-        {            
-            LuaDLL.tolua_pushvec2(L, v2.x, v2.y);
-        }
-
-        public static void Push(IntPtr L, Vector4 v4)
-        {            
-            LuaDLL.tolua_pushvec4(L, v4.x, v4.y, v4.z, v4.w);
-        }
-
-        public static void Push(IntPtr L, Quaternion q)
-        {            
-            LuaDLL.tolua_pushquat(L, q.x, q.y, q.z, q.w);
-        }
-
-        public static void Push(IntPtr L, Color clr)
-        {            
-            LuaDLL.tolua_pushclr(L, clr.r, clr.g, clr.b, clr.a);
-        }
-
         public static void Push(IntPtr L, Ray ray)
         {
             LuaStatic.GetPackRay(L);
@@ -2226,25 +2166,9 @@ namespace LuaInterface
                     double d = LuaMisc.ToDouble(obj);
                     LuaDLL.lua_pushnumber(L, d);
                 }
-                else if (t == typeof(Vector3))
-                {
-                    Push(L, (Vector3)obj);
-                }
                 else if (t == typeof(Quaternion))
                 {
                     Push(L, (Quaternion)obj);
-                }
-                else if (t == typeof(Vector2))
-                {
-                    Push(L, (Vector2)obj);
-                }
-                else if (t == typeof(Vector4))
-                {
-                    Push(L, (Vector4)obj);
-                }
-                else if (t == typeof(Color))
-                {
-                    Push(L, (Color)obj);
                 }
                 else if (t == typeof(RaycastHit))
                 {

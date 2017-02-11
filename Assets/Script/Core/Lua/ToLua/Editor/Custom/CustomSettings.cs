@@ -53,7 +53,11 @@ public static class CustomSettings
         _GT(typeof(Component)),
         _GT(typeof(Behaviour)),
         //_GT(typeof(MonoBehaviour)),
-        
+
+        _GT(typeof(Vector3)),
+        _GT(typeof(Vector4)),
+        _GT(typeof(Vector2)),
+        _GT(typeof(Color)),
     #endregion
 
     #region UGUI

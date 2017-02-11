@@ -429,7 +429,7 @@ public class AnimDataWrap
 		{
 			ToLua.CheckArgsCount(L, 2);
 			AnimData obj = (AnimData)ToLua.CheckObject(L, 1, typeof(AnimData));
-			UnityEngine.Color arg0 = ToLua.ToColor(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
 			obj.SetColor(arg0);
 			return 0;
 		}
@@ -1757,7 +1757,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
 			obj.m_fromV3 = arg0;
 			return 0;
 		}
@@ -1776,7 +1776,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
 			obj.m_toV3 = arg0;
 			return 0;
 		}
@@ -1795,7 +1795,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			obj.m_fromV2 = arg0;
 			return 0;
 		}
@@ -1814,7 +1814,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			obj.m_toV2 = arg0;
 			return 0;
 		}
@@ -1871,7 +1871,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Color arg0 = ToLua.ToColor(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
 			obj.m_fromColor = arg0;
 			return 0;
 		}
@@ -1890,7 +1890,7 @@ public class AnimDataWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			AnimData obj = (AnimData)o;
-			UnityEngine.Color arg0 = ToLua.ToColor(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
 			obj.m_toColor = arg0;
 			return 0;
 		}

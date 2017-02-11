@@ -119,7 +119,7 @@ public class RecordManagerWrap
 			{
 				string arg0 = ToLua.ToString(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
-				UnityEngine.Vector2 arg2 = ToLua.ToVector2(L, 3);
+				UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.ToObject(L, 3);
 				RecordManager.SaveRecord(arg0, arg1, arg2);
 				return 0;
 			}
@@ -127,7 +127,7 @@ public class RecordManagerWrap
 			{
 				string arg0 = ToLua.ToString(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
-				UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+				UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.ToObject(L, 3);
 				RecordManager.SaveRecord(arg0, arg1, arg2);
 				return 0;
 			}
@@ -135,7 +135,7 @@ public class RecordManagerWrap
 			{
 				string arg0 = ToLua.ToString(L, 1);
 				string arg1 = ToLua.ToString(L, 2);
-				UnityEngine.Color arg2 = ToLua.ToColor(L, 3);
+				UnityEngine.Color arg2 = (UnityEngine.Color)ToLua.ToObject(L, 3);
 				RecordManager.SaveRecord(arg0, arg1, arg2);
 				return 0;
 			}

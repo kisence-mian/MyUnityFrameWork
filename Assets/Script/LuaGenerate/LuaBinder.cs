@@ -60,6 +60,10 @@ public static class LuaBinder
 		UnityEngine_TransformWrap.Register(L);
 		UnityEngine_ComponentWrap.Register(L);
 		UnityEngine_BehaviourWrap.Register(L);
+		UnityEngine_Vector3Wrap.Register(L);
+		UnityEngine_Vector4Wrap.Register(L);
+		UnityEngine_Vector2Wrap.Register(L);
+		UnityEngine_ColorWrap.Register(L);
 		UnityEngine_MonoBehaviourWrap.Register(L);
 		L.BeginModule("UI");
 		UnityEngine_UI_SelectableWrap.Register(L);

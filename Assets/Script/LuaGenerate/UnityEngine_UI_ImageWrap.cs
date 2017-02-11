@@ -127,7 +127,7 @@ public class UnityEngine_UI_ImageWrap
 		{
 			ToLua.CheckArgsCount(L, 3);
 			UnityEngine.UI.Image obj = (UnityEngine.UI.Image)ToLua.CheckObject(L, 1, typeof(UnityEngine.UI.Image));
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			UnityEngine.Camera arg1 = (UnityEngine.Camera)ToLua.CheckUnityObject(L, 3, typeof(UnityEngine.Camera));
 			bool o = obj.IsRaycastLocationValid(arg0, arg1);
 			LuaDLL.lua_pushboolean(L, o);

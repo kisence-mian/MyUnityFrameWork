@@ -178,7 +178,7 @@ public class UnityEngine_UI_GraphicWrap
 		{
 			ToLua.CheckArgsCount(L, 3);
 			UnityEngine.UI.Graphic obj = (UnityEngine.UI.Graphic)ToLua.CheckObject(L, 1, typeof(UnityEngine.UI.Graphic));
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			UnityEngine.Camera arg1 = (UnityEngine.Camera)ToLua.CheckUnityObject(L, 3, typeof(UnityEngine.Camera));
 			bool o = obj.Raycast(arg0, arg1);
 			LuaDLL.lua_pushboolean(L, o);
@@ -197,7 +197,7 @@ public class UnityEngine_UI_GraphicWrap
 		{
 			ToLua.CheckArgsCount(L, 2);
 			UnityEngine.UI.Graphic obj = (UnityEngine.UI.Graphic)ToLua.CheckObject(L, 1, typeof(UnityEngine.UI.Graphic));
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			UnityEngine.Vector2 o = obj.PixelAdjustPoint(arg0);
 			ToLua.Push(L, o);
 			return 1;
@@ -235,7 +235,7 @@ public class UnityEngine_UI_GraphicWrap
 			if (count == 5 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.UI.Graphic), typeof(UnityEngine.Color), typeof(float), typeof(bool), typeof(bool)))
 			{
 				UnityEngine.UI.Graphic obj = (UnityEngine.UI.Graphic)ToLua.ToObject(L, 1);
-				UnityEngine.Color arg0 = ToLua.ToColor(L, 2);
+				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 2);
 				float arg1 = (float)LuaDLL.lua_tonumber(L, 3);
 				bool arg2 = LuaDLL.lua_toboolean(L, 4);
 				bool arg3 = LuaDLL.lua_toboolean(L, 5);
@@ -245,7 +245,7 @@ public class UnityEngine_UI_GraphicWrap
 			else if (count == 6 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.UI.Graphic), typeof(UnityEngine.Color), typeof(float), typeof(bool), typeof(bool), typeof(bool)))
 			{
 				UnityEngine.UI.Graphic obj = (UnityEngine.UI.Graphic)ToLua.ToObject(L, 1);
-				UnityEngine.Color arg0 = ToLua.ToColor(L, 2);
+				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 2);
 				float arg1 = (float)LuaDLL.lua_tonumber(L, 3);
 				bool arg2 = LuaDLL.lua_toboolean(L, 4);
 				bool arg3 = LuaDLL.lua_toboolean(L, 5);
@@ -688,7 +688,7 @@ public class UnityEngine_UI_GraphicWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			UnityEngine.UI.Graphic obj = (UnityEngine.UI.Graphic)o;
-			UnityEngine.Color arg0 = ToLua.ToColor(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
 			obj.color = arg0;
 			return 0;
 		}

@@ -56,7 +56,7 @@ public class AnimSystemWrap
 			ToLua.CheckArgsCount(L, 12);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 			System.Nullable<UnityEngine.Color> arg1 = (System.Nullable<UnityEngine.Color>)ToLua.CheckVarObject(L, 2, typeof(System.Nullable<UnityEngine.Color>));
-			UnityEngine.Color arg2 = ToLua.ToColor(L, 3);
+			UnityEngine.Color arg2 = (UnityEngine.Color)ToLua.CheckObject(L, 3, typeof(UnityEngine.Color));
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			InterpType arg5 = (InterpType)ToLua.CheckObject(L, 6, typeof(InterpType));
@@ -136,7 +136,7 @@ public class AnimSystemWrap
 			ToLua.CheckArgsCount(L, 11);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 			System.Nullable<UnityEngine.Vector3> arg1 = (System.Nullable<UnityEngine.Vector3>)ToLua.CheckVarObject(L, 2, typeof(System.Nullable<UnityEngine.Vector3>));
-			UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+			UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector3));
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			InterpType arg5 = (InterpType)ToLua.CheckObject(L, 6, typeof(InterpType));
@@ -175,7 +175,7 @@ public class AnimSystemWrap
 			ToLua.CheckArgsCount(L, 11);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 			System.Nullable<UnityEngine.Vector2> arg1 = (System.Nullable<UnityEngine.Vector2>)ToLua.CheckVarObject(L, 2, typeof(System.Nullable<UnityEngine.Vector2>));
-			UnityEngine.Vector2 arg2 = ToLua.ToVector2(L, 3);
+			UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector2));
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			InterpType arg5 = (InterpType)ToLua.CheckObject(L, 6, typeof(InterpType));
@@ -213,8 +213,8 @@ public class AnimSystemWrap
 		{
 			ToLua.CheckArgsCount(L, 12);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
-			UnityEngine.Color arg1 = ToLua.ToColor(L, 2);
-			UnityEngine.Color arg2 = ToLua.ToColor(L, 3);
+			UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
+			UnityEngine.Color arg2 = (UnityEngine.Color)ToLua.CheckObject(L, 3, typeof(UnityEngine.Color));
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			InterpType arg5 = (InterpType)ToLua.CheckObject(L, 6, typeof(InterpType));
@@ -294,7 +294,7 @@ public class AnimSystemWrap
 			ToLua.CheckArgsCount(L, 12);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 			System.Nullable<UnityEngine.Vector3> arg1 = (System.Nullable<UnityEngine.Vector3>)ToLua.CheckVarObject(L, 2, typeof(System.Nullable<UnityEngine.Vector3>));
-			UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+			UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector3));
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			bool arg5 = LuaDLL.luaL_checkboolean(L, 6);
@@ -334,7 +334,7 @@ public class AnimSystemWrap
 			ToLua.CheckArgsCount(L, 12);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 			System.Nullable<UnityEngine.Vector3> arg1 = (System.Nullable<UnityEngine.Vector3>)ToLua.CheckVarObject(L, 2, typeof(System.Nullable<UnityEngine.Vector3>));
-			UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+			UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector3));
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			bool arg5 = LuaDLL.luaL_checkboolean(L, 6);
@@ -373,7 +373,7 @@ public class AnimSystemWrap
 			ToLua.CheckArgsCount(L, 11);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 			System.Nullable<UnityEngine.Vector3> arg1 = (System.Nullable<UnityEngine.Vector3>)ToLua.CheckVarObject(L, 2, typeof(System.Nullable<UnityEngine.Vector3>));
-			UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+			UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector3));
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			InterpType arg4 = (InterpType)ToLua.CheckObject(L, 5, typeof(InterpType));
 			bool arg5 = LuaDLL.luaL_checkboolean(L, 6);
@@ -474,8 +474,8 @@ public class AnimSystemWrap
 				arg0 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodVector2), func) as AnimCustomMethodVector2;
 			}
 
-			UnityEngine.Vector2 arg1 = ToLua.ToVector2(L, 2);
-			UnityEngine.Vector2 arg2 = ToLua.ToVector2(L, 3);
+			UnityEngine.Vector2 arg1 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
+			UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector2));
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			InterpType arg5 = (InterpType)ToLua.CheckObject(L, 6, typeof(InterpType));
@@ -525,8 +525,8 @@ public class AnimSystemWrap
 				arg0 = DelegateFactory.CreateDelegate(typeof(AnimCustomMethodVector3), func) as AnimCustomMethodVector3;
 			}
 
-			UnityEngine.Vector3 arg1 = ToLua.ToVector3(L, 2);
-			UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+			UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
+			UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector3));
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			InterpType arg5 = (InterpType)ToLua.CheckObject(L, 6, typeof(InterpType));
@@ -567,8 +567,8 @@ public class AnimSystemWrap
 			if (count == 10 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector3), typeof(float), typeof(InterpType), typeof(bool), typeof(PathType), typeof(float[]), typeof(AnimCallBack), typeof(object[])))
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
-				UnityEngine.Vector3 arg1 = ToLua.ToVector3(L, 2);
-				UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+				UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.ToObject(L, 2);
+				UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.ToObject(L, 3);
 				float arg3 = (float)LuaDLL.lua_tonumber(L, 4);
 				InterpType arg4 = (InterpType)ToLua.ToObject(L, 5);
 				bool arg5 = LuaDLL.lua_toboolean(L, 6);
@@ -595,7 +595,7 @@ public class AnimSystemWrap
 			else if (count == 10 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(UnityEngine.Vector3), typeof(float), typeof(RepeatType), typeof(InterpType), typeof(bool), typeof(PathType), typeof(float[]), typeof(AnimCallBack), typeof(object[])))
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
-				UnityEngine.Vector3 arg1 = ToLua.ToVector3(L, 2);
+				UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.ToObject(L, 2);
 				float arg2 = (float)LuaDLL.lua_tonumber(L, 3);
 				RepeatType arg3 = (RepeatType)ToLua.ToObject(L, 4);
 				InterpType arg4 = (InterpType)ToLua.ToObject(L, 5);
@@ -623,7 +623,7 @@ public class AnimSystemWrap
 			else if (count == 10 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(UnityEngine.Vector3), typeof(float), typeof(InterpType), typeof(RepeatType), typeof(bool), typeof(PathType), typeof(UnityEngine.Vector3[]), typeof(AnimCallBack), typeof(object[])))
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
-				UnityEngine.Vector3 arg1 = ToLua.ToVector3(L, 2);
+				UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.ToObject(L, 2);
 				float arg2 = (float)LuaDLL.lua_tonumber(L, 3);
 				InterpType arg3 = (InterpType)ToLua.ToObject(L, 4);
 				RepeatType arg4 = (RepeatType)ToLua.ToObject(L, 5);
@@ -651,8 +651,8 @@ public class AnimSystemWrap
 			else if (count == 10 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector3), typeof(float), typeof(InterpType), typeof(bool), typeof(PathType), typeof(UnityEngine.Vector3[]), typeof(AnimCallBack), typeof(object[])))
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
-				UnityEngine.Vector3 arg1 = ToLua.ToVector3(L, 2);
-				UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+				UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.ToObject(L, 2);
+				UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.ToObject(L, 3);
 				float arg3 = (float)LuaDLL.lua_tonumber(L, 4);
 				InterpType arg4 = (InterpType)ToLua.ToObject(L, 5);
 				bool arg5 = LuaDLL.lua_toboolean(L, 6);
@@ -679,8 +679,8 @@ public class AnimSystemWrap
 			else if (count == 11 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector3), typeof(float), typeof(RepeatType), typeof(InterpType), typeof(bool), typeof(PathType), typeof(UnityEngine.Vector3[]), typeof(AnimCallBack), typeof(object[])))
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
-				UnityEngine.Vector3 arg1 = ToLua.ToVector3(L, 2);
-				UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+				UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.ToObject(L, 2);
+				UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.ToObject(L, 3);
 				float arg3 = (float)LuaDLL.lua_tonumber(L, 4);
 				RepeatType arg4 = (RepeatType)ToLua.ToObject(L, 5);
 				InterpType arg5 = (InterpType)ToLua.ToObject(L, 6);
@@ -708,8 +708,8 @@ public class AnimSystemWrap
 			else if (count == 11 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector3), typeof(float), typeof(RepeatType), typeof(InterpType), typeof(bool), typeof(PathType), typeof(float[]), typeof(AnimCallBack), typeof(object[])))
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
-				UnityEngine.Vector3 arg1 = ToLua.ToVector3(L, 2);
-				UnityEngine.Vector3 arg2 = ToLua.ToVector3(L, 3);
+				UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.ToObject(L, 2);
+				UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.ToObject(L, 3);
 				float arg3 = (float)LuaDLL.lua_tonumber(L, 4);
 				RepeatType arg4 = (RepeatType)ToLua.ToObject(L, 5);
 				InterpType arg5 = (InterpType)ToLua.ToObject(L, 6);

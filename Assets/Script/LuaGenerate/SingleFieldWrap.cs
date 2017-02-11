@@ -42,21 +42,21 @@ public class SingleFieldWrap
 			}
 			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector2)))
 			{
-				UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 1);
+				UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector2));
 				SingleField obj = new SingleField(arg0);
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
 			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector3)))
 			{
-				UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 1);
+				UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector3));
 				SingleField obj = new SingleField(arg0);
 				ToLua.PushObject(L, obj);
 				return 1;
 			}
 			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Color)))
 			{
-				UnityEngine.Color arg0 = ToLua.ToColor(L, 1);
+				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 1, typeof(UnityEngine.Color));
 				SingleField obj = new SingleField(arg0);
 				ToLua.PushObject(L, obj);
 				return 1;

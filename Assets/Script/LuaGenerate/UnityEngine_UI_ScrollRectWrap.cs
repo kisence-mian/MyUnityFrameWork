@@ -1128,7 +1128,7 @@ public class UnityEngine_UI_ScrollRectWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			UnityEngine.UI.ScrollRect obj = (UnityEngine.UI.ScrollRect)o;
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			obj.velocity = arg0;
 			return 0;
 		}
@@ -1147,7 +1147,7 @@ public class UnityEngine_UI_ScrollRectWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			UnityEngine.UI.ScrollRect obj = (UnityEngine.UI.ScrollRect)o;
-			UnityEngine.Vector2 arg0 = ToLua.ToVector2(L, 2);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
 			obj.normalizedPosition = arg0;
 			return 0;
 		}

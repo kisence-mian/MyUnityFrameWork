@@ -116,7 +116,7 @@ public class ReusingScrollRectWrap
 		{
 			ToLua.CheckArgsCount(L, 2);
 			ReusingScrollRect obj = (ReusingScrollRect)ToLua.CheckObject(L, 1, typeof(ReusingScrollRect));
-			UnityEngine.Vector3 arg0 = ToLua.ToVector3(L, 2);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
 			obj.SetPos(arg0);
 			return 0;
 		}

@@ -108,19 +108,19 @@ namespace LuaInterface
             stateMap.Add(L, this);
             OpenToLuaLibs();
             ToLua.OpenLibs(L);
-
+            //OpenBaseLibs();    
 
             LuaSetTop(0);
 
 
             
-            //OpenBaseLibs();     
+             
             //InitLuaPath();
 
         }
 
-        //void OpenBaseLibs()
-        //{            
+        void OpenBaseLibs()
+        {            
         //    BeginModule(null);
 
         //    BeginModule("System");
@@ -163,7 +163,7 @@ namespace LuaInterface
 
         //    EndModule(); //end global
                         
-        //    LuaUnityLibs.OpenLibs(L);            
+              LuaUnityLibs.OpenLibs(L);            
         //    LuaReflection.OpenLibs(L);
         //    ArrayMetatable = metaMap[typeof(System.Array)];
         //    TypeMetatable = metaMap[typeof(System.Type)];
@@ -171,10 +171,11 @@ namespace LuaInterface
         //    EnumMetatable = metaMap[typeof(System.Enum)];
         //    IterMetatable = metaMap[typeof(IEnumerator)];
         //    EventMetatable = metaMap[typeof(EventObject)];
-        //}
+        }
 
         void OpenBaseLuaLibs()
         {
+
             //DoFile("tolua.lua");            //tolua table名字已经存在了,不能用require
             LuaUnityLibs.OpenLuaLibs(L);
         }
@@ -184,8 +185,8 @@ namespace LuaInterface
 #if UNITY_EDITOR
             beStart = true;
 #endif
-            //Debugger.Log("LuaState start");
             //OpenBaseLuaLibs();
+
             //PackBounds = GetFuncRef("Bounds.New");
             //UnpackBounds = GetFuncRef("Bounds.Get");
             //PackRay = GetFuncRef("Ray.New");

@@ -34,7 +34,7 @@ namespace LuaInterface
         }
 
         public static void OpenLuaLibs(IntPtr L)
-        {                        
+        {
             //if (LuaDLL.tolua_openlualibs(L) != 0)
             //{
             //    string error = LuaDLL.lua_tostring(L, -1);
