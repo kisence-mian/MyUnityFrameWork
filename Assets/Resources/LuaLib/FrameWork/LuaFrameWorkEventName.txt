@@ -1,0 +1,8 @@
+FrameWorkEvent = {};
+
+	--定时器
+	FrameWorkEvent.timer_everyFrame      = "timer_everyFrame_event";  --每帧触发一次
+	FrameWorkEvent.timer_100ms           = "timer_100ms_event";  	 --每100毫秒触发一次
+	FrameWorkEvent.timer_500ms           = "timer_500ms_event";  	 --每500毫秒触发一次
+	FrameWorkEvent.timer_700ms           = "timer_700ms_event";  	 --每700毫秒触发一次
+	FrameWorkEvent.timer_1000ms          = "timer_1000ms_event"; 	 --每1000毫秒触发一次

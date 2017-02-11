@@ -5,9 +5,12 @@ using UnityEngine;
 public class RenderManager  
 {
     /// <summary>
-    /// 细节等级，值目前在1-3之间
+    /// 细节等级，值目前在0-3之间
     /// </summary>
     static int s_LOD = 3;
+
+    static int MaxLOD = 3;
+    static int MinLOD = 0;
 
     public static int LOD
     {
@@ -15,15 +18,17 @@ public class RenderManager
         set {
             s_LOD = value;
 
-            if (s_LOD > 3)
+            if (s_LOD > MaxLOD)
             {
-                s_LOD = 3;
+                s_LOD = MaxLOD;
             }
 
-            if (s_LOD < 1)
+            if (s_LOD < MinLOD)
             {
-                s_LOD = 1;
+                s_LOD = MinLOD;
             }
+
+            Shader.globalMaximumLOD = s_LOD * 100;
 
             GlobalEvent.DispatchEvent(RenderEventEnum.UpdateLOD);
         }

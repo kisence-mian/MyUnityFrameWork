@@ -1,0 +1,25 @@
+LuaStatusMetaTable = {};
+LuaStatusMetaTable.__index = LuaStatusMetaTable;
+
+function LuaStatusMetaTable:New()
+	local t_status = {}
+	setmetatable(t_status, self);
+	self.__index = self;
+	return t_status;
+end
+
+function LuaStatusMetaTable:OnStatusInit()
+	-- body
+end
+
+function LuaStatusMetaTable:OnEnterStatus()
+	-- body
+end
+
+function LuaStatusMetaTable:OnExitStatus()
+	-- body
+end
+
+function LuaStatusMetaTable:OnStatusDestroy()
+	-- body
+end
