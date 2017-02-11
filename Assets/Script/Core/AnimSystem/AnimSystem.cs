@@ -108,9 +108,6 @@ public class AnimSystem : MonoBehaviour
         int repeatCount = -1, 
         AnimCallBack callBack = null, object[] parameter = null)
     {
-
-
-
         float fromTmp = from ?? 1;
 
         if (from == null)
@@ -216,7 +213,7 @@ public class AnimSystem : MonoBehaviour
     public static AnimData ColorTo(GameObject animObject, Color from, Color to,
 
         float time             = 0.5f,
-        float delayTime = 0, 
+        float delayTime        = 0, 
         InterpType interp      = InterpType.Default,
         bool isChild           = true,
         bool IsIgnoreTimeScale = false,
