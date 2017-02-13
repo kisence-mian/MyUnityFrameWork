@@ -1,5 +1,6 @@
 LuaStatusMetaTable = {};
 LuaStatusMetaTable.__index = LuaStatusMetaTable;
+LuaStatusMetaTable.t_windowList = {};
 
 function LuaStatusMetaTable:New()
 	local t_status = {}
@@ -22,4 +23,49 @@ end
 
 function LuaStatusMetaTable:OnStatusDestroy()
 	-- body
+end
+
+function LuaStatusMetaTable:OpenUIWindow(s_WindowName,func_callBack,parms)
+	
+	if LuaStatusMetaTable.t_windowList[s_WindowName] == nil then
+		LuaStatusMetaTable.t_windowList[s_WindowName] = {};
+	end
+
+	LuaStatusMetaTable.t_windowList[s_WindowName].s_WindowName = s_WindowName;
+	LuaStatusMetaTable.t_windowList[s_WindowName].UIWindow_ui  = UIManager.OpenUIWindow(s_WindowName,func_callBack,parms);
+end
+
+function LuaStatusMetaTable:CloseUIWindow(s_WindowName,isPlayAnim,func_callBack,parms)
+	
+	if s_WindowName == nil then
+		error("CloseUIWindow error : s_WindowName is nil");
+		return;
+	end
+
+	if LuaStatusMetaTable.t_windowList[s_WindowName] == nil then
+		error("Not Exits ->"..s_WindowName"<- Window !");
+		return;
+	end
+
+	if isPlayAnim == nil then
+		isPlayAnim = true;
+	end
+
+	UIManager.CloseUIWindow(s_WindowName,isPlayAnim,func_callBack,parms);
+	LuaStatusMetaTable.t_windowList[s_WindowName] = nil;
+
+end
+
+function LuaStatusMetaTable:CloseALLUIWindow()
+	
+	for k,v in pairs(LuaStatusMetaTable.t_windowList) do
+		-- print("Close: "..v.s_WindowName);
+		self:CloseUIWindow(v.s_WindowName);
+	end
+
+	LuaStatusMetaTable.t_windowList = {};
+end
+
+function LuaStatusMetaTable:EnterStatus(status_name)
+	LuaStatusManager:EnterStatus(status_name)
 end

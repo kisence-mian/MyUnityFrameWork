@@ -17,7 +17,6 @@ local n_timeTmp = 0;
 --接受定时器事件,该事件100ms左右触发一次
 --参数为上一次本事件触发于这一次事件触发的时间间隔，单位为毫秒
 function LuaUpdate(n_timeDelta)
-
 	n_timerTime = n_timerTime + n_timeDelta;
 
 	if b_isStop == false then

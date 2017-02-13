@@ -1,0 +1,24 @@
+function sec2time( second )
+ 	local timeDay=math.floor(second/86400)
+    local timeHour=math.fmod(math.floor(second/3600), 24)
+    local timeMinute=math.fmod(math.floor(second/60), 60)
+    local timeSecond=math.fmod(second, 60)
+    return timeDay, timeHour, timeMinute, timeSecond
+end
+function sec2string(sec)
+	local d,h,m,s = sec2time(sec)
+	local str = ""
+	if d>0 then
+		str = d..":"..h..":"..m..":"..s
+	end
+	if d<=0 then
+		str = h..":"..m..":"..s
+	end
+	if d<= 0 and h<=0 then
+		str = m..":"..s
+	end
+	if d<=0 and h<=0 and m<=0 then
+		str = s
+	end
+	return str
+end
