@@ -94,6 +94,12 @@ public class NetworkManager
         {
             if (IsConnect)
             {
+                if (!data.ContainsKey("MT"))
+                {
+                    Debug.LogError("NetworkManager SendMessage Error ：消息没有加 MT 字段！");
+                    return;
+                }
+
                 s_network.SendMessage(data["MT"].ToString(), data);
             }
             else

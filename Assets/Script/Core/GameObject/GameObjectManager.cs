@@ -59,7 +59,7 @@ public class GameObjectManager :MonoBehaviour
         {
             l_instanceTmp.transform.SetParent(l_parent.transform);
         }
-        l_instanceTmp.transform.localScale = Vector3.one;
+        //l_instanceTmp.transform.localScale = Vector3.one;
         return l_instanceTmp;
     }
 

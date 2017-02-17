@@ -29,6 +29,18 @@ public class AndroidPluginsManager : EditorWindow
 
     #endregion
 
+    #region 选择方案
+
+    #endregion
+
+    #region 选择插件类型
+
+    #endregion
+
+    #region 配置参数
+
+    #endregion
+
     #region Manifest
 
     //获取所有的清单文件

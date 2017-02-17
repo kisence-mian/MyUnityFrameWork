@@ -2,15 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LogInterface : MonoBehaviour {
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+public interface LogInterface : SDKInterfaceBase
+{
+    void Log(string eventID, Dictionary<string, object> data);
 }

@@ -55,8 +55,6 @@ public class ApplicationStatusManager
         }
         else
         {
-            //throw new Exception("ApplicationStatusManager GetStatus Exception: " + l_statusName + " not Init !");
-
             IApplicationStatus l_statusTmp = (IApplicationStatus)Activator.CreateInstance(Type.GetType(l_statusName));
             s_status.Add(l_statusName, l_statusTmp);
 

@@ -337,6 +337,8 @@ public class UIBase : MonoBehaviour
     public UIBase CreateItem(string itemName,string prantName)
     {
         GameObject item = GameObjectManager.CreatGameObjectByPool(itemName, GetGameObject(prantName), true);
+
+        item.transform.localScale = Vector3.one;
         UIBase UIItem = item.GetComponent<UIBase>();
 
         if(UIItem == null)
@@ -377,4 +379,20 @@ public class UIBase : MonoBehaviour
     #endregion
 
     #endregion
+
+    public void SetText(string TextID, string content)
+    {
+        GetText(TextID).text = content;
+    }
+
+    public void SetInputText(string TextID, string content)
+    {
+        GetInputField(TextID).text = content;
+    }
+
+    public void SetTextByLangeage(string textID, string langeageID, params object[] objs)
+    {
+        GetText(textID).text = LanguageManager.GetContent(langeageID, objs);
+    }
+
 }

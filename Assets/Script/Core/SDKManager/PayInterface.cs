@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PayInterface : MonoBehaviour {
+public class PayInterface : SDKInterfaceBase
+{
+    public PayCallBack m_callBack;
+    public void Pay(string goodsID)
+    {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    }
+
+    public void Init()
+    {
+
+    }
 }

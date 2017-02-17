@@ -2,15 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LoginInterface : SDKInterfaceBase
+public class ADInterface  : SDKInterfaceBase 
 {
-    public LoginCallBack m_callBack;
-
     public void Init()
     {
 
     }
-    public void Login()
+
+    public void PlayAD()
     {
 
     }

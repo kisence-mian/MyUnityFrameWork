@@ -7,7 +7,7 @@ using System;
 using LuaInterface;
 
 /// <summary>
-/// 配置管理器，可读可写，可同步
+/// 配置管理器，只读
 /// </summary>
 public static class ConfigManager 
 {
