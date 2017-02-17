@@ -21,7 +21,7 @@ public class ParseTool : MonoBehaviour
         }
     }
 
-    public static Vector2 String2Vector3(string value)
+    public static Vector3 String2Vector3(string value)
     {
         try
         {

@@ -31,6 +31,7 @@ public class DataTable : Dictionary<string, SingleData>
     /// 储存每个字段是什么类型
     /// </summary>
     public Dictionary<string, FieldType> m_tableTypes = new Dictionary<string,FieldType>();
+
     /// <summary>
     /// 如果是枚举类型，这里储存二级类型
     /// </summary>
@@ -53,8 +54,8 @@ public class DataTable : Dictionary<string, SingleData>
     /// <returns>表单数据</returns>
     public static DataTable Analysis(string stringData)
     {
-        try
-        {
+        //try
+        //{
             int lineIndex = 0;
             DataTable data = new DataTable();
             string[] line = stringData.Split(c_newline.ToCharArray());
@@ -123,15 +124,14 @@ public class DataTable : Dictionary<string, SingleData>
                     //第一个数据作为这一个记录的Key
                     data.AddData(dataTmp);
                 }
-
             }
 
             return data;
-        }
-        catch (Exception e)
-        {
-            throw new Exception("Analysis: Don't convert value to DataTable:" + "\n" + e.ToString()); // throw  
-        }
+        //}
+        //catch (Exception e)
+        //{
+        //    throw new Exception("Analysis: Don't convert value to DataTable:" + "\n" + e.ToString()); // throw  
+        //}
     }
 
     /// <summary>
@@ -282,8 +282,6 @@ public class DataTable : Dictionary<string, SingleData>
             }
         }
 
-
-
         //defauleValue
         List<string> defaultValue = new List<string>(data.m_defaultValue.Keys);
 
@@ -398,7 +396,6 @@ public class DataTable : Dictionary<string, SingleData>
         }
     }
 
-
     public void SetFieldType(string key,FieldType type ,string enumType)
     {
         //主键只能是String类型
@@ -435,7 +432,6 @@ public class DataTable : Dictionary<string, SingleData>
         //主键只能是String类型
         return this[key];
     }
-
 
     public string GetEnumType(string key)
     {
@@ -499,17 +495,15 @@ public class DataTable : Dictionary<string, SingleData>
 
     public void AddData(SingleData data)
     {
-        data.m_SingleDataName = data[TableKeys[0]];
-
         if(data.ContainsKey(TableKeys[0]))
         {
+            data.m_SingleDataName = data[TableKeys[0]];
             Add(data[TableKeys[0]], data);
-
             TableIDs.Add(data[TableKeys[0]]);
         }
         else
         {
-            throw new Exception("Add SingleData fail! The dataTable dont have MainKeyKey!");
+            throw new Exception("Add SingleData fail! The dataTable dont have MainKey!");
         }
     }
 
@@ -549,8 +543,6 @@ public class DataTable : Dictionary<string, SingleData>
             throw new Exception("Add SingleData fail!");
         }
     }
-
-
 }
 public class SingleData : Dictionary<string, string>
 {
@@ -670,7 +662,7 @@ public class SingleData : Dictionary<string, string>
 
         if (data.m_defaultValue.ContainsKey(key))
         {
-            return (T)Enum.Parse(typeof(T), data.m_defaultValue[key]); ;
+            return (T)Enum.Parse(typeof(T), data.m_defaultValue[key]);
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  

@@ -39,45 +39,54 @@ public class DataManager
 
     public static DataTable GetData(string DataName)
     {
-
-        if(s_dataCatch.ContainsKey(DataName))
+        try
         {
-            return s_dataCatch[DataName];
-        }
+            if (s_dataCatch.ContainsKey(DataName))
+            {
+                return s_dataCatch[DataName];
+            }
 
-        DataTable data = null;
+            DataTable data = null;
 
-        string dataJson = "";
+            string dataJson = "";
 
 #if UNITY_EDITOR
 
-        if (Application.isPlaying)
-        {
-            dataJson = ResourceManager.ReadTextFile(DataName);
-        }
-        else
-        {
+            if (Application.isPlaying)
+            {
+                dataJson = ResourceManager.ReadTextFile(DataName);
+            }
+            else
+            {
 
-            dataJson = ResourceIOTool.ReadStringByResource(
-                    PathTool.GetRelativelyPath(c_directoryName,
-                                                DataName,
-                                                c_expandName));
-        }
+                dataJson = ResourceIOTool.ReadStringByResource(
+                        PathTool.GetRelativelyPath(c_directoryName,
+                                                    DataName,
+                                                    c_expandName));
+            }
 #else
             dataJson = ResourceManager.ReadTextFile(DataName);
 #endif
 
-        if (dataJson == "")
+            if (dataJson == "")
+            {
+                throw new Exception("Dont Find ->" + DataName + "<-");
+            }
+
+            data = DataTable.Analysis(dataJson);
+            data.m_tableName = DataName;
+
+            s_dataCatch.Add(DataName, data);
+
+            return data;
+        }
+        catch(Exception e)
         {
-            throw new Exception("Dont Find ->" + DataName + "<-");
+            Debug.LogError(DataName + "\n" + e.ToString());
         }
 
-        data = DataTable.Analysis(dataJson);
-        data.m_tableName = DataName;
 
-        s_dataCatch.Add(DataName, data);
-
-        return data;
+        return null;
     }
 
     /// <summary>

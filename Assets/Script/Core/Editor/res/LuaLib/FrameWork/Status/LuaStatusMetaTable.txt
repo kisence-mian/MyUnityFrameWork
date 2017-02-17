@@ -43,7 +43,7 @@ function LuaStatusMetaTable:CloseUIWindow(s_WindowName,isPlayAnim,func_callBack,
 	end
 
 	if LuaStatusMetaTable.t_windowList[s_WindowName] == nil then
-		error("Not Exits ->"..s_WindowName"<- Window !");
+		error("Not Exits ->"..tostring(s_WindowName).."<- Window !");
 		return;
 	end
 

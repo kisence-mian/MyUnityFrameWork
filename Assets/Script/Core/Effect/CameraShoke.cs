@@ -11,6 +11,7 @@ public class CameraShoke : MonoBehaviour {
     public float n_decreaseFactor = 1f;       //震动速度
 
     private Vector3 m_v3_randomOffest = new Vector3(-0.1f,0,0.1f); //左右偏移修正
+    private Vector3 m_v3_weight = Vector3.one;// 震动方向权重
 
     public void Init(GameObject l_go_camera )
     {
@@ -26,30 +27,41 @@ public class CameraShoke : MonoBehaviour {
     /// <param name="振幅"></param>
     /// <param name="震速"></param>
     /// <param name="偏移"></param>
-    public void Shoke(float l_n_shokeTime, float l_n_amount, float l_n_decreaseFactor, Vector3 l_v3_randomOffest)
+    public void Shoke(float l_n_shokeTime, float l_n_amount, float l_n_decreaseFactor, Vector3 l_v3_randomOffest, Vector3 l_v3_weight)
     {
         n_shake = l_n_shokeTime;
         n_shakeAmount = l_n_amount;
         n_decreaseFactor = l_n_decreaseFactor;
         m_v3_randomOffest = l_v3_randomOffest;
-
+        m_v3_weight = l_v3_weight;
     }
 
-    public void UpdateShoke(Vector3 l_v3_originalPos)
+    public void UpdateShoke()
     {
         if (n_shake > 0)
         {
             Vector3 l_v3_randomValue = Random.insideUnitSphere * n_shakeAmount + m_v3_randomOffest;
 
-            l_v3_randomValue.y = 0; //禁止y轴方向的震动，
-            camTransform.localPosition = l_v3_originalPos + l_v3_randomValue;
+            float weight = m_v3_weight.x + m_v3_weight.y + m_v3_weight.z;
+            if (weight == 0)
+            {
+                return;
+            }
+            l_v3_randomValue.x *= (m_v3_weight.x / weight);
+            l_v3_randomValue.y *= (m_v3_weight.y / weight);
+            l_v3_randomValue.z *= (m_v3_weight.z / weight);
+
+            //l_v3_randomValue.y = 0; //禁止y轴方向的震动，
+            camTransform.localPosition =  l_v3_randomValue;
 
             n_shake -= Time.deltaTime * n_decreaseFactor;
         }
+
         else
         {
-            n_shake = 0f;
-            camTransform.localPosition = l_v3_originalPos;
+            camTransform.localPosition = Vector3.zero;
+            n_shake = 0;
+
         }
     }
 }

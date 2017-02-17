@@ -231,7 +231,7 @@ public class GameObjectManager :MonoBehaviour
         GameObject instanceTmp = Instantiate(go);
         instanceTmp.name = go.name;
 
-        PoolObject po = go.GetComponent<PoolObject>();
+        PoolObject po = instanceTmp.GetComponent<PoolObject>();
 
         if (po == null)
         {
@@ -244,7 +244,8 @@ public class GameObjectManager :MonoBehaviour
         {
             instanceTmp.transform.SetParent(parent.transform);
         }
-        //instanceTmp.transform.localScale = Vector3.one;
+
+        instanceTmp.SetActive(true);
 
         return po;
     }
@@ -272,7 +273,7 @@ public class GameObjectManager :MonoBehaviour
     /// <param name="name">对象名</param>
     /// <param name="parent">要创建到的父节点</param>
     /// <returns>返回这个对象</returns>
-    public static PoolObject CetPoolObject(string name, GameObject parent = null)
+    public static PoolObject GetPoolObject(string name, GameObject parent = null)
     {
         PoolObject po;
         if (IsExist_New(name))

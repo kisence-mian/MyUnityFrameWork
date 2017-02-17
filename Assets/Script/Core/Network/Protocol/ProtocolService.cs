@@ -565,6 +565,7 @@ public class ProtocolService : INetworkInterface
     private List<string> ReadStringList(ByteArray ba)
     {
         List<string> tbl = HeapObjectPoolTool<List<string>>.GetHeapObject();
+        tbl.Clear();
 
         int len1 = ba.ReadShort();
         ba.ReadInt();
@@ -582,6 +583,7 @@ public class ProtocolService : INetworkInterface
     private List<bool> ReadBoolList(ByteArray ba)
     {
         List<bool> tbl = HeapObjectPoolTool<List<bool>>.GetHeapObject();
+        tbl.Clear();
 
         int len1 = ba.ReadShort();
         ba.ReadInt();
@@ -599,6 +601,7 @@ public class ProtocolService : INetworkInterface
     private List<int> ReadIntList(ByteArray ba)
     {
         List<int> tbl = HeapObjectPoolTool<List<int>>.GetHeapObject();
+        tbl.Clear();
 
         int len1 = ba.ReadShort();
         ba.ReadInt();
@@ -620,6 +623,7 @@ public class ProtocolService : INetworkInterface
     private List<double> ReadDoubleList(ByteArray ba)
     {
         List<double> tbl = HeapObjectPoolTool<List<double>>.GetHeapObject();
+        tbl.Clear();
 
         int len1 = ba.ReadShort();
         ba.ReadInt();
@@ -732,6 +736,8 @@ public class ProtocolService : INetworkInterface
     private List<Dictionary<string, object>> ReadDictionaryList(string str, ByteArray ba)
     {
         List<Dictionary<string, object>> stbl = HeapObjectPoolTool<List<Dictionary<string, object>>>.GetHeapObject();
+
+        stbl.Clear();
         int len1 = ba.ReadShort();
         ba.ReadInt();
 

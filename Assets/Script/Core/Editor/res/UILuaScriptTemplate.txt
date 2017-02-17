@@ -19,9 +19,6 @@ end
 function {0}:OnRefresh()
 end
 
-function {0}:OnClose()
-end
-
 function {0}:ExitAnim()
 	return 0;
 end
