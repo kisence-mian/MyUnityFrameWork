@@ -82,11 +82,8 @@ public class DataManager
         }
         catch(Exception e)
         {
-            Debug.LogError(DataName + "\n" + e.ToString());
+            throw new Exception("->" + DataName + "<- : " + e.ToString());
         }
-
-
-        return null;
     }
 
     /// <summary>
