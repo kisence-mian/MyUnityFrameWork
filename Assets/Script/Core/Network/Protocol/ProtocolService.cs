@@ -92,7 +92,6 @@ public class ProtocolService : INetworkInterface
             m_ConnectStatusCallback(NetworkState.Connecting);
 
             m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            Debug.Log(m_IPaddress);
             IPAddress ip = IPAddress.Parse(m_IPaddress);
             
             IPEndPoint ipe = new IPEndPoint(ip, m_port);
@@ -147,9 +146,9 @@ public class ProtocolService : INetworkInterface
         ByteArray msg = HeapObjectPoolTool<ByteArray>.GetHeapObject();
         msg.clear();
 
-        byte[] message = GetSendByte(MessageType, data);
+        List<byte> message = GetSendByte(MessageType, data);
 
-        int len = 3 + message.Length;
+        int len = 3 + message.Count;
         int method = GetMethodIndex(MessageType);
 
         msg.WriteShort(len);
@@ -157,7 +156,7 @@ public class ProtocolService : INetworkInterface
         msg.WriteShort(method);
 
         if (message != null)
-            msg.WriteALLBytes(message);
+            msg.bytes.AddRange(message);
         else
             msg.WriteInt(0);
 
@@ -754,7 +753,7 @@ public class ProtocolService : INetworkInterface
 
     #region 发包
 
-    byte[] GetSendByte(string messageType, Dictionary<string, object> data)
+    List<byte> GetSendByte(string messageType, Dictionary<string, object> data)
     {
         try
         {
@@ -785,18 +784,21 @@ public class ProtocolService : INetworkInterface
         return len;
     }
 
+    List<List<byte>> m_arrayCatch = new List<List<byte>>();
     int GetCustomListLength(string customType,List<object> list)
     {
+        m_arrayCatch.Clear();
         int len = 0;
         for (int i = 0; i < list.Count; i++)
         {
-            byte[] bs = GetCustomTypeByte(customType, (Dictionary<string, object>)list[i]);
-            len = len + bs.Length + 4;
+            List<byte> bs = GetCustomTypeByte(customType, (Dictionary<string, object>)list[i]);
+            m_arrayCatch.Add(bs);
+            len = len + bs.Count + 4;
         }
         return len;
     }
 
-    private byte[] GetCustomTypeByte(string customType, Dictionary<string, object> data)
+    private List<byte> GetCustomTypeByte(string customType, Dictionary<string, object> data)
     {
         string fieldName = null;
         int fieldType = 0;
@@ -872,16 +874,16 @@ public class ProtocolService : INetworkInterface
                     {
                         if (repeatType == RT_equired)
                         {
-                            Bytes.WriteDouble(Convert.ToDouble(data[fieldName].ToString()));
+                            Bytes.WriteDouble((float)data[fieldName]);
                         }
                         else
                         {
                             List<object> tb = (List<object>)data[fieldName];
                             Bytes.WriteShort(tb.Count);
                             Bytes.WriteInt(tb.Count * 8);
-                            for (int i2 = 0; i2 < tb.Count; i2++)
+                            for (int j = 0; j < tb.Count; j++)
                             {
-                                Bytes.WriteDouble((double)tb[i2]);
+                                Bytes.WriteDouble((float)tb[j]);
                             }
                         }
                     }
@@ -892,7 +894,7 @@ public class ProtocolService : INetworkInterface
                     {
                         if (repeatType == RT_equired)
                         {
-                            Bytes.WriteInt(Convert.ToInt32(Convert.ToDouble(data[fieldName].ToString())));
+                            Bytes.WriteInt(int.Parse(data[fieldName].ToString()));
                         }
                         else
                         {
@@ -901,7 +903,7 @@ public class ProtocolService : INetworkInterface
                             Bytes.WriteInt(tb.Count * 4);
                             for (int i2 = 0; i2 < tb.Count; i2++)
                             {
-                                Bytes.WriteDouble((int)tb[i2]);
+                                Bytes.WriteInt(int.Parse(tb[i2].ToString()));
                             }
                         }
                     }
@@ -913,26 +915,28 @@ public class ProtocolService : INetworkInterface
                         if (repeatType == RT_equired)
                         {
                             customType = (string)currentField["vp"];
-                            Bytes.WriteALLBytes(GetSendByte(customType, (Dictionary<string, object>)data[fieldName]));
+                            Bytes.bytes.AddRange(GetSendByte(customType, (Dictionary<string, object>)data[fieldName]));
                         }
                         else
                         {
                             List<object> tb = (List<object>)data[fieldName];
+
                             Bytes.WriteShort(tb.Count);
+                            //这里会修改m_arrayCatch的值，下面就可以直接使用
                             Bytes.WriteInt(GetCustomListLength(customType, tb));
 
-                            for (int i2 = 0; i2 < tb.Count; i2++)
+                            for (int j = 0; j < m_arrayCatch.Count; j++)
                             {
-                                byte[] tempb = GetCustomTypeByte(customType, (Dictionary<string, object>)tb[i2]);
-                                Bytes.WriteInt(tempb.Length);
-                                Bytes.WriteALLBytes(tempb);
+                                List<byte> tempb = m_arrayCatch[j];
+                                Bytes.WriteInt(tempb.Count);
+                                Bytes.bytes.AddRange(tempb);
                             }
                         }
                     }
                 }
             }
 
-            return Bytes.Buffer;
+            return Bytes.bytes;
         }
         catch(Exception e)
         {

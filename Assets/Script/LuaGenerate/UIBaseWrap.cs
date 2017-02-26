@@ -30,6 +30,10 @@ public class UIBaseWrap
 		L.RegFunction("CreateItem", CreateItem);
 		L.RegFunction("DestroyItem", DestroyItem);
 		L.RegFunction("CleanItem", CleanItem);
+		L.RegFunction("SetText", SetText);
+		L.RegFunction("SetInputText", SetInputText);
+		L.RegFunction("SetTextByLangeage", SetTextByLangeage);
+		L.RegFunction("SetSlider", SetSlider);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("m_objectList", get_m_objectList, set_m_objectList);
@@ -474,6 +478,79 @@ public class UIBaseWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
 			obj.CleanItem();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetText(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			string arg0 = ToLua.CheckString(L, 2);
+			string arg1 = ToLua.CheckString(L, 3);
+			obj.SetText(arg0, arg1);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetInputText(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			string arg0 = ToLua.CheckString(L, 2);
+			string arg1 = ToLua.CheckString(L, 3);
+			obj.SetInputText(arg0, arg1);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetTextByLangeage(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			string arg0 = ToLua.CheckString(L, 2);
+			string arg1 = ToLua.CheckString(L, 3);
+			object[] arg2 = ToLua.ToParamsObject(L, 4, count - 3);
+			obj.SetTextByLangeage(arg0, arg1, arg2);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SetSlider(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			string arg0 = ToLua.CheckString(L, 2);
+			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
+			obj.SetSlider(arg0, arg1);
 			return 0;
 		}
 		catch(Exception e)

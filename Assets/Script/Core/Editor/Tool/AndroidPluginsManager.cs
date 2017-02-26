@@ -13,6 +13,14 @@ public class AndroidPluginsManager : EditorWindow
         EditorWindow.GetWindow(typeof(AndroidPluginsManager));
     }
 
+    void OnEnable()
+    {
+        ResourcesConfigManager.Initialize();
+
+        //m_currentSelectIndex = 0;
+        EditorGUIStyleData.Init();
+    }
+
     void OnProjectChange()
     {
         FindALLManiFest();
@@ -22,14 +30,22 @@ public class AndroidPluginsManager : EditorWindow
     void OnGUI()
     {
         titleContent.text = "安卓插件管理器";
-        //manifest列表
-        //主manifest信息
-        //库列表
+        SelectConfigGUI();
     }
 
     #endregion
 
     #region 选择方案
+
+    void SelectConfigGUI()
+    {
+
+    }
+
+    void GetAllConfigName()
+    {
+
+    }
 
     #endregion
 
@@ -38,6 +54,10 @@ public class AndroidPluginsManager : EditorWindow
     #endregion
 
     #region 配置参数
+
+    #endregion
+
+    #region 文件/插件管理
 
     #endregion
 
@@ -62,6 +82,11 @@ public class AndroidPluginsManager : EditorWindow
     //    public string m_showName;
     //    public string m_path;
     //}
+
+}
+
+public class SchemeData
+{
 
 }
 

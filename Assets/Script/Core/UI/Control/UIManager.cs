@@ -92,7 +92,7 @@ public class UIManager : MonoBehaviour
             UIbase.OnOpen();}
         catch (Exception e)
         {
-            Debug.LogError("OnOpen Exception: " + e.ToString());
+            Debug.LogError(UIName + " OnOpen Exception: " + e.ToString());
         }
 
         s_UILayerManager.SetLayer(UIbase);      //设置层级
@@ -144,7 +144,7 @@ public class UIManager : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError("OnClose Exception: " + e.ToString());
+            Debug.LogError(l_UI.UIName + " OnClose Exception: " + e.ToString());
         }
 
         l_UI.gameObject.SetActive(false);

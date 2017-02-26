@@ -147,6 +147,18 @@ public class ResourceIOTool :MonoBehaviour
         CreateFile(path, dataByte);
     }
 
+    public static void DeleteFile(string path)
+    {
+        if (File.Exists(path))
+        {
+            File.Delete(path);
+        }
+        else
+        {
+            Debug.Log("File:[" + path + "] dont exists");
+        }
+    }
+
     //web Player 不支持该函数
 #if !UNITY_WEBPLAYER
     public static void CreateFile(string path, byte[] byt)

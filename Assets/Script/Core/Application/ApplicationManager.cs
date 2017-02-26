@@ -22,7 +22,7 @@ public class ApplicationManager : MonoBehaviour
         get { return instance.m_AppMode; }
         //set { m_AppMode = value; }
     }
-
+    public bool runInBackground = false;
 
     //快速启动
     public bool m_quickLunch = true;
@@ -40,6 +40,7 @@ public class ApplicationManager : MonoBehaviour
     {
         instance = this;
         AppLaunch();
+        Application.runInBackground = runInBackground;
     }
 
     /// <summary>

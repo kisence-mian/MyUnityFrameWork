@@ -164,20 +164,15 @@ public class InputManager
         dispatcher.AddListener(typeof(T).Name, callback);
     }
 
-    ///// <summary>
-    ///// 添加一个输入事件监听，只有当事件是自定义的操作事件才可以调用这个方法
-    ///// </summary>
-    ///// <typeparam name="T"></typeparam>
-    ///// <param name="callback"></param>
-    //public static void AddListener<T>(InputEventHandle<T> callback) where T : IInputOperationEventBase
-    //{
-    //    InputDispatcher<T> dispatcher = GetDispatcher<T>();
-    //    dispatcher.AddListener(typeof(T).Name, callback);
-    //}
-
     #endregion
 
     #region RemoveListener
+
+    public static void RemoveListener(string eventName, string eventKey, InputEventHandle<IInputEventBase> callback)
+    {
+        IInputDispatcher dispatcher = GetDispatcher(eventName);
+        dispatcher.RemoveListener(eventKey, callback);
+    }
 
     public static void RemoveListener<T>(string eventKey, InputEventHandle<T> callback) where T : IInputEventBase
     {

@@ -14,7 +14,7 @@ public class GameObjectManagerWrap
 		L.RegFunction("CleanPool", CleanPool);
 		L.RegFunction("CleanPoolByName", CleanPoolByName);
 		L.RegFunction("IsExist_New", IsExist_New);
-		L.RegFunction("CetPoolObject", CetPoolObject);
+		L.RegFunction("GetPoolObject", GetPoolObject);
 		L.RegFunction("DestroyPoolObject", DestroyPoolObject);
 		L.RegFunction("CleanPool_New", CleanPool_New);
 		L.RegFunction("CleanPoolByName_New", CleanPoolByName_New);
@@ -192,14 +192,14 @@ public class GameObjectManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int CetPoolObject(IntPtr L)
+	static int GetPoolObject(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 2);
 			string arg0 = ToLua.CheckString(L, 1);
 			UnityEngine.GameObject arg1 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.GameObject));
-			PoolObject o = GameObjectManager.CetPoolObject(arg0, arg1);
+			PoolObject o = GameObjectManager.GetPoolObject(arg0, arg1);
 			ToLua.Push(L, o);
 			return 1;
 		}

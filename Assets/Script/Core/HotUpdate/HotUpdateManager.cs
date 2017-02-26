@@ -88,7 +88,7 @@ public class HotUpdateManager
         //取得服务器版本文件
         WWW www = new WWW(s_versionFileDownLoadPath);
 
-        Debug.Log("服务器获取版本文件 ：" + s_versionFileDownLoadPath);
+        //Debug.Log("服务器获取版本文件 ：" + s_versionFileDownLoadPath);
         //yield return www;
 
         while (!www.isDone)
@@ -110,7 +110,7 @@ public class HotUpdateManager
 
         UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingVersionFile, GetHotUpdateProgress(false, false, 1));
 
-        Debug.Log("www.text: " + www.text);
+        //Debug.Log("www.text: " + www.text);
 
         Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)MiniJSON.Json.Deserialize(www.text);
 
@@ -134,7 +134,7 @@ public class HotUpdateManager
         //服务器小版本比较小，无需更新
         else
         {
-            Debug.Log("无需更新，直接进入游戏");
+            //Debug.Log("无需更新，直接进入游戏");
             UpdateDateCallBack(HotUpdateStatusEnum.NoUpdate, 1);
             yield break;
         }

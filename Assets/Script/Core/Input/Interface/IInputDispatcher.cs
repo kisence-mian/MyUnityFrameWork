@@ -9,6 +9,8 @@ public abstract class IInputDispatcher
 
     public abstract void AddListener(string eventKey, InputEventHandle<IInputEventBase> callBack);
 
+    public abstract void RemoveListener(string eventKey, InputEventHandle<IInputEventBase> callBack);
+
     public abstract void Dispatch(IInputEventBase inputEvent);
 
     protected void AllEventDispatch(string eventName, IInputEventBase inputEvent)

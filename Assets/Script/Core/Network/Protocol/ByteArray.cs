@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 public class ByteArray
 {
-    private List<byte> bytes = new List<byte>();
+    public List<byte> bytes = new List<byte>();
 
     public void Add(byte[] buffer)
     {
@@ -34,7 +34,10 @@ public class ByteArray
     }
     public byte[] Buffer
     {
-        get { return bytes.ToArray(); }
+        get 
+        { 
+            return bytes.ToArray(); 
+        }
     }
     public bool ReadBoolean()
     {
@@ -108,18 +111,17 @@ public class ByteArray
         return result;
     }
 
+    byte[] b = new byte[8];
+    //byte[] Temp = new byte[8];
     public double ReadDouble()
     {
-        byte[] b = new byte[8];
         for (int i = 0; i < 8; i++)
         {
-            b[i] = bytes[i + Postion];
+            b[7 - i] = bytes[i + Postion];
         }
         Postion += 8;
-        Array.Reverse(b);
-        double dbl = BitConverter.ToDouble(b, 0);
-
-        return dbl;
+        //Array.Reverse(b);
+        return  BitConverter.ToDouble(b, 0);
     }
     public string ReadUTFBytes(uint length)
     {
@@ -146,6 +148,7 @@ public class ByteArray
     {
         bytes.Add(value ? ((byte)1) : ((byte)0));
     }
+
     public void WriteByte(byte value)
     {
         bytes.Add(value);
@@ -154,8 +157,13 @@ public class ByteArray
     public void WriteDouble(double v)
     {
         byte[] temp = BitConverter.GetBytes(v);
-        Array.Reverse(temp);
-        bytes.AddRange(temp);
+
+        for (int i = 0; i < 8; i++)
+        {
+            b[7 - i] = temp[i];
+        }
+
+        bytes.AddRange(b);
     }
 
     public void WriteString(string content)

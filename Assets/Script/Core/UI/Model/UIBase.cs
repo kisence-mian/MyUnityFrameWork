@@ -380,6 +380,8 @@ public class UIBase : MonoBehaviour
 
     #endregion
 
+    #region 赋值方法
+
     public void SetText(string TextID, string content)
     {
         GetText(TextID).text = content;
@@ -394,5 +396,12 @@ public class UIBase : MonoBehaviour
     {
         GetText(textID).text = LanguageManager.GetContent(langeageID, objs);
     }
+
+    public void SetSlider(string sliderID,float value)
+    {
+        GetSlider(sliderID).value = value;
+    }
+
+    #endregion
 
 }

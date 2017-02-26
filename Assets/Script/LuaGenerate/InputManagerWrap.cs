@@ -12,6 +12,7 @@ public class InputManagerWrap
 		L.RegFunction("RemoveDispatcher", RemoveDispatcher);
 		L.RegFunction("Dispatch", Dispatch);
 		L.RegFunction("AddListener", AddListener);
+		L.RegFunction("RemoveListener", RemoveListener);
 		L.RegFunction("New", _CreateInputManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("OnEveryEventDispatch", get_OnEveryEventDispatch, set_OnEveryEventDispatch);
@@ -143,6 +144,36 @@ public class InputManagerWrap
 			}
 
 			InputManager.AddListener(arg0, arg1, arg2);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int RemoveListener(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			string arg0 = ToLua.CheckString(L, 1);
+			string arg1 = ToLua.CheckString(L, 2);
+			InputEventHandle<IInputEventBase> arg2 = null;
+			LuaTypes funcType3 = LuaDLL.lua_type(L, 3);
+
+			if (funcType3 != LuaTypes.LUA_TFUNCTION)
+			{
+				 arg2 = (InputEventHandle<IInputEventBase>)ToLua.CheckObject(L, 3, typeof(InputEventHandle<IInputEventBase>));
+			}
+			else
+			{
+				LuaFunction func = ToLua.ToLuaFunction(L, 3);
+				arg2 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<IInputEventBase>), func) as InputEventHandle<IInputEventBase>;
+			}
+
+			InputManager.RemoveListener(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)
