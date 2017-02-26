@@ -47,7 +47,7 @@ public static class CustomSettings
         _GT(typeof(Debugger)).SetNameSpace(null),        
 
     #region Base
-
+        _GT(typeof(UnityEngine.Object)),
         _GT(typeof(GameObject)),
         _GT(typeof(Transform)),
         _GT(typeof(Component)),
@@ -129,10 +129,10 @@ public static class CustomSettings
 
         #endregion
 
-         _GT(typeof(HeapObjectPool)),
-         _GT(typeof(ResourceManager)),
-         _GT(typeof(ApplicationManager)),
-         _GT(typeof(ApplicationStatusManager)),
+         //_GT(typeof(HeapObjectPool)),
+         //_GT(typeof(ResourceManager)),
+         //_GT(typeof(ApplicationManager)),
+         //_GT(typeof(ApplicationStatusManager)),
          _GT(typeof(GameObjectManager)),
 
     #endregion
@@ -152,6 +152,7 @@ public static class CustomSettings
          //_GT(typeof(CharacterBase)),
          // _GT(typeof(SkillData)),
          // _GT(typeof(UGUITool)),
+          _GT(typeof(GameObjectLuaHelper)),
 
          // _GT(typeof(StoryServiceLuaHelper)),
           //_GT(typeof(ResurgenceLuaHelper)),

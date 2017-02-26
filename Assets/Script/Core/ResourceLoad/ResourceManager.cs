@@ -106,6 +106,18 @@ public static class ResourceManager
         }
     }
 
+    public static void UnLoad(string name)
+    {
+        if (m_gameLoadType == ResLoadLocation.Resource)
+        {
+
+        }
+        else
+        {
+            AssetsBundleManager.UnLoadBundle(name);
+        }
+    }
+
     //public static T GetResource<T>(string path)
     //{
     //    T resouce = new T();

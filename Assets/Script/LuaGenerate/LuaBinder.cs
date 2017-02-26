@@ -37,11 +37,9 @@ public static class LuaBinder
 		NetworkStateWrap.Register(L);
 		InputManagerWrap.Register(L);
 		NetworkManagerWrap.Register(L);
-		HeapObjectPoolWrap.Register(L);
-		ResourceManagerWrap.Register(L);
-		ApplicationManagerWrap.Register(L);
-		ApplicationStatusManagerWrap.Register(L);
 		GameObjectManagerWrap.Register(L);
+		GameObjectLuaHelperWrap.Register(L);
+		HeapObjectBaseWrap.Register(L);
 		L.RegFunction("AnimCallBack", AnimCallBack);
 		L.RegFunction("AnimCustomMethodVector3", AnimCustomMethodVector3);
 		L.RegFunction("AnimCustomMethodVector2", AnimCustomMethodVector2);
@@ -52,9 +50,6 @@ public static class LuaBinder
 		L.RegFunction("UICallBack", UICallBack);
 		L.RegFunction("InputEventCallBack", InputEventCallBack);
 		L.RegFunction("InputEventHandle_IInputEventBase", InputEventHandle_IInputEventBase);
-		L.RegFunction("LoadCallBack", LoadCallBack);
-		L.RegFunction("ApplicationVoidCallback", ApplicationVoidCallback);
-		L.RegFunction("ApplicationBoolCallback", ApplicationBoolCallback);
 		L.BeginModule("UnityEngine");
 		UnityEngine_GameObjectWrap.Register(L);
 		UnityEngine_TransformWrap.Register(L);
@@ -358,87 +353,6 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<IInputEventBase>), func, self);
-				ToLua.Push(L, arg1);
-			}
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int LoadCallBack(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
-
-			if (count == 1)
-			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(LoadCallBack), func);
-				ToLua.Push(L, arg1);
-			}
-			else
-			{
-				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(LoadCallBack), func, self);
-				ToLua.Push(L, arg1);
-			}
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int ApplicationVoidCallback(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
-
-			if (count == 1)
-			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(ApplicationVoidCallback), func);
-				ToLua.Push(L, arg1);
-			}
-			else
-			{
-				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(ApplicationVoidCallback), func, self);
-				ToLua.Push(L, arg1);
-			}
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int ApplicationBoolCallback(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
-
-			if (count == 1)
-			{
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(ApplicationBoolCallback), func);
-				ToLua.Push(L, arg1);
-			}
-			else
-			{
-				LuaTable self = ToLua.CheckLuaTable(L, 2);
-				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(ApplicationBoolCallback), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

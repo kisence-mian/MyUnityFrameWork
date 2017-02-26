@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
 
-public class AnimData
+public class AnimData : HeapObjectBase
 {
     #region 参数
 
@@ -108,7 +108,6 @@ public class AnimData
             case AnimType.UGUI_AnchoredPosition: UguiPosition(); break;
             case AnimType.UGUI_SizeDetal: SizeDelta(); break;
 
-
             case AnimType.Position: Position(); break;
             case AnimType.LocalPosition: LocalPosition(); break;
             case AnimType.LocalScale: LocalScale(); break;
@@ -186,7 +185,6 @@ public class AnimData
     }
     public void ExchangePos()
     {
-
         Vector3 Vtmp = m_fromV3;
         m_fromV3 = m_toV3;
         m_toV3 = Vtmp;
@@ -207,6 +205,9 @@ public class AnimData
 
     public void Init()
     {
+        m_currentTime = 0;
+        m_isDone = false;
+
         switch (m_animType)
         {
             case AnimType.UGUI_Color: UguiColorInit(m_isChild); break;
@@ -353,11 +354,10 @@ public class AnimData
 
     #region ALpha
 
-    
-
     public void UguiAlphaInit(bool isChild)
     {
         m_animObjectList_Image = new List<Image>();
+        m_animObjectList_Text = new List<Text>();
         m_oldColor = new List<Color>();
 
         if (isChild)
@@ -408,9 +408,10 @@ public class AnimData
         SetUGUIAlpha(GetInterpolation(m_fromFloat, m_toFloat));
     }
 
+    Color colTmp = new Color();
     public void SetUGUIAlpha(float a)
     {
-        Color newColor = new Color();
+        Color newColor = colTmp;
 
         int index = 0;
         for (int i = 0; i < m_animObjectList_Image.Count; i++)

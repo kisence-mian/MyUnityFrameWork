@@ -13,7 +13,6 @@ public class ApplicationManagerWrap
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("m_AppMode", get_m_AppMode, set_m_AppMode);
 		L.RegVar("m_useAssetsBundle", get_m_useAssetsBundle, set_m_useAssetsBundle);
-		L.RegVar("runInBackground", get_runInBackground, set_runInBackground);
 		L.RegVar("m_quickLunch", get_m_quickLunch, set_m_quickLunch);
 		L.RegVar("m_useLua", get_m_useLua, set_m_useLua);
 		L.RegVar("m_Status", get_m_Status, set_m_Status);
@@ -113,25 +112,6 @@ public class ApplicationManagerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_useAssetsBundle on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_runInBackground(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			ApplicationManager obj = (ApplicationManager)o;
-			bool ret = obj.runInBackground;
-			LuaDLL.lua_pushboolean(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index runInBackground on a nil value" : e.Message);
 		}
 	}
 
@@ -344,25 +324,6 @@ public class ApplicationManagerWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_useAssetsBundle on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_runInBackground(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			ApplicationManager obj = (ApplicationManager)o;
-			bool arg0 = LuaDLL.luaL_checkboolean(L, 2);
-			obj.runInBackground = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index runInBackground on a nil value" : e.Message);
 		}
 	}
 

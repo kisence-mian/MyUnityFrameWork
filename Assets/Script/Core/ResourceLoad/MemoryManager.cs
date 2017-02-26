@@ -94,16 +94,16 @@ public class MemoryManager
 
     public static void LoadRes(List<string> resList,LoadProgressCallBack callBack)
     {
-        if(ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
-        {
-            callBack(LoadState.CompleteState);
-        }
-        else
-        {
+        //if(ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
+        //{
+        //    callBack(LoadState.CompleteState);
+        //}
+        //else
+        //{
             s_loadCallBack += callBack;
             s_LoadList.AddRange(resList);
             s_loadCount += resList.Count;
-        }
+        //}
     }
 
     public static void UnLoadRes(List<string> resList)
@@ -112,7 +112,8 @@ public class MemoryManager
         {
             for (int i = 0; i < resList.Count; i++)
             {
-                AssetsBundleManager.UnLoadBundle(resList[i]);
+                ResourceManager.UnLoad(resList[i]);
+                //AssetsBundleManager.UnLoadBundle(resList[i]);
             }
         }
     }
@@ -148,7 +149,8 @@ public class MemoryManager
             }
             else
             {
-                AssetsBundleManager.LoadBundleAsync(s_LoadList[0], LoadResourcesFinishCallBack);
+                ResourceManager.LoadAsync(s_LoadList[0], LoadResourcesFinishCallBack);
+                //AssetsBundleManager.LoadBundleAsync(s_LoadList[0], LoadResourcesFinishCallBack);
                 s_LoadList.RemoveAt(0);
                 isLoading = true;
 
@@ -168,7 +170,7 @@ public class MemoryManager
         }
     }
 
-    static void LoadResourcesFinishCallBack(LoadState state, Bundle bundlle)
+    static void LoadResourcesFinishCallBack(LoadState state, object res)
     {
         if (state.isDone == true)
             isLoading = false;

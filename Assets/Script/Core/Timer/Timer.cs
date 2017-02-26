@@ -4,24 +4,14 @@ using System.Collections.Generic;
 
 public class Timer : MonoBehaviour 
 {
-    static Timer s_instance;
+    public static List<TimerEvent> m_timers = new List<TimerEvent>();
 
-    public static Timer s_Instance
+    public static void Init()
     {
-        get {
-            if (s_instance == null)
-            {
-                s_instance = new GameObject("Timer").AddComponent<Timer>();
-                DontDestroyOnLoad(s_instance.gameObject);
-            }
-            return s_instance;
-        }
-        set { s_instance = value; }
+        ApplicationManager.s_OnApplicationUpdate += Update;
     }
 
-    public List<TimerEvent> m_timers = new List<TimerEvent>();
-
-	void Update () 
+	static void Update () 
     {
         for (int i = 0; i < m_timers.Count;i++ )
         {
@@ -173,21 +163,21 @@ public class Timer : MonoBehaviour
         l_te.m_isIgnoreTimeScale = l_isIgnoreTimeScale;
         l_te.m_repeatCount = l_callBackCount;
 
-        s_Instance.m_timers.Add(l_te);
+        m_timers.Add(l_te);
 
         return l_te;
     }
 
     public static void DestroyTimer(TimerEvent l_timer,bool isCallBack = false)
     {
-        if(s_instance.m_timers.Contains(l_timer))
+        if(m_timers.Contains(l_timer))
         {
             if (isCallBack)
             {
                 l_timer.CallBackTimer();
             }
 
-            s_instance.m_timers.Remove(l_timer);
+            m_timers.Remove(l_timer);
         }
         else
         {
@@ -197,26 +187,26 @@ public class Timer : MonoBehaviour
 
     public static void DestroyTimer(string l_timerName, bool isCallBack = false)
     {
-        for (int i = 0; i < s_instance.m_timers.Count;i++ )
+        for (int i = 0; i < m_timers.Count;i++ )
         {
-            if (s_instance.m_timers[i].m_timerName.Equals(l_timerName))
+            if (m_timers[i].m_timerName.Equals(l_timerName))
             {
-                DestroyTimer(s_instance.m_timers[i], isCallBack);
+                DestroyTimer(m_timers[i], isCallBack);
             }
         }
     }
 
     public static void DestroyAllTimer(bool isCallBack = false)
     {
-        for (int i = 0; i < s_instance.m_timers.Count; i++)
+        for (int i = 0; i < m_timers.Count; i++)
         {
-            DestroyTimer(s_instance.m_timers[i], isCallBack);
+            DestroyTimer(m_timers[i], isCallBack);
         }
     }
 
     public static void ResetTimer(TimerEvent l_timer)
     {
-        if(s_instance.m_timers.Contains(l_timer))
+        if(m_timers.Contains(l_timer))
         {
             l_timer.ResetTimer();
         }
@@ -228,11 +218,11 @@ public class Timer : MonoBehaviour
 
     public static void ResetTimer(string l_timerName)
     {
-        for (int i = 0; i < s_instance.m_timers.Count; i++)
+        for (int i = 0; i < m_timers.Count; i++)
         {
-            if (s_instance.m_timers[i].m_timerName.Equals(l_timerName))
+            if (m_timers[i].m_timerName.Equals(l_timerName))
             {
-                ResetTimer(s_instance.m_timers[i]);
+                ResetTimer(m_timers[i]);
             }
         }
     }

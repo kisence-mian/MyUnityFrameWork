@@ -148,7 +148,7 @@ public class GameObjectManager :MonoBehaviour
     /// 将一个对象放入对象池
     /// </summary>
     /// <param name="obj">目标对象</param>
-    public static void DestroyGameobjectByPool(GameObject obj, bool isSetActive = true)
+    public static void DestroyGameObjectByPool(GameObject obj, bool isSetActive = true)
     {
         string key = obj.name.Replace("(Clone)", "");
 
@@ -174,7 +174,7 @@ public class GameObjectManager :MonoBehaviour
     {
         Timer.DelayCallBack(time, (object[] obj) =>
         {
-            DestroyGameobjectByPool(go);
+            DestroyGameObjectByPool(go);
         });
     }
 

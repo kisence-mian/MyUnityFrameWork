@@ -360,7 +360,7 @@ public class UIBase : MonoBehaviour
         {
             m_ChildList.Remove(item);
             item.OnDestroy();
-            GameObjectManager.DestroyGameobjectByPool(item.gameObject);
+            GameObjectManager.DestroyGameObjectByPool(item.gameObject);
         }
     }
 
@@ -369,7 +369,7 @@ public class UIBase : MonoBehaviour
         for (int i = 0; i < m_ChildList.Count; i++)
         {
             m_ChildList[i].OnDestroy();
-            GameObjectManager.DestroyGameobjectByPool(m_ChildList[i].gameObject);
+            GameObjectManager.DestroyGameObjectByPool(m_ChildList[i].gameObject);
         }
 
         m_ChildList.Clear();

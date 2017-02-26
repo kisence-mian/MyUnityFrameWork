@@ -6,7 +6,7 @@ public class AnimDataWrap
 {
 	public static void Register(LuaState L)
 	{
-		L.BeginClass(typeof(AnimData), typeof(System.Object));
+		L.BeginClass(typeof(AnimData), typeof(HeapObjectBase));
 		L.RegFunction("executeUpdate", executeUpdate);
 		L.RegFunction("executeCallBack", executeCallBack);
 		L.RegFunction("AnimReplayLogic", AnimReplayLogic);

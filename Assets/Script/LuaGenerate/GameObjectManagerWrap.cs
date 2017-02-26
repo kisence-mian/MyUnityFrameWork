@@ -10,6 +10,7 @@ public class GameObjectManagerWrap
 		L.RegFunction("CreatGameObject", CreatGameObject);
 		L.RegFunction("IsExist", IsExist);
 		L.RegFunction("CreatGameObjectByPool", CreatGameObjectByPool);
+		L.RegFunction("DestroyGameObjectByPool", DestroyGameObjectByPool);
 		L.RegFunction("DestroyGameobjectByPool", DestroyGameobjectByPool);
 		L.RegFunction("CleanPool", CleanPool);
 		L.RegFunction("CleanPoolByName", CleanPoolByName);
@@ -112,30 +113,32 @@ public class GameObjectManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int DestroyGameObjectByPool(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
+			bool arg1 = LuaDLL.luaL_checkboolean(L, 2);
+			GameObjectManager.DestroyGameObjectByPool(arg0, arg1);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int DestroyGameobjectByPool(IntPtr L)
 	{
 		try
 		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(float)))
-			{
-				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
-				float arg1 = (float)LuaDLL.lua_tonumber(L, 2);
-				GameObjectManager.DestroyGameobjectByPool(arg0, arg1);
-				return 0;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(bool)))
-			{
-				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
-				bool arg1 = LuaDLL.lua_toboolean(L, 2);
-				GameObjectManager.DestroyGameobjectByPool(arg0, arg1);
-				return 0;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: GameObjectManager.DestroyGameobjectByPool");
-			}
+			ToLua.CheckArgsCount(L, 2);
+			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
+			float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
+			GameObjectManager.DestroyGameobjectByPool(arg0, arg1);
+			return 0;
 		}
 		catch(Exception e)
 		{

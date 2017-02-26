@@ -8,6 +8,7 @@ public class AnimSystemWrap
 	{
 		L.BeginClass(typeof(AnimSystem), typeof(UnityEngine.MonoBehaviour));
 		L.RegFunction("GetInstance", GetInstance);
+		L.RegFunction("InitAnimData", InitAnimData);
 		L.RegFunction("UguiColor", UguiColor);
 		L.RegFunction("UguiAlpha", UguiAlpha);
 		L.RegFunction("UguiMove", UguiMove);
@@ -41,6 +42,21 @@ public class AnimSystemWrap
 			AnimSystem o = AnimSystem.GetInstance();
 			ToLua.Push(L, o);
 			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InitAnimData(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 0);
+			AnimSystem.InitAnimData();
+			return 0;
 		}
 		catch(Exception e)
 		{
@@ -356,8 +372,9 @@ public class AnimSystemWrap
 			}
 
 			object[] arg11 = ToLua.CheckObjectArray(L, 12);
-			AnimSystem.Rotate(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
-			return 0;
+			AnimData o = AnimSystem.Rotate(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+			ToLua.PushObject(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{
@@ -676,35 +693,6 @@ public class AnimSystemWrap
 				ToLua.PushObject(L, o);
 				return 1;
 			}
-			else if (count == 11 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector3), typeof(float), typeof(RepeatType), typeof(InterpType), typeof(bool), typeof(PathType), typeof(UnityEngine.Vector3[]), typeof(AnimCallBack), typeof(object[])))
-			{
-				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
-				UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.ToObject(L, 2);
-				UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.ToObject(L, 3);
-				float arg3 = (float)LuaDLL.lua_tonumber(L, 4);
-				RepeatType arg4 = (RepeatType)ToLua.ToObject(L, 5);
-				InterpType arg5 = (InterpType)ToLua.ToObject(L, 6);
-				bool arg6 = LuaDLL.lua_toboolean(L, 7);
-				PathType arg7 = (PathType)ToLua.ToObject(L, 8);
-				UnityEngine.Vector3[] arg8 = ToLua.CheckObjectArray<UnityEngine.Vector3>(L, 9);
-				AnimCallBack arg9 = null;
-				LuaTypes funcType10 = LuaDLL.lua_type(L, 10);
-
-				if (funcType10 != LuaTypes.LUA_TFUNCTION)
-				{
-					 arg9 = (AnimCallBack)ToLua.ToObject(L, 10);
-				}
-				else
-				{
-					LuaFunction func = ToLua.ToLuaFunction(L, 10);
-					arg9 = DelegateFactory.CreateDelegate(typeof(AnimCallBack), func) as AnimCallBack;
-				}
-
-				object[] arg10 = ToLua.CheckObjectArray(L, 11);
-				AnimData o = AnimSystem.BezierMove(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
-				ToLua.PushObject(L, o);
-				return 1;
-			}
 			else if (count == 11 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector3), typeof(float), typeof(RepeatType), typeof(InterpType), typeof(bool), typeof(PathType), typeof(float[]), typeof(AnimCallBack), typeof(object[])))
 			{
 				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
@@ -731,6 +719,37 @@ public class AnimSystemWrap
 
 				object[] arg10 = ToLua.CheckObjectArray(L, 11);
 				AnimData o = AnimSystem.BezierMove(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10);
+				ToLua.PushObject(L, o);
+				return 1;
+			}
+			else if (count == 13 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.GameObject), typeof(UnityEngine.Vector3), typeof(UnityEngine.Vector3), typeof(float), typeof(float), typeof(RepeatType), typeof(int), typeof(InterpType), typeof(bool), typeof(PathType), typeof(UnityEngine.Vector3[]), typeof(AnimCallBack), typeof(object[])))
+			{
+				UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.ToObject(L, 1);
+				UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.ToObject(L, 2);
+				UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.ToObject(L, 3);
+				float arg3 = (float)LuaDLL.lua_tonumber(L, 4);
+				float arg4 = (float)LuaDLL.lua_tonumber(L, 5);
+				RepeatType arg5 = (RepeatType)ToLua.ToObject(L, 6);
+				int arg6 = (int)LuaDLL.lua_tonumber(L, 7);
+				InterpType arg7 = (InterpType)ToLua.ToObject(L, 8);
+				bool arg8 = LuaDLL.lua_toboolean(L, 9);
+				PathType arg9 = (PathType)ToLua.ToObject(L, 10);
+				UnityEngine.Vector3[] arg10 = ToLua.CheckObjectArray<UnityEngine.Vector3>(L, 11);
+				AnimCallBack arg11 = null;
+				LuaTypes funcType12 = LuaDLL.lua_type(L, 12);
+
+				if (funcType12 != LuaTypes.LUA_TFUNCTION)
+				{
+					 arg11 = (AnimCallBack)ToLua.ToObject(L, 12);
+				}
+				else
+				{
+					LuaFunction func = ToLua.ToLuaFunction(L, 12);
+					arg11 = DelegateFactory.CreateDelegate(typeof(AnimCallBack), func) as AnimCallBack;
+				}
+
+				object[] arg12 = ToLua.CheckObjectArray(L, 13);
+				AnimData o = AnimSystem.BezierMove(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 				ToLua.PushObject(L, o);
 				return 1;
 			}

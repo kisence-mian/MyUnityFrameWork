@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
+using System.Reflection;
 
 public class HeapObjectPool
 {
@@ -84,12 +86,138 @@ public class HeapObjectPool
 
     #endregion
 
-    #region Mini Josn 优化
+    #region HeapObjectPool
+
+    static Dictionary<string, List<HeapObjectBase>> s_pool = new Dictionary<string, List<HeapObjectBase>>();
+
+    public static void Init<T>(int count = 20) where T : HeapObjectBase, new()
+    {
+        string type = typeof(T).Name;
+
+        JudgeNullPool(type);
+
+        List<HeapObjectBase> list = s_pool[type];
+
+        for (int i = 0; i < count; i++)
+        {
+            T tmp = new T();
+            list.Add((HeapObjectBase)tmp);
+        }
+    }
+
+    public static void Init(string type,int count = 20)
+    {
+        JudgeNullPool(type);
+
+        List<HeapObjectBase> list = s_pool[type];
+
+        for (int i = 0; i < count; i++)
+        {
+            Type t = Type.GetType(type);
+
+            HeapObjectBase tmp = (HeapObjectBase)Activator.CreateInstance(t);
+            list.Add(tmp);
+        }
+    }
+
+    public static HeapObjectBase GetObject(string type)
+    {
+        JudgeNullPool(type);
+
+        List<HeapObjectBase> list = s_pool[type];
+
+        if (list.Count > 0)
+        {
+            HeapObjectBase tmp = list[0];
+            list.RemoveAt(0);
+
+            return tmp;
+        }
+        else
+        {
+            Init(type);
+            return GetObject(type);
+        }
+    }
+
+    public static T GetObject<T>() where T : HeapObjectBase, new()
+    {
+        string type = typeof(T).Name;
+
+        JudgeNullPool(type);
+
+        List<HeapObjectBase> list = s_pool[type];
+
+        if (list.Count > 0)
+        {
+            HeapObjectBase tmp = list[0];
+            list.RemoveAt(0);
+
+            return (T)tmp;
+        }
+        else
+        {
+            Init<T>();
+            return GetObject<T>();
+        }
+    }
+
+    public static void ReleaseObject(string type,HeapObjectBase obj)
+    {
+        JudgeNullPool(type);
+
+        s_pool[type].Add(obj);
+    }
+
+    public static void ReleaseObject<T>(HeapObjectBase obj)
+    {
+        string type = typeof(T).Name;
+        JudgeNullPool(type);
+
+        s_pool[type].Add(obj);
+    }
+
+    static void JudgeNullPool(string type)
+    {
+        if (!s_pool.ContainsKey(type))
+        {
+            s_pool.Add(type, new List<HeapObjectBase>());
+        }
+    }
 
     #endregion
 }
 
-#region HeapObjectPool
+#region HeapObject
+public class HeapObjectBase
+{
+    public virtual void OnCreate()
+    {
+
+    }
+
+    public virtual void OnRelease()
+    {
+
+    }
+
+    public void Release()
+    {
+        try
+        {
+            OnRelease();
+        }
+        catch(Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
+        HeapObjectPool.ReleaseObject(GetType().Name, this);
+    }
+}
+
+#endregion
+
+#region HeapObjectPoolTool
 
 public class HeapObjectPoolTool<T> where T : new()
 {

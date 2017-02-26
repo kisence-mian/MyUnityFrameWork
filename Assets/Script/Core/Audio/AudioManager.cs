@@ -61,8 +61,24 @@ public class AudioManager : MonoBehaviour
 
     public static void Init()
     {
-        s_instance = new GameObject("AudioManager").AddComponent<AudioManager>();
-        DontDestroyOnLoad(s_instance.gameObject);
+        if (s_instance == null)
+        {
+            s_instance = new GameObject("AudioManager").AddComponent<AudioManager>();
+            DontDestroyOnLoad(s_instance.gameObject);
+
+            Init2DpPlayer(10);
+        }
+
+    }
+
+    static void Init2DpPlayer(int count)
+    {
+        AudioSource AudioSourceTmp = null;
+        for (int i = 0; i < count; i++)
+        {
+            AudioSourceTmp = s_instance.gameObject.AddComponent<AudioSource>();
+            s_2Dplayers.Add(AudioSourceTmp);
+        }
     }
 
     public void Update()

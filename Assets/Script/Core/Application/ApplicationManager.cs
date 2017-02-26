@@ -22,7 +22,7 @@ public class ApplicationManager : MonoBehaviour
         get { return instance.m_AppMode; }
         //set { m_AppMode = value; }
     }
-    public bool runInBackground = false;
+    //public bool runInBackground = false;
 
     //快速启动
     public bool m_quickLunch = true;
@@ -40,7 +40,7 @@ public class ApplicationManager : MonoBehaviour
     {
         instance = this;
         AppLaunch();
-        Application.runInBackground = runInBackground;
+        //Application.runInBackground = runInBackground;
     }
 
     /// <summary>
@@ -51,8 +51,9 @@ public class ApplicationManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         SetResourceLoadType();               //设置资源加载类型
         ResourcesConfigManager.Initialize(); //资源路径管理器启动
-        MemoryManager.Init();                //内存管理初始化
 
+        MemoryManager.Init();                //内存管理初始化
+        Timer.Init();                        //计时器启动
         InputManager.Init();                 //输入管理器启动
         UIManager.Init();                    //UIManager启动
 
