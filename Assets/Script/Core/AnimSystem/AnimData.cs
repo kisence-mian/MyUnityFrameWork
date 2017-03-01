@@ -170,7 +170,7 @@ public class AnimData : HeapObjectBase
         else
         {
             m_repeatCount--;
-            return  (m_repeatCount < 0);
+            return  (m_repeatCount > 0);
         }
     }
 
@@ -205,9 +205,6 @@ public class AnimData : HeapObjectBase
 
     public void Init()
     {
-        m_currentTime = 0;
-        m_isDone = false;
-
         switch (m_animType)
         {
             case AnimType.UGUI_Color: UguiColorInit(m_isChild); break;
@@ -229,6 +226,21 @@ public class AnimData : HeapObjectBase
         {
             BezierInit();
         }
+    }
+
+    public override void OnRelease()
+    {
+        m_ignoreTimeScale = false;
+
+        m_delayTime   = 0;
+        m_isDone      = false;
+        m_currentTime = 0;
+        m_totalTime   = 0;
+        m_repeatCount = -1;
+
+        m_pathType = PathType.Line;
+        m_v3Contral = null;
+        m_floatContral = null;
     }
 
     #endregion

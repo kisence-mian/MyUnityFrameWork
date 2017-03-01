@@ -87,7 +87,14 @@ public class UIBase : MonoBehaviour
         {
             if (m_objectList[i] != null)
             {
-                m_objects.Add(m_objectList[i].name, m_objectList[i]);
+                if (m_objects.ContainsKey(m_objectList[i].name))
+                {
+                    Debug.LogError("CreateObjectTable ContainsKey ->" + m_objectList[i].name+"<-");
+                }
+                else
+                {
+                    m_objects.Add(m_objectList[i].name, m_objectList[i]);
+                }
             }
             else
             {
@@ -236,6 +243,19 @@ public class UIBase : MonoBehaviour
         return tmp;
     }
 
+    public Vector3 GetPosition(string name,bool islocal)
+    {
+        Vector3 tmp = Vector3.zero;
+        GameObject go = GetGameObject(name);
+        if (go != null)
+        {
+            if (islocal)
+                tmp = GetGameObject(name).transform.localPosition;
+            else
+                tmp = GetGameObject(name).transform.position;
+        }
+        return tmp;
+    }
 
     private RectTransform m_rectTransform;
     public RectTransform m_RectTransform
@@ -400,6 +420,25 @@ public class UIBase : MonoBehaviour
     public void SetSlider(string sliderID,float value)
     {
         GetSlider(sliderID).value = value;
+    }
+
+    public void SetActive(string TextID,bool isshow)
+    {
+        GetGameObject(TextID).SetActive(isshow);
+    }
+
+    public void SetRectWidth(string TextID,float value,float height)
+    {
+        GetRectTransform(TextID).sizeDelta = Vector2.right * -value * 2 + Vector2.up * height;
+    }
+
+    public void SetPosition(string TextID,float x,float y,float z,bool islocal)
+    {
+        if (islocal)
+            GetRectTransform(TextID).localPosition = Vector3.right * x + Vector3.up * y + Vector3.forward * z;
+        else
+            GetRectTransform(TextID).position = Vector3.right * x + Vector3.up * y + Vector3.forward * z;
+
     }
 
     #endregion

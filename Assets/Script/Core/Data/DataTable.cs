@@ -54,17 +54,23 @@ public class DataTable : Dictionary<string, SingleData>
     /// <returns>表单数据</returns>
     public static DataTable Analysis(string stringData)
     {
-        //try
-        //{
+        string debugContent = "";
+        int debugLineCount = 0;
+        int debugRowCount = 0;
+
+        try
+        {
             int lineIndex = 0;
             DataTable data = new DataTable();
             string[] line = stringData.Split(c_newline.ToCharArray());
 
             //第一行作为Key
+            debugContent = "解析Key";
             data.TableKeys = new List<string>();
             string[] rowKeys = ConvertStringArray(line[0]);
             for (int i = 0; i < rowKeys.Length; i++)
             {
+                debugRowCount = i;
                 if (!rowKeys[i].Equals(""))
                 {
                     data.TableKeys.Add(rowKeys[i]);
@@ -76,26 +82,32 @@ public class DataTable : Dictionary<string, SingleData>
             {
                 if (line[lineIndex] != "" && line[lineIndex] != null)
                 {
+                    debugLineCount = lineIndex;
                     LineData = ConvertStringArray(line[lineIndex]);
 
                     //注释
+                    
                     if (LineData[0].Equals(c_noteTableTitle))
                     {
+                        debugContent = "解析注释";
                         AnalysisNoteValue(data, LineData);
                     }
                     //默认值
                     else if (LineData[0].Equals(c_defaultValueTableTitle))
                     {
+                        debugContent = "解析默认值";
                         AnalysisDefaultValue(data, LineData);
                     }
                     //数据类型
                     else if (LineData[0].Equals(c_fieldTypeTableTitle))
                     {
+                        debugContent = "解析类型";
                         AnalysisFieldType(data, LineData);
                     }
                     //数据正文
                     else
                     {
+                        debugContent = "解析正文";
                         break;
                     }
                 }
@@ -106,6 +118,7 @@ public class DataTable : Dictionary<string, SingleData>
             //开始解析数据
             for (int i = lineIndex; i < line.Length; i++)
             {
+                debugLineCount = i;
                 SingleData dataTmp = new SingleData();
                 dataTmp.data = data;
 
@@ -115,6 +128,7 @@ public class DataTable : Dictionary<string, SingleData>
 
                     for (int j = 0; j < data.TableKeys.Count; j++)
                     {
+                        debugRowCount = j;
                         if (!row[j].Equals(""))
                         {
                             dataTmp.Add(data.TableKeys[j], row[j]);
@@ -127,11 +141,11 @@ public class DataTable : Dictionary<string, SingleData>
             }
 
             return data;
-        //}
-        //catch (Exception e)
-        //{
-        //    throw new Exception("Analysis: Don't convert value to DataTable:" + "\n" + e.ToString()); // throw  
-        //}
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Analysis: Don't convert value to DataTable: 错误类型：" + debugContent + " 行:" + debugLineCount + " 列：" + debugRowCount + "\n" + e.ToString()); // throw  
+        }
     }
 
     /// <summary>

@@ -5,20 +5,17 @@ using UnityEngine;
 
 public class SDKManager 
 {
-    const string c_ConfigName = "SDKConfig";
-
-    const string c_LoginConfigName = "Login";
-    const string c_LogConfigName = "Log";
-    const string c_PayConfigName = "Pay";
-    const string c_ADConfigName  = "AD";
+    public const string c_ConfigName = "SDKConfig";
+    public const string c_KeyName = "SDKconfig";
 
     static LoginCallBack LoginCallBack = null;
     static PayCallBack   PayCallBack   = null;
 
-    static LoginInterface     s_loginService;
-    static PayInterface       s_payService;
-    static ADInterface        s_ADService;
-    static List<LogInterface> s_logServiceList;
+    static LoginInterface s_loginService = null;
+    static PayInterface s_payService = null;
+    static ADInterface s_ADService = null;
+    static List<LogInterface> s_logServiceList = null;
+    static List<OtherSDKInterface> s_otherServiceList = null;
 
     /// <summary>
     /// 初始化
@@ -30,20 +27,10 @@ public class SDKManager
             if (ConfigManager.GetIsExistConfig(c_ConfigName))
             {
                 Dictionary<string, SingleField> configData = ConfigManager.GetData(c_ConfigName);
+                SchemeData tmp = JsonUtility.FromJson<SchemeData>(configData[c_KeyName].GetString());
 
-                LoadLogService(
-                configData[c_LogConfigName].GetString());
-
-                LoadLoginService(
-                configData[c_LoginConfigName].GetString());
-
-                LoadPayService(
-                configData[c_PayConfigName].GetString());
-
-                LoadADService(
-                configData[c_ADConfigName].GetString());
+                LoadService(tmp);
             }
- 
         }
         catch(Exception e)
         {
@@ -121,60 +108,28 @@ public class SDKManager
 
     #region 加载Service
 
-    static void LoadLoginService(string serviceName)
+    static void LoadService(SchemeData data)
     {
-        if (serviceName == "null")
+        s_loginService = (LoginInterface)AnalysisConfig(data.LoginScheme);
+        s_ADService = (ADInterface)AnalysisConfig(data.ADScheme);
+        s_payService = (PayInterface)AnalysisConfig(data.PayScheme);
+
+        s_logServiceList = new List<LogInterface>();
+        for (int i = 0; i < data.LogScheme.Count; i++)
         {
-            return;
+            s_logServiceList.Add((LogInterface)AnalysisConfig(data.LogScheme[i]));
         }
 
-        Type serviceType = Type.GetType(serviceName);
-        s_loginService = (LoginInterface)Activator.CreateInstance(serviceType);
-
-        s_loginService.m_callBack = LoginCallBack;
-    }
-
-    static void LoadADService(string serviceName)
-    {
-        if (serviceName == "null")
+        s_otherServiceList = new List<OtherSDKInterface>();
+        for (int i = 0; i < data.OtherScheme.Count; i++)
         {
-            return;
-        }
-
-        Type serviceType = Type.GetType(serviceName);
-        s_ADService = (ADInterface)Activator.CreateInstance(serviceType);
-    }
-
-    static void LoadLogService(string serviceName)
-    {
-        if (serviceName == "null")
-        {
-            return;
-        }
-
-        string[] serviceNameArray = serviceName.Split('|');
-
-        for (int i = 0; i < serviceNameArray.Length; i++)
-        {
-            if (serviceName != "" && serviceName != null)
-            {
-                Type serviceType = Type.GetType(serviceNameArray[i]);
-                s_logServiceList.Add((LogInterface)Activator.CreateInstance(serviceType));
-            }
+            s_otherServiceList.Add((OtherSDKInterface)AnalysisConfig(data.OtherScheme[i]));
         }
     }
 
-    static void LoadPayService(string serviceName)
+    public static SDKInterfaceBase AnalysisConfig(SDKConfigData data)
     {
-        if (serviceName == "null")
-        {
-            return;
-        }
-
-        Type serviceType = Type.GetType(serviceName);
-        s_payService = (PayInterface)Activator.CreateInstance(serviceType);
-
-        s_payService.m_callBack = PayCallBack;
+        return (SDKInterfaceBase)JsonUtility.FromJson(data.SDKContent, Type.GetType(data.SDKName));
     }
 
     #endregion
@@ -182,3 +137,20 @@ public class SDKManager
 
 public delegate void LoginCallBack(string ID, Dictionary<string,object> data);
 public delegate void PayCallBack(string goodsID, Dictionary<string, object> data);
+
+public class SchemeData
+{
+    public string SchemeName;
+
+    public List<SDKConfigData> LogScheme = new List<SDKConfigData>();
+    public SDKConfigData LoginScheme;
+    public SDKConfigData ADScheme;
+    public SDKConfigData PayScheme;
+    public List<SDKConfigData> OtherScheme = new List<SDKConfigData>();
+}
+[System.Serializable]
+public class SDKConfigData
+{
+    public string SDKName;
+    public string SDKContent;
+}

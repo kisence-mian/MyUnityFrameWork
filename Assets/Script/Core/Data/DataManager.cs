@@ -5,15 +5,16 @@ using MiniJSON;
 using System.Text;
 using System;
 using LuaInterface;
+using System.IO;
 
 /*
  * 数据管理器，只读，可热更新，可使用默认值
  * 通过ResourceManager加载
  * */
-public class DataManager 
+public class DataManager
 {
     public const string c_directoryName = "Data";
-    public const string c_expandName    = "txt";
+    public const string c_expandName = "txt";
 
     /// <summary>
     /// 数据缓存
@@ -41,13 +42,17 @@ public class DataManager
     {
         try
         {
+            //编辑器下不处理缓存
+#if !UNITY_EDITOR
+
             if (s_dataCatch.ContainsKey(DataName))
             {
                 return s_dataCatch[DataName];
             }
 
-            DataTable data = null;
+#endif
 
+            DataTable data = null;
             string dataJson = "";
 
 #if UNITY_EDITOR
@@ -58,7 +63,6 @@ public class DataManager
             }
             else
             {
-
                 dataJson = ResourceIOTool.ReadStringByResource(
                         PathTool.GetRelativelyPath(c_directoryName,
                                                     DataName,
@@ -80,7 +84,7 @@ public class DataManager
 
             return data;
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             throw new Exception("->" + DataName + "<- : " + e.ToString());
         }
@@ -95,7 +99,7 @@ public class DataManager
     }
 
     //只在编辑器下能够使用
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
 
     [NoToLuaAttribute]
     public static void SaveData(string ConfigName, DataTable data)
@@ -106,7 +110,7 @@ public class DataManager
                 PathTool.GetRelativelyPath(
                     c_directoryName,
                     ConfigName,
-                    c_expandName)), 
+                    c_expandName)),
             DataTable.Serialize(data));
 
         UnityEditor.AssetDatabase.Refresh();
@@ -126,7 +130,7 @@ public class DataManager
         if (dataJson == "")
         {
             Debug.Log(dataName + " dont find!");
-            return new Dictionary<string,object>();
+            return new Dictionary<string, object>();
         }
         else
         {
@@ -148,5 +152,38 @@ public class DataManager
 
         UnityEditor.AssetDatabase.Refresh();
     }
+
+    static void ConvertUtf8()
+    {
+        //ConvertFileEncoding("e:\\555.txt", null, System.Text.Encoding.UTF8);
+        string stmp = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+        Console.WriteLine(stmp);
+
+        DirectoryInfo TheFolder = new DirectoryInfo(stmp);
+
+        foreach (FileInfo NextFile in TheFolder.GetFiles())
+        {
+            if (NextFile.Name.EndsWith("txt"))
+            {
+                FileTool.ConvertFileEncoding(stmp + NextFile.Name, null, System.Text.Encoding.UTF8);
+            }
+        }
+
+        foreach (DirectoryInfo NextFolder in TheFolder.GetDirectories())
+        {
+            string stmp_inside = stmp + NextFolder.Name + @"\";
+            DirectoryInfo TheFolder_inside = new DirectoryInfo(stmp_inside);
+            foreach (FileInfo NextFile2 in TheFolder_inside.GetFiles())
+            {
+                if (NextFile2.Name.EndsWith("txt"))
+                {
+                    FileTool.ConvertFileEncoding(stmp_inside + NextFile2.Name, null, System.Text.Encoding.UTF8);
+                }
+            }
+        }
+    }
+
+
+
 #endif
 }

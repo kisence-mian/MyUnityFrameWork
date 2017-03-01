@@ -2,7 +2,7 @@
 
 public class GameObjectLuaHelper : MonoBehaviour {
 
-    public static void del_all_child(GameObject go)
+    public static void DeleteAllChild(GameObject go)
     {
         if (go.transform == null) return;
         int len = go.transform.childCount;

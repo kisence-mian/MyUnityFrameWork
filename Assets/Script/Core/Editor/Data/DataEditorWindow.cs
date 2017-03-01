@@ -25,13 +25,12 @@ public class DataEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        //if (!Application.isPlaying)
-        //{
+        ConvertUtf8();
+
         m_currentSelectIndex = 0;
         EditorGUIStyleData.Init();
 
         FindAllDataName();
-        //}
     }
 
     //当选择改变时
@@ -45,6 +44,8 @@ public class DataEditorWindow : EditorWindow
     {
         if (!Application.isPlaying)
         {
+            ConvertUtf8();
+
             FindAllDataName();
 
             if (m_currentDataName != null
@@ -892,6 +893,19 @@ public class DataEditorWindow : EditorWindow
             case FieldType.StringArray: return "string[]";
             default: return "";
         }
+    }
+
+    #endregion
+
+    #region Utf-8转换
+
+    public static void ConvertUtf8()
+    {
+        FileTool.RecursionFileExecute(Application.dataPath + "/Resources/" + DataManager.c_directoryName, "txt", (name) =>
+        {
+            //Debug.Log("ConvertUtf8 path-> " + name);
+            FileTool.ConvertFileEncoding(name, null, System.Text.Encoding.UTF8);
+        });
     }
 
     #endregion

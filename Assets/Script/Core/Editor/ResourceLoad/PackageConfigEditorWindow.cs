@@ -114,19 +114,24 @@ public class BundleConfigEditorWindow : EditorWindow
             CheckPackage();
         }
 
-        if (GUILayout.Button("保存编辑器设置文件"))
-        {
-            CreatPackageFile();
-        }
+        //if (GUILayout.Button("重新添加资源文件并保存"))
+        //{
+        //    AddAllResourceBundle();  //添加资源文件
+        //    ArrangeBundlesByLayer(); //整理资源路径
 
-        if (GUILayout.Button("生成游戏资源路径文件"))
+        //    CreatPackageFile();                 //保存编辑器文件
+        //    CheckAndCreatBundelPackageConfig(); //生成资源路径文件
+        //}
+
+        if (GUILayout.Button("保存游戏资源路径文件"))
         {
-            CheckAndCreatBundelPackageConfig();
+            CreatPackageFile(); //保存编辑器文件
+            CheckAndCreatBundelPackageConfig(); //生成资源路径文件
         }
 
         if(!isPacking)
         {
-            if (GUILayout.Button("打包 并生成MD5文件"))
+            if (GUILayout.Button("打包"))
             {
                 CheckAndPackage();
             }
@@ -139,10 +144,10 @@ public class BundleConfigEditorWindow : EditorWindow
             }
         }
 
-        if (GUILayout.Button("生成MD5"))
-        {
-            CheckAndCreatBundelPackageConfig();
-        }
+        //if (GUILayout.Button("生成MD5"))
+        //{
+        //    CheckAndCreatBundelPackageConfig();
+        //}
 
         GUILayout.BeginHorizontal();
 
@@ -341,6 +346,15 @@ public class BundleConfigEditorWindow : EditorWindow
         {
             AddAllResourceBundle();
             ArrangeBundlesByLayer();
+        }
+
+        if (GUILayout.Button("自动添加 Resource 目录下的资源并保存"))
+        {
+            AddAllResourceBundle();  //添加资源文件
+            ArrangeBundlesByLayer(); //整理资源路径
+
+            CreatPackageFile();                 //保存编辑器文件
+            CheckAndCreatBundelPackageConfig(); //生成资源路径文件
         }
 
         if (GUILayout.Button("增加选中资源"))

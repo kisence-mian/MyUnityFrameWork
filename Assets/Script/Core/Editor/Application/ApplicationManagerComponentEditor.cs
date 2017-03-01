@@ -87,7 +87,6 @@ public class ApplicationManagerComponentEditor : Editor
                 return i;
             }
         }
-
         return 0;
     }
 }

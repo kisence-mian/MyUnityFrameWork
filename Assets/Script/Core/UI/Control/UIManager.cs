@@ -50,18 +50,21 @@ public class UIManager : MonoBehaviour
     }
     public static UIWindowBase CreateUIWindow(string UIName)
     {
-        GameObject l_UItmp = GameObjectManager.CreatGameObject(UIName, s_UIManagerGo);
-        UIWindowBase l_UIbase = l_UItmp.GetComponent<UIWindowBase>();
-        UISystemEvent.Dispatch(l_UIbase, UIEvent.OnInit);  //派发OnInit事件
+        GameObject UItmp = GameObjectManager.CreatGameObject(UIName, s_UIManagerGo);
+        UIWindowBase UIbase = UItmp.GetComponent<UIWindowBase>();
+        UISystemEvent.Dispatch(UIbase, UIEvent.OnInit);  //派发OnInit事件
         try{
-            l_UIbase.Init(GetUIID(UIName));
+            UIbase.Init(GetUIID(UIName));
         }
-        catch(Exception e){
+        catch(Exception e)
+        {
             Debug.LogError("OnInit Exception: " + e.ToString());}
 
-        AddHideUI(l_UIbase);
+        AddHideUI(UIbase);
 
-        return l_UIbase;
+        s_UILayerManager.SetLayer(UIbase);      //设置层级
+
+        return UIbase;
     }
 
     /// <summary>
@@ -79,23 +82,20 @@ public class UIManager : MonoBehaviour
         {
             UIbase = CreateUIWindow(UIName);
         }
-        else
-        {
-            UIbase.gameObject.SetActive(true);
-        }
 
         RemoveHideUI(UIbase);
         AddUI(UIbase);
 
         UISystemEvent.Dispatch(UIbase, UIEvent.OnOpen);  //派发OnOpen事件
         try{
-            UIbase.OnOpen();}
+            UIbase.OnOpen();
+        }
         catch (Exception e)
         {
             Debug.LogError(UIName + " OnOpen Exception: " + e.ToString());
         }
 
-        s_UILayerManager.SetLayer(UIbase);      //设置层级
+
         s_UIAnimManager.StartEnterAnim(UIbase, callback, objs); //播放动画
         return UIbase;
     }
@@ -147,7 +147,6 @@ public class UIManager : MonoBehaviour
             Debug.LogError(l_UI.UIName + " OnClose Exception: " + e.ToString());
         }
 
-        l_UI.gameObject.SetActive(false);
         AddHideUI(l_UI);
     }
     public static void CloseUIWindow(string l_UIname, bool isPlayAnim = true, UICallBack l_callback = null, params object[] l_objs)
@@ -282,6 +281,8 @@ public class UIManager : MonoBehaviour
         }
 
         s_UIs[l_UI.name].Add(l_UI);
+
+        l_UI.gameObject.SetActive(true);
     }
 
     static void RemoveUI(UIWindowBase l_UI)
@@ -366,8 +367,9 @@ public class UIManager : MonoBehaviour
             }
             else
             {
+                UIWindowBase ui = s_hideUIs[l_UIname][s_hideUIs[l_UIname].Count - 1];
                 //默认返回最后创建的那一个
-                return s_hideUIs[l_UIname][s_hideUIs[l_UIname].Count - 1];
+                return ui;
             }
         }
     }
@@ -392,6 +394,8 @@ public class UIManager : MonoBehaviour
         }
 
         s_hideUIs[l_UI.name].Add(l_UI);
+
+        l_UI.gameObject.SetActive(false);
     }
 
 

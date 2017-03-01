@@ -170,7 +170,7 @@ public class GameObjectManager :MonoBehaviour
         obj.transform.SetParent(PoolParent);
     }
 
-    public static void DestroyGameobjectByPool(GameObject go,float time)
+    public static void DestroyGameObjectByPool(GameObject go,float time)
     {
         Timer.DelayCallBack(time, (object[] obj) =>
         {

@@ -969,7 +969,6 @@ public class AnimSystem : MonoBehaviour
     {
         for (int i = 0; i < animList.Count; i++)
         {
-            //Debug.Log(animList.Count+">>>"+i);
             //执行Update
             animList[i].executeUpdate();
 
@@ -981,13 +980,13 @@ public class AnimSystem : MonoBehaviour
                 {
                     animList.Remove(animTmp);
                     i--;
+
+                    //释放
+                    animTmp.Release();
                 }
 
                 //执行回调
                 animTmp.executeCallBack();
-
-                //释放
-                animTmp.Release();
             }
         }
     }

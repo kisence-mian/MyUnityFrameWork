@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.IO;
+using System;
 
 public class FileTool  
 {
@@ -88,9 +89,11 @@ public class FileTool
     {
         DirectoryInfo info = new DirectoryInfo(sourcePath);
         Directory.CreateDirectory(destinationPath);
+
         foreach (FileSystemInfo fsi in info.GetFileSystemInfos())
         {
             string destName = Path.Combine(destinationPath, fsi.Name);
+            Debug.Log(destName);
 
             if (fsi is System.IO.FileInfo)          //如果是文件，复制文件
                 File.Copy(fsi.FullName, destName);
@@ -107,4 +110,58 @@ public class FileTool
         string[] paths = path.Split('/');
         return paths[paths.Length - 1];
     }
+
+    /// <summary>
+    /// 文件编码转换
+    /// </summary>
+    /// <param name="sourceFile">源文件</param>
+    /// <param name="destFile">目标文件，如果为空，则覆盖源文件</param>
+    /// <param name="targetEncoding">目标编码</param>
+    public static void ConvertFileEncoding(string sourceFile, string destFile, System.Text.Encoding targetEncoding)
+    {
+        destFile = string.IsNullOrEmpty(destFile) ? sourceFile : destFile;
+        System.IO.File.WriteAllText(destFile,
+        System.IO.File.ReadAllText(sourceFile, System.Text.Encoding.Default),
+        targetEncoding);
+    }
+
+    /// <summary>
+    /// 递归处理某路径及其他的子目录
+    /// </summary>
+    /// <param name="path">目标路径</param>
+    /// <param name="expandName">要处理的特定拓展名</param>
+    /// <param name="handle">处理函数</param>
+    public static void RecursionFileExecute(string path, string expandName, FileExecuteHandle handle)
+    {
+        string[] allUIPrefabName = Directory.GetFiles(path);
+        foreach (var item in allUIPrefabName)
+        {
+            try
+            {
+                if (expandName != null)
+                {
+                    if (item.EndsWith("." + expandName))
+                    {
+                        handle(item);
+                    }
+                }
+                else
+                {
+                    handle(item);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("RecursionFileExecute Error :" + item + " Exception:" + e.ToString());
+            }
+        }
+
+        string[] dires = Directory.GetDirectories(path);
+        for (int i = 0; i < dires.Length; i++)
+        {
+            RecursionFileExecute(dires[i], expandName, handle);
+        }
+    }
 }
+
+public delegate void FileExecuteHandle(string filePath);
