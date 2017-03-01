@@ -59,6 +59,7 @@ public class UILayerManager : MonoBehaviour
 
             rt.sizeDelta = Vector2.zero;
             rt.anchoredPosition = Vector3.zero;
+            rt.SetAsLastSibling();
         }
     }
 }

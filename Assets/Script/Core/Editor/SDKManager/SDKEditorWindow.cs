@@ -240,6 +240,7 @@ public class SDKEditorWindow : EditorWindow
         }
     }
 
+    int selectTmp = 0;
     void EditorSDKListGUI(ref bool isFold,List<bool> foldList,Type SDKType, List<SDKInterfaceBase> list, string title)
     {
        
@@ -277,9 +278,8 @@ public class SDKEditorWindow : EditorWindow
             }
             EditorGUILayout.Space();
 
-            int currentIndex = 0;
             string[] mask = GetSDKNameList(SDKType);
-            int index = EditorGUILayout.Popup("新增SDK类型：", currentIndex, mask);
+            selectTmp = EditorGUILayout.Popup("新增SDK类型：", selectTmp, mask);
 
             EditorGUILayout.BeginHorizontal();
 
@@ -287,7 +287,8 @@ public class SDKEditorWindow : EditorWindow
 
             if(GUILayout.Button("新增SDK"))
             {
-                Type type = Assembly.Load("Assembly-CSharp").GetType(mask[index]);
+
+                Type type = Assembly.Load("Assembly-CSharp").GetType(mask[selectTmp]);
 
                 if (type != null)
                 {
@@ -296,9 +297,10 @@ public class SDKEditorWindow : EditorWindow
                 }
                 else
                 {
-                    Debug.LogError("Load " + mask[index] + " Fail!");
+                    Debug.LogError("Load " + mask[selectTmp] + " Fail!");
                 }
 
+                selectTmp = 0;
             }
 
             EditorGUILayout.Space();
