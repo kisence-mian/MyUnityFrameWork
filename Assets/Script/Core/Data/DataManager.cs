@@ -80,7 +80,9 @@ public class DataManager
             data = DataTable.Analysis(dataJson);
             data.m_tableName = DataName;
 
+            #if !UNITY_EDITOR
             s_dataCatch.Add(DataName, data);
+#endif
 
             return data;
         }
