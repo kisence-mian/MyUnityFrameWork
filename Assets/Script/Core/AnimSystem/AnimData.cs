@@ -492,7 +492,7 @@ public class AnimData : HeapObjectBase
                 m_animObjectList_Text.Add(text);
             }
         }
-        SetUGUIAlpha(m_fromFloat);
+        SetUGUIColor(m_fromColor);
     }
 
     void SetUGUIColor(Color color)
@@ -751,6 +751,8 @@ public class AnimData : HeapObjectBase
 
     Color GetInterpolationColor(Color oldValue, Color aimValue)
     {
+        
+
         Color result = new Color( GetInterpolation(oldValue.r,aimValue.r), 
                                   GetInterpolation(oldValue.g,aimValue.g), 
                                   GetInterpolation(oldValue.b,aimValue.b), 

@@ -49,6 +49,13 @@ public class MemoryManager
             s_enable = !s_enable;
         }
 
+#if UNITY_EDITOR
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            FreeHeapMemory();
+        }
+#endif
+
         #endif
     }
 

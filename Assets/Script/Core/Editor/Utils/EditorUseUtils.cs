@@ -129,6 +129,46 @@ public class EditorUseUtils  {
         else
             return displayedOptions[sel];
     }
+    public static object DrawStringPopupList(string name, object obj, List<string> displayedOptions)
+    {
+        if (obj == null)
+            return null;
+        Type type = obj.GetType();
+        //Type t = type.GetGenericArguments()[0];
+
+        MethodInfo methodInfo = type.GetMethod("get_Item", BindingFlags.Instance | BindingFlags.Public);
+        MethodInfo methodInfo1 = type.GetMethod("set_Item", BindingFlags.Instance | BindingFlags.Public);
+        MethodInfo methodInfo2 = type.GetMethod("RemoveAt", BindingFlags.Instance | BindingFlags.Public);
+        MethodInfo methodInfo3 = type.GetMethod("Add", BindingFlags.Instance | BindingFlags.Public);
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(name);
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("+", GUILayout.Width(50)))
+        {
+            object temp = "";          
+            methodInfo3.Invoke(obj, new object[] { temp });
+        }
+        GUILayout.EndHorizontal();
+        PropertyInfo pro = type.GetProperty("Count");
+        int cout = (int)pro.GetValue(obj, null);
+        GUILayout.BeginVertical("box");
+        for (int i = 0; i < cout; i++)
+        {
+            object da = methodInfo.Invoke(obj, new object[] { i });
+            GUILayout.BeginHorizontal();
+            da = DrawPopup("", da.ToString(),displayedOptions);
+            methodInfo1.Invoke(obj, new object[] { i, da });
+
+            if (GUILayout.Button("-", GUILayout.Width(50)))
+            {
+                methodInfo2.Invoke(obj, new object[] { i });
+                break;
+            }
+            GUILayout.EndHorizontal();
+        }
+        GUILayout.EndVertical();
+        return obj;
+    }
     public static object DrawList(string name, object obj)
     {
         if (obj == null)
@@ -145,12 +185,17 @@ public class EditorUseUtils  {
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("+", GUILayout.Width(50)))
         {
-            object temp = Activator.CreateInstance(t);
+            object temp = null;
+            if (t.FullName == typeof(string).FullName)
+                temp = "";
+            else
+             temp = Activator.CreateInstance(t);
             methodInfo3.Invoke(obj, new object[] { temp });
         }
         GUILayout.EndHorizontal();
         PropertyInfo pro = type.GetProperty("Count");
         int cout = (int)pro.GetValue(obj, null);
+        GUILayout.BeginVertical("box");
         for (int i = 0; i < cout; i++)
         {
             object da = methodInfo.Invoke(obj, new object[] { i });
@@ -165,6 +210,7 @@ public class EditorUseUtils  {
              }
             GUILayout.EndHorizontal();
         }
+        GUILayout.EndVertical();
         return obj;
     }
 

@@ -5,6 +5,7 @@ using System;
 
 public class DataGenerateManager<T> where T : DataGenerateBase, new()
 {
+    static T s_dataCatch;
     static Dictionary<string, T> s_dict = new Dictionary<string, T>();
 
     static bool s_isInit = false;
@@ -34,6 +35,18 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
             s_dict.Add(key,data);
             return data;
         }
+    }
+
+    public static void PreLoad()
+    {
+        //清理缓存
+        if (!s_isInit)
+        {
+            s_isInit = true;
+            GlobalEvent.AddEvent(MemoryEvent.FreeHeapMemory, CleanCatch);
+        }
+
+
     }
 
     public static void CleanCatch(params object[] objs)

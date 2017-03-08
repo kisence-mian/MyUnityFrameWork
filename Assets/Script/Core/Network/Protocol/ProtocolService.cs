@@ -104,7 +104,7 @@ public class ProtocolService : INetworkInterface
         }
         catch (Exception e)
         {
-            Debug.LogError(e.ToString());
+            Debug.LogError("IP :" + m_IPaddress + " Port: " + m_port+" :"+e.ToString());
             isConnect = false;
             m_ConnectStatusCallback(NetworkState.FaildToConnect);
         }
@@ -551,8 +551,12 @@ public class ProtocolService : INetworkInterface
         }
         catch(Exception e)
         {
-            throw new Exception(@"ProtocolService AnalysisData Excepiton : MessageType is ->" + MessageType
-                                 + "<-\n" + e.ToString());
+            throw new Exception(@"AnalysisData Excepiton Data is ->" + MessageType
+                        + "<-\nFieldName:->" + fieldName
+                        + "<-\nFieldType:->" + GetFieldType(fieldType)
+                        + "<-\nRepeatType:->" + GetRepeatType(repeatType)
+                        + "<-\nCustomType:->" + customType
+                        + "<-\n" + e.ToString());
         }
     }
 

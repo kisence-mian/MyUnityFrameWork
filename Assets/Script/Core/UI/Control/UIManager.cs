@@ -72,7 +72,7 @@ public class UIManager : MonoBehaviour
     /// </summary>
     /// <param name="UIName">UI名</param>
     /// <param name="callback">动画播放完毕回调</param>
-    /// <param name="objs">回调传参</param>
+    /// <param name="objs">回调传参</param>`
     /// <returns>返回打开的UI</returns>
     public static UIWindowBase OpenUIWindow(string UIName, UICallBack callback = null, params object[] objs)
     {
@@ -95,7 +95,7 @@ public class UIManager : MonoBehaviour
             Debug.LogError(UIName + " OnOpen Exception: " + e.ToString());
         }
 
-
+        s_UILayerManager.SetLayer(UIbase);      //设置层级
         s_UIAnimManager.StartEnterAnim(UIbase, callback, objs); //播放动画
         return UIbase;
     }
@@ -166,6 +166,82 @@ public class UIManager : MonoBehaviour
     public static void CloseUIWindow<T>(bool isPlayAnim = true, UICallBack l_callback = null, params object[] l_objs) where T : UIWindowBase
     {
         CloseUIWindow(typeof(T).Name, isPlayAnim,l_callback, l_objs);
+    }
+
+    public static UIWindowBase ShowUI(string UIname)
+    {
+        UIWindowBase ui = GetUI(UIname);
+        return ShowUI(ui);
+    }
+
+    public static UIWindowBase ShowUI(UIWindowBase ui)
+    {
+        try
+        {
+            ui.gameObject.SetActive(true);
+            ui.OnShow();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(ui.UIName + " OnShow Exception: " + e.ToString());
+        }
+
+        return ui;
+    }
+
+    public static UIWindowBase HideUI(string UIname)
+    {
+        UIWindowBase ui = GetUI(UIname);
+        return HideUI(ui);
+    }
+
+    public static UIWindowBase HideUI(UIWindowBase ui)
+    {
+        UISystemEvent.Dispatch(ui, UIEvent.OnHide);  //派发OnShow事件
+
+        try
+        {
+            ui.gameObject.SetActive(false);
+            ui.OnHide();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(ui.UIName + " OnShow Exception: " + e.ToString());
+        }
+
+        return ui;
+    }
+
+    public static void HideOtherUI(string UIName)
+    {
+        List<string> keys = new List<string>(s_UIs.Keys);
+        for (int i = 0; i < keys.Count; i++)
+        {
+            List<UIWindowBase> list = s_UIs[keys[i]];
+            for (int j = 0; j < list.Count; j++)
+            {
+                if (list[j].UIName != UIName)
+                {
+                    HideUI(list[j]);
+                }
+            }
+        }
+    }
+
+    public static void ShowOtherUI(string UIName)
+    {
+        List<string> keys = new List<string>(s_UIs.Keys);
+        for (int i = 0; i < keys.Count; i++)
+        {
+            List<UIWindowBase> list = s_UIs[keys[i]];
+            for (int j = 0; j < list.Count; j++)
+            {
+                if (list[j].UIName != UIName)
+                {
+                    ShowUI(list[j]);
+                }
+            }
+        }
     }
 
     /// <summary>

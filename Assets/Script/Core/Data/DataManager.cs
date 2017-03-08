@@ -43,14 +43,13 @@ public class DataManager
         try
         {
             //编辑器下不处理缓存
-#if !UNITY_EDITOR
+
 
             if (s_dataCatch.ContainsKey(DataName))
             {
                 return s_dataCatch[DataName];
             }
 
-#endif
 
             DataTable data = null;
             string dataJson = "";
@@ -80,9 +79,9 @@ public class DataManager
             data = DataTable.Analysis(dataJson);
             data.m_tableName = DataName;
 
-            #if !UNITY_EDITOR
+
             s_dataCatch.Add(DataName, data);
-#endif
+
 
             return data;
         }

@@ -65,6 +65,11 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler
 
     }
 
+    public void ReHomePos()
+    {
+        content.anchoredPosition3D = Vector3.zero;
+        onJoyStick(Vector3.zero);
+    }
 }
 
 public delegate void UGUIJoyStickHandle(Vector3 dir);

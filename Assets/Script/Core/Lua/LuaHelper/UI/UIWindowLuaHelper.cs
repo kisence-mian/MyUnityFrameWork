@@ -15,6 +15,16 @@ public class UIWindowLuaHelper : UIWindowBase
         UIEventCallBackHelper.CallOnUIOpen(this);
     }
 
+    public override void OnShow()
+    {
+        UIEventCallBackHelper.CallOnUIShow(this);
+    }
+
+    public override void OnHide()
+    {
+        UIEventCallBackHelper.CallOnUIHide(this);
+    }
+
     public override IEnumerator EnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
     {
         float time = 0;

@@ -69,7 +69,7 @@ public static class CustomSettings
         _GT(typeof(Button)),
         _GT(typeof(Image)),
         _GT(typeof(Text)),
-
+        _GT(typeof(RectTransform)),
         //自定义的UGUI拓展类
         _GT(typeof(ScrollRectInput)),
         _GT(typeof(ReusingScrollRect)),
@@ -114,7 +114,6 @@ public static class CustomSettings
 
         #region Input
             
-            
             _GT(typeof(IInputEventBase)),
             _GT(typeof(InputUIEventType)),
             _GT(typeof(InputUIEventBase)),
@@ -157,6 +156,7 @@ public static class CustomSettings
          // _GT(typeof(StoryServiceLuaHelper)),
           //_GT(typeof(ResurgenceLuaHelper)),
           //_GT(typeof(ResurgenceStatus)),
+          _GT(typeof(CharacterLuaHelper)),
 
     #endregion
 

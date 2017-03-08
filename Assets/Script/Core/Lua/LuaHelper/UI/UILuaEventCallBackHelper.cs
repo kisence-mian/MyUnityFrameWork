@@ -13,6 +13,16 @@ public class UIEventCallBackHelper
         LuaManager.LuaState.GetFunction("LuaUIManager.UIOnOpen").Call(UI);
     }
 
+    public static void CallOnUIShow(UIWindowBase UI)
+    {
+        LuaManager.LuaState.GetFunction("LuaUIManager.UIOnShow").Call(UI);
+    }
+
+    public static void CallOnUIHide(UIWindowBase UI)
+    {
+        LuaManager.LuaState.GetFunction("LuaUIManager.UIOnHide").Call(UI);
+    }
+
     public static double CallOnEnterAnim(UIWindowBase UI)
     {
         return (double)LuaManager.LuaState.GetFunction("LuaUIManager.UIOnEnterAnim").Call(UI)[0];

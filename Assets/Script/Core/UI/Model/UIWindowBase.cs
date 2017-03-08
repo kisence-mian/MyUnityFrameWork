@@ -24,6 +24,16 @@ public class UIWindowBase : UIBase
 
     }
 
+    public virtual void OnHide()
+    {
+
+    }
+
+    public virtual void OnShow()
+    {
+
+    }
+
     public virtual void OnRefresh()
     {
     }
@@ -50,7 +60,6 @@ public class UIWindowBase : UIBase
 
     public virtual void OnCompleteExitAnim()
     {
-
     }
 
     #endregion 

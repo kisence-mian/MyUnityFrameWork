@@ -1549,7 +1549,6 @@ public class BundleConfigEditorWindow : EditorWindow
         if (errorCount == 0)
         {
             EditorCoroutineRunner.StartEditorCoroutine(Package());
-
         }
         else
         {

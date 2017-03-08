@@ -422,9 +422,9 @@ public class UIBase : MonoBehaviour
         GetSlider(sliderID).value = value;
     }
 
-    public void SetActive(string TextID,bool isshow)
+    public void SetActive(string gameObjectID,bool isShow)
     {
-        GetGameObject(TextID).SetActive(isshow);
+        GetGameObject(gameObjectID).SetActive(isShow);
     }
 
     public void SetRectWidth(string TextID,float value,float height)

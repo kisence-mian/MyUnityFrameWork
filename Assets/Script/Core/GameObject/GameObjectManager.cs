@@ -281,7 +281,7 @@ public class GameObjectManager :MonoBehaviour
             po = s_objectPool_new[name][0];
             s_objectPool_new[name].RemoveAt(0);
 
-            if (po.SetActive)
+            if (po && po.SetActive)
                 po.gameObject.SetActive(true);
 
             if (parent == null)
