@@ -86,21 +86,21 @@ public class ResourceIOTool :MonoBehaviour
         StartCoroutine(MonoLoadByResourcesAsync(path, callback));
     }
 
+    LoadState m_loadState = new LoadState(); 
     public IEnumerator MonoLoadByResourcesAsync(string path, LoadCallBack callback)
     {
         ResourceRequest status = Resources.LoadAsync(path);
-        LoadState loadState = new LoadState(); 
-
+        
         while (!status.isDone)
         {
-            loadState.UpdateProgress(status);
-            callback(loadState,null);
+            m_loadState.UpdateProgress(status);
+            callback(m_loadState,null);
 
             yield return 0;
         }
 
-        loadState.UpdateProgress(status);
-        callback(loadState, status.asset);
+        m_loadState.UpdateProgress(status);
+        callback(m_loadState, status.asset);
     }
 
     /// <summary>

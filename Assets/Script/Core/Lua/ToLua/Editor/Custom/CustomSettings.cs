@@ -156,7 +156,7 @@ public static class CustomSettings
          // _GT(typeof(StoryServiceLuaHelper)),
           //_GT(typeof(ResurgenceLuaHelper)),
           //_GT(typeof(ResurgenceStatus)),
-          _GT(typeof(CharacterLuaHelper)),
+          //_GT(typeof(CharacterLuaHelper)),
 
     #endregion
 

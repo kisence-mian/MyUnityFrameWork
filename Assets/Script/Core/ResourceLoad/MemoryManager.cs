@@ -156,13 +156,15 @@ public class MemoryManager
             }
             else
             {
+                //Debug.Log("s_LoadList[0] :" + s_LoadList[0]);
+
                 ResourceManager.LoadAsync(s_LoadList[0], LoadResourcesFinishCallBack);
                 //AssetsBundleManager.LoadBundleAsync(s_LoadList[0], LoadResourcesFinishCallBack);
                 s_LoadList.RemoveAt(0);
                 isLoading = true;
 
                 s_loadStatus.isDone = false;
-                s_loadStatus.progress = (1- (s_LoadList.Count / s_loadCount));
+                s_loadStatus.progress = (1- ((float)s_LoadList.Count / (float)s_loadCount));
 
                 try
                 {
@@ -174,6 +176,10 @@ public class MemoryManager
                 }
                 
             }
+        }
+        else
+        {
+            Debug.Log("s_LoadList.Count " + s_LoadList.Count);
         }
     }
 
