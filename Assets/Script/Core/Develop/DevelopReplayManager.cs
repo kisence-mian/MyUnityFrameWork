@@ -83,7 +83,7 @@ public class DevelopReplayManager
             Log.Init(true); //日志记录启动
 
             ApplicationManager.s_OnApplicationUpdate += OnRecordUpdate;
-            InputManager.OnEveryEventDispatch += OnEveryEventCallBack;
+            //InputManager.OnEveryEventDispatch += OnEveryEventCallBack;
             GUIConsole.onGUICallback += RecordModeGUI;
             RandomService.OnRandomCreat += OnGetRandomCallBack;
 

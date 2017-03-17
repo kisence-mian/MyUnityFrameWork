@@ -46,6 +46,8 @@ public enum InputUIEventType
     PressDown,
     PressUp,
 
+    LongPress,
+
     BeginDrag,
     Drag,
     EndDrag,

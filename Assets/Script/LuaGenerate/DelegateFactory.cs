@@ -18,17 +18,20 @@ public static class DelegateFactory
 	{
 		dict.Clear();
 		dict.Add(typeof(UnityEngine.Events.UnityAction), UnityEngine_Events_UnityAction);
+		dict.Add(typeof(UnityEngine.RectTransform.ReapplyDrivenProperties), UnityEngine_RectTransform_ReapplyDrivenProperties);
 		dict.Add(typeof(AnimCallBack), AnimCallBack);
 		dict.Add(typeof(AnimCustomMethodVector3), AnimCustomMethodVector3);
 		dict.Add(typeof(AnimCustomMethodVector2), AnimCustomMethodVector2);
 		dict.Add(typeof(AnimCustomMethodFloat), AnimCustomMethodFloat);
 		dict.Add(typeof(InputEventHandle<InputUIOnClickEvent>), InputEventHandle_InputUIOnClickEvent);
+		dict.Add(typeof(InputEventHandle<InputUILongPressEvent>), InputEventHandle_InputUILongPressEvent);
 		dict.Add(typeof(EventHandle), EventHandle);
 		dict.Add(typeof(UIAnimCallBack), UIAnimCallBack);
 		dict.Add(typeof(UICallBack), UICallBack);
 		dict.Add(typeof(System.Predicate<string>), System_Predicate_string);
 		dict.Add(typeof(System.Action<string>), System_Action_string);
 		dict.Add(typeof(System.Comparison<string>), System_Comparison_string);
+		dict.Add(typeof(AudioCallBack), AudioCallBack);
 		dict.Add(typeof(InputEventCallBack), InputEventCallBack);
 		dict.Add(typeof(InputEventHandle<IInputEventBase>), InputEventHandle_IInputEventBase);
 	}
@@ -184,6 +187,53 @@ public static class DelegateFactory
 		{
 			UnityEngine_Events_UnityAction_Event target = new UnityEngine_Events_UnityAction_Event(func, self);
 			UnityEngine.Events.UnityAction d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class UnityEngine_RectTransform_ReapplyDrivenProperties_Event : LuaDelegate
+	{
+		public UnityEngine_RectTransform_ReapplyDrivenProperties_Event(LuaFunction func) : base(func) { }
+		public UnityEngine_RectTransform_ReapplyDrivenProperties_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(UnityEngine.RectTransform param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(UnityEngine.RectTransform param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate UnityEngine_RectTransform_ReapplyDrivenProperties(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			UnityEngine.RectTransform.ReapplyDrivenProperties fn = delegate(UnityEngine.RectTransform param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			UnityEngine_RectTransform_ReapplyDrivenProperties_Event target = new UnityEngine_RectTransform_ReapplyDrivenProperties_Event(func);
+			UnityEngine.RectTransform.ReapplyDrivenProperties d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			UnityEngine_RectTransform_ReapplyDrivenProperties_Event target = new UnityEngine_RectTransform_ReapplyDrivenProperties_Event(func, self);
+			UnityEngine.RectTransform.ReapplyDrivenProperties d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
@@ -429,6 +479,53 @@ public static class DelegateFactory
 		{
 			InputEventHandle_InputUIOnClickEvent_Event target = new InputEventHandle_InputUIOnClickEvent_Event(func, self);
 			InputEventHandle<InputUIOnClickEvent> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class InputEventHandle_InputUILongPressEvent_Event : LuaDelegate
+	{
+		public InputEventHandle_InputUILongPressEvent_Event(LuaFunction func) : base(func) { }
+		public InputEventHandle_InputUILongPressEvent_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(InputUILongPressEvent param0)
+		{
+			func.BeginPCall();
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(InputUILongPressEvent param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate InputEventHandle_InputUILongPressEvent(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			InputEventHandle<InputUILongPressEvent> fn = delegate(InputUILongPressEvent param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			InputEventHandle_InputUILongPressEvent_Event target = new InputEventHandle_InputUILongPressEvent_Event(func);
+			InputEventHandle<InputUILongPressEvent> d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			InputEventHandle_InputUILongPressEvent_Event target = new InputEventHandle_InputUILongPressEvent_Event(func, self);
+			InputEventHandle<InputUILongPressEvent> d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}
@@ -757,6 +854,53 @@ public static class DelegateFactory
 		{
 			System_Comparison_string_Event target = new System_Comparison_string_Event(func, self);
 			System.Comparison<string> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class AudioCallBack_Event : LuaDelegate
+	{
+		public AudioCallBack_Event(LuaFunction func) : base(func) { }
+		public AudioCallBack_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(SoundType param0)
+		{
+			func.BeginPCall();
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(SoundType param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.Push(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate AudioCallBack(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			AudioCallBack fn = delegate(SoundType param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			AudioCallBack_Event target = new AudioCallBack_Event(func);
+			AudioCallBack d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			AudioCallBack_Event target = new AudioCallBack_Event(func, self);
+			AudioCallBack d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

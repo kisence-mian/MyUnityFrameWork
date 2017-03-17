@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class Timer : MonoBehaviour 
+public class Timer 
 {
     public static List<TimerEvent> m_timers = new List<TimerEvent>();
 
     public static void Init()
     {
         ApplicationManager.s_OnApplicationUpdate += Update;
+        HeapObjectPool.Init<TimerEvent>(50);
     }
 
 	static void Update () 
@@ -21,16 +22,30 @@ public class Timer : MonoBehaviour
             {
                 TimerEvent e = m_timers[i];
 
-                if (m_timers[i].m_repeatCount == 0)
+                e.CompleteTimer();
+
+                if (e.m_repeatCount == 0)
                 {
-                    m_timers.Remove(m_timers[i]);
+                    m_timers.Remove(e);
+                    e.Release();
                     i--;
                 }
-
-                e.CompleteTimer();
             }
         }
 	}
+
+    public static TimerEvent GetTimer(string timerName)
+    {
+        for (int i = 0; i < m_timers.Count; i++)
+        {
+            if (m_timers[i].m_timerName == timerName)
+            {
+                return m_timers[i];
+            }
+        }
+
+        return null;
+    }
 
     /// <summary>
     /// 延迟调用
@@ -141,55 +156,56 @@ public class Timer : MonoBehaviour
     /// <summary>
     /// 添加一个Timer
     /// </summary>
-    /// <param name="l_spaceTime">间隔时间</param>
-    /// <param name="l_isIgnoreTimeScale">是否忽略时间缩放</param>
-    /// <param name="l_callBackCount">重复调用的次数</param>
-    /// <param name="l_timerName">Timer的名字</param>
-    /// <param name="l_callBack">回调函数</param>
-    /// <param name="l_objs">回调函数的参数</param>
+    /// <param name="spaceTime">间隔时间</param>
+    /// <param name="isIgnoreTimeScale">是否忽略时间缩放</param>
+    /// <param name="callBackCount">重复调用的次数</param>
+    /// <param name="timerName">Timer的名字</param>
+    /// <param name="callBack">回调函数</param>
+    /// <param name="objs">回调函数的参数</param>
     /// <returns></returns>
-    public static TimerEvent AddTimer(float l_spaceTime, bool l_isIgnoreTimeScale, int l_callBackCount, string l_timerName,TimerCallBack l_callBack, params object[] l_objs)
+    public static TimerEvent AddTimer(float spaceTime, bool isIgnoreTimeScale, int callBackCount, string timerName,TimerCallBack callBack, params object[] objs)
     {
-        TimerEvent l_te = new TimerEvent();
+        TimerEvent te = HeapObjectPool.GetObject<TimerEvent>("TimerEvent");
 
-        l_te.m_timerName = l_timerName;
+        te.m_timerName = timerName;
 
-        l_te.m_currentTimer = 0;
-        l_te.m_timerSpace = l_spaceTime;
+        te.m_currentTimer = 0;
+        te.m_timerSpace = spaceTime;
 
-        l_te.m_callBack = l_callBack;
-        l_te.m_objs = l_objs;
+        te.m_callBack = callBack;
+        te.m_objs = objs;
 
-        l_te.m_isIgnoreTimeScale = l_isIgnoreTimeScale;
-        l_te.m_repeatCount = l_callBackCount;
+        te.m_isIgnoreTimeScale = isIgnoreTimeScale;
+        te.m_repeatCount = callBackCount;
 
-        m_timers.Add(l_te);
+        m_timers.Add(te);
 
-        return l_te;
+        return te;
     }
 
-    public static void DestroyTimer(TimerEvent l_timer,bool isCallBack = false)
+    public static void DestroyTimer(TimerEvent timer,bool isCallBack = false)
     {
-        if(m_timers.Contains(l_timer))
+        if(m_timers.Contains(timer))
         {
             if (isCallBack)
             {
-                l_timer.CallBackTimer();
+                timer.CallBackTimer();
             }
 
-            m_timers.Remove(l_timer);
+            m_timers.Remove(timer);
+            timer.Release();
         }
         else
         {
-            Debug.LogError("Timer DestroyTimer error: dont exist timer " + l_timer);
+            Debug.LogError("Timer DestroyTimer error: dont exist timer " + timer);
         }
     }
 
-    public static void DestroyTimer(string l_timerName, bool isCallBack = false)
+    public static void DestroyTimer(string timerName, bool isCallBack = false)
     {
         for (int i = 0; i < m_timers.Count;i++ )
         {
-            if (m_timers[i].m_timerName.Equals(l_timerName))
+            if (m_timers[i].m_timerName.Equals(timerName))
             {
                 DestroyTimer(m_timers[i], isCallBack);
             }
@@ -200,27 +216,33 @@ public class Timer : MonoBehaviour
     {
         for (int i = 0; i < m_timers.Count; i++)
         {
-            DestroyTimer(m_timers[i], isCallBack);
+            if (isCallBack)
+            {
+                m_timers[i].CallBackTimer();
+            }
+            m_timers[i].Release();
         }
+
+        m_timers.Clear();
     }
 
-    public static void ResetTimer(TimerEvent l_timer)
+    public static void ResetTimer(TimerEvent timer)
     {
-        if(m_timers.Contains(l_timer))
+        if(m_timers.Contains(timer))
         {
-            l_timer.ResetTimer();
+            timer.ResetTimer();
         }
         else
         {
-            Debug.LogError("Timer ResetTimer error: dont exist timer "+ l_timer);
+            Debug.LogError("Timer ResetTimer error: dont exist timer "+ timer);
         }
     }
 
-    public static void ResetTimer(string l_timerName)
+    public static void ResetTimer(string timerName)
     {
         for (int i = 0; i < m_timers.Count; i++)
         {
-            if (m_timers[i].m_timerName.Equals(l_timerName))
+            if (m_timers[i].m_timerName.Equals(timerName))
             {
                 ResetTimer(m_timers[i]);
             }

@@ -350,6 +350,9 @@ public class BundleConfigEditorWindow : EditorWindow
 
         if (GUILayout.Button("自动添加 Resource 目录下的资源并保存"))
         {
+            bundles.Clear();
+            ArrangeBundlesByLayer();
+
             AddAllResourceBundle();  //添加资源文件
             ArrangeBundlesByLayer(); //整理资源路径
 
@@ -1012,6 +1015,7 @@ public class BundleConfigEditorWindow : EditorWindow
                 || relativePath.EndsWith(".xml")
                 || relativePath.EndsWith(".csv")
                 || relativePath.EndsWith(".tga")
+                || relativePath.EndsWith(".shader")
                 )
             {
                 relativePath = FileTool.RemoveExpandName(relativePath);

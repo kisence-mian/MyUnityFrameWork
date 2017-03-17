@@ -14,7 +14,7 @@ public class ScrollRectInput : ScrollRect
 
     protected override void SetContentAnchoredPosition(Vector2 position)
     {
-        InputUIEventProxy.DispatchScrollEvent(m_UIEventKey, name, position);
+        InputUIEventProxy.DispatchScrollEvent(m_UIEventKey, name,"", position);
     }
 
     protected virtual void OnSetContentAnchoredPosition(InputUIOnScrollEvent e)

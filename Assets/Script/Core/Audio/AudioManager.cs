@@ -3,11 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-[RequireComponent(typeof(AudioListener))]
+//[RequireComponent(typeof(AudioListener))]
 public class AudioManager : MonoBehaviour
 {
     private static AudioManager s_instance;
-    public static AudioManager s_Instance
+    public static AudioManager Instance
     {
         get {if (s_instance == null) Init();
             return s_instance;}
@@ -109,7 +109,7 @@ public class AudioManager : MonoBehaviour
     /// </summary>
     /// <param name="l_musicName">音乐名</param>
     /// <param name="l_isLoop">是否循环</param>
-    public  AudioSource PlayMusic2D(string l_musicName, bool l_isLoop)
+    public static AudioSource PlayMusic2D(string l_musicName, bool l_isLoop)
     {
         s_MusicIsPlaying = true;
 
@@ -134,7 +134,7 @@ public class AudioManager : MonoBehaviour
     /// 播放一个2D音效
     /// </summary>
     /// <param name="l_soundName">音效名</param>
-    public  AudioSource PlaySound2D(string l_soundName)
+    public static AudioSource PlaySound2D(string l_soundName)
     {
         AudioSource audioTmp = GetAudioSource2D(SoundType.Sound);
         audioTmp.clip = GetAudioClip(l_soundName);
@@ -148,7 +148,7 @@ public class AudioManager : MonoBehaviour
     /// 延时播放一个2D音效
     /// </summary>
     /// <param name="l_soundName">音效名</param>
-    public void PlaySound2D(string l_soundName,float l_delay )
+    public static void PlaySound2D(string l_soundName,float l_delay )
     {
         if (l_delay == 0)
         {
@@ -156,11 +156,11 @@ public class AudioManager : MonoBehaviour
         }
         else
         {
-            StartCoroutine(DelayPlay(l_soundName, l_delay));
+            ApplicationManager.Instance.StartCoroutine(DelayPlay(l_soundName, l_delay));
         }
     }
 
-    IEnumerator DelayPlay(string l_soundName, float l_delay)
+    static IEnumerator DelayPlay(string l_soundName, float l_delay)
     {
         yield return new WaitForSeconds(l_delay);
         PlaySound2D(l_soundName);
@@ -186,7 +186,7 @@ public class AudioManager : MonoBehaviour
         {
             if(s_2Dmusic == null)
             {
-                s_2Dmusic = s_instance.gameObject.AddComponent<AudioSource>();
+                s_2Dmusic = Instance.gameObject.AddComponent<AudioSource>();
             }
 
             return s_2Dmusic;
@@ -203,7 +203,7 @@ public class AudioManager : MonoBehaviour
                 }
             }
 
-            AudioSourceTmp = s_instance.gameObject.AddComponent<AudioSource>();
+            AudioSourceTmp = Instance.gameObject.AddComponent<AudioSource>();
 
             s_2Dplayers.Add(AudioSourceTmp);
 

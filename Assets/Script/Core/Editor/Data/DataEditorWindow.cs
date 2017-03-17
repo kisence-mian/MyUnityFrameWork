@@ -25,7 +25,7 @@ public class DataEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        ConvertUtf8();
+        //ConvertUtf8();
 
         m_currentSelectIndex = 0;
         EditorGUIStyleData.Init();
@@ -44,7 +44,7 @@ public class DataEditorWindow : EditorWindow
     {
         if (!Application.isPlaying)
         {
-            ConvertUtf8();
+            //ConvertUtf8();
 
             FindAllDataName();
 
@@ -903,7 +903,6 @@ public class DataEditorWindow : EditorWindow
     {
         FileTool.RecursionFileExecute(Application.dataPath + "/Resources/" + DataManager.c_directoryName, "txt", (name) =>
         {
-            //Debug.Log("ConvertUtf8 path-> " + name);
             FileTool.ConvertFileEncoding(name, null, System.Text.Encoding.UTF8);
         });
     }

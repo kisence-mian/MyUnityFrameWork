@@ -78,6 +78,8 @@ public class MemoryManager
         //清空对象池
         GameObjectManager.CleanPool();
 
+        GameObjectManager.CleanPool_New();
+
         //清空缓存的UI
         UIManager.DestroyAllHideUI();
 
@@ -177,10 +179,10 @@ public class MemoryManager
                 
             }
         }
-        else
-        {
-            Debug.Log("s_LoadList.Count " + s_LoadList.Count);
-        }
+        //else
+        //{
+        //    Debug.Log("s_LoadList.Count " + s_LoadList.Count);
+        //}
     }
 
     static void LoadResourcesFinishCallBack(LoadState state, object res)

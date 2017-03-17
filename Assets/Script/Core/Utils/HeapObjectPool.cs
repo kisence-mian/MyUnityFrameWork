@@ -162,6 +162,26 @@ public class HeapObjectPool
         }
     }
 
+    public static T GetObject<T>(string TypeName) where T : HeapObjectBase, new()
+    {
+        JudgeNullPool(TypeName);
+
+        List<HeapObjectBase> list = s_pool[TypeName];
+
+        if (list.Count > 0)
+        {
+            HeapObjectBase tmp = list[0];
+            list.RemoveAt(0);
+
+            return (T)tmp;
+        }
+        else
+        {
+            Init<T>();
+            return GetObject<T>();
+        }
+    }
+
     public static void ReleaseObject(string type,HeapObjectBase obj)
     {
         JudgeNullPool(type);

@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class TimerEvent
+public class TimerEvent : HeapObjectBase
 {
 
     public string m_timerName = "";
@@ -40,6 +40,19 @@ public class TimerEvent
         {
             m_isDone = true;
         }
+    }
+
+    public override void OnRelease()
+    {
+        m_timerName = "";
+        m_repeatCount   = 0;
+        m_currentRepeat = 0;
+        m_isIgnoreTimeScale = false;
+        m_callBack = null;
+        m_objs = null;
+        m_timerSpace = 0; ;
+        m_currentTimer = 0;
+        m_isDone = false;
     }
 
     public void CompleteTimer()

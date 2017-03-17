@@ -9,11 +9,15 @@ public class UIWindowBaseWrap
 		L.BeginClass(typeof(UIWindowBase), typeof(UIBase));
 		L.RegFunction("OnOpen", OnOpen);
 		L.RegFunction("OnClose", OnClose);
+		L.RegFunction("OnHide", OnHide);
+		L.RegFunction("OnShow", OnShow);
 		L.RegFunction("OnRefresh", OnRefresh);
 		L.RegFunction("EnterAnim", EnterAnim);
 		L.RegFunction("OnCompleteEnterAnim", OnCompleteEnterAnim);
 		L.RegFunction("ExitAnim", ExitAnim);
 		L.RegFunction("OnCompleteExitAnim", OnCompleteExitAnim);
+		L.RegFunction("Show", Show);
+		L.RegFunction("Hide", Hide);
 		L.RegFunction("Refresh", Refresh);
 		L.RegFunction("AddEventListener", AddEventListener);
 		L.RegFunction("RemoveAllListener", RemoveAllListener);
@@ -49,6 +53,38 @@ public class UIWindowBaseWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
 			obj.OnClose();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnHide(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.OnHide();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnShow(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.OnShow();
 			return 0;
 		}
 		catch(Exception e)
@@ -185,6 +221,38 @@ public class UIWindowBaseWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
 			obj.OnCompleteExitAnim();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Show(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.Show();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Hide(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.Hide();
 			return 0;
 		}
 		catch(Exception e)

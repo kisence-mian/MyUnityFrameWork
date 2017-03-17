@@ -68,7 +68,7 @@ public abstract class IInputProxyBase
     #endregion
 }
 
-public class InputEventRegisterInfo<T> where T: IInputEventBase
+public class InputEventRegisterInfo<T> : HeapObjectBase where T : IInputEventBase
 {
     public string eventKey;
     public InputEventHandle<T> callBack;
@@ -81,6 +81,7 @@ public class InputEventRegisterInfo<T> where T: IInputEventBase
     public virtual void RemoveListener()
     {
         InputManager.RemoveListener<T>(eventKey, callBack);
+        Release();
     }
 
     

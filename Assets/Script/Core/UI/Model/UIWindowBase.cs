@@ -62,6 +62,16 @@ public class UIWindowBase : UIBase
     {
     }
 
+    public virtual void Show()
+    {
+        gameObject.SetActive(true);
+    }
+
+    public virtual void Hide()
+    {
+        gameObject.SetActive(false);
+    }
+
     #endregion 
 
     #region 继承方法

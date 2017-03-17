@@ -64,6 +64,10 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
         {
             m_Listeners[eventKey] -= callBack;
         }
+        //else
+        //{
+        //    Debug.LogError("不存在的UI事件 " + eventKey);
+        //}
     }
 
     InputEventHandle<Event> m_handle;
@@ -87,6 +91,8 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
 
     void DispatchSingleEvent(Event inputEvent, InputEventHandle<Event> callBack)
     {
+        //Debug.Log("DispatchSingleEvent");
+
         if (callBack != null)
         {
             try

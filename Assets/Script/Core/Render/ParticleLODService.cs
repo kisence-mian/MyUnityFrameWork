@@ -26,7 +26,7 @@ public class ParticleLODService : PoolObject
         GlobalEvent.AddEvent(RenderEventEnum.UpdateLOD, ReceviceUpdateLOD);
     }
 
-    public override void OnDistroy()
+    public override void OnObjectDestroy()
     {
         GlobalEvent.RemoveEvent(RenderEventEnum.UpdateLOD, ReceviceUpdateLOD);
     }

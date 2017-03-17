@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class UIBase : MonoBehaviour
 {
+    public Canvas m_canvas;
 
     #region 重载方法
 
@@ -15,15 +16,14 @@ public class UIBase : MonoBehaviour
 
     }
 
-
     public void DestroyUI()
     {
         RemoveAllListener();
         CleanItem();
-        OnDestroy();
+        OnUIDestroy();
     }
 
-    protected virtual void OnDestroy()
+    protected virtual void OnUIDestroy()
     {
 
     }
@@ -65,14 +65,16 @@ public class UIBase : MonoBehaviour
     public void Init(int id)
     {
         m_UIID = id;
+        m_canvas = GetComponent<Canvas>();
+
         CreateObjectTable();
         OnInit();
     }
 
-    public void Destroy()
-    {
-        OnDestroy();
-    }
+    //public void Destroy()
+    //{
+    //    OnDestroy();
+    //}
 
     #region 获取对象
 
@@ -81,7 +83,20 @@ public class UIBase : MonoBehaviour
     //生成对象表，便于快速获取对象，并忽略层级
     void CreateObjectTable()
     {
-        m_objects = new Dictionary<string, GameObject>();
+        m_objects.Clear();
+
+        m_images.Clear();
+        m_texts.Clear();
+        m_buttons.Clear();
+        m_scrollRects.Clear();
+        m_reusingScrollRects.Clear();
+        m_rawImages.Clear();
+        m_rectTransforms.Clear();
+        m_inputFields.Clear();
+        m_Sliders.Clear();
+        m_joySticks.Clear();
+        m_longPressList.Clear();
+        m_Canvas.Clear();
 
         for (int i = 0; i < m_objectList.Count; i++)
         {
@@ -105,7 +120,7 @@ public class UIBase : MonoBehaviour
 
     Dictionary<string, UIBase> m_uiBases = new Dictionary<string, UIBase>();
 
-    Dictionary<string, GameObject> m_objects;
+    Dictionary<string, GameObject> m_objects = new Dictionary<string, GameObject>();
     Dictionary<string, Image> m_images = new Dictionary<string, Image>();
     Dictionary<string, Text> m_texts = new Dictionary<string, Text>();
     Dictionary<string, Button> m_buttons = new Dictionary<string, Button>();
@@ -115,8 +130,10 @@ public class UIBase : MonoBehaviour
     Dictionary<string, RectTransform> m_rectTransforms = new Dictionary<string, RectTransform>();
     Dictionary<string, InputField> m_inputFields = new Dictionary<string, InputField>();
     Dictionary<string, Slider> m_Sliders = new Dictionary<string, Slider>();
+    Dictionary<string, Canvas> m_Canvas = new Dictionary<string, Canvas>();
 
     Dictionary<string, UGUIJoyStick> m_joySticks = new Dictionary<string, UGUIJoyStick>();
+    Dictionary<string, LongPressAcceptor> m_longPressList = new Dictionary<string, LongPressAcceptor>();
 
     public GameObject GetGameObject(string name)
     {
@@ -131,7 +148,7 @@ public class UIBase : MonoBehaviour
         }
         else
         {
-            throw new Exception("UIWindowBase GetGameObject error: dont find ->" + name + "<-");
+            throw new Exception("UIWindowBase GetGameObject error: " + UIName + " dont find ->" + name + "<-");
         }
     }
 
@@ -143,6 +160,13 @@ public class UIBase : MonoBehaviour
         }
 
         RectTransform tmp = GetGameObject(name).GetComponent<RectTransform>();
+
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetRectTransform ->" + name + "<- is Null !");
+        }
+
         m_rectTransforms.Add(name, tmp);
         return tmp;
     }
@@ -155,6 +179,12 @@ public class UIBase : MonoBehaviour
         }
 
         UIBase tmp = GetGameObject(name).GetComponent<UIBase>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetUIBase ->" + name + "<- is Null !");
+        }
+
         m_uiBases.Add(name, tmp);
         return tmp;
     }
@@ -167,6 +197,12 @@ public class UIBase : MonoBehaviour
         }
 
         Image tmp = GetGameObject(name).GetComponent<Image>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetImage ->" + name + "<- is Null !");
+        }
+
         m_images.Add(name, tmp);
         return tmp;
     }
@@ -179,6 +215,12 @@ public class UIBase : MonoBehaviour
         }
 
         Text tmp = GetGameObject(name).GetComponent<Text>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetText ->" + name + "<- is Null !");
+        }
+
         m_texts.Add(name, tmp);
         return tmp;
     }
@@ -191,6 +233,12 @@ public class UIBase : MonoBehaviour
         }
 
         Button tmp = GetGameObject(name).GetComponent<Button>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetButton ->" + name + "<- is Null !");
+        }
+
         m_buttons.Add(name, tmp);
         return tmp;
     }
@@ -203,6 +251,12 @@ public class UIBase : MonoBehaviour
         }
 
         InputField tmp = GetGameObject(name).GetComponent<InputField>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetInputField ->" + name + "<- is Null !");
+        }
+
         m_inputFields.Add(name, tmp);
         return tmp;
     }
@@ -215,6 +269,12 @@ public class UIBase : MonoBehaviour
         }
 
         ScrollRect tmp = GetGameObject(name).GetComponent<ScrollRect>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetScrollRect ->" + name + "<- is Null !");
+        }
+
         m_scrollRects.Add(name, tmp);
         return tmp;
     }
@@ -227,6 +287,12 @@ public class UIBase : MonoBehaviour
         }
 
         RawImage tmp = GetGameObject(name).GetComponent<RawImage>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetRawImage ->" + name + "<- is Null !");
+        }
+
         m_rawImages.Add(name, tmp);
         return tmp;
     }
@@ -239,7 +305,31 @@ public class UIBase : MonoBehaviour
         }
 
         Slider tmp = GetGameObject(name).GetComponent<Slider>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetSlider ->" + name + "<- is Null !");
+        }
+
         m_Sliders.Add(name, tmp);
+        return tmp;
+    }
+
+    public Canvas GetCanvas(string name)
+    {
+        if (m_Canvas.ContainsKey(name))
+        {
+            return m_Canvas[name];
+        }
+
+        Canvas tmp = GetGameObject(name).GetComponent<Canvas>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetSlider ->" + name + "<- is Null !");
+        }
+
+        m_Canvas.Add(name, tmp);
         return tmp;
     }
 
@@ -282,6 +372,12 @@ public class UIBase : MonoBehaviour
         }
 
         ReusingScrollRect tmp = GetGameObject(name).GetComponent<ReusingScrollRect>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetReusingScrollRect ->" + name + "<- is Null !");
+        }
+
         m_reusingScrollRects.Add(name, tmp);
         return tmp;
     }
@@ -294,7 +390,31 @@ public class UIBase : MonoBehaviour
         }
 
         UGUIJoyStick tmp = GetGameObject(name).GetComponent<UGUIJoyStick>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetJoyStick ->" + name + "<- is Null !");
+        }
+
         m_joySticks.Add(name, tmp);
+        return tmp;
+    }
+
+    public LongPressAcceptor GetLongPressComp(string name)
+    {
+        if (m_longPressList.ContainsKey(name))
+        {
+            return m_longPressList[name];
+        }
+
+        LongPressAcceptor tmp = GetGameObject(name).GetComponent<LongPressAcceptor>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetLongPressComp ->" + name + "<- is Null !");
+        }
+
+        m_longPressList.Add(name, tmp);
         return tmp;
     }
     #endregion
@@ -307,6 +427,7 @@ public class UIBase : MonoBehaviour
     protected List<EventHandRegisterInfo> m_EventListeners = new List<EventHandRegisterInfo>();
 
     protected List<InputEventRegisterInfo<InputUIOnClickEvent>> m_OnClickEvents = new List<InputEventRegisterInfo<InputUIOnClickEvent>>();
+    protected List<InputEventRegisterInfo<InputUILongPressEvent>> m_LongPressEvents = new List<InputEventRegisterInfo<InputUILongPressEvent>>();
 
     public virtual void RemoveAllListener()
     {
@@ -323,6 +444,13 @@ public class UIBase : MonoBehaviour
         }
 
         m_EventListeners.Clear();
+
+        for (int i = 0; i < m_LongPressEvents.Count; i++)
+        {
+            m_LongPressEvents[i].RemoveListener();
+        }
+
+        m_LongPressEvents.Clear();
     }
 
     public void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
@@ -335,6 +463,12 @@ public class UIBase : MonoBehaviour
     {
         InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(button, UIEventKey, compName, parm, callback);
         m_OnClickEvents.Add(info);
+    }
+
+    public void AddLongPressListener(string compName, InputEventHandle<InputUILongPressEvent> callback, string parm = null)
+    {
+        InputEventRegisterInfo<InputUILongPressEvent> info = InputUIEventProxy.AddLongPressListener(GetLongPressComp(compName), UIEventKey, compName, parm, callback);
+        m_LongPressEvents.Add(info);
     }
 
     public void AddEventListener(Enum EventEnum, EventHandle handle)
@@ -379,7 +513,7 @@ public class UIBase : MonoBehaviour
         if(m_ChildList.Contains(item))
         {
             m_ChildList.Remove(item);
-            item.OnDestroy();
+            item.OnUIDestroy();
             GameObjectManager.DestroyGameObjectByPool(item.gameObject);
         }
     }
@@ -388,7 +522,7 @@ public class UIBase : MonoBehaviour
     {
         for (int i = 0; i < m_ChildList.Count; i++)
         {
-            m_ChildList[i].OnDestroy();
+            m_ChildList[i].OnUIDestroy();
             GameObjectManager.DestroyGameObjectByPool(m_ChildList[i].gameObject);
         }
 

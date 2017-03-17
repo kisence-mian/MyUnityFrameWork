@@ -448,7 +448,10 @@ public class DataTable : Dictionary<string, SingleData>
     public SingleData GetLineFromKey(string key)
     {
         //主键只能是String类型
-        return this[key];
+        SingleData _value = null;
+        if (ContainsKey(key))
+            _value = this[key];
+        return _value;
     }
 
     public string GetEnumType(string key)

@@ -36,7 +36,7 @@ public class PoolObject : MonoBehaviour
     /// <summary>
     /// 被销毁时调用
     /// </summary>
-    public virtual void OnDistroy()
+    public virtual void OnObjectDestroy()
     {
 
     }

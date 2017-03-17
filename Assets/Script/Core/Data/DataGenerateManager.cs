@@ -37,6 +37,9 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
         }
     }
 
+    /// <summary>
+    /// 全查表
+    /// </summary>
     public static void PreLoad()
     {
         //清理缓存
@@ -46,7 +49,13 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
             GlobalEvent.AddEvent(MemoryEvent.FreeHeapMemory, CleanCatch);
         }
 
+        string dataName = typeof(T).Name.Replace("Generate","");
 
+        DataTable data = DataManager.GetData(dataName);
+        for (int i = 0; i < data.TableIDs.Count; i++)
+        {
+            GetData(data.TableIDs[i]);
+        }
     }
 
     public static void CleanCatch(params object[] objs)
