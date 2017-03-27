@@ -243,7 +243,7 @@ public class HeapObjectPoolTool<T> where T : new()
 {
     static T[] s_pool;
     static int s_poolIndex = 0;
-    static int s_size = 20;
+    static int s_size = 50;
 
     public static void SetSize(int size)
     {

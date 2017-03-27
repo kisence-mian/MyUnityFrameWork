@@ -53,7 +53,10 @@ public class BundleConfigEditorWindow : EditorWindow
     bool isFoldRelyPackages = true; //是否展开依赖包
     bool isFoldBundles = true; //是否展开普通包
 
+    bool isFoldLog = false; //是否展开日志
+
     Vector2 scrollPos = new Vector2();
+    Vector2 LogsScrollPos = new Vector2();
 
     string[] RelyPackageNames = new string[1];
 
@@ -79,7 +82,7 @@ public class BundleConfigEditorWindow : EditorWindow
         bundleQuery = EditorGUILayout.TextField("", bundleQuery);
         EditorGUILayout.EndHorizontal();
 
-        scrollPos = GUILayout.BeginScrollView(scrollPos);
+        scrollPos = GUILayout.BeginScrollView(scrollPos, GUILayout.ExpandHeight(false));
 
         isFoldRelyPackages = EditorGUILayout.Foldout(isFoldRelyPackages, "依赖包:");
         if (isFoldRelyPackages)
@@ -96,6 +99,17 @@ public class BundleConfigEditorWindow : EditorWindow
         {
             //bundle包视图
             BundlesView();
+        }
+        GUILayout.EndScrollView();
+
+        LogsScrollPos = GUILayout.BeginScrollView(LogsScrollPos,GUILayout.ExpandHeight(true));
+
+        EditorGUI.indentLevel = 0;
+        isFoldLog = EditorGUILayout.Foldout(isFoldLog, "提示信息:");
+        if (isFoldLog)
+        {
+            //提示信息视图
+            LogView();
         }
 
         GUILayout.EndScrollView();
@@ -388,6 +402,36 @@ public class BundleConfigEditorWindow : EditorWindow
             }
         }
         //EditorGUILayout.EndHorizontal();
+    }
+
+    void LogView()
+    {
+        EditorGUI.indentLevel = 1;
+        for (int i = 0; i < relyPackages.Count; i++)
+        {
+            for (int j = 0; j < relyPackages[i].warnMsg.Count; j++)
+            {
+                EditorGUILayout.LabelField("WARN: " + relyPackages[i].warnMsg[j], EditorGUIStyleData.s_WarnMessageLabel);
+            }
+
+            for (int j = 0; j < relyPackages[i].errorMsg.Count; j++)
+            {
+                EditorGUILayout.LabelField("ERROR: " + relyPackages[i].errorMsg[j], EditorGUIStyleData.s_ErrorMessageLabel);
+            }
+        }
+
+        for (int i = 0; i < bundles.Count; i++)
+        {
+            for (int j = 0; j < bundles[i].warnMsg.Count; j++)
+            {
+                EditorGUILayout.LabelField("WARN: " + bundles[i].warnMsg[j], EditorGUIStyleData.s_WarnMessageLabel);
+            }
+
+            for (int j = 0; j < bundles[i].errorMsg.Count; j++)
+            {
+                EditorGUILayout.LabelField("ERROR: " + bundles[i].errorMsg[j], EditorGUIStyleData.s_ErrorMessageLabel);
+            }
+        }
     }
 
     void ShowMessage(string msg)
@@ -1016,6 +1060,7 @@ public class BundleConfigEditorWindow : EditorWindow
                 || relativePath.EndsWith(".csv")
                 || relativePath.EndsWith(".tga")
                 || relativePath.EndsWith(".shader")
+                || relativePath.EndsWith(".mat")
                 )
             {
                 relativePath = FileTool.RemoveExpandName(relativePath);
@@ -1082,6 +1127,7 @@ public class BundleConfigEditorWindow : EditorWindow
                 {
                     if (isExist_Bundle(tmp, relyPackages[i]))
                     {
+                        //Debug.Log("添加依赖包 : " + i);
                         //在依赖包选项中添加此依赖包
                         EditPackageConfigTmp.relyPackagesMask = EditPackageConfigTmp.relyPackagesMask | 1 << i;
                         //isExistRelyPackage = true;
@@ -1107,15 +1153,20 @@ public class BundleConfigEditorWindow : EditorWindow
             return true;
         }
 
-        //过滤掉所有shander
-        if (comp as Shader != null)
-        {
-            if (!shaderFilter.ContainsKey(comp.ToString()))
-            {
-                shaderFilter.Add(comp.ToString(), (Shader)comp);
-                Debug.LogWarning("包含 Shader! :" + comp.ToString());
-            }
+        ////过滤掉所有shander
+        //if (comp as Shader != null)
+        //{
+        //    if (!shaderFilter.ContainsKey(comp.ToString()))
+        //    {
+        //        shaderFilter.Add(comp.ToString(), (Shader)comp);
+        //        Debug.LogWarning("包含 Shader! :" + comp.ToString());
+        //    }
 
+        //    return true;
+        //}
+
+        if (comp is MonoScript)
+        {
             return true;
         }
 
@@ -1219,6 +1270,11 @@ public class BundleConfigEditorWindow : EditorWindow
             tmp.obj = res[i];
             tmp.path = GetObjectPath(res[i]);
 
+            if(ComponentFilter(tmp.obj))
+            {
+                continue;
+            }
+
             if (checkDict.ContainsKey(resNameTmp))
             {
                 //判断该资源是否在它的依赖包里，如果不在，加入判重
@@ -1228,7 +1284,7 @@ public class BundleConfigEditorWindow : EditorWindow
                 {
                     if (isExist_EditorList(checkDict[resNameTmp], tmp))
                     {
-                        pack.warnMsg.Add("Objects存在重复资源 ! " + resNameTmp);
+                        pack.warnMsg.Add(pack.path +  " 存在重复资源 ! " + resNameTmp);
                         warnCount++;
                     }
                     else
@@ -1307,7 +1363,7 @@ public class BundleConfigEditorWindow : EditorWindow
         {
             if (res[i] == null)
             {
-                pack.warnMsg.Add("有丢失的脚本！");
+                pack.warnMsg.Add(pack.mainObject.path + " 有丢失的脚本！");
                 warnCount++;
                 continue;
             }
@@ -1577,8 +1633,8 @@ public class BundleConfigEditorWindow : EditorWindow
         CreatVersionFile();
 
         relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
-               | BuildAssetBundleOptions.CollectDependencies;   //收集依赖
-                                                                //| BuildAssetBundleOptions.CompleteAssets;      //完整资源
+               | BuildAssetBundleOptions.CollectDependencies   //收集依赖
+               | BuildAssetBundleOptions.CompleteAssets;      //完整资源
                                                                 //| BuildAssetBundleOptions.UncompressedAssetBundle //不压缩
 
         BuildPipeline.PushAssetDependencies();

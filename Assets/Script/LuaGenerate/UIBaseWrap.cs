@@ -10,6 +10,7 @@ public class UIBaseWrap
 		L.RegFunction("OnInit", OnInit);
 		L.RegFunction("DestroyUI", DestroyUI);
 		L.RegFunction("Init", Init);
+		L.RegFunction("Destroy", Destroy);
 		L.RegFunction("GetGameObject", GetGameObject);
 		L.RegFunction("GetRectTransform", GetRectTransform);
 		L.RegFunction("GetUIBase", GetUIBase);
@@ -20,29 +21,17 @@ public class UIBaseWrap
 		L.RegFunction("GetScrollRect", GetScrollRect);
 		L.RegFunction("GetRawImage", GetRawImage);
 		L.RegFunction("GetSlider", GetSlider);
-		L.RegFunction("GetCanvas", GetCanvas);
-		L.RegFunction("GetPosition", GetPosition);
 		L.RegFunction("GetReusingScrollRect", GetReusingScrollRect);
 		L.RegFunction("GetJoyStick", GetJoyStick);
-		L.RegFunction("GetLongPressComp", GetLongPressComp);
 		L.RegFunction("RemoveAllListener", RemoveAllListener);
 		L.RegFunction("AddOnClickListener", AddOnClickListener);
 		L.RegFunction("AddOnClickListenerByCreate", AddOnClickListenerByCreate);
-		L.RegFunction("AddLongPressListener", AddLongPressListener);
 		L.RegFunction("AddEventListener", AddEventListener);
 		L.RegFunction("CreateItem", CreateItem);
 		L.RegFunction("DestroyItem", DestroyItem);
 		L.RegFunction("CleanItem", CleanItem);
-		L.RegFunction("SetText", SetText);
-		L.RegFunction("SetInputText", SetInputText);
-		L.RegFunction("SetTextByLangeage", SetTextByLangeage);
-		L.RegFunction("SetSlider", SetSlider);
-		L.RegFunction("SetActive", SetActive);
-		L.RegFunction("SetRectWidth", SetRectWidth);
-		L.RegFunction("SetPosition", SetPosition);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
-		L.RegVar("m_canvas", get_m_canvas, set_m_canvas);
 		L.RegVar("m_objectList", get_m_objectList, set_m_objectList);
 		L.RegVar("UIID", get_UIID, null);
 		L.RegVar("UIEventKey", get_UIEventKey, null);
@@ -92,6 +81,22 @@ public class UIBaseWrap
 			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
 			int arg0 = (int)LuaDLL.luaL_checknumber(L, 2);
 			obj.Init(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Destroy(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			obj.Destroy();
 			return 0;
 		}
 		catch(Exception e)
@@ -281,43 +286,6 @@ public class UIBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetCanvas(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			UnityEngine.Canvas o = obj.GetCanvas(arg0);
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetPosition(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			bool arg1 = LuaDLL.luaL_checkboolean(L, 3);
-			UnityEngine.Vector3 o = obj.GetPosition(arg0, arg1);
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int GetReusingScrollRect(IntPtr L)
 	{
 		try
@@ -344,24 +312,6 @@ public class UIBaseWrap
 			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
 			string arg0 = ToLua.CheckString(L, 2);
 			UGUIJoyStick o = obj.GetJoyStick(arg0);
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetLongPressComp(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			LongPressAcceptor o = obj.GetLongPressComp(arg0);
 			ToLua.Push(L, o);
 			return 1;
 		}
@@ -442,37 +392,6 @@ public class UIBaseWrap
 
 			string arg3 = ToLua.CheckString(L, 5);
 			obj.AddOnClickListenerByCreate(arg0, arg1, arg2, arg3);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int AddLongPressListener(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 4);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			InputEventHandle<InputUILongPressEvent> arg1 = null;
-			LuaTypes funcType3 = LuaDLL.lua_type(L, 3);
-
-			if (funcType3 != LuaTypes.LUA_TFUNCTION)
-			{
-				 arg1 = (InputEventHandle<InputUILongPressEvent>)ToLua.CheckObject(L, 3, typeof(InputEventHandle<InputUILongPressEvent>));
-			}
-			else
-			{
-				LuaFunction func = ToLua.ToLuaFunction(L, 3);
-				arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUILongPressEvent>), func) as InputEventHandle<InputUILongPressEvent>;
-			}
-
-			string arg2 = ToLua.CheckString(L, 4);
-			obj.AddLongPressListener(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)
@@ -564,137 +483,6 @@ public class UIBaseWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetText(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			string arg1 = ToLua.CheckString(L, 3);
-			obj.SetText(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetInputText(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			string arg1 = ToLua.CheckString(L, 3);
-			obj.SetInputText(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetTextByLangeage(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			string arg1 = ToLua.CheckString(L, 3);
-			object[] arg2 = ToLua.ToParamsObject(L, 4, count - 3);
-			obj.SetTextByLangeage(arg0, arg1, arg2);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetSlider(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
-			obj.SetSlider(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetActive(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			bool arg1 = LuaDLL.luaL_checkboolean(L, 3);
-			obj.SetActive(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetRectWidth(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 4);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
-			float arg2 = (float)LuaDLL.luaL_checknumber(L, 4);
-			obj.SetRectWidth(arg0, arg1, arg2);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetPosition(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 6);
-			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
-			string arg0 = ToLua.CheckString(L, 2);
-			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
-			float arg2 = (float)LuaDLL.luaL_checknumber(L, 4);
-			float arg3 = (float)LuaDLL.luaL_checknumber(L, 5);
-			bool arg4 = LuaDLL.luaL_checkboolean(L, 6);
-			obj.SetPosition(arg0, arg1, arg2, arg3, arg4);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int op_Equality(IntPtr L)
 	{
 		try
@@ -709,25 +497,6 @@ public class UIBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_m_canvas(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			UIBase obj = (UIBase)o;
-			UnityEngine.Canvas ret = obj.m_canvas;
-			ToLua.Push(L, ret);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_canvas on a nil value" : e.Message);
 		}
 	}
 
@@ -823,25 +592,6 @@ public class UIBaseWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_RectTransform on a nil value" : e.Message);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_m_canvas(IntPtr L)
-	{
-		object o = null;
-
-		try
-		{
-			o = ToLua.ToObject(L, 1);
-			UIBase obj = (UIBase)o;
-			UnityEngine.Canvas arg0 = (UnityEngine.Canvas)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Canvas));
-			obj.m_canvas = arg0;
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_canvas on a nil value" : e.Message);
 		}
 	}
 

@@ -11,10 +11,6 @@ public class UIManagerWrap
 		L.RegFunction("CreateUIWindow", CreateUIWindow);
 		L.RegFunction("OpenUIWindow", OpenUIWindow);
 		L.RegFunction("CloseUIWindow", CloseUIWindow);
-		L.RegFunction("ShowUI", ShowUI);
-		L.RegFunction("HideUI", HideUI);
-		L.RegFunction("HideOtherUI", HideOtherUI);
-		L.RegFunction("ShowOtherUI", ShowOtherUI);
 		L.RegFunction("CloseAllUI", CloseAllUI);
 		L.RegFunction("DestroyUI", DestroyUI);
 		L.RegFunction("DestroyAllUI", DestroyAllUI);
@@ -149,102 +145,6 @@ public class UIManagerWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: UIManager.CloseUIWindow");
 			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int ShowUI(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UIWindowBase)))
-			{
-				UIWindowBase arg0 = (UIWindowBase)ToLua.ToObject(L, 1);
-				UIWindowBase o = UIManager.ShowUI(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(string)))
-			{
-				string arg0 = ToLua.ToString(L, 1);
-				UIWindowBase o = UIManager.ShowUI(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UIManager.ShowUI");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int HideUI(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UIWindowBase)))
-			{
-				UIWindowBase arg0 = (UIWindowBase)ToLua.ToObject(L, 1);
-				UIWindowBase o = UIManager.HideUI(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(string)))
-			{
-				string arg0 = ToLua.ToString(L, 1);
-				UIWindowBase o = UIManager.HideUI(arg0);
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UIManager.HideUI");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int HideOtherUI(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			string arg0 = ToLua.CheckString(L, 1);
-			UIManager.HideOtherUI(arg0);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int ShowOtherUI(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			string arg0 = ToLua.CheckString(L, 1);
-			UIManager.ShowOtherUI(arg0);
-			return 0;
 		}
 		catch(Exception e)
 		{

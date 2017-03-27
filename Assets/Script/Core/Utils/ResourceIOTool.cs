@@ -130,8 +130,11 @@ public class ResourceIOTool :MonoBehaviour
 
             yield return 0;
         }
+        if (status.assetBundle != null)
+        {
+            status.assetBundle.name = path;
+        }
 
-        status.assetBundle.name = path;
         loadState.UpdateProgress(status);
         callback(loadState, status.assetBundle);
     }

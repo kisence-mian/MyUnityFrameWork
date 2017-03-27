@@ -541,6 +541,11 @@ public class UIBase : MonoBehaviour
         GetText(TextID).text = content;
     }
 
+    public void SetImageColor(string ImageID, Color color)
+    {
+        GetImage(ImageID).color = color;
+    }
+
     public void SetInputText(string TextID, string content)
     {
         GetInputField(TextID).text = content;
@@ -573,6 +578,11 @@ public class UIBase : MonoBehaviour
         else
             GetRectTransform(TextID).position = Vector3.right * x + Vector3.up * y + Vector3.forward * z;
 
+    }
+
+    public void SetScale(string TextID,float x,float y,float z)
+    {
+        GetGameObject(TextID).transform.localScale = Vector3.right * x + Vector3.up * y + Vector3.forward * z;
     }
 
     #endregion

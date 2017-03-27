@@ -126,7 +126,7 @@ public static class ResourcesConfigManager
             ResourcesConfig config = new ResourcesConfig();
             config.name = (string)tmp["name"];
             config.path = (string)tmp["path"];
-            config.relyPackages = ((string)tmp["relyPackages"]).Split('|');
+            config.relyPackages = (tmp["relyPackages"].ToString()).Split('|');
             config.md5 = (string)tmp["md5"];
 
             result.relyList.Add(config.name,config);

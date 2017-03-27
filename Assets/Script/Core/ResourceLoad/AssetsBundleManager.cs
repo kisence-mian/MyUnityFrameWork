@@ -30,6 +30,8 @@ public static class AssetsBundleManager
         {
             if (configTmp.relyPackages[i] != "")
             {
+                //Debug.Log("LoadBundle:" + configTmp.relyPackages[i]);
+
                 LoadRelyBundle(configTmp.relyPackages[i]);
             }
         }
@@ -75,43 +77,66 @@ public static class AssetsBundleManager
         string path = GetBundlePath(configTmp);
 
         LoadState state = new LoadState();
-        Dictionary<string, LoadState> loadStateDict = new Dictionary<string, LoadState>();
+        //Dictionary<string, LoadState> loadStateDict = new Dictionary<string, LoadState>();
 
-        //先加载依赖包
-        for (int i = 0; i < configTmp.relyPackages.Length; i++)
+        int LoadCount = 0;
+
+        if (configTmp.relyPackages.Length > 0 && configTmp.relyPackages[0] != "")
         {
-            LoadRelyBundleAsync(configTmp.relyPackages[i], (LoadState relyLoadState, RelyBundle RelyBundle) => 
+            //先加载依赖包
+            for (int i = 0; i < configTmp.relyPackages.Length; i++)
             {
-                if (RelyBundle != null && relyLoadState.isDone)
+                if (configTmp.relyPackages[i] != "")
                 {
-                    Debug.Log(RelyBundle.bundle.name);
-
-                    loadStateDict.Add(RelyBundle.bundle.name, relyLoadState);
-                    state.progress += 1 / ((float)configTmp.relyPackages.Length + 1);
-                }
-
-                //所有依赖包加载完毕加载资源包
-                if (loadStateDict.Keys.Count == configTmp.relyPackages.Length)
-                {
-                    ResourceIOTool.AssetsBundleLoadAsync(path, (LoadState bundleLoadState, AssetBundle bundle) => 
+                    LoadRelyBundleAsync(configTmp.relyPackages[i], (LoadState relyLoadState, RelyBundle RelyBundle) =>
                     {
-                        if (bundleLoadState.isDone)
+                        if (RelyBundle != null && relyLoadState.isDone)
                         {
-                            callBack(LoadState.CompleteState, AddBundle(bundleName, bundle));
+                            LoadCount++;
+                            state.progress += 1 / ((float)configTmp.relyPackages.Length + 1);
                         }
-                        else 
+
+                        //所有依赖包加载完毕加载资源包
+                        if (LoadCount == configTmp.relyPackages.Length)
                         {
-                            state.progress += bundleLoadState.progress / ((float)configTmp.relyPackages.Length + 1);
+                            ResourceIOTool.AssetsBundleLoadAsync(path, (LoadState bundleLoadState, AssetBundle bundle) =>
+                            {
+                                if (bundleLoadState.isDone)
+                                {
+                                    callBack(LoadState.CompleteState, AddBundle(bundleName, bundle));
+                                }
+                                else
+                                {
+                                    state.progress += bundleLoadState.progress / ((float)configTmp.relyPackages.Length + 1);
+                                    callBack(state, null);
+                                }
+                            });
+                        }
+                        else
+                        {
                             callBack(state, null);
                         }
                     });
                 }
+            }
+        }
+        else
+        {
+            ResourceIOTool.AssetsBundleLoadAsync(path, (LoadState bundleLoadState, AssetBundle bundle) =>
+            {
+                if (bundleLoadState.isDone)
+                {
+                    callBack(LoadState.CompleteState, AddBundle(bundleName, bundle));
+                }
                 else
                 {
-                    callBack(state,null);
+                    state.progress += bundleLoadState.progress / ((float)configTmp.relyPackages.Length + 1);
+                    callBack(state, null);
                 }
             });
         }
+
+
     }
 
     /// <summary>
@@ -245,7 +270,7 @@ public static class AssetsBundleManager
         }
         catch(Exception e)
         {
-            Debug.LogError("LoadAsync: " + e.ToString());
+            Debug.LogError("LoadAsync: ResName:" +name+" Error:"+ e.ToString());
         }
     }
 

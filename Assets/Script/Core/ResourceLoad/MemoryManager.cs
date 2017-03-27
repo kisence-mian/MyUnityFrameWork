@@ -158,12 +158,11 @@ public class MemoryManager
             }
             else
             {
-                //Debug.Log("s_LoadList[0] :" + s_LoadList[0]);
-
+                isLoading = true;
                 ResourceManager.LoadAsync(s_LoadList[0], LoadResourcesFinishCallBack);
                 //AssetsBundleManager.LoadBundleAsync(s_LoadList[0], LoadResourcesFinishCallBack);
                 s_LoadList.RemoveAt(0);
-                isLoading = true;
+                
 
                 s_loadStatus.isDone = false;
                 s_loadStatus.progress = (1- ((float)s_LoadList.Count / (float)s_loadCount));
@@ -176,7 +175,6 @@ public class MemoryManager
                 {
                     Debug.LogError("Load Finsih CallBack Error : " + e.ToString());
                 }
-                
             }
         }
         //else
@@ -188,7 +186,9 @@ public class MemoryManager
     static void LoadResourcesFinishCallBack(LoadState state, object res)
     {
         if (state.isDone == true)
+        {
             isLoading = false;
+        }
     }
 
     #endregion

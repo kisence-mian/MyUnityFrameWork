@@ -24,10 +24,12 @@ public class UnityEngine_UI_ImageWrap
 		L.RegVar("fillAmount", get_fillAmount, set_fillAmount);
 		L.RegVar("fillClockwise", get_fillClockwise, set_fillClockwise);
 		L.RegVar("fillOrigin", get_fillOrigin, set_fillOrigin);
-		L.RegVar("eventAlphaThreshold", get_eventAlphaThreshold, set_eventAlphaThreshold);
+		L.RegVar("alphaHitTestMinimumThreshold", get_alphaHitTestMinimumThreshold, set_alphaHitTestMinimumThreshold);
+		L.RegVar("defaultETC1GraphicMaterial", get_defaultETC1GraphicMaterial, null);
 		L.RegVar("mainTexture", get_mainTexture, null);
 		L.RegVar("hasBorder", get_hasBorder, null);
 		L.RegVar("pixelsPerUnit", get_pixelsPerUnit, null);
+		L.RegVar("material", get_material, set_material);
 		L.RegVar("minWidth", get_minWidth, null);
 		L.RegVar("preferredWidth", get_preferredWidth, null);
 		L.RegVar("flexibleWidth", get_flexibleWidth, null);
@@ -327,7 +329,7 @@ public class UnityEngine_UI_ImageWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_eventAlphaThreshold(IntPtr L)
+	static int get_alphaHitTestMinimumThreshold(IntPtr L)
 	{
 		object o = null;
 
@@ -335,13 +337,27 @@ public class UnityEngine_UI_ImageWrap
 		{
 			o = ToLua.ToObject(L, 1);
 			UnityEngine.UI.Image obj = (UnityEngine.UI.Image)o;
-			float ret = obj.eventAlphaThreshold;
+			float ret = obj.alphaHitTestMinimumThreshold;
 			LuaDLL.lua_pushnumber(L, ret);
 			return 1;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index eventAlphaThreshold on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index alphaHitTestMinimumThreshold on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_defaultETC1GraphicMaterial(IntPtr L)
+	{
+		try
+		{
+			ToLua.Push(L, UnityEngine.UI.Image.defaultETC1GraphicMaterial);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
 		}
 	}
 
@@ -399,6 +415,25 @@ public class UnityEngine_UI_ImageWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index pixelsPerUnit on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_material(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UnityEngine.UI.Image obj = (UnityEngine.UI.Image)o;
+			UnityEngine.Material ret = obj.material;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index material on a nil value" : e.Message);
 		}
 	}
 
@@ -707,7 +742,7 @@ public class UnityEngine_UI_ImageWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int set_eventAlphaThreshold(IntPtr L)
+	static int set_alphaHitTestMinimumThreshold(IntPtr L)
 	{
 		object o = null;
 
@@ -716,12 +751,31 @@ public class UnityEngine_UI_ImageWrap
 			o = ToLua.ToObject(L, 1);
 			UnityEngine.UI.Image obj = (UnityEngine.UI.Image)o;
 			float arg0 = (float)LuaDLL.luaL_checknumber(L, 2);
-			obj.eventAlphaThreshold = arg0;
+			obj.alphaHitTestMinimumThreshold = arg0;
 			return 0;
 		}
 		catch(Exception e)
 		{
-			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index eventAlphaThreshold on a nil value" : e.Message);
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index alphaHitTestMinimumThreshold on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_material(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			UnityEngine.UI.Image obj = (UnityEngine.UI.Image)o;
+			UnityEngine.Material arg0 = (UnityEngine.Material)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Material));
+			obj.material = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index material on a nil value" : e.Message);
 		}
 	}
 }

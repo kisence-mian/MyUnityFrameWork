@@ -11,7 +11,6 @@ public class InputUIEventTypeWrap
 		L.RegVar("Scroll", get_Scroll, null);
 		L.RegVar("PressDown", get_PressDown, null);
 		L.RegVar("PressUp", get_PressUp, null);
-		L.RegVar("LongPress", get_LongPress, null);
 		L.RegVar("BeginDrag", get_BeginDrag, null);
 		L.RegVar("Drag", get_Drag, null);
 		L.RegVar("EndDrag", get_EndDrag, null);
@@ -44,13 +43,6 @@ public class InputUIEventTypeWrap
 	static int get_PressUp(IntPtr L)
 	{
 		ToLua.Push(L, InputUIEventType.PressUp);
-		return 1;
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int get_LongPress(IntPtr L)
-	{
-		ToLua.Push(L, InputUIEventType.LongPress);
 		return 1;
 	}
 

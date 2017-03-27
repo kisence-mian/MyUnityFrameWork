@@ -16,6 +16,7 @@ public class GameObjectManager :MonoBehaviour
             {
                 GameObject instancePool = new GameObject("ObjectPool");
                 s_poolParent = instancePool.transform;
+                if(Application.isPlaying)
                 DontDestroyOnLoad(s_poolParent);
             }
 
@@ -308,7 +309,6 @@ public class GameObjectManager :MonoBehaviour
         {
             po = s_objectPool_new[name][0];
             s_objectPool_new[name].RemoveAt(0);
-
             if (po && po.SetActive)
                 po.gameObject.SetActive(true);
 
