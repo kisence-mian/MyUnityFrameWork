@@ -9,14 +9,14 @@ public class UIWindowLuaHelperWrap
 		L.BeginClass(typeof(UIWindowLuaHelper), typeof(UIWindowBase));
 		L.RegFunction("OnInit", OnInit);
 		L.RegFunction("OnOpen", OnOpen);
+		L.RegFunction("OnShow", OnShow);
+		L.RegFunction("OnHide", OnHide);
 		L.RegFunction("EnterAnim", EnterAnim);
 		L.RegFunction("OnCompleteEnterAnim", OnCompleteEnterAnim);
 		L.RegFunction("OnRefresh", OnRefresh);
 		L.RegFunction("OnClose", OnClose);
 		L.RegFunction("ExitAnim", ExitAnim);
 		L.RegFunction("OnCompleteExitAnim", OnCompleteExitAnim);
-		L.RegFunction("SetText", SetText);
-		L.RegFunction("SetTextByLangeage", SetTextByLangeage);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.EndClass();
@@ -46,6 +46,38 @@ public class UIWindowLuaHelperWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
 			obj.OnOpen();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnShow(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
+			obj.OnShow();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnHide(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
+			obj.OnHide();
 			return 0;
 		}
 		catch(Exception e)
@@ -198,43 +230,6 @@ public class UIWindowLuaHelperWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
 			obj.OnCompleteExitAnim();
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetText(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
-			string arg0 = ToLua.CheckString(L, 2);
-			string arg1 = ToLua.CheckString(L, 3);
-			obj.SetText(arg0, arg1);
-			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SetTextByLangeage(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-			UIWindowLuaHelper obj = (UIWindowLuaHelper)ToLua.CheckObject(L, 1, typeof(UIWindowLuaHelper));
-			string arg0 = ToLua.CheckString(L, 2);
-			string arg1 = ToLua.CheckString(L, 3);
-			object[] arg2 = ToLua.ToParamsObject(L, 4, count - 3);
-			obj.SetTextByLangeage(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)

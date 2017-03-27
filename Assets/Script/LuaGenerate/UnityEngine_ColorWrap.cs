@@ -217,120 +217,6 @@ public class UnityEngine_ColorWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int op_Addition(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 1, typeof(UnityEngine.Color));
-			UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
-			UnityEngine.Color o = arg0 + arg1;
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int op_Subtraction(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 1, typeof(UnityEngine.Color));
-			UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
-			UnityEngine.Color o = arg0 - arg1;
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int op_Multiply(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(float), typeof(UnityEngine.Color)))
-			{
-				float arg0 = (float)LuaDLL.lua_tonumber(L, 1);
-				UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.ToObject(L, 2);
-				UnityEngine.Color o = arg0 * arg1;
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Color), typeof(float)))
-			{
-				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 1);
-				float arg1 = (float)LuaDLL.lua_tonumber(L, 2);
-				UnityEngine.Color o = arg0 * arg1;
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Color), typeof(UnityEngine.Color)))
-			{
-				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 1);
-				UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.ToObject(L, 2);
-				UnityEngine.Color o = arg0 * arg1;
-				ToLua.Push(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Color.op_Multiply");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int op_Division(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 1, typeof(UnityEngine.Color));
-			float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
-			UnityEngine.Color o = arg0 / arg1;
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int op_Equality(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 2);
-			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 1);
-			UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.ToObject(L, 2);
-			bool o = arg0 == arg1;
-			LuaDLL.lua_pushboolean(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int Lerp(IntPtr L)
 	{
 		try
@@ -458,6 +344,120 @@ public class UnityEngine_ColorWrap
 			{
 				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Color.HSVToRGB");
 			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int op_Addition(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 1, typeof(UnityEngine.Color));
+			UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
+			UnityEngine.Color o = arg0 + arg1;
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int op_Subtraction(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 1, typeof(UnityEngine.Color));
+			UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
+			UnityEngine.Color o = arg0 - arg1;
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int op_Multiply(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(float), typeof(UnityEngine.Color)))
+			{
+				float arg0 = (float)LuaDLL.lua_tonumber(L, 1);
+				UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.ToObject(L, 2);
+				UnityEngine.Color o = arg0 * arg1;
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Color), typeof(float)))
+			{
+				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 1);
+				float arg1 = (float)LuaDLL.lua_tonumber(L, 2);
+				UnityEngine.Color o = arg0 * arg1;
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Color), typeof(UnityEngine.Color)))
+			{
+				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 1);
+				UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.ToObject(L, 2);
+				UnityEngine.Color o = arg0 * arg1;
+				ToLua.Push(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Color.op_Multiply");
+			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int op_Division(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 1, typeof(UnityEngine.Color));
+			float arg1 = (float)LuaDLL.luaL_checknumber(L, 2);
+			UnityEngine.Color o = arg0 / arg1;
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int op_Equality(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 1);
+			UnityEngine.Color arg1 = (UnityEngine.Color)ToLua.ToObject(L, 2);
+			bool o = arg0 == arg1;
+			LuaDLL.lua_pushboolean(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{
