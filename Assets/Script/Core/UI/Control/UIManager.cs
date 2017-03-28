@@ -384,12 +384,12 @@ public class UIManager : MonoBehaviour
 
         if (!s_UIs.ContainsKey(UI.name))
         {
-            throw new Exception("UIManager: RemoveUI error dont find: " + UI.name + "  " + UI);
+            throw new Exception("UIManager: RemoveUI error dont find UI name: ->" + UI.name + "<-  " + UI);
         }
 
         if (!s_UIs[UI.name].Contains(UI))
         {
-            throw new Exception("UIManager: RemoveUI error dont find: " + UI.name + "  " + UI);
+            throw new Exception("UIManager: RemoveUI error dont find UI: ->" + UI.name + "<-  " + UI);
         }
         else
         {

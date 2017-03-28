@@ -600,6 +600,8 @@ public class AnimData : HeapObjectBase
 
     public void AlphaInit(bool isChild)
     {
+        m_animObjectList_Sprite.Clear();
+        m_oldColor.Clear();
         if (isChild)
         {
             SpriteRenderer[] images = m_animGameObejct.GetComponentsInChildren<SpriteRenderer>();
@@ -648,6 +650,9 @@ public class AnimData : HeapObjectBase
 
     public void ColorInit(bool isChild)
     {
+        m_animObjectList_Sprite.Clear();
+        m_oldColor.Clear();
+
         if (isChild)
         {
             SpriteRenderer[] images = m_animGameObejct.GetComponentsInChildren<SpriteRenderer>();

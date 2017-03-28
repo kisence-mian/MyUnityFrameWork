@@ -11,7 +11,7 @@ public class LongPressAcceptor : MonoBehaviour ,IPointerDownHandler,IPointerUpHa
     /// <summary>
     /// 长按时间
     /// </summary>
-    public float LongPressTime = 1.5f;
+    public float LongPressTime = 1f;
 
     float m_Timer = 0;
 

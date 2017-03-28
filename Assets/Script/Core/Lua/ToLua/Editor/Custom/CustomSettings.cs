@@ -162,6 +162,7 @@ public static class CustomSettings
           //_GT(typeof(ResurgenceLuaHelper)),
           //_GT(typeof(ResurgenceStatus)),
           //_GT(typeof(CharacterLuaHelper)),
+          
 
     #endregion
 

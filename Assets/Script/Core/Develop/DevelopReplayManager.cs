@@ -393,7 +393,10 @@ public class DevelopReplayManager
             }
         }
 
-
+        if (GUILayout.Button("清除持久化数据", GUILayout.ExpandHeight(true)))
+        {
+            RecordManager.CleanAllRecord();
+        }
     }
 
     /// <summary>

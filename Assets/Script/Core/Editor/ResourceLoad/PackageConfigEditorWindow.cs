@@ -34,8 +34,8 @@ public class BundleConfigEditorWindow : EditorWindow
         EditorGUIStyleData.Init();
 
         m_NoPackagekFile.Clear();
-        m_NoPackagekFile.Add(HotUpdateManager.c_versionFileName);
-        m_NoPackagekFile.Add(ResourcesConfigManager.c_ManifestFileName);
+        //m_NoPackagekFile.Add(HotUpdateManager.c_versionFileName);
+        //m_NoPackagekFile.Add(ResourcesConfigManager.c_ManifestFileName);
 
         LoadAndAnalysisJson();
         AnalysisVersionFile();
@@ -158,10 +158,10 @@ public class BundleConfigEditorWindow : EditorWindow
             }
         }
 
-        //if (GUILayout.Button("生成MD5"))
-        //{
-        //    CheckAndCreatBundelPackageConfig();
-        //}
+        if (GUILayout.Button("生成MD5"))
+        {
+            CheckAndCreatBundelPackageConfig();
+        }
 
         GUILayout.BeginHorizontal();
 
@@ -545,6 +545,7 @@ public class BundleConfigEditorWindow : EditorWindow
                     EditorGUI.indentLevel = n_level;
                     EditorGUILayout.BeginHorizontal();
                     bundle.isFold = EditorGUILayout.Foldout(bundle.isFold, bundle.name);
+
                     //删除视图
                     if (GUILayout.Button("删除", GUILayout.Width(ButtonWidth)))
                     {
@@ -562,7 +563,6 @@ public class BundleConfigEditorWindow : EditorWindow
                     EditorGUI.indentLevel = n_level + 1;
                     //消息视图
                     MessageView(bundle);
-
                 }
 
             }
@@ -645,6 +645,11 @@ public class BundleConfigEditorWindow : EditorWindow
             EditorGUILayout.BeginHorizontal();
             bundles[i].isFold = EditorGUILayout.Foldout(bundles[i].isFold, bundles[i].name);
 
+            if (GUILayout.Button("重新打包", GUILayout.Width(ButtonWidth)))
+            {
+                RePackageBundle(bundles[i]);
+            }
+
             //删除视图
             if (GUILayout.Button("删除", GUILayout.Width(ButtonWidth)))
             {
@@ -685,6 +690,11 @@ public class BundleConfigEditorWindow : EditorWindow
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.LabelField("主资源:");
         EditorGUILayout.ObjectField(bundle.mainObject.obj, typeof(Object), false);
+
+        if (GUILayout.Button("重新打包", GUILayout.Width(ButtonWidth)))
+        {
+            RePackageBundle(bundle);
+        }
         EditorGUILayout.EndHorizontal();
 
         //依赖包
@@ -1718,8 +1728,6 @@ public class BundleConfigEditorWindow : EditorWindow
         }
     }
 
-
-
     void PackageRelyPackage(EditPackageConfig package)
     {
         //BuildPipeline.PushAssetDependencies();
@@ -1764,6 +1772,28 @@ public class BundleConfigEditorWindow : EditorWindow
         FileTool.CreatFilePath(path);
 
         BuildPipeline.BuildAssetBundle(package.mainObject.obj, res, path, relyBuildOption, getTargetPlatform);
+
+        BuildPipeline.PopAssetDependencies();
+    }
+
+    void RePackageBundle(EditPackageConfig package)
+    {
+        relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
+       | BuildAssetBundleOptions.CollectDependencies   //收集依赖
+       | BuildAssetBundleOptions.CompleteAssets;      //完整资源
+        //| BuildAssetBundleOptions.UncompressedAssetBundle //不压缩
+
+        BuildPipeline.PushAssetDependencies();
+
+        List<EditPackageConfig> tmp = GetRelyPackListByMask(package.relyPackagesMask);
+        //先打依赖包
+        for (int i = 0; i < tmp.Count; i++)
+        {
+            PackageRelyPackage(relyPackages[i]);
+        }
+
+        //再打普通包
+        PackageBundle(package);
 
         BuildPipeline.PopAssetDependencies();
     }
