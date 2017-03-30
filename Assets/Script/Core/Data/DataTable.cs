@@ -451,6 +451,9 @@ public class DataTable : Dictionary<string, SingleData>
         SingleData _value = null;
         if (ContainsKey(key))
             _value = this[key];
+
+
+
         return _value;
     }
 

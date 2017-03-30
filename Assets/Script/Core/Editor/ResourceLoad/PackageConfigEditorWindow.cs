@@ -1152,7 +1152,7 @@ public class BundleConfigEditorWindow : EditorWindow
         }
     }
 
-    Dictionary<string, Shader> shaderFilter = new Dictionary<string, Shader>();
+    //Dictionary<string, Shader> shaderFilter = new Dictionary<string, Shader>();
     //组件过滤器
     bool ComponentFilter(Object comp)
     {
