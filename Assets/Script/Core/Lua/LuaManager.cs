@@ -76,6 +76,7 @@ public class LuaManager
         {
             s_state.GetFunction("Main").Call();
             s_isUpdate = true;
+            s_updateFunction = s_state.GetFunction("LuaUpdate");
         }
         catch (Exception e)
         {
@@ -89,12 +90,9 @@ public class LuaManager
     {
         if(s_isUpdate)
         {
-            if (s_updateFunction == null)
-            {
-                s_updateFunction = s_state.GetFunction("LuaUpdate");
-            }
+            //s_updateFunction.Call(Time.deltaTime * 1000);
 
-            s_updateFunction.Call(Time.deltaTime * 1000);
+            s_updateFunction.Call(200);
         }
     }
 

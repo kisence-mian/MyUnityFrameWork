@@ -86,7 +86,7 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
         DispatchSingleEvent(inputEvent, OnEventDispatch);
 
         //所有事件派发时都调用
-        AllEventDispatch(typeof(Event).Name, inputEvent);
+        AllEventDispatch(m_eventKey, inputEvent);
     }
 
     void DispatchSingleEvent(Event inputEvent, InputEventHandle<Event> callBack)

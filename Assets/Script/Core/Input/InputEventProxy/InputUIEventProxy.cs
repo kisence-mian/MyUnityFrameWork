@@ -16,7 +16,7 @@ public class InputUIEventProxy : IInputProxyBase
         info.m_button = button;
         info.m_OnClick = () =>
         {
-            DispatchUIEvent<InputUIOnClickEvent>(UIName, ComponentName, parm);
+            DispatchOnClickEvent(UIName, ComponentName, parm);
         };
 
         info.AddListener();
@@ -100,13 +100,23 @@ public class InputUIEventProxy : IInputProxyBase
 
     #region 事件派发
 
-    public static void DispatchUIEvent<T>(string UIName, string ComponentName, string parm) where T : InputUIEventBase, new()
+    //public static void DispatchUIEvent<T>(string UIName, string ComponentName, string parm) where T : InputUIEventBase, new()
+    //{
+    //    //只有允许输入时才派发事件
+    //    if (IsActive)
+    //    {
+    //        T eventTmp = GetUIEvent<T>(UIName, ComponentName, parm);
+    //        InputManager.Dispatch<T>(eventTmp);
+    //    }
+    //}
+
+    public static void DispatchOnClickEvent(string UIName, string ComponentName, string parm)
     {
         //只有允许输入时才派发事件
         if (IsActive)
         {
-            T eventTmp = GetUIEvent<T>(UIName, ComponentName, parm);
-            InputManager.Dispatch<T>(eventTmp);
+            InputUIOnClickEvent e = GetUIEvent<InputUIOnClickEvent>(UIName, ComponentName, parm);
+            InputManager.Dispatch("InputUIOnClickEvent", e);
         }
     }
 
@@ -117,7 +127,7 @@ public class InputUIEventProxy : IInputProxyBase
         {
             InputUILongPressEvent e = GetUIEvent<InputUILongPressEvent>(UIName, ComponentName, parm);
             e.m_LongPressType = type;
-            InputManager.Dispatch<InputUILongPressEvent>(e);
+            InputManager.Dispatch("InputUILongPressEvent",e);
         }
     }
 
@@ -128,7 +138,7 @@ public class InputUIEventProxy : IInputProxyBase
         if (IsActive)
         {
             InputUIOnScrollEvent e = GetOnScrollEvent(UIName, ComponentName, parm, position);
-            InputManager.Dispatch<InputUIOnScrollEvent>(e);
+            InputManager.Dispatch("InputUIOnScrollEvent",e);
         }
     }
 
@@ -138,7 +148,7 @@ public class InputUIEventProxy : IInputProxyBase
         if (IsActive)
         {
             InputUIOnDragEvent e = GetDragEvent(UIName, ComponentName,parm, pos);
-            InputManager.Dispatch<InputUIOnDragEvent>(e);
+            InputManager.Dispatch("InputUIOnDragEvent",e);
         }
     }
 
@@ -148,7 +158,7 @@ public class InputUIEventProxy : IInputProxyBase
         if (IsActive)
         {
             InputUIOnBeginDragEvent e = GetUIEvent<InputUIOnBeginDragEvent>(UIName, ComponentName, parm);
-            InputManager.Dispatch<InputUIOnBeginDragEvent>(e);
+            InputManager.Dispatch("InputUIOnBeginDragEvent",e);
         }
     }
 
@@ -158,7 +168,7 @@ public class InputUIEventProxy : IInputProxyBase
         if (IsActive)
         {
             InputUIOnEndDragEvent e = GetUIEvent<InputUIOnEndDragEvent>(UIName, ComponentName, parm);
-            InputManager.Dispatch<InputUIOnEndDragEvent>(e);
+            InputManager.Dispatch("InputUIOnEndDragEvent",e);
         }
     }
 

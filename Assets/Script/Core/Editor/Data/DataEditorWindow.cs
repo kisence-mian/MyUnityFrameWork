@@ -25,7 +25,7 @@ public class DataEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        //ConvertUtf8();
+        ConvertUtf8();
 
         m_currentSelectIndex = 0;
         EditorGUIStyleData.Init();
@@ -44,7 +44,7 @@ public class DataEditorWindow : EditorWindow
     {
         if (!Application.isPlaying)
         {
-            //ConvertUtf8();
+            ConvertUtf8();
 
             FindAllDataName();
 
@@ -773,6 +773,9 @@ public class DataEditorWindow : EditorWindow
 
         //type
         List<string> type = new List<string>(data.m_tableTypes.Keys);
+
+        Debug.Log("type count: "+type.Count);
+
         if (type.Count > 0)
         {
             for (int i = 1; i < data.TableKeys.Count; i++)
