@@ -77,7 +77,7 @@ public class HeapObjectPool
         if (s_ObjListPool == null)
         {
             s_ObjListPool = new List<object>[c_ObjListSize];
-            for (int i = 0; i < c_SODictSize; i++)
+            for (int i = 0; i < c_ObjListSize; i++)
             {
                 s_ObjListPool[i] = new List<object>();
             }

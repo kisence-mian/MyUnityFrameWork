@@ -90,9 +90,7 @@ public class LuaManager
     {
         if(s_isUpdate)
         {
-            //s_updateFunction.Call(Time.deltaTime * 1000);
-
-            s_updateFunction.Call(200);
+            s_updateFunction.Call(Time.deltaTime * 1000);
         }
     }
 
