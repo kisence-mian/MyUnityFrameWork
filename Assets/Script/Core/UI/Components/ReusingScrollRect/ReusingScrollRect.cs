@@ -8,7 +8,9 @@ public class ReusingScrollRect : ScrollRectInput
     public string m_ItemName = "";
 
     //默认是从上到下，从左到右，勾上此选项则反向
-    public bool m_isInversion;
+    public bool m_isInversion = false;
+    //是否接受操作
+    public bool m_isReceiveControl = true;
 
     public List<Dictionary<string, object>> m_datas = new List<Dictionary<string, object>>();
     public List<ReusingScrollItemBase> m_items = new List<ReusingScrollItemBase>();
@@ -34,6 +36,21 @@ public class ReusingScrollRect : ScrollRectInput
 
         m_itemPrefab = ResourceManager.Load<GameObject>(m_ItemName);
         m_itemSize = m_itemPrefab.GetComponent<RectTransform>().sizeDelta;
+    }
+
+    public void Dispose()
+    {
+        for (int i = 0; i < m_items.Count; i++)
+        {
+            GameObjectManager.DestroyGameObjectByPool(m_items[i].gameObject);
+        }
+        m_items.Clear();
+
+        for (int i = 0; i < m_itemCatchs.Count; i++)
+        {
+            GameObjectManager.DestroyGameObjectByPool(m_itemCatchs[i].gameObject);
+        }
+        m_itemCatchs.Clear();
     }
 
 
@@ -161,6 +178,8 @@ public class ReusingScrollRect : ScrollRectInput
         //计算已显示的哪些需要隐藏
         for (int i = 0; i < m_items.Count; i++)
         {
+            m_items[i].OnDrag();
+
             if (!m_clip)
             {
                 m_startPos = m_items[i].m_index;
@@ -231,7 +250,7 @@ public class ReusingScrollRect : ScrollRectInput
         itemTmp.transform.SetParent(content);
         itemTmp.transform.localScale = Vector3.one;
 
-        itemTmp.SetConetnt(index,data);
+        itemTmp.SetContent(index,data);
 
         itemTmp.m_RectTransform.pivot = GetPivot();
         itemTmp.m_RectTransform.anchorMin = GetMinAchors();
@@ -428,9 +447,39 @@ public class ReusingScrollRect : ScrollRectInput
 
     #endregion
 
-    #region 事件监听与转发
+    #region 动画
     
+    public void StartEnterAnim()
+    {
+        m_isReceiveControl = false;
+        StartCoroutine(EnterAnim());
+    }
 
+    public void StartExitAnim()
+    {
+        m_isReceiveControl = false;
+        StartCoroutine(ExitAnim());
+    }
+
+    void EndEnterAnim()
+    {
+        m_isReceiveControl = true;
+    }
+
+    void EndExitAnim()
+    {
+        m_isReceiveControl = true;
+    }
+
+    public virtual IEnumerator EnterAnim()
+    {
+        return null;
+    }
+
+    public virtual IEnumerator ExitAnim()
+    {
+        return null;
+    }
 
     #endregion
 

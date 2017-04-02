@@ -1,9 +1,35 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public abstract class IApplicationStatus
 {
+    List<UIWindowBase> m_uiList = new List<UIWindowBase>();
+
+    public void OpenUI<T>() where T: UIWindowBase
+    {
+        UIWindowBase ui =  UIManager.OpenUIWindow<T>();
+
+        m_uiList.Add(ui);
+    }
+
+    public void CloseUI<T>() where T:UIWindowBase
+    {
+        UIWindowBase ui = UIManager.GetUI<T>();
+        m_uiList.Remove(ui);
+        UIManager.CloseUIWindow(ui);
+    }
+
+    public void CloseAllUI()
+    {
+        for (int i = 0; i < m_uiList.Count; i++)
+        {
+            UIManager.CloseUIWindow(m_uiList[i]);
+        }
+        m_uiList.Clear();
+    }
+
     /// <summary>
     /// 测试使用，直接进入游戏某个流程时，这里可以初始化测试数据
     /// </summary>

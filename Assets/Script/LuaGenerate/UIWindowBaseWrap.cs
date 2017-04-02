@@ -9,6 +9,8 @@ public class UIWindowBaseWrap
 		L.BeginClass(typeof(UIWindowBase), typeof(UIBase));
 		L.RegFunction("OnOpen", OnOpen);
 		L.RegFunction("OnClose", OnClose);
+		L.RegFunction("OnHide", OnHide);
+		L.RegFunction("OnShow", OnShow);
 		L.RegFunction("OnRefresh", OnRefresh);
 		L.RegFunction("EnterAnim", EnterAnim);
 		L.RegFunction("OnCompleteEnterAnim", OnCompleteEnterAnim);
@@ -49,6 +51,38 @@ public class UIWindowBaseWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
 			obj.OnClose();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnHide(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.OnHide();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int OnShow(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.OnShow();
 			return 0;
 		}
 		catch(Exception e)
