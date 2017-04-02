@@ -42,8 +42,8 @@ public class ProtocolService : INetworkInterface
 
         InitMessagePool(50);
         m_acb = new AsyncCallback(EndReceive);
-        m_readData = new byte[1024];
-        m_messageBuffer = new byte[2048];
+        m_readData = new byte[102400];
+        m_messageBuffer = new byte[204800];
 
         m_head = 0;
         m_total = 0;
@@ -445,7 +445,7 @@ public class ProtocolService : INetworkInterface
     NetWorkMessage  Analysis(ByteArray bytes)
     {
         NetWorkMessage msg = GetMessageByPool();
-
+        //Debug.Log("ReceiveDataLoad : " + BitConverter.ToString(bytes));
         bytes.ReadShort(); //消息长度
         bytes.ReadByte();  //模块名
 
@@ -454,6 +454,7 @@ public class ProtocolService : INetworkInterface
         msg.m_MessageType = m_methodNameInfo[methodIndex];
         int re_len = bytes.Length - 5;
         msg.m_data = AnalysisData(msg.m_MessageType, bytes.ReadBytes(re_len));
+
 
         return msg;
     }
@@ -607,6 +608,7 @@ public class ProtocolService : INetworkInterface
         tbl.Clear();
 
         int len1 = ba.ReadShort();
+        //Debug.Log("len1    ---- "+ len1);
         ba.ReadInt();
 
         for (int i = 0; i < len1; i++)
@@ -702,10 +704,14 @@ public class ProtocolService : INetworkInterface
                     if (repeatType == RT_repeated)
                     {
                         tbl[fieldName] = ReadIntList(ba);
+
+
+
                     }
                     else
                     {
                         tbl[fieldName] = ReadInt(ba);
+
                     }
                 }
                 else

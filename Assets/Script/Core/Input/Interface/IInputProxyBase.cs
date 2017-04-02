@@ -17,58 +17,23 @@ public abstract class IInputProxyBase
 
     #region 事件池
 
-    static Dictionary<string, EventPool> m_eventPool = new Dictionary<string, EventPool>();
+    //public static T GetEvent<T>() where T : IInputEventBase, new()
+    //{
+    //    return InputOperationEventProxy.GetEvent<T>();
+    //}
 
-    public static T GetEvent<T>() where T : IInputEventBase, new()
+    public static T GetEvent<T>(string eventKey) where T : IInputEventBase, new()
     {
-        string cmdKey = typeof(T).Name;
+        T tmp = HeapObjectPoolTool<T>.GetHeapObject();
+        tmp.EventKey = eventKey;
 
-        if (!m_eventPool.ContainsKey(cmdKey))
-        {
-            EventPool pool = new EventPool();
-            pool.Init<T>(3);
-
-            m_eventPool.Add(cmdKey, pool);
-        }
-
-
-        return (T)m_eventPool[cmdKey].GetEvent();
-    }
-
-    class EventPool
-    {
-        IInputEventBase[] m_pool;
-        int m_poolIndex = 0;
-
-        public void Init<T>(int size) where T : IInputEventBase, new()
-        {
-            m_pool = new T[size];
-            for (int i = 0; i < size; i++)
-            {
-                m_pool[i] = new T();
-            }
-        }
-
-        public IInputEventBase GetEvent()
-        {
-            IInputEventBase cmd = m_pool[m_poolIndex];
-            cmd.Reset();
-
-            m_poolIndex++;
-
-            if (m_poolIndex >= m_pool.Length)
-            {
-                m_poolIndex = 0;
-            }
-
-            return cmd;
-        }
+        return tmp;
     }
 
     #endregion
 }
 
-public class InputEventRegisterInfo<T> where T: IInputEventBase
+public class InputEventRegisterInfo<T> : HeapObjectBase where T : IInputEventBase
 {
     public string eventKey;
     public InputEventHandle<T> callBack;
@@ -81,6 +46,7 @@ public class InputEventRegisterInfo<T> where T: IInputEventBase
     public virtual void RemoveListener()
     {
         InputManager.RemoveListener<T>(eventKey, callBack);
+        Release();
     }
 
     

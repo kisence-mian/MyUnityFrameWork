@@ -16,6 +16,7 @@ public class GameObjectManager :MonoBehaviour
             {
                 GameObject instancePool = new GameObject("ObjectPool");
                 s_poolParent = instancePool.transform;
+                if(Application.isPlaying)
                 DontDestroyOnLoad(s_poolParent);
             }
 
@@ -185,8 +186,21 @@ public class GameObjectManager :MonoBehaviour
     {
         foreach (string name in s_objectPool.Keys)
         {
-            CleanPoolByName(name);
+            if (s_objectPool.ContainsKey(name))
+            {
+                List<GameObject> l_objList = s_objectPool[name];
+
+                for (int i = 0; i < l_objList.Count; i++)
+                {
+                    Destroy(l_objList[i]);
+                }
+
+                l_objList.Clear();
+
+            }
         }
+
+        s_objectPool.Clear();
     }
 
     /// <summary>
@@ -194,6 +208,8 @@ public class GameObjectManager :MonoBehaviour
     /// </summary>
     public static void CleanPoolByName(string name)
     {
+        Debug.Log("CleanPool :" + name);
+
         if (s_objectPool.ContainsKey(name))
         {
             List<GameObject> l_objList = s_objectPool[name];
@@ -204,7 +220,11 @@ public class GameObjectManager :MonoBehaviour
             }
 
             l_objList.Clear();
+
+            s_objectPool.Remove(name);
         }
+
+
     }
 
     #endregion
@@ -250,6 +270,15 @@ public class GameObjectManager :MonoBehaviour
         return po;
     }
 
+    /// <summary>
+    /// 把一个对象放入对象池
+    /// </summary>
+    /// <param name="gameObjectName"></param>
+    public static void PutPoolObject(string gameObjectName)
+    {
+        DestroyPoolObject(CreatPoolObject(gameObjectName));
+    }
+
 
     public static bool IsExist_New(string objectName)
     {
@@ -280,7 +309,6 @@ public class GameObjectManager :MonoBehaviour
         {
             po = s_objectPool_new[name][0];
             s_objectPool_new[name].RemoveAt(0);
-
             if (po && po.SetActive)
                 po.gameObject.SetActive(true);
 
@@ -295,6 +323,7 @@ public class GameObjectManager :MonoBehaviour
         }
         else
         {
+            //Debug.Log("GetPoolObject " + name);
             po = CreatPoolObject(name, parent);
         }
 
@@ -369,10 +398,31 @@ public class GameObjectManager :MonoBehaviour
     /// </summary>
     public static void CleanPool_New()
     {
-        foreach (string name in s_objectPool.Keys)
+        foreach (string name in s_objectPool_new.Keys)
         {
-            CleanPoolByName_New(name);
+            if (s_objectPool_new.ContainsKey(name))
+            {
+                List<PoolObject> objList = s_objectPool_new[name];
+
+                for (int i = 0; i < objList.Count; i++)
+                {
+                    try
+                    {
+                        objList[i].OnObjectDestroy();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log(e.ToString());
+                    }
+
+                    Destroy(objList[i].gameObject);
+                }
+
+                objList.Clear();
+            }
         }
+
+        s_objectPool_new.Clear();
     }
 
     /// <summary>
@@ -382,17 +432,24 @@ public class GameObjectManager :MonoBehaviour
     {
         if (s_objectPool_new.ContainsKey(name))
         {
-            List<PoolObject> l_objList = s_objectPool_new[name];
+            List<PoolObject> objList = s_objectPool_new[name];
 
-            for (int i = 0; i < l_objList.Count; i++)
+            for (int i = 0; i < objList.Count; i++)
             {
-                try{l_objList[i].OnDistroy();}
-                catch(Exception e){Debug.Log(e.ToString());}
+                try
+                {
+                    objList[i].OnObjectDestroy();
+                }
+                catch(Exception e)
+                {
+                    Debug.Log(e.ToString());
+                }
 
-                Destroy(l_objList[i].gameObject);
+                Destroy(objList[i].gameObject);
             }
 
-            l_objList.Clear();
+            objList.Clear();
+            s_objectPool_new.Remove(name);
         }
     }
 

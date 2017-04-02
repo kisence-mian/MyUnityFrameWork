@@ -1,7 +1,4 @@
 ﻿using System.Collections.Generic;
-/// <summary>
-/// 存点儿 用户登陆数据 游戏设置 相关的数据（可读写）
-/// </summary>
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -27,8 +24,17 @@ public class UGUITool
     
     static public void set_icon(Image img,string name,bool is_nativesize = true)
     {
-        img.overrideSprite = ResourceManager.Load<Sprite>(name);
-        if (is_nativesize)
-            img.SetNativeSize();
+        try
+        {
+            Texture2D tex = ResourceManager.Load<Texture2D>(name);
+            img.overrideSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);
+
+            if (is_nativesize)
+                img.SetNativeSize();
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e.Message);           
+        }
     }
 }

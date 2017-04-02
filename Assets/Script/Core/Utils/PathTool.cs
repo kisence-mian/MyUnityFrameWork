@@ -20,7 +20,7 @@ public class PathTool
             case ResLoadLocation.Streaming:
 
 #if UNITY_ANDROID && !UNITY_EDITOR
-
+                //path.Append("file://");
                 path.Append(Application.dataPath );
                 path.Append("!assets/");
 #else

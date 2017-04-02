@@ -13,6 +13,7 @@ public class GameObjectManagerWrap
 		L.RegFunction("DestroyGameObjectByPool", DestroyGameObjectByPool);
 		L.RegFunction("CleanPool", CleanPool);
 		L.RegFunction("CleanPoolByName", CleanPoolByName);
+		L.RegFunction("PutPoolObject", PutPoolObject);
 		L.RegFunction("IsExist_New", IsExist_New);
 		L.RegFunction("GetPoolObject", GetPoolObject);
 		L.RegFunction("DestroyPoolObject", DestroyPoolObject);
@@ -166,6 +167,22 @@ public class GameObjectManagerWrap
 			ToLua.CheckArgsCount(L, 1);
 			string arg0 = ToLua.CheckString(L, 1);
 			GameObjectManager.CleanPoolByName(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int PutPoolObject(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			string arg0 = ToLua.CheckString(L, 1);
+			GameObjectManager.PutPoolObject(arg0);
 			return 0;
 		}
 		catch(Exception e)

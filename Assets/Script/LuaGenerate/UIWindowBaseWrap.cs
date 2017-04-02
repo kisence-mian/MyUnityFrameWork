@@ -16,6 +16,8 @@ public class UIWindowBaseWrap
 		L.RegFunction("OnCompleteEnterAnim", OnCompleteEnterAnim);
 		L.RegFunction("ExitAnim", ExitAnim);
 		L.RegFunction("OnCompleteExitAnim", OnCompleteExitAnim);
+		L.RegFunction("Show", Show);
+		L.RegFunction("Hide", Hide);
 		L.RegFunction("Refresh", Refresh);
 		L.RegFunction("AddEventListener", AddEventListener);
 		L.RegFunction("RemoveAllListener", RemoveAllListener);
@@ -219,6 +221,38 @@ public class UIWindowBaseWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
 			obj.OnCompleteExitAnim();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Show(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.Show();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Hide(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIWindowBase obj = (UIWindowBase)ToLua.CheckObject(L, 1, typeof(UIWindowBase));
+			obj.Hide();
 			return 0;
 		}
 		catch(Exception e)

@@ -94,6 +94,8 @@ public static class CustomSettings
             _GT(typeof(UIManager)),
             _GT(typeof(UIWindowLuaHelper)),
 
+            //_GT(typeof(LongPressAcceptor)),
+
         #endregion
 
         #region Data
@@ -105,10 +107,12 @@ public static class CustomSettings
             _GT(typeof(DataTable)),
             _GT(typeof(SingleData)),
             _GT(typeof(SingleField)),
+            _GT(typeof(RecordTable)),            
 
             _GT(typeof(DataManager)),
             _GT(typeof(ConfigManager)),
             _GT(typeof(RecordManager)),
+            _GT(typeof(AudioManager)),
 
         #endregion
 
@@ -119,6 +123,7 @@ public static class CustomSettings
             _GT(typeof(InputUIEventBase)),
             _GT(typeof(InputUIOnScrollEvent)),
             _GT(typeof(InputUIOnClickEvent)),
+            _GT(typeof(InputUILongPressEvent)),
 
             _GT(typeof(InputNetworkMessageEvent)),
             _GT(typeof(InputNetworkConnectStatusEvent)),
@@ -157,6 +162,7 @@ public static class CustomSettings
           //_GT(typeof(ResurgenceLuaHelper)),
           //_GT(typeof(ResurgenceStatus)),
           //_GT(typeof(CharacterLuaHelper)),
+          
 
     #endregion
 

@@ -58,16 +58,11 @@ public class HotUpdateManager
 
     static void CheckLocalVersion()
     {
-        string streamVersionPath = ResourceIOTool.ReadStringByFile(PathTool.GetAbsolutePath(
-                    ResLoadLocation.Streaming,c_versionFileName + "." + ConfigManager.c_expandName));
-
-        if (!File.Exists(streamVersionPath))
-        {
-            return;
-        }
-
-
-        string StreamVersionContent = ResourceIOTool.ReadStringByFile(streamVersionPath);
+        AssetBundle ab = AssetBundle.LoadFromFile(PathTool.GetAbsolutePath(ResLoadLocation.Streaming,
+            c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName));
+        TextAsset text = (TextAsset)ab.mainAsset;
+        string StreamVersionContent = text.text;
+        ab.Unload(true);
 
         //stream版本
         Dictionary<string, object> StreamVersion = (Dictionary<string, object>)MiniJSON.Json.Deserialize(StreamVersionContent);
@@ -106,13 +101,15 @@ public class HotUpdateManager
             yield break;
         }
 
-        m_versionFileCatch = www.text;
+        m_versionFileCatch = ((TextAsset)www.assetBundle.mainAsset).text;
+
+        www.assetBundle.Unload(true);
 
         UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingVersionFile, GetHotUpdateProgress(false, false, 1));
 
-        //Debug.Log("www.text: " + www.text);
+        //Debug.Log("Version File :text: " + m_versionFileCatch);
 
-        Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)MiniJSON.Json.Deserialize(www.text);
+        Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)MiniJSON.Json.Deserialize(m_versionFileCatch);
 
         //服务器大版本比较大，需要整包更新
         if ( GetInt(m_versionConfig[c_largeVersionKey])
@@ -172,11 +169,13 @@ public class HotUpdateManager
             yield break;
         }
 
-        m_Md5FileCatch = www.text;
+        m_Md5FileCatch = ((TextAsset)www.assetBundle.mainAsset).text;
+
+        www.assetBundle.Unload(true);
 
         UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingMd5File, GetHotUpdateProgress(true, false, 1));
 
-        ResourcesConfigStruct serviceFileConfig = ResourcesConfigManager.AnalysisResourcesConfig2Struct(www.text);
+        ResourcesConfigStruct serviceFileConfig = ResourcesConfigManager.AnalysisResourcesConfig2Struct(m_Md5FileCatch);
         ResourcesConfigStruct localFileConfig   = ResourcesConfigManager.AnalysisResourcesConfig2Struct(ResourcesConfigManager.ReadResourceConfigContent());
 
         s_downLoadList = new List<ResourcesConfig>();
@@ -289,8 +288,8 @@ public class HotUpdateManager
 
         string downLoadPath = downLoadServicePath + "/" + platform + "/" + Application.version + "/";
 
-        s_versionFileDownLoadPath   = downLoadPath + HotUpdateManager.c_versionFileName + "." + ConfigManager.c_expandName;
-        s_Md5FileDownLoadPath       = downLoadPath + ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName;
+        s_versionFileDownLoadPath   = downLoadPath + HotUpdateManager.c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
+        s_Md5FileDownLoadPath       = downLoadPath + ResourcesConfigManager.c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
         s_resourcesFileDownLoadPath = downLoadPath;
     }
 
@@ -329,7 +328,7 @@ public class HotUpdateManager
         if (s_downLoadList.Count ==0)
         {
             Debug.Log("更新列表为 0");
-            return 1;
+            return 0.95f;
         }
 
         return ((float)(index + 1) / (float)(s_downLoadList.Count + 1));
@@ -366,12 +365,22 @@ public class HotUpdateManager
             if (RecordManager.GetData(c_HotUpdateRecordName).GetRecord(c_useHotUpdateRecordKey, false))
             {
                 type = ResLoadLocation.Persistent;
+                dataJson = ResourceIOTool.ReadStringByFile(
+                    PathTool.GetAbsolutePath(
+                         type,
+                         c_versionFileName + "." + ConfigManager.c_expandName));
+            }
+            else
+            {
+                AssetBundle ab = AssetBundle.LoadFromFile(PathTool.GetAbsolutePath(
+                  type,
+                  c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName));
+                    TextAsset text = (TextAsset)ab.mainAsset;
+                    dataJson = text.text;
+                    ab.Unload(true);
             }
 
-            dataJson = ResourceIOTool.ReadStringByFile(
-                PathTool.GetAbsolutePath(
-                     type,
-                     c_versionFileName + "." + ConfigManager.c_expandName));
+
         }
 
         return dataJson;

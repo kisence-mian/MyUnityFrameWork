@@ -77,7 +77,7 @@ public class HeapObjectPool
         if (s_ObjListPool == null)
         {
             s_ObjListPool = new List<object>[c_ObjListSize];
-            for (int i = 0; i < c_SODictSize; i++)
+            for (int i = 0; i < c_ObjListSize; i++)
             {
                 s_ObjListPool[i] = new List<object>();
             }
@@ -162,6 +162,26 @@ public class HeapObjectPool
         }
     }
 
+    public static T GetObject<T>(string TypeName) where T : HeapObjectBase, new()
+    {
+        JudgeNullPool(TypeName);
+
+        List<HeapObjectBase> list = s_pool[TypeName];
+
+        if (list.Count > 0)
+        {
+            HeapObjectBase tmp = list[0];
+            list.RemoveAt(0);
+
+            return (T)tmp;
+        }
+        else
+        {
+            Init<T>();
+            return GetObject<T>();
+        }
+    }
+
     public static void ReleaseObject(string type,HeapObjectBase obj)
     {
         JudgeNullPool(type);
@@ -223,7 +243,7 @@ public class HeapObjectPoolTool<T> where T : new()
 {
     static T[] s_pool;
     static int s_poolIndex = 0;
-    static int s_size = 20;
+    static int s_size = 500;
 
     public static void SetSize(int size)
     {

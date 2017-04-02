@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-public class ReusingScrollItemBase : UIBase 
+public class ReusingScrollItemBase : UIBase
 {
     public int m_index = 0;
 

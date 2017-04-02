@@ -27,6 +27,7 @@ public class AnimSystemWrap
 		L.RegFunction("StopAnim", StopAnim);
 		L.RegFunction("FinishAnim", FinishAnim);
 		L.RegFunction("ClearAllAnim", ClearAllAnim);
+		L.RegFunction("Update", Update);
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("animList", get_animList, set_animList);
@@ -307,7 +308,7 @@ public class AnimSystemWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 12);
+			ToLua.CheckArgsCount(L, 13);
 			UnityEngine.GameObject arg0 = (UnityEngine.GameObject)ToLua.CheckUnityObject(L, 1, typeof(UnityEngine.GameObject));
 			System.Nullable<UnityEngine.Vector3> arg1 = (System.Nullable<UnityEngine.Vector3>)ToLua.CheckVarObject(L, 2, typeof(System.Nullable<UnityEngine.Vector3>));
 			UnityEngine.Vector3 arg2 = (UnityEngine.Vector3)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector3));
@@ -318,21 +319,22 @@ public class AnimSystemWrap
 			bool arg7 = LuaDLL.luaL_checkboolean(L, 8);
 			RepeatType arg8 = (RepeatType)ToLua.CheckObject(L, 9, typeof(RepeatType));
 			int arg9 = (int)LuaDLL.luaL_checknumber(L, 10);
-			AnimCallBack arg10 = null;
-			LuaTypes funcType11 = LuaDLL.lua_type(L, 11);
+			UnityEngine.Transform arg10 = (UnityEngine.Transform)ToLua.CheckUnityObject(L, 11, typeof(UnityEngine.Transform));
+			AnimCallBack arg11 = null;
+			LuaTypes funcType12 = LuaDLL.lua_type(L, 12);
 
-			if (funcType11 != LuaTypes.LUA_TFUNCTION)
+			if (funcType12 != LuaTypes.LUA_TFUNCTION)
 			{
-				 arg10 = (AnimCallBack)ToLua.CheckObject(L, 11, typeof(AnimCallBack));
+				 arg11 = (AnimCallBack)ToLua.CheckObject(L, 12, typeof(AnimCallBack));
 			}
 			else
 			{
-				LuaFunction func = ToLua.ToLuaFunction(L, 11);
-				arg10 = DelegateFactory.CreateDelegate(typeof(AnimCallBack), func) as AnimCallBack;
+				LuaFunction func = ToLua.ToLuaFunction(L, 12);
+				arg11 = DelegateFactory.CreateDelegate(typeof(AnimCallBack), func) as AnimCallBack;
 			}
 
-			object[] arg11 = ToLua.CheckObjectArray(L, 12);
-			AnimData o = AnimSystem.Move(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11);
+			object[] arg12 = ToLua.CheckObjectArray(L, 13);
+			AnimData o = AnimSystem.Move(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9, arg10, arg11, arg12);
 			ToLua.PushObject(L, o);
 			return 1;
 		}
@@ -878,6 +880,22 @@ public class AnimSystemWrap
 			ToLua.CheckArgsCount(L, 1);
 			bool arg0 = LuaDLL.luaL_checkboolean(L, 1);
 			AnimSystem.ClearAllAnim(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Update(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			AnimSystem obj = (AnimSystem)ToLua.CheckObject(L, 1, typeof(AnimSystem));
+			obj.Update();
 			return 0;
 		}
 		catch(Exception e)

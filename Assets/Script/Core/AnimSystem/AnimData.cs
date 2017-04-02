@@ -35,6 +35,9 @@ public class AnimData : HeapObjectBase
     //Float
     public float m_fromFloat = 0;
     public float m_toFloat = 0;
+
+    //Move
+    public Transform m_toTransform;
     
     //Color
     public Color m_fromColor;
@@ -101,27 +104,35 @@ public class AnimData : HeapObjectBase
             m_isDone = true;
         }
 
-        switch (m_animType)
+        try
         {
-            case AnimType.UGUI_Color: UguiColor(); break;
-            case AnimType.UGUI_Alpha: UguiAlpha(); break;
-            case AnimType.UGUI_AnchoredPosition: UguiPosition(); break;
-            case AnimType.UGUI_SizeDetal: SizeDelta(); break;
 
-            case AnimType.Position: Position(); break;
-            case AnimType.LocalPosition: LocalPosition(); break;
-            case AnimType.LocalScale: LocalScale(); break;
-            case AnimType.LocalRotate: LocalRotate(); break;
-            case AnimType.Rotate: Rotate(); break;
+            switch (m_animType)
+            {
+                case AnimType.UGUI_Color: UguiColor(); break;
+                case AnimType.UGUI_Alpha: UguiAlpha(); break;
+                case AnimType.UGUI_AnchoredPosition: UguiPosition(); break;
+                case AnimType.UGUI_SizeDetal: SizeDelta(); break;
 
-            case AnimType.Color: UpdateColor(); break;
-            case AnimType.Alpha: UpdateAlpha(); break;
+                case AnimType.Position: Position(); break;
+                case AnimType.LocalPosition: LocalPosition(); break;
+                case AnimType.LocalScale: LocalScale(); break;
+                case AnimType.LocalRotate: LocalRotate(); break;
+                case AnimType.Rotate: Rotate(); break;
 
-            case AnimType.Custom_Vector3: CustomMethodVector3(); break;
-            case AnimType.Custom_Vector2: CustomMethodVector2(); break;
-            case AnimType.Custom_Float:   CustomMethodFloat(); break;
+                case AnimType.Color: UpdateColor(); break;
+                case AnimType.Alpha: UpdateAlpha(); break;
 
-            case AnimType.Blink: Blink(); break;
+                case AnimType.Custom_Vector3: CustomMethodVector3(); break;
+                case AnimType.Custom_Vector2: CustomMethodVector2(); break;
+                case AnimType.Custom_Float: CustomMethodFloat(); break;
+
+                case AnimType.Blink: Blink(); break;
+            }
+        }
+        catch(Exception e)
+        {
+            Debug.LogError("AnimSystem Error Exception: " + e.ToString());
         }
     }
 
@@ -241,6 +252,7 @@ public class AnimData : HeapObjectBase
         m_pathType = PathType.Line;
         m_v3Contral = null;
         m_floatContral = null;
+        //m_toTransform = null;
     }
 
     #endregion
@@ -368,9 +380,9 @@ public class AnimData : HeapObjectBase
 
     public void UguiAlphaInit(bool isChild)
     {
-        m_animObjectList_Image = new List<Image>();
-        m_animObjectList_Text = new List<Text>();
-        m_oldColor = new List<Color>();
+        m_animObjectList_Image.Clear();
+        m_animObjectList_Text.Clear();
+        m_oldColor.Clear();
 
         if (isChild)
         {
@@ -381,10 +393,6 @@ public class AnimData : HeapObjectBase
                 {
                     m_animObjectList_Image.Add(images[i]);
                     m_oldColor.Add(images[i].color);
-                }
-                else
-                {
-                    //Debug.LogError("name:" + images[i].gameObject.name);
                 }
             }
 
@@ -456,7 +464,8 @@ public class AnimData : HeapObjectBase
 
     public void UguiColorInit(bool isChild)
     {
-        m_animObjectList_Image = new List<Image>();
+        m_animObjectList_Image.Clear();
+        m_animObjectList_Text.Clear();
 
         if (isChild)
         {
@@ -551,7 +560,14 @@ public class AnimData : HeapObjectBase
 
     void Position()
     {
-        m_transform.position = GetInterpolationV3(m_fromV3, m_toV3);
+        if (m_toTransform != null)
+        {
+            m_transform.position = GetInterpolationV3(m_fromV3, m_toTransform.position);
+        }
+        else
+        {
+            m_transform.position = GetInterpolationV3(m_fromV3, m_toV3);
+        }
     }
 
     void LocalPosition()
@@ -584,6 +600,8 @@ public class AnimData : HeapObjectBase
 
     public void AlphaInit(bool isChild)
     {
+        m_animObjectList_Sprite.Clear();
+        m_oldColor.Clear();
         if (isChild)
         {
             SpriteRenderer[] images = m_animGameObejct.GetComponentsInChildren<SpriteRenderer>();
@@ -632,6 +650,9 @@ public class AnimData : HeapObjectBase
 
     public void ColorInit(bool isChild)
     {
+        m_animObjectList_Sprite.Clear();
+        m_oldColor.Clear();
+
         if (isChild)
         {
             SpriteRenderer[] images = m_animGameObejct.GetComponentsInChildren<SpriteRenderer>();

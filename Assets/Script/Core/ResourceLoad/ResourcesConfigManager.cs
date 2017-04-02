@@ -92,12 +92,27 @@ public static class ResourcesConfigManager
             if (RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(HotUpdateManager.c_useHotUpdateRecordKey, false))
             {
                 type = ResLoadLocation.Persistent;
-            }
 
-            dataJson = ResourceIOTool.ReadStringByFile(
+                dataJson = ResourceIOTool.ReadStringByFile(
                 PathTool.GetAbsolutePath(
                      type,
                      c_ManifestFileName + "." + ConfigManager.c_expandName));
+            }
+            else
+            {
+                AssetBundle ab = AssetBundle.LoadFromFile(PathTool.GetAbsolutePath(
+                     type,
+                     c_ManifestFileName + "." +  AssetsBundleManager.c_AssetsBundlesExpandName));
+
+                TextAsset text = (TextAsset)ab.mainAsset;
+                dataJson = text.text;
+
+                ab.Unload(true);
+            }
+
+            Debug.Log("loadType: " + type);
+
+
         }
 
         return dataJson;
@@ -126,7 +141,7 @@ public static class ResourcesConfigManager
             ResourcesConfig config = new ResourcesConfig();
             config.name = (string)tmp["name"];
             config.path = (string)tmp["path"];
-            config.relyPackages = ((string)tmp["relyPackages"]).Split('|');
+            config.relyPackages = (tmp["relyPackages"].ToString()).Split('|');
             config.md5 = (string)tmp["md5"];
 
             result.relyList.Add(config.name,config);

@@ -72,6 +72,12 @@ public class RecordManager
         SaveData(recordName, table);
     }
 
+    public static void CleanAllRecord()
+    {
+        FileTool.DeleteDirectory(Application.persistentDataPath + "/" + RecordManager.c_directoryName);
+        CleanCatch();
+    }
+
     public static void CleanCatch()
     {
         s_RecordCatch.Clear();

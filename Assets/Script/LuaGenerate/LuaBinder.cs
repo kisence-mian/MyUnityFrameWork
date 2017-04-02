@@ -24,14 +24,17 @@ public static class LuaBinder
 		DataTableWrap.Register(L);
 		SingleDataWrap.Register(L);
 		SingleFieldWrap.Register(L);
+		RecordTableWrap.Register(L);
 		DataManagerWrap.Register(L);
 		ConfigManagerWrap.Register(L);
 		RecordManagerWrap.Register(L);
+		AudioManagerWrap.Register(L);
 		IInputEventBaseWrap.Register(L);
 		InputUIEventTypeWrap.Register(L);
 		InputUIEventBaseWrap.Register(L);
 		InputUIOnScrollEventWrap.Register(L);
 		InputUIOnClickEventWrap.Register(L);
+		InputUILongPressEventWrap.Register(L);
 		InputNetworkMessageEventWrap.Register(L);
 		InputNetworkConnectStatusEventWrap.Register(L);
 		NetworkStateWrap.Register(L);
@@ -45,9 +48,11 @@ public static class LuaBinder
 		L.RegFunction("AnimCustomMethodVector2", AnimCustomMethodVector2);
 		L.RegFunction("AnimCustomMethodFloat", AnimCustomMethodFloat);
 		L.RegFunction("InputEventHandle_InputUIOnClickEvent", InputEventHandle_InputUIOnClickEvent);
+		L.RegFunction("InputEventHandle_InputUILongPressEvent", InputEventHandle_InputUILongPressEvent);
 		L.RegFunction("EventHandle", EventHandle);
 		L.RegFunction("UIAnimCallBack", UIAnimCallBack);
 		L.RegFunction("UICallBack", UICallBack);
+		L.RegFunction("AudioCallBack", AudioCallBack);
 		L.RegFunction("InputEventCallBack", InputEventCallBack);
 		L.RegFunction("InputEventHandle_IInputEventBase", InputEventHandle_IInputEventBase);
 		L.BeginModule("UnityEngine");
@@ -90,6 +95,7 @@ public static class LuaBinder
 		System_Collections_Generic_Dictionary_string_objectWrap.Register(L);
 		System_Collections_Generic_Dictionary_string_SingleDataWrap.Register(L);
 		System_Collections_Generic_Dictionary_string_stringWrap.Register(L);
+		System_Collections_Generic_Dictionary_string_SingleFieldWrap.Register(L);
 		L.EndModule();
 		L.EndModule();
 		L.EndModule();
@@ -233,6 +239,33 @@ public static class LuaBinder
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InputEventHandle_InputUILongPressEvent(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUILongPressEvent>), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUILongPressEvent>), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int EventHandle(IntPtr L)
 	{
 		try
@@ -303,6 +336,33 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(UICallBack), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int AudioCallBack(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AudioCallBack), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(AudioCallBack), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

@@ -117,7 +117,10 @@ public class EditorUseUtils  {
 
     public static string DrawPopup(string name, string selectedStr, List<string> displayedOptions)
     {
+        if (displayedOptions == null)
+            return selectedStr;
         int selectedIndex = 0;
+        
         if (displayedOptions.Contains(selectedStr))
         {
             selectedIndex = displayedOptions.IndexOf(selectedStr);

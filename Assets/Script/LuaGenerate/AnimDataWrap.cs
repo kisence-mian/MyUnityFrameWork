@@ -73,6 +73,7 @@ public class AnimDataWrap
 		L.RegVar("m_toV2", get_m_toV2, set_m_toV2);
 		L.RegVar("m_fromFloat", get_m_fromFloat, set_m_fromFloat);
 		L.RegVar("m_toFloat", get_m_toFloat, set_m_toFloat);
+		L.RegVar("m_toTransform", get_m_toTransform, set_m_toTransform);
 		L.RegVar("m_fromColor", get_m_fromColor, set_m_fromColor);
 		L.RegVar("m_toColor", get_m_toColor, set_m_toColor);
 		L.RegVar("m_parameter", get_m_parameter, set_m_parameter);
@@ -1329,6 +1330,25 @@ public class AnimDataWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_toTransform(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Transform ret = obj.m_toTransform;
+			ToLua.Push(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toTransform on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_m_fromColor(IntPtr L)
 	{
 		object o = null;
@@ -1876,6 +1896,25 @@ public class AnimDataWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toFloat on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_toTransform(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			AnimData obj = (AnimData)o;
+			UnityEngine.Transform arg0 = (UnityEngine.Transform)ToLua.CheckUnityObject(L, 2, typeof(UnityEngine.Transform));
+			obj.m_toTransform = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_toTransform on a nil value" : e.Message);
 		}
 	}
 

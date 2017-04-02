@@ -773,6 +773,9 @@ public class DataEditorWindow : EditorWindow
 
         //type
         List<string> type = new List<string>(data.m_tableTypes.Keys);
+
+        Debug.Log("type count: "+type.Count);
+
         if (type.Count > 0)
         {
             for (int i = 1; i < data.TableKeys.Count; i++)
@@ -903,7 +906,6 @@ public class DataEditorWindow : EditorWindow
     {
         FileTool.RecursionFileExecute(Application.dataPath + "/Resources/" + DataManager.c_directoryName, "txt", (name) =>
         {
-            //Debug.Log("ConvertUtf8 path-> " + name);
             FileTool.ConvertFileEncoding(name, null, System.Text.Encoding.UTF8);
         });
     }
