@@ -26,8 +26,8 @@ public class SDKEditorWindow : EditorWindow
     SDKInterfaceBase m_LoginScheme;
     SDKInterfaceBase m_ADScheme;
     SDKInterfaceBase m_PayScheme;
-    List<SDKInterfaceBase> m_LogScheme;
-    List<SDKInterfaceBase> m_otherScheme;
+    List<SDKInterfaceBase> m_LogScheme= new List<SDKInterfaceBase>();
+    List<SDKInterfaceBase> m_otherScheme = new List<SDKInterfaceBase>();
 
 
     [MenuItem("Window/SDK管理器")]
