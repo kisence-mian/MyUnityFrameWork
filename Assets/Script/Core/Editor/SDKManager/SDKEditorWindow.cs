@@ -187,9 +187,12 @@ public class SDKEditorWindow : EditorWindow
 
     void SaveConfigGUI()
     {
-        if (GUILayout.Button("保存"))
+        if (currentSchemeData != null)
         {
-            SaveSchemeConfig();
+            if (GUILayout.Button("保存"))
+            {
+                SaveSchemeConfig();
+            }
         }
     }
 
@@ -338,7 +341,7 @@ public class SDKEditorWindow : EditorWindow
 
             //显示界面
 
-            EditorUseUtils.DrawClassData(sdk);
+            EditorUtilGUI.DrawClassData(sdk);
 
             EditorGUI.indentLevel--;
             EditorGUILayout.Space();
@@ -450,25 +453,28 @@ public class SDKEditorWindow : EditorWindow
 
     void SaveCurrentSchemeConfig()
     {
-        currentSchemeData.LoginScheme = SerializeConfig(m_LoginScheme);
-        currentSchemeData.ADScheme = SerializeConfig(m_ADScheme);
-        currentSchemeData.PayScheme = SerializeConfig(m_PayScheme);
-
-        currentSchemeData.LogScheme.Clear();
-
-        for (int i = 0; i < m_LogScheme.Count; i++)
+        if (currentSchemeData != null)
         {
-            currentSchemeData.LogScheme.Add(SerializeConfig(m_LogScheme[i]));
+            currentSchemeData.LoginScheme = SerializeConfig(m_LoginScheme);
+            currentSchemeData.ADScheme = SerializeConfig(m_ADScheme);
+            currentSchemeData.PayScheme = SerializeConfig(m_PayScheme);
+
+            currentSchemeData.LogScheme.Clear();
+
+            for (int i = 0; i < m_LogScheme.Count; i++)
+            {
+                currentSchemeData.LogScheme.Add(SerializeConfig(m_LogScheme[i]));
+            }
+
+            currentSchemeData.OtherScheme.Clear();
+
+            for (int i = 0; i < m_otherScheme.Count; i++)
+            {
+                currentSchemeData.OtherScheme.Add(SerializeConfig(m_otherScheme[i]));
+            }
+
+            Debug.Log(JsonUtility.ToJson(currentSchemeData));
         }
-
-        currentSchemeData.OtherScheme.Clear();
-
-        for (int i = 0; i < m_otherScheme.Count; i++)
-        {
-            currentSchemeData.OtherScheme.Add(SerializeConfig(m_otherScheme[i]));
-        }
-
-        Debug.Log(JsonUtility.ToJson(currentSchemeData));
     }
 
     void LoadCurrentSchemeConfig(SchemeData data)
