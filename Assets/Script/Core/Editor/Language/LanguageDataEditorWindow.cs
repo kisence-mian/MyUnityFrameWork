@@ -403,12 +403,13 @@ public class LanguageDataEditorWindow : EditorWindow
                     data.TableKeys.Add(LanguageManager.c_valueKey);
                     data.SetDefault(LanguageManager.c_valueKey,"NoValue");
 
-                    string savePath = c_DataPath + "/" + LanguageManager.c_DataFilePrefix + m_selectLanguage.ToString();
+                    string dataName = LanguageManager.c_DataFilePrefix + m_selectLanguage.ToString();
+                    string savePath = c_DataPath + "/" + dataName;
 
                     DataManager.SaveData(savePath, data);
                     AssetDatabase.Refresh();
 
-                    LoadLanguage(savePath);
+                    LoadLanguage(dataName);
                 }
 
                 EditorGUILayout.Space();

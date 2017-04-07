@@ -43,13 +43,10 @@ public class DataManager
         try
         {
             //编辑器下不处理缓存
-
-
             if (s_dataCatch.ContainsKey(DataName))
             {
                 return s_dataCatch[DataName];
             }
-
 
             DataTable data = null;
             string dataJson = "";
@@ -79,15 +76,12 @@ public class DataManager
             data = DataTable.Analysis(dataJson);
             data.m_tableName = DataName;
 
-
             s_dataCatch.Add(DataName, data);
-
-
             return data;
         }
         catch (Exception e)
         {
-            throw new Exception("->" + DataName + "<- : " + e.ToString());
+            throw new Exception("GetData Exception ->" + DataName + "<- : " + e.ToString());
         }
     }
 
