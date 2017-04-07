@@ -30,7 +30,7 @@ public class GameDataMonitorEditorWindow : EditorWindow
 
     void DescriptionGUI()
     {
-        EditorGUILayout.TextArea("用法介绍：\n可以将游戏中的数据可视化的显示出来（类只显示public的字段)\nGameDataMonitor.PushData(string key,object obj)\nGameDataMonitor.RemoveData(string string)");
+        EditorGUILayout.TextArea("用法介绍：\n可以将游戏中的数据可视化的显示出来（类只显示public的字段)\nAPI:\nGameDataMonitor.PushData(string key,object obj)\nGameDataMonitor.RemoveData(string string)");
     }
 
     #endregion
