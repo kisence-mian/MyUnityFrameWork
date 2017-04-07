@@ -315,69 +315,8 @@ public class EditorUtilGUI
 
     public static object DrawInternalVariableGUI(object obj, FieldInfo f)
     {
-        //bool isShow = true;
-        //foreach (Attribute a in f.GetCustomAttributes(true))
-        //{
-        //    NoneShowInEditorGUIAttribute ns = a as NoneShowInEditorGUIAttribute;
-        //    if (ns != null)
-        //    {
-        //        isShow = false;
-        //        break;
-        //    }
-        //}
-        //if (!isShow) return obj;
-
-        bool isCanUseInternalVariable = false;
-        foreach (Attribute a in f.GetCustomAttributes(true))
-        {
-            CanUseInternalVariableAttribute ns = a as CanUseInternalVariableAttribute;
-            if (ns != null)
-            {
-                isCanUseInternalVariable = true;
-                break;
-            }
-        }
-        if (!isCanUseInternalVariable)
-        {
-            object value = EditorUseUtils.DrawObjectDataEditorDefultOneField(f.Name, f.GetValue(obj));
-            f.SetValue(obj, value);
-            return obj;
-        }
-
-        TriggerDataBase td = obj as TriggerDataBase;
-        if (td == null)
-            return obj;
-        UseInternalVariableInfo info = td.GetUseInternalVariableInfoByFieldName(f.Name);
-        GUILayout.BeginHorizontal();
-        if (info == null)
-        {
-            object temp = EditorUseUtils.DrawObjectDataEditorDefultOneField(f.Name, f.GetValue(obj));
-            f.SetValue(obj, temp);
-        }
-        else
-        {
-            if (NewTriggerSystemEditor.instance != null)
-            {
-                List<string> names = NewTriggerSystemEditor.instance.data.GetInternalVariableNamesByTypes(new string[] { f.FieldType.FullName });
-                info.internalVariableName = EditorUseUtils.DrawPopup(f.Name, info.internalVariableName, names);
-            }
-        }
-        if (GUILayout.Button("o", GUILayout.Width(25)))
-        {
-            if (info == null)
-            {
-                UseInternalVariableInfo t = new UseInternalVariableInfo();
-                t.fieldName = f.Name;
-                td.useInternalVariableInfoList.Add(t);
-            }
-            else
-            {
-                td.useInternalVariableInfoList.Remove(info);
-            }
-
-        }
-        GUILayout.EndHorizontal();
-
+        object value = DrawObjectDataEditorDefultOneField(f.Name, f.GetValue(obj));
+        f.SetValue(obj, value);
         return obj;
     }
     public static object DrawInternalVariableGUI(object obj, string fieldName)
