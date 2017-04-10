@@ -230,14 +230,33 @@ public class UnityEngine_UI_GraphicWrap
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 5);
-			UnityEngine.UI.Graphic obj = (UnityEngine.UI.Graphic)ToLua.CheckObject(L, 1, typeof(UnityEngine.UI.Graphic));
-			UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.CheckObject(L, 2, typeof(UnityEngine.Color));
-			float arg1 = (float)LuaDLL.luaL_checknumber(L, 3);
-			bool arg2 = LuaDLL.luaL_checkboolean(L, 4);
-			bool arg3 = LuaDLL.luaL_checkboolean(L, 5);
-			obj.CrossFadeColor(arg0, arg1, arg2, arg3);
-			return 0;
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 5 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.UI.Graphic), typeof(UnityEngine.Color), typeof(float), typeof(bool), typeof(bool)))
+			{
+				UnityEngine.UI.Graphic obj = (UnityEngine.UI.Graphic)ToLua.ToObject(L, 1);
+				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 2);
+				float arg1 = (float)LuaDLL.lua_tonumber(L, 3);
+				bool arg2 = LuaDLL.lua_toboolean(L, 4);
+				bool arg3 = LuaDLL.lua_toboolean(L, 5);
+				obj.CrossFadeColor(arg0, arg1, arg2, arg3);
+				return 0;
+			}
+			else if (count == 6 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.UI.Graphic), typeof(UnityEngine.Color), typeof(float), typeof(bool), typeof(bool), typeof(bool)))
+			{
+				UnityEngine.UI.Graphic obj = (UnityEngine.UI.Graphic)ToLua.ToObject(L, 1);
+				UnityEngine.Color arg0 = (UnityEngine.Color)ToLua.ToObject(L, 2);
+				float arg1 = (float)LuaDLL.lua_tonumber(L, 3);
+				bool arg2 = LuaDLL.lua_toboolean(L, 4);
+				bool arg3 = LuaDLL.lua_toboolean(L, 5);
+				bool arg4 = LuaDLL.lua_toboolean(L, 6);
+				obj.CrossFadeColor(arg0, arg1, arg2, arg3, arg4);
+				return 0;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.UI.Graphic.CrossFadeColor");
+			}
 		}
 		catch(Exception e)
 		{

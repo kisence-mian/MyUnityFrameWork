@@ -19,14 +19,14 @@ public class UnityEngine_Vector4Wrap
 		L.RegFunction("GetHashCode", GetHashCode);
 		L.RegFunction("Equals", Equals);
 		L.RegFunction("Normalize", Normalize);
-		L.RegFunction("ToString", ToString);
 		L.RegFunction("Dot", Dot);
 		L.RegFunction("Project", Project);
 		L.RegFunction("Distance", Distance);
 		L.RegFunction("Magnitude", Magnitude);
-		L.RegFunction("SqrMagnitude", SqrMagnitude);
 		L.RegFunction("Min", Min);
 		L.RegFunction("Max", Max);
+		L.RegFunction("ToString", ToString);
+		L.RegFunction("SqrMagnitude", SqrMagnitude);
 		L.RegFunction("New", _CreateUnityEngine_Vector4);
 		L.RegVar("this", _this, null);
 		L.RegFunction("__add", op_Addition);
@@ -344,39 +344,6 @@ public class UnityEngine_Vector4Wrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int ToString(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector4)))
-			{
-				UnityEngine.Vector4 obj = (UnityEngine.Vector4)ToLua.ToObject(L, 1);
-				string o = obj.ToString();
-				LuaDLL.lua_pushstring(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector4), typeof(string)))
-			{
-				UnityEngine.Vector4 obj = (UnityEngine.Vector4)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				string o = obj.ToString(arg0);
-				LuaDLL.lua_pushstring(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Vector4.ToString");
-			}
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int Dot(IntPtr L)
 	{
 		try
@@ -439,24 +406,6 @@ public class UnityEngine_Vector4Wrap
 			UnityEngine.Vector4 arg0 = (UnityEngine.Vector4)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector4));
 			float o = UnityEngine.Vector4.Magnitude(arg0);
 			LuaDLL.lua_pushnumber(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int SqrMagnitude(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 1);
-			UnityEngine.Vector4 obj = (UnityEngine.Vector4)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector4));
-			float o = obj.SqrMagnitude();
-			LuaDLL.lua_pushnumber(L, o);
-			ToLua.SetBack(L, 1, obj);
 			return 1;
 		}
 		catch(Exception e)
@@ -616,6 +565,57 @@ public class UnityEngine_Vector4Wrap
 			UnityEngine.Vector4 arg1 = (UnityEngine.Vector4)ToLua.ToObject(L, 2);
 			bool o = arg0 == arg1;
 			LuaDLL.lua_pushboolean(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ToString(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector4)))
+			{
+				UnityEngine.Vector4 obj = (UnityEngine.Vector4)ToLua.ToObject(L, 1);
+				string o = obj.ToString();
+				LuaDLL.lua_pushstring(L, o);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector4), typeof(string)))
+			{
+				UnityEngine.Vector4 obj = (UnityEngine.Vector4)ToLua.ToObject(L, 1);
+				string arg0 = ToLua.ToString(L, 2);
+				string o = obj.ToString(arg0);
+				LuaDLL.lua_pushstring(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Vector4.ToString");
+			}
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int SqrMagnitude(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UnityEngine.Vector4 obj = (UnityEngine.Vector4)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector4));
+			float o = obj.SqrMagnitude();
+			LuaDLL.lua_pushnumber(L, o);
+			ToLua.SetBack(L, 1, obj);
 			return 1;
 		}
 		catch(Exception e)

@@ -10,6 +10,7 @@ public class RecordManagerWrap
 		L.RegFunction("GetData", GetData);
 		L.RegFunction("SaveData", SaveData);
 		L.RegFunction("CleanRecord", CleanRecord);
+		L.RegFunction("CleanAllRecord", CleanAllRecord);
 		L.RegFunction("CleanCatch", CleanCatch);
 		L.RegFunction("SaveRecord", SaveRecord);
 		L.RegFunction("New", _CreateRecordManager);
@@ -85,6 +86,21 @@ public class RecordManagerWrap
 			ToLua.CheckArgsCount(L, 1);
 			string arg0 = ToLua.CheckString(L, 1);
 			RecordManager.CleanRecord(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CleanAllRecord(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 0);
+			RecordManager.CleanAllRecord();
 			return 0;
 		}
 		catch(Exception e)

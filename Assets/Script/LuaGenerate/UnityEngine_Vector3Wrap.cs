@@ -7,13 +7,13 @@ public class UnityEngine_Vector3Wrap
 	public static void Register(LuaState L)
 	{
 		L.BeginClass(typeof(UnityEngine.Vector3), null);
-		L.RegFunction("Lerp", Lerp);
-		L.RegFunction("LerpUnclamped", LerpUnclamped);
 		L.RegFunction("Slerp", Slerp);
 		L.RegFunction("SlerpUnclamped", SlerpUnclamped);
 		L.RegFunction("OrthoNormalize", OrthoNormalize);
-		L.RegFunction("MoveTowards", MoveTowards);
 		L.RegFunction("RotateTowards", RotateTowards);
+		L.RegFunction("Lerp", Lerp);
+		L.RegFunction("LerpUnclamped", LerpUnclamped);
+		L.RegFunction("MoveTowards", MoveTowards);
 		L.RegFunction("SmoothDamp", SmoothDamp);
 		L.RegFunction(".geti", get_Item);
 		L.RegFunction("get_Item", get_Item);
@@ -26,7 +26,6 @@ public class UnityEngine_Vector3Wrap
 		L.RegFunction("Equals", Equals);
 		L.RegFunction("Reflect", Reflect);
 		L.RegFunction("Normalize", Normalize);
-		L.RegFunction("ToString", ToString);
 		L.RegFunction("Dot", Dot);
 		L.RegFunction("Project", Project);
 		L.RegFunction("ProjectOnPlane", ProjectOnPlane);
@@ -37,6 +36,7 @@ public class UnityEngine_Vector3Wrap
 		L.RegFunction("SqrMagnitude", SqrMagnitude);
 		L.RegFunction("Min", Min);
 		L.RegFunction("Max", Max);
+		L.RegFunction("ToString", ToString);
 		L.RegFunction("New", _CreateUnityEngine_Vector3);
 		L.RegVar("this", _this, null);
 		L.RegFunction("__add", op_Addition);
@@ -161,44 +161,6 @@ public class UnityEngine_Vector3Wrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int Lerp(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector3));
-			UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
-			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
-			UnityEngine.Vector3 o = UnityEngine.Vector3.Lerp(arg0, arg1, arg2);
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int LerpUnclamped(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector3));
-			UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
-			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
-			UnityEngine.Vector3 o = UnityEngine.Vector3.LerpUnclamped(arg0, arg1, arg2);
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int Slerp(IntPtr L)
 	{
 		try
@@ -275,25 +237,6 @@ public class UnityEngine_Vector3Wrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int MoveTowards(IntPtr L)
-	{
-		try
-		{
-			ToLua.CheckArgsCount(L, 3);
-			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector3));
-			UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
-			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
-			UnityEngine.Vector3 o = UnityEngine.Vector3.MoveTowards(arg0, arg1, arg2);
-			ToLua.Push(L, o);
-			return 1;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int RotateTowards(IntPtr L)
 	{
 		try
@@ -304,6 +247,63 @@ public class UnityEngine_Vector3Wrap
 			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
 			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
 			UnityEngine.Vector3 o = UnityEngine.Vector3.RotateTowards(arg0, arg1, arg2, arg3);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int Lerp(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector3));
+			UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
+			UnityEngine.Vector3 o = UnityEngine.Vector3.Lerp(arg0, arg1, arg2);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int LerpUnclamped(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector3));
+			UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
+			UnityEngine.Vector3 o = UnityEngine.Vector3.LerpUnclamped(arg0, arg1, arg2);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int MoveTowards(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 3);
+			UnityEngine.Vector3 arg0 = (UnityEngine.Vector3)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector3));
+			UnityEngine.Vector3 arg1 = (UnityEngine.Vector3)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector3));
+			float arg2 = (float)LuaDLL.luaL_checknumber(L, 3);
+			UnityEngine.Vector3 o = UnityEngine.Vector3.MoveTowards(arg0, arg1, arg2);
 			ToLua.Push(L, o);
 			return 1;
 		}
@@ -526,39 +526,6 @@ public class UnityEngine_Vector3Wrap
 			obj.Normalize();
 			ToLua.SetBack(L, 1, obj);
 			return 0;
-		}
-		catch(Exception e)
-		{
-			return LuaDLL.toluaL_exception(L, e);
-		}
-	}
-
-	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int ToString(IntPtr L)
-	{
-		try
-		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector3)))
-			{
-				UnityEngine.Vector3 obj = (UnityEngine.Vector3)ToLua.ToObject(L, 1);
-				string o = obj.ToString();
-				LuaDLL.lua_pushstring(L, o);
-				return 1;
-			}
-			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector3), typeof(string)))
-			{
-				UnityEngine.Vector3 obj = (UnityEngine.Vector3)ToLua.ToObject(L, 1);
-				string arg0 = ToLua.ToString(L, 2);
-				string o = obj.ToString(arg0);
-				LuaDLL.lua_pushstring(L, o);
-				return 1;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Vector3.ToString");
-			}
 		}
 		catch(Exception e)
 		{
@@ -860,6 +827,39 @@ public class UnityEngine_Vector3Wrap
 			bool o = arg0 == arg1;
 			LuaDLL.lua_pushboolean(L, o);
 			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int ToString(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+
+			if (count == 1 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector3)))
+			{
+				UnityEngine.Vector3 obj = (UnityEngine.Vector3)ToLua.ToObject(L, 1);
+				string o = obj.ToString();
+				LuaDLL.lua_pushstring(L, o);
+				return 1;
+			}
+			else if (count == 2 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector3), typeof(string)))
+			{
+				UnityEngine.Vector3 obj = (UnityEngine.Vector3)ToLua.ToObject(L, 1);
+				string arg0 = ToLua.ToString(L, 2);
+				string o = obj.ToString(arg0);
+				LuaDLL.lua_pushstring(L, o);
+				return 1;
+			}
+			else
+			{
+				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Vector3.ToString");
+			}
 		}
 		catch(Exception e)
 		{

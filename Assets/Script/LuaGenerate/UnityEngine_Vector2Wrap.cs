@@ -38,9 +38,9 @@ public class UnityEngine_Vector2Wrap
 		L.RegFunction("__eq", op_Equality);
 		L.RegFunction("__unm", op_UnaryNegation);
 		L.RegFunction("__tostring", ToLua.op_ToString);
-		L.RegConstant("kEpsilon", 9.99999974737875E-06);
 		L.RegVar("x", get_x, set_x);
 		L.RegVar("y", get_y, set_y);
+		L.RegConstant("kEpsilon", 9.99999974737875E-06);
 		L.RegVar("normalized", get_normalized, null);
 		L.RegVar("magnitude", get_magnitude, null);
 		L.RegVar("sqrMagnitude", get_sqrMagnitude, null);
@@ -508,48 +508,17 @@ public class UnityEngine_Vector2Wrap
 	{
 		try
 		{
-			int count = LuaDLL.lua_gettop(L);
-
-			if (count == 4 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector2), typeof(UnityEngine.Vector2), typeof(UnityEngine.Vector2), typeof(float)))
-			{
-				UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.ToObject(L, 1);
-				UnityEngine.Vector2 arg1 = (UnityEngine.Vector2)ToLua.ToObject(L, 2);
-				UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.ToObject(L, 3);
-				float arg3 = (float)LuaDLL.lua_tonumber(L, 4);
-				UnityEngine.Vector2 o = UnityEngine.Vector2.SmoothDamp(arg0, arg1, ref arg2, arg3);
-				ToLua.Push(L, o);
-				ToLua.Push(L, arg2);
-				return 2;
-			}
-			else if (count == 5 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector2), typeof(UnityEngine.Vector2), typeof(UnityEngine.Vector2), typeof(float), typeof(float)))
-			{
-				UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.ToObject(L, 1);
-				UnityEngine.Vector2 arg1 = (UnityEngine.Vector2)ToLua.ToObject(L, 2);
-				UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.ToObject(L, 3);
-				float arg3 = (float)LuaDLL.lua_tonumber(L, 4);
-				float arg4 = (float)LuaDLL.lua_tonumber(L, 5);
-				UnityEngine.Vector2 o = UnityEngine.Vector2.SmoothDamp(arg0, arg1, ref arg2, arg3, arg4);
-				ToLua.Push(L, o);
-				ToLua.Push(L, arg2);
-				return 2;
-			}
-			else if (count == 6 && TypeChecker.CheckTypes(L, 1, typeof(UnityEngine.Vector2), typeof(UnityEngine.Vector2), typeof(UnityEngine.Vector2), typeof(float), typeof(float), typeof(float)))
-			{
-				UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.ToObject(L, 1);
-				UnityEngine.Vector2 arg1 = (UnityEngine.Vector2)ToLua.ToObject(L, 2);
-				UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.ToObject(L, 3);
-				float arg3 = (float)LuaDLL.lua_tonumber(L, 4);
-				float arg4 = (float)LuaDLL.lua_tonumber(L, 5);
-				float arg5 = (float)LuaDLL.lua_tonumber(L, 6);
-				UnityEngine.Vector2 o = UnityEngine.Vector2.SmoothDamp(arg0, arg1, ref arg2, arg3, arg4, arg5);
-				ToLua.Push(L, o);
-				ToLua.Push(L, arg2);
-				return 2;
-			}
-			else
-			{
-				return LuaDLL.luaL_throw(L, "invalid arguments to method: UnityEngine.Vector2.SmoothDamp");
-			}
+			ToLua.CheckArgsCount(L, 6);
+			UnityEngine.Vector2 arg0 = (UnityEngine.Vector2)ToLua.CheckObject(L, 1, typeof(UnityEngine.Vector2));
+			UnityEngine.Vector2 arg1 = (UnityEngine.Vector2)ToLua.CheckObject(L, 2, typeof(UnityEngine.Vector2));
+			UnityEngine.Vector2 arg2 = (UnityEngine.Vector2)ToLua.CheckObject(L, 3, typeof(UnityEngine.Vector2));
+			float arg3 = (float)LuaDLL.luaL_checknumber(L, 4);
+			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
+			float arg5 = (float)LuaDLL.luaL_checknumber(L, 6);
+			UnityEngine.Vector2 o = UnityEngine.Vector2.SmoothDamp(arg0, arg1, ref arg2, arg3, arg4, arg5);
+			ToLua.Push(L, o);
+			ToLua.Push(L, arg2);
+			return 2;
 		}
 		catch(Exception e)
 		{
