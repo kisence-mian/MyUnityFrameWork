@@ -16,7 +16,12 @@ public class ReusingScrollItemBase : UIBase
 
     }
 
-    public virtual void SetConetnt(int index,Dictionary<string, object> data)
+    public virtual void SetContent(int index,Dictionary<string, object> data)
+    {
+
+    }
+
+    public virtual void OnDrag()
     {
 
     }

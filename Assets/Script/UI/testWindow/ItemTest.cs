@@ -11,7 +11,7 @@ public class ItemTest :ReusingScrollItemBase
         AddOnClickListener("Image_item", OnClick);
     }
 
-    public override void SetConetnt(int index, Dictionary<string, object> data)
+    public override void SetContent(int index, Dictionary<string, object> data)
     {
         GetText("Text").text = index.ToString() + RandomService.Range(0,100);
     }

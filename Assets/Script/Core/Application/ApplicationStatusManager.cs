@@ -31,6 +31,7 @@ public class ApplicationStatusManager
     {
         if (s_currentAppStatus != null)
         {
+            s_currentAppStatus.CloseAllUI();
             s_currentAppStatus.OnExitStatus();
         }
 
@@ -86,6 +87,7 @@ public class ApplicationStatusManager
     {
         if (s_currentAppStatus != null)
         {
+            s_currentAppStatus.CloseAllUI();
             s_currentAppStatus.OnExitStatus();
         }
 

@@ -15,7 +15,7 @@ public class LanguageDataEditorWindow : EditorWindow
     private List<string> m_dataNameList = new List<string>();
     Dictionary<string, object> m_editorConfig;
 
-    List<string> m_languageKeyList;
+    List<string> m_languageKeyList = new List<string>();
 
     private int m_currentSelectIndex;
 
@@ -403,12 +403,13 @@ public class LanguageDataEditorWindow : EditorWindow
                     data.TableKeys.Add(LanguageManager.c_valueKey);
                     data.SetDefault(LanguageManager.c_valueKey,"NoValue");
 
-                    string savePath = c_DataPath + "/" + LanguageManager.c_DataFilePrefix + m_selectLanguage.ToString();
+                    string dataName = LanguageManager.c_DataFilePrefix + m_selectLanguage.ToString();
+                    string savePath = c_DataPath + "/" + dataName;
 
                     DataManager.SaveData(savePath, data);
                     AssetDatabase.Refresh();
 
-                    LoadLanguage(savePath);
+                    LoadLanguage(dataName);
                 }
 
                 EditorGUILayout.Space();

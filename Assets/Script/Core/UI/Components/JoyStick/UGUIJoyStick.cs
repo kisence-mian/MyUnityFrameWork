@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
 
-public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler
+public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHandler
 {
     protected float mRadius;
 
@@ -12,10 +12,16 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler
 
     public UGUIJoyStickHandle onJoyStick;
 
+    private bool canMove = true;
     void Start()
     {
         //计算摇杆块的半径
         mRadius = ((transform as RectTransform).sizeDelta.x-content.sizeDelta.x) * 0.5f;
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        canMove = true;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -52,7 +58,7 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler
         {
             try
             {
-                if (GetDir() != Vector3.zero)
+                if (GetDir() != Vector3.zero && canMove)
                 {
                     onJoyStick(GetDir());
                 }
@@ -67,6 +73,7 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler
 
     public void ReHomePos()
     {
+        canMove = false;
         content.anchoredPosition3D = Vector3.zero;
         onJoyStick(Vector3.zero);
     }

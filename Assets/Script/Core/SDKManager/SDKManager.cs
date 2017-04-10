@@ -14,6 +14,7 @@ public class SDKManager
     static LoginInterface s_loginService = null;
     static PayInterface s_payService = null;
     static ADInterface s_ADService = null;
+
     static List<LogInterface> s_logServiceList = null;
     static List<OtherSDKInterface> s_otherServiceList = null;
 
@@ -34,7 +35,7 @@ public class SDKManager
         }
         catch(Exception e)
         {
-            Debug.Log("SDKManager Init Exception: " + e.ToString());
+            Debug.LogError("SDKManager Init Exception: " + e.ToString());
         }
     }
 
@@ -51,7 +52,7 @@ public class SDKManager
         }
         catch (Exception e)
         {
-            Debug.Log("SDKManager Login Exception: " + e.ToString());
+            Debug.LogError("SDKManager Login Exception: " + e.ToString());
         }
     }
 
@@ -66,24 +67,59 @@ public class SDKManager
         }
         catch (Exception e)
         {
-            Debug.Log("SDKManager Pay Exception: " + e.ToString());
+            Debug.LogError("SDKManager Pay Exception: " + e.ToString());
+        }
+    }
+
+    #region AD
+
+    /// <summary>
+    /// 加载广告
+    /// </summary>
+    public static void LoadAD(ADType adType)
+    {
+        try
+        {
+            s_ADService.LoadAD(adType);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("SDKManager LoadAD Exception: " + e.ToString());
         }
     }
 
     /// <summary>
-    /// 广告
+    /// 显示广告
     /// </summary>
-    public static void PlayAD()
+    public static void PlayAD(ADType adType)
     {
         try
         {
-            s_ADService.PlayAD();
+            s_ADService.PlayAD(adType);
         }
         catch (Exception e)
         {
-            Debug.Log("SDKManager AD Exception: " + e.ToString());
+            Debug.LogError("SDKManager PlayAD Exception: " + e.ToString());
         }
     }
+
+    /// <summary>
+    /// 隐藏广告
+    /// </summary>
+    /// <param name="adType"></param>
+    public static void CloseAD(ADType adType)
+    {
+        try
+        {
+            s_ADService.CloseAD(adType);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("SDKManager CloseAD Exception: " + e.ToString());
+        }
+    }
+
+    #endregion
 
     /// <summary>
     /// 数据上报
@@ -100,7 +136,7 @@ public class SDKManager
         }
         catch (Exception e)
         {
-            Debug.Log("SDKManager Log Exception: " + e.ToString());
+            Debug.LogError("SDKManager Log Exception: " + e.ToString());
         }
     }
 

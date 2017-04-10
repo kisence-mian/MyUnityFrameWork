@@ -9,8 +9,25 @@ public class ADInterface  : SDKInterfaceBase
 
     }
 
-    public void PlayAD()
+    public virtual void LoadAD(ADType adType)
     {
 
     }
+
+    public virtual void PlayAD(ADType adType)
+    {
+
+    }
+
+    public virtual void CloseAD(ADType adType)
+    {
+
+    }
+}
+
+public enum ADType
+{
+    Banner,
+    Reward,
+    Interstitial,
 }
