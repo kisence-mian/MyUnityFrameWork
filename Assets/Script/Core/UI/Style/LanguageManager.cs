@@ -3,7 +3,7 @@ using System.Collections;
 using System.Text;
 using System.Collections.Generic;
 
-public class LanguageManager  
+public class LanguageManager
 {
     public const string c_DataFilePrefix = "LangData_";
     public const string c_configFileName = "LanguageConfig";
@@ -14,7 +14,7 @@ public class LanguageManager
 
     static public SystemLanguage s_currentLanguage = SystemLanguage.ChineseSimplified;
     static public DataTable s_languageData;
-	public static void Init()
+    public static void Init()
     {
         //Debug.Log("当前语言: " + Application.systemLanguage);
 
@@ -27,22 +27,26 @@ public class LanguageManager
 
         string languageDataName = c_DataFilePrefix + l_lang.ToString();
 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         if (!Application.isPlaying)
         {
             languageDataName = "Language/" + languageDataName;
         }
-        #endif
+#endif
 
-        if(DataManager.GetIsExistData(languageDataName))
+        if (DataManager.GetIsExistData(languageDataName))
         {
             s_languageData = DataManager.GetData(languageDataName);
         }
         else
         {
+            Debug.Log("当前语言不存在 " + languageDataName);
+
             string defaultLanguage = ConfigManager.GetData(c_configFileName)[c_defaultLanguageKey].GetString();
             s_languageData = DataManager.GetData(defaultLanguage);
         }
+
+        GlobalEvent.DispatchEvent(LanguageEventEnum.LanguageChange, l_lang);
     }
     public static string GetContent(string contentID, List<object> contentParams)
     {
@@ -88,7 +92,7 @@ public class LanguageManager
         if (contentParams == null || contentParams.Length == 0)
             return content;
         else
-        { 
+        {
             for (int i = 0; i < contentParams.Length; i++)
             {
                 string replaceTmp = "{" + i + "}";
@@ -98,4 +102,9 @@ public class LanguageManager
             return content;
         }
     }
+}
+
+public enum LanguageEventEnum
+{
+    LanguageChange,
 }

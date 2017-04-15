@@ -23,19 +23,7 @@ public class DataManager
 
     public static bool GetIsExistData(string DataName)
     {
-        string dataJson = ResourceIOTool.ReadStringByResource(
-        PathTool.GetRelativelyPath(c_directoryName,
-                                    DataName,
-                                    c_expandName));
-
-        if (dataJson == "")
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return ResourcesConfigManager.GetIsExitRes(DataName);
     }
 
     public static DataTable GetData(string DataName)

@@ -12,10 +12,9 @@ public class LanguageDataEditorWindow : EditorWindow
 
     const string c_ListKey = "LanguageKeys";
 
-    private List<string> m_dataNameList = new List<string>();
-    Dictionary<string, object> m_editorConfig;
-
-    List<string> m_languageKeyList = new List<string>();
+    static List<string> s_dataNameList = new List<string>();
+    static Dictionary<string, object> s_editorConfig;
+    static List<string> s_languageKeyList = new List<string>();
 
     private int m_currentSelectIndex;
 
@@ -61,31 +60,29 @@ public class LanguageDataEditorWindow : EditorWindow
 
     #region 加载/保存编辑器设置
 
-    void LoadEditorConfig()
+    static void LoadEditorConfig()
     {
-        m_editorConfig =  ConfigManager.GetEditorConfigData(c_EditorConfigName);
+        s_editorConfig =  ConfigManager.GetEditorConfigData(c_EditorConfigName);
 
-
-
-        if (m_editorConfig == null)
+        if (s_editorConfig == null)
         {
-            m_editorConfig = new Dictionary<string, object>();
+            s_editorConfig = new Dictionary<string, object>();
         }
 
-        if(m_editorConfig.ContainsKey(c_ListKey))
+        if(s_editorConfig.ContainsKey(c_ListKey))
         {
-            string m_KeyContent = m_editorConfig[c_ListKey].ToString();
+            string m_KeyContent = s_editorConfig[c_ListKey].ToString();
             string[] m_stringArrary = m_KeyContent.Split('|');
 
-            m_languageKeyList = new List<string>();
-            m_LanguageKeyCatch = new Dictionary<string, string>();
+            s_languageKeyList = new List<string>();
+            s_LanguageKeyCatch = new Dictionary<string, string>();
 
             for (int i = 0; i < m_stringArrary.Length; i++)
             {
-                if (m_stringArrary[i] != "" && !m_LanguageKeyCatch.ContainsKey(m_stringArrary[i]))
+                if (m_stringArrary[i] != "" && !s_LanguageKeyCatch.ContainsKey(m_stringArrary[i]))
                 {
-                    m_languageKeyList.Add(m_stringArrary[i]);
-                    m_LanguageKeyCatch.Add(m_stringArrary[i], "");
+                    s_languageKeyList.Add(m_stringArrary[i]);
+                    s_LanguageKeyCatch.Add(m_stringArrary[i], "");
                 }
             }
         }
@@ -95,25 +92,25 @@ public class LanguageDataEditorWindow : EditorWindow
     {
         string content = "";
 
-        for (int i = 0; i < m_languageKeyList.Count; i++)
+        for (int i = 0; i < s_languageKeyList.Count; i++)
         {
-            content += m_languageKeyList[i];
-            if(i!= m_languageKeyList.Count - 1)
+            content += s_languageKeyList[i];
+            if(i!= s_languageKeyList.Count - 1)
             {
                 content += "|";
             }
         }
 
-        if (m_editorConfig.ContainsKey(c_ListKey))
+        if (s_editorConfig.ContainsKey(c_ListKey))
         {
-            m_editorConfig[c_ListKey] = content;
+            s_editorConfig[c_ListKey] = content;
         }
         else
         {
-            m_editorConfig.Add(c_ListKey, content);
+            s_editorConfig.Add(c_ListKey, content);
         }
 
-        ConfigManager.SaveEditorConfigData(c_EditorConfigName, m_editorConfig);
+        ConfigManager.SaveEditorConfigData(c_EditorConfigName, s_editorConfig);
     }
 
     #endregion
@@ -161,7 +158,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
     void SelectLanguageGUI()
     {
-        string[] mask = m_dataNameList.ToArray();
+        string[] mask = s_dataNameList.ToArray();
         m_currentSelectIndex = EditorGUILayout.Popup("当前语言：", m_currentSelectIndex, mask);
         if (mask.Length != 0)
         {
@@ -184,7 +181,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
     #region 编辑语言字段
 
-    Dictionary<string,string> m_LanguageKeyCatch = new Dictionary<string,string>();
+    static Dictionary<string,string> s_LanguageKeyCatch = new Dictionary<string,string>();
 
     Vector2 pos_editorField = Vector2.zero;
 
@@ -201,14 +198,14 @@ public class LanguageDataEditorWindow : EditorWindow
 
             pos_editorField = EditorGUILayout.BeginScrollView(pos_editorField, GUILayout.ExpandHeight(false));
 
-            for (int i = 0; i < m_languageKeyList.Count; i++)
+            for (int i = 0; i < s_languageKeyList.Count; i++)
             {
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("",m_languageKeyList[i]);
+                EditorGUILayout.LabelField("",s_languageKeyList[i]);
 
                 if(GUILayout.Button("删除字段"))
                 {
-                    m_languageKeyList.RemoveAt(i);
+                    s_languageKeyList.RemoveAt(i);
                     i--;
                 }
 
@@ -235,19 +232,19 @@ public class LanguageDataEditorWindow : EditorWindow
             EditorGUI.indentLevel = 3;
             newField = EditorGUILayout.TextField("字段名",newField);
 
-            if (newField != "" && !m_LanguageKeyCatch.ContainsKey(newField))
+            if (newField != "" && !s_LanguageKeyCatch.ContainsKey(newField))
             {
                 if (GUILayout.Button("新增语言字段"))
                 {
-                    m_languageKeyList.Add(newField);
-                    m_LanguageKeyCatch.Add(newField, "");
+                    s_languageKeyList.Add(newField);
+                    s_LanguageKeyCatch.Add(newField, "");
                     newField = "";
                 }
                 EditorGUILayout.Space();
             }
             else
             {
-                if (m_LanguageKeyCatch.ContainsKey(newField))
+                if (s_LanguageKeyCatch.ContainsKey(newField))
                 {
                     EditorGUILayout.LabelField("字段名重复！", EditorGUIStyleData.s_WarnMessageLabel);
                 }
@@ -275,10 +272,10 @@ public class LanguageDataEditorWindow : EditorWindow
 
                 ResetLanguageKeyList(m_currentData);
 
-                for (int i = 0; i < m_languageKeyList.Count; i++)
+                for (int i = 0; i < s_languageKeyList.Count; i++)
                 {
                     EditorGUI.indentLevel = 2;
-                    LanguageItemGUI(m_currentData, m_languageKeyList[i]);
+                    LanguageItemGUI(m_currentData, s_languageKeyList[i]);
                 }
 
                 EditorGUILayout.EndScrollView();
@@ -295,10 +292,10 @@ public class LanguageDataEditorWindow : EditorWindow
 
         for (int i = 0; i < keys.Count; i++)
         {
-            if (!m_LanguageKeyCatch.ContainsKey(keys[i]))
+            if (!s_LanguageKeyCatch.ContainsKey(keys[i]))
             {
-                m_LanguageKeyCatch.Add(keys[i], "");
-                m_languageKeyList.Add(keys[i]);
+                s_LanguageKeyCatch.Add(keys[i], "");
+                s_languageKeyList.Add(keys[i]);
             }
         }
     }
@@ -392,7 +389,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
             m_selectLanguage = (SystemLanguage)EditorGUILayout.EnumPopup("语言类型", m_selectLanguage);
 
-            if (!m_dataNameList.Contains(m_selectLanguage.ToString()) )
+            if (!s_dataNameList.Contains(m_selectLanguage.ToString()) )
             {
                 EditorGUILayout.BeginHorizontal();
                 EditorGUILayout.Space();
@@ -432,9 +429,9 @@ public class LanguageDataEditorWindow : EditorWindow
     void FindAllDataName()
     {
         AssetDatabase.Refresh();
-        m_dataNameList = new List<string>();
+        s_dataNameList = new List<string>();
 
-        m_dataNameList.Add("None");
+        s_dataNameList.Add("None");
 
         m_directoryPath = Application.dataPath + "/Resources/" + DataManager.c_directoryName + "/" + c_DataPath;
 
@@ -451,7 +448,7 @@ public class LanguageDataEditorWindow : EditorWindow
             if (item.EndsWith(".txt"))
             {
                 //string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
-                m_dataNameList.Add(FileTool.RemoveExpandName(PathTool.GetDirectoryRelativePath(m_directoryPath + "/", item)));
+                s_dataNameList.Add(FileTool.RemoveExpandName(PathTool.GetDirectoryRelativePath(m_directoryPath + "/", item)));
             }
         }
 
@@ -460,6 +457,15 @@ public class LanguageDataEditorWindow : EditorWindow
         {
             FindConfigName(dires[i]);
         }
+    }
+
+    public static List<string> GetLanguageKeyList()
+    {
+        if(s_languageKeyList != null)
+        {
+            LoadEditorConfig();
+        }
+        return s_languageKeyList;
     }
 
     #endregion

@@ -23,6 +23,16 @@ public static class ResourcesConfigManager
         m_bundleConfigs = result.bundleList;
     }
 
+    public static bool GetIsExitRes(string resName)
+    {
+        if (m_bundleConfigs == null)
+        {
+            throw new Exception("RecourcesConfigManager GetBundleConfig : bundleConfigs is null  do you Initialize?");
+        }
+
+        return m_bundleConfigs.ContainsKey(resName);
+    }
+
     public static ResourcesConfig GetBundleConfig(string bundleName)
     {
         if (m_bundleConfigs == null)
