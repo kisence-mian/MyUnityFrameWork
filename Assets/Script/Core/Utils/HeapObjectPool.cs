@@ -8,80 +8,41 @@ public class HeapObjectPool
 {
     #region string, object字典
 
-    const int c_SODictSize = 200;
-    static Dictionary<string, object>[] s_SODict;
-    static int s_SODictIndex = 0;
-
     /// <summary>
     /// 获取string, object字典
     /// </summary>
     /// <returns></returns>
     public static Dictionary<string, object> GetSODict()
     {
-        InitSODict();
-        Dictionary<string, object> dict = s_SODict[s_SODictIndex];
+        Dictionary<string, object> dict = HeapObjectPoolTool<Dictionary<string, object>>.GetHeapObject();
         dict.Clear();
-
-        s_SODictIndex++;
-
-        if (s_SODictIndex >= s_SODict.Length)
-        {
-            s_SODictIndex = 0;
-        }
 
         return dict;
     }
 
-    static void InitSODict()
+    public static void PutSODict(Dictionary<string, object> dict)
     {
-        if (s_SODict == null)
-        {
-            s_SODict = new Dictionary<string, object>[c_SODictSize];
-            for (int i = 0; i < c_SODictSize; i++)
-            {
-                s_SODict[i] = new Dictionary<string, object>();
-            }
-        }
+        HeapObjectPoolTool<Dictionary<string, object>>.PutHeapObject(dict);
     }
 
     #endregion
 
     #region object列表
-
-    const int c_ObjListSize = 20;
-    static List<object>[] s_ObjListPool;
-    static int s_ObjListIndex = 0;
-
     /// <summary>
     /// 获取string, object字典
     /// </summary>
     /// <returns></returns>
     public static List<object> GetObjList()
     {
-        InitObjList();
-        List<object> dict = s_ObjListPool[s_ObjListIndex];
-        dict.Clear();
+        List<object> list = HeapObjectPoolTool<List<object>>.GetHeapObject();
+        list.Clear();
 
-        s_ObjListIndex++;
-
-        if (s_ObjListIndex >= s_ObjListPool.Length)
-        {
-            s_ObjListIndex = 0;
-        }
-
-        return dict;
+        return list;
     }
 
-    static void InitObjList()
+    public static void PutObjList(List<object> list)
     {
-        if (s_ObjListPool == null)
-        {
-            s_ObjListPool = new List<object>[c_ObjListSize];
-            for (int i = 0; i < c_ObjListSize; i++)
-            {
-                s_ObjListPool[i] = new List<object>();
-            }
-        }
+        HeapObjectPoolTool<List<object>>.PutHeapObject(list);
     }
 
     #endregion
@@ -241,45 +202,23 @@ public class HeapObjectBase
 
 public class HeapObjectPoolTool<T> where T : new()
 {
-    static T[] s_pool;
-    static int s_poolIndex = 0;
-    static int s_size = 500;
-
-    public static void SetSize(int size)
-    {
-        if (s_size != size)
-        {
-            s_size = size;
-            Init();
-        }
-    }
-
-    static void Init()
-    {
-        s_pool = new T[s_size];
-        for (int i = 0; i < s_size; i++)
-        {
-            s_pool[i] = new T();
-        }
-    }
+    static Stack<T> s_pool = new Stack<T>();
 
     public static T GetHeapObject()
     {
-        if (s_pool == null)
+        if (s_pool.Count >0)
         {
-            Init();
+            return s_pool.Pop();
         }
-
-        T obj = s_pool[s_poolIndex];
-
-        s_poolIndex++;
-
-        if (s_poolIndex >= s_pool.Length)
+        else
         {
-            s_poolIndex = 0;
+            return new T();
         }
+    }
 
-        return obj;
+    public static void PutHeapObject(T obj)
+    {
+        s_pool.Push(obj);
     }
 }
 

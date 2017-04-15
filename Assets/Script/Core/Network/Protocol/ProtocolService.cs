@@ -108,7 +108,6 @@ public class ProtocolService : INetworkInterface
             isConnect = false;
             m_ConnectStatusCallback(NetworkState.FaildToConnect);
         }
-
     }
 
     void StartReceive()
@@ -143,7 +142,7 @@ public class ProtocolService : INetworkInterface
 
     public override void SendMessage(string MessageType,Dictionary<string, object> data)
     {
-        ByteArray msg = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+        ByteArray msg = GetByteArray();
         msg.clear();
 
         List<byte> message = GetSendByte(MessageType, data);
@@ -161,6 +160,9 @@ public class ProtocolService : INetworkInterface
             msg.WriteInt(0);
 
         Send(msg.Buffer);
+
+        //释放缓存
+        ReleaseCatch();
     }
 
     #region 缓冲区
@@ -264,9 +266,7 @@ public class ProtocolService : INetworkInterface
     {
         try
         {
-            //Debug.Log("ReceiveDataLoad : " + BitConverter.ToString(bytes));
-
-            ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+            ByteArray ba = GetByteArray();
 
             //用于做数据处理,加解密,或者压缩于解压缩    
             ba.clear();
@@ -279,6 +279,9 @@ public class ProtocolService : INetworkInterface
         {
             Debug.LogError(e.ToString());
         }
+
+        //释放缓存
+        ReleaseCatch();
     }
 
     private void ConnectCallback(IAsyncResult asyncConnect)
@@ -310,11 +313,7 @@ public class ProtocolService : INetworkInterface
             {
                 if (currentLine.Contains("message"))
                 {
-                    
                     string msgName = rgx.Match(currentLine).Groups[1].Value;
-
-                    //Debug.Log("message :->" + msgName + "<-");
-
                     msgInfo = new List<Dictionary<string, object>>();
 
                     if (m_protocolInfo.ContainsKey(msgName))
@@ -326,7 +325,6 @@ public class ProtocolService : INetworkInterface
                         m_protocolInfo.Add(msgName, msgInfo);
                     }
 
-                    
                     currentStatus = AnalysisProtocolStatus.Message;
                 }
             }
@@ -455,7 +453,6 @@ public class ProtocolService : INetworkInterface
     NetWorkMessage  Analysis(ByteArray bytes)
     {
         NetWorkMessage msg = GetMessageByPool();
-        //Debug.Log("ReceiveDataLoad : " + BitConverter.ToString(bytes));
         bytes.ReadShort(); //消息长度
         bytes.ReadByte();  //模块名
 
@@ -464,7 +461,6 @@ public class ProtocolService : INetworkInterface
         msg.m_MessageType = m_methodNameInfo[methodIndex];
         int re_len = bytes.Length - 5;
         msg.m_data = AnalysisData(msg.m_MessageType, bytes.ReadBytes(re_len));
-
 
         return msg;
     }
@@ -479,8 +475,8 @@ public class ProtocolService : INetworkInterface
         int repeatType = 0;
         try
         {
-            Dictionary<string, object> data = HeapObjectPool.GetSODict();
-            ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+            Dictionary<string, object> data = GetSODict();
+            ByteArray ba = GetByteArray();
 
             ba.clear();
             ba.Add(bytes);
@@ -578,7 +574,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<string> ReadStringList(ByteArray ba)
     {
-        List<string> tbl = HeapObjectPoolTool<List<string>>.GetHeapObject();
+        List<string> tbl = GetStringList();
         tbl.Clear();
 
         int len1 = ba.ReadShort();
@@ -596,7 +592,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<bool> ReadBoolList(ByteArray ba)
     {
-        List<bool> tbl = HeapObjectPoolTool<List<bool>>.GetHeapObject();
+        List<bool> tbl = GetBoolList();
         tbl.Clear();
 
         int len1 = ba.ReadShort();
@@ -614,7 +610,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<int> ReadIntList(ByteArray ba)
     {
-        List<int> tbl = HeapObjectPoolTool<List<int>>.GetHeapObject();
+        List<int> tbl = GetIntList();
         tbl.Clear();
 
         int len1 = ba.ReadShort();
@@ -637,7 +633,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<double> ReadDoubleList(ByteArray ba)
     {
-        List<double> tbl = HeapObjectPoolTool<List<double>>.GetHeapObject();
+        List<double> tbl = GetDoubleList();
         tbl.Clear();
 
         int len1 = ba.ReadShort();
@@ -661,7 +657,7 @@ public class ProtocolService : INetworkInterface
         {
             int st_len = ba.ReadInt();
 
-            Dictionary<string, object> tbl = HeapObjectPool.GetSODict();
+            Dictionary<string, object> tbl = GetSODict();
 
             if (st_len == 0)
             {
@@ -754,7 +750,7 @@ public class ProtocolService : INetworkInterface
 
     private List<Dictionary<string, object>> ReadDictionaryList(string str, ByteArray ba)
     {
-        List<Dictionary<string, object>> stbl = HeapObjectPoolTool<List<Dictionary<string, object>>>.GetHeapObject();
+        List<Dictionary<string, object>> stbl = GetSODictList();
 
         stbl.Clear();
         int len1 = ba.ReadShort();
@@ -826,7 +822,7 @@ public class ProtocolService : INetworkInterface
 
         try
         {
-            ByteArray Bytes = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+            ByteArray Bytes = GetByteArray();
             Bytes.clear();
 
             if (!m_protocolInfo.ContainsKey(customType))
@@ -990,6 +986,123 @@ public class ProtocolService : INetworkInterface
             case RT_equired: return "RT_equired";
             default: return "Error";
         }
+    }
+
+    #endregion
+
+    #region 缓冲池
+
+    static List<Dictionary<string, object>> s_SOListCatch = new List<Dictionary<string, object>>();
+
+    static List<List<Dictionary<string, object>>> s_SODictListCatch = new List<List<Dictionary<string, object>>>();
+
+    static List<List<string>> s_stringListCatch = new List<List<string>>();
+    static List<List<bool>> s_boolListCatch = new List<List<bool>>();
+    static List<List<int>> s_intListCatch = new List<List<int>>();
+    static List<List<double>> s_doubleListCatch = new List<List<double>>();
+    static List<ByteArray> s_ByteArrayCatch = new List<ByteArray>();
+
+
+    static Dictionary<string, object> GetSODict()
+    {
+        Dictionary<string, object> dict = HeapObjectPool.GetSODict();
+        s_SOListCatch.Add(dict);
+
+        return dict;
+    }
+
+    static List<Dictionary<string, object>> GetSODictList()
+    {
+        List<Dictionary<string, object>> tmp = HeapObjectPoolTool<List<Dictionary<string, object>>>.GetHeapObject();
+        s_SODictListCatch.Add(tmp);
+
+        return tmp;
+    }
+
+    static ByteArray GetByteArray()
+    {
+        ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+        s_ByteArrayCatch.Add(ba);
+
+        return ba;
+    }
+
+    static List<string> GetStringList()
+    {
+        List<string> ba = HeapObjectPoolTool<List<string>>.GetHeapObject();
+        s_stringListCatch.Add(ba);
+
+        return ba;
+    }
+
+    static List<bool> GetBoolList()
+    {
+        List<bool> ba = HeapObjectPoolTool<List<bool>>.GetHeapObject();
+        s_boolListCatch.Add(ba);
+
+        return ba;
+    }
+
+    static List<int> GetIntList()
+    {
+        List<int> ba = HeapObjectPoolTool<List<int>>.GetHeapObject();
+        s_intListCatch.Add(ba);
+
+        return ba;
+    }
+
+    static List<double> GetDoubleList()
+    {
+        List<double> ba = HeapObjectPoolTool<List<double>>.GetHeapObject();
+        s_doubleListCatch.Add(ba);
+
+        return ba;
+    }
+
+    static void ReleaseCatch()
+    {
+        for (int i = 0; i < s_SOListCatch.Count; i++)
+        {
+            HeapObjectPool.PutSODict(s_SOListCatch[i]);
+        }
+        s_SOListCatch.Clear();
+
+
+        for (int i = 0; i < s_SODictListCatch.Count; i++)
+        {
+            HeapObjectPoolTool<List<Dictionary<string, object>>>.PutHeapObject(s_SODictListCatch[i]);
+        }
+        s_SODictListCatch.Clear();
+
+        for (int i = 0; i < s_stringListCatch.Count; i++)
+        {
+            HeapObjectPoolTool<List<string>>.PutHeapObject(s_stringListCatch[i]);
+        }
+        s_stringListCatch.Clear();
+
+        for (int i = 0; i < s_boolListCatch.Count; i++)
+        {
+            HeapObjectPoolTool<List<bool>>.PutHeapObject(s_boolListCatch[i]);
+        }
+        s_boolListCatch.Clear();
+
+        for (int i = 0; i < s_intListCatch.Count; i++)
+        {
+            HeapObjectPoolTool<List<int>>.PutHeapObject(s_intListCatch[i]);
+        }
+        s_intListCatch.Clear();
+
+        for (int i = 0; i < s_doubleListCatch.Count; i++)
+        {
+            HeapObjectPoolTool<List<double>>.PutHeapObject(s_doubleListCatch[i]);
+        }
+        s_doubleListCatch.Clear();
+
+        for (int i = 0; i < s_ByteArrayCatch.Count; i++)
+        {
+            HeapObjectPoolTool<ByteArray>.PutHeapObject(s_ByteArrayCatch[i]);
+        }
+        s_ByteArrayCatch.Clear();
     }
 
     #endregion
