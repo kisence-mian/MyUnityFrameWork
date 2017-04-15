@@ -1,4 +1,4 @@
-ID	name	pos	age
+﻿ID	name	pos	age
 type	Vector2	Vector3	Int
 default	0|0	333|333.333|0	23232323
 1111			

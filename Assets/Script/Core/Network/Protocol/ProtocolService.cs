@@ -316,7 +316,17 @@ public class ProtocolService : INetworkInterface
                     //Debug.Log("message :->" + msgName + "<-");
 
                     msgInfo = new List<Dictionary<string, object>>();
-                    m_protocolInfo.Add(msgName, msgInfo);
+
+                    if (m_protocolInfo.ContainsKey(msgName))
+                    {
+                        Debug.LogError("protocol 有重复的Key! :" + msgName);
+                    }
+                    else
+                    {
+                        m_protocolInfo.Add(msgName, msgInfo);
+                    }
+
+                    
                     currentStatus = AnalysisProtocolStatus.Message;
                 }
             }

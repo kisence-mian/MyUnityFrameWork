@@ -16,7 +16,6 @@ public class UIWindowBase : UIBase
 
     public virtual void OnOpen()
     {
-
     }
 
     public virtual void OnClose()
