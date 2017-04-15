@@ -200,6 +200,10 @@ public class HeapObjectBase
 
 #region HeapObjectPoolTool
 
+/// <summary>
+/// 注意：为避免内存泄漏，GetObject的引用计数必须和Put的引用计数相等
+/// </summary>
+/// <typeparam name="T"></typeparam>
 public class HeapObjectPoolTool<T> where T : new()
 {
     static Stack<T> s_pool = new Stack<T>();
