@@ -15,22 +15,22 @@ public abstract class IInputProxyBase
         set { IInputProxyBase.s_isActive = value; }
     }
 
-    //#region 事件池
+    #region 事件池
 
-    ////public static T GetEvent<T>() where T : IInputEventBase, new()
-    ////{
-    ////    return InputOperationEventProxy.GetEvent<T>();
-    ////}
-
-    //public static T GetEvent<T>(string eventKey) where T : IInputEventBase, new()
+    //public static T GetEvent<T>() where T : IInputEventBase, new()
     //{
-    //    T tmp = HeapObjectPoolTool<T>.GetHeapObject();
-    //    tmp.EventKey = eventKey;
-
-    //    return tmp;
+    //    return InputOperationEventProxy.GetEvent<T>();
     //}
 
-    //#endregion
+    public static T GetEvent<T>(string eventKey) where T : IInputEventBase, new()
+    {
+        T tmp = HeapObjectPoolTool<T>.GetHeapObject();
+        tmp.EventKey = eventKey;
+
+        return tmp;
+    }
+
+    #endregion
 }
 
 public class InputEventRegisterInfo<T> : HeapObjectBase where T : IInputEventBase
@@ -48,6 +48,4 @@ public class InputEventRegisterInfo<T> : HeapObjectBase where T : IInputEventBas
         InputManager.RemoveListener<T>(eventKey, callBack);
         Release();
     }
-
-    
 }

@@ -32,7 +32,6 @@ public class LongPressAcceptor : MonoBehaviour ,IPointerDownHandler,IPointerUpHa
         {
              OnLongPress(InputUIEventType.PressDown);
         }
-
     }
 
     public void OnPointerUp(PointerEventData eventData)

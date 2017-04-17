@@ -53,6 +53,7 @@ public class ApplicationManager : MonoBehaviour
         ResourcesConfigManager.Initialize(); //资源路径管理器启动
 
         MemoryManager.Init();                //内存管理初始化
+        HeapObjectPool.Init();
         Timer.Init();                        //计时器启动
         InputManager.Init();                 //输入管理器启动
         UIManager.Init();                    //UIManager启动

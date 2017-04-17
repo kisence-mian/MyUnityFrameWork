@@ -44,6 +44,15 @@ public class INetworkInterface
 
     }
 
+    /// <summary>
+    ///回收资源
+    /// </summary>
+    /// <param name="data"></param>
+    public virtual void RecycleData(Dictionary<string, object> data)
+    {
+
+    }
+
     NetWorkMessage[] m_messagePool;
     int m_msgPoolIndex = 0;
     protected NetWorkMessage GetMessageByPool()

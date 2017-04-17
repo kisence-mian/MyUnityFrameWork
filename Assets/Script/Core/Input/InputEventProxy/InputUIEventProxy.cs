@@ -117,8 +117,6 @@ public class InputUIEventProxy : IInputProxyBase
         {
             InputUIOnClickEvent e = GetUIEvent<InputUIOnClickEvent>(UIName, ComponentName, parm);
             InputManager.Dispatch("InputUIOnClickEvent", e);
-
-            PutUIEvent<InputUIOnClickEvent>(e);
         }
     }
 
@@ -129,9 +127,9 @@ public class InputUIEventProxy : IInputProxyBase
         {
             InputUILongPressEvent e = GetUIEvent<InputUILongPressEvent>(UIName, ComponentName, parm);
             e.m_LongPressType = type;
-            InputManager.Dispatch("InputUILongPressEvent",e);
 
-            PutUIEvent<InputUILongPressEvent>(e);
+            e.EventKey = InputUILongPressEvent.GetEventKey(UIName, ComponentName, parm);
+            InputManager.Dispatch("InputUILongPressEvent",e);
         }
     }
 
@@ -143,8 +141,6 @@ public class InputUIEventProxy : IInputProxyBase
         {
             InputUIOnScrollEvent e = GetOnScrollEvent(UIName, ComponentName, parm, position);
             InputManager.Dispatch("InputUIOnScrollEvent",e);
-
-            PutUIEvent<InputUIOnScrollEvent>(e);
         }
     }
 
@@ -155,8 +151,6 @@ public class InputUIEventProxy : IInputProxyBase
         {
             InputUIOnDragEvent e = GetDragEvent(UIName, ComponentName,parm, pos);
             InputManager.Dispatch("InputUIOnDragEvent",e);
-
-            PutUIEvent<InputUIOnDragEvent>(e);
         }
     }
 
@@ -167,8 +161,6 @@ public class InputUIEventProxy : IInputProxyBase
         {
             InputUIOnBeginDragEvent e = GetUIEvent<InputUIOnBeginDragEvent>(UIName, ComponentName, parm);
             InputManager.Dispatch("InputUIOnBeginDragEvent",e);
-
-            PutUIEvent<InputUIOnBeginDragEvent>(e);
         }
     }
 
@@ -179,8 +171,6 @@ public class InputUIEventProxy : IInputProxyBase
         {
             InputUIOnEndDragEvent e = GetUIEvent<InputUIOnEndDragEvent>(UIName, ComponentName, parm);
             InputManager.Dispatch("InputUIOnEndDragEvent",e);
-
-            PutUIEvent<InputUIOnEndDragEvent>(e);
         }
     }
 
@@ -213,16 +203,6 @@ public class InputUIEventProxy : IInputProxyBase
         InputUIOnDragEvent msg = GetUIEvent<InputUIOnDragEvent>(UIName, ComponentName, parm);
         msg.m_dragPosition = pos;
         return msg;
-    }
-
-    /// <summary>
-    /// UI事件派发完毕将事件对象重新放入对象池，所以UI事件对象不允许储存
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="e"></param>
-    static void PutUIEvent<T>(T e) where T : InputUIEventBase, new()
-    {
-        HeapObjectPoolTool<T>.PutHeapObject(e);
     }
 
     #endregion
