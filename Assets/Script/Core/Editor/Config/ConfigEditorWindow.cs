@@ -293,7 +293,15 @@ public class ConfigEditorWindow : EditorWindow
 
             for (int i = 0; i < keys.Count; i++)
             {
-                ConfigItemGUI(m_currentConfig, keys[i]);
+                try
+                {
+                    ConfigItemGUI(m_currentConfig, keys[i]);
+                }
+                catch(Exception e)
+                {
+                    GUILayout.Label(e.ToString(), EditorGUIStyleData.s_ErrorMessageLabel);
+                }
+
             }
 
             EditorGUILayout.Space();

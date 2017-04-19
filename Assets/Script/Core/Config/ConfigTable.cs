@@ -87,6 +87,7 @@ public class SingleField
     public SingleField(Enum content)
     {
         m_type = FieldType.Enum;
+        m_enumType = content.GetType().Name;
         m_content = content.ToString();
     }
 

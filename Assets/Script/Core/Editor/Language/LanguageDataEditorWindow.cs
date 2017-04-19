@@ -128,7 +128,7 @@ public class LanguageDataEditorWindow : EditorWindow
         Dictionary<string, SingleField> config = new Dictionary<string, SingleField>();
 
         //保存默认语言
-        config.Add(LanguageManager.c_defaultLanguageKey, new SingleField(m_defaultLanguage));
+        config.Add(LanguageManager.c_defaultLanguageKey, new SingleField(m_defaultLanguage.ToString()));
 
         //保存语言列表
         List<string> languageList = new List<string>();

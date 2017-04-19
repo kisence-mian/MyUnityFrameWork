@@ -31,23 +31,31 @@ public class LanguageComponmentEditor : Editor
 
         m_languageList = LanguageDataEditorWindow.GetLanguageKeyList().ToArray();
 
-        if (m_currentSelectIndex == 0 && m_lc.m_text != null)
+        if (m_currentSelectIndex == 0)
         {
-            m_currentSelectIndex = GetIndex(m_lc.m_text.text);
+            m_currentSelectIndex = GetIndex(m_lc.m_moduleName,m_lc.m_languageID);
         }
 
         m_currentSelectIndex = EditorGUILayout.Popup("当前内容：", m_currentSelectIndex, m_languageList);
-        m_lc.m_languageID = m_languageList[m_currentSelectIndex];
 
+        string content = m_languageList[m_currentSelectIndex];
+
+        string[] tmp = content.Split('/');
+
+        string moduleName = tmp[0];
+        string contentID = tmp[1];
+
+        m_lc.m_moduleName = moduleName;
+        m_lc.m_languageID = contentID;
 
         base.OnInspectorGUI();
     }
 
-    public int GetIndex(string content)
+    public int GetIndex(string mouleName,string content)
     {
         for (int i = 0; i < m_languageList.Length; i++)
         {
-            if(m_languageList[i] == content)
+            if (m_languageList[i].Equals(mouleName + "/" + content))
             {
                 return i;
             }

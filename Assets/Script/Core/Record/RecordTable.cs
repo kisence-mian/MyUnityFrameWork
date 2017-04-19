@@ -130,6 +130,18 @@ public class RecordTable : Dictionary<string, SingleField>
         }
     }
 
+    public T GetEnumRecord<T>(string key, T defaultValue) where T:struct
+    {
+        if (this.ContainsKey(key))
+        {
+            return this[key].GetEnum<T>();
+        }
+        else
+        {
+            return new SingleField(defaultValue.ToString()).GetEnum<T>();
+        }
+    }
+
     #endregion
 
     #region 存值封装
@@ -215,6 +227,18 @@ public class RecordTable : Dictionary<string, SingleField>
         else
         {
             this.Add(key, new SingleField(value));
+        }
+    }
+
+    public void SetEnumRecord(string key, Enum value)
+    {
+        if (this.ContainsKey(key))
+        {
+            this[key] = new SingleField(value.ToString());
+        }
+        else
+        {
+            this.Add(key, new SingleField(value.ToString()));
         }
     }
 

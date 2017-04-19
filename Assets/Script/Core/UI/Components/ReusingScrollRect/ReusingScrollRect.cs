@@ -16,6 +16,8 @@ public class ReusingScrollRect : ScrollRectInput
     public List<ReusingScrollItemBase> m_items = new List<ReusingScrollItemBase>();
     public List<ReusingScrollItemBase> m_itemCatchs = new List<ReusingScrollItemBase>();
 
+    RectTransform m_rectTransform;
+
     private Bounds m_viewBounds;
     GameObject m_itemPrefab;
 
@@ -28,6 +30,7 @@ public class ReusingScrollRect : ScrollRectInput
         base.Init(UIEventKey);
 
         m_ItemName = itemName;
+        m_rectTransform = GetComponent<RectTransform>();
 
         Rebuild(CanvasUpdate.Layout);
 
@@ -138,11 +141,13 @@ public class ReusingScrollRect : ScrollRectInput
         if(horizontal)
         {
             size.x *= count;
+            size.y = m_rectTransform.sizeDelta.y;
         }
 
         if(vertical)
         {
             size.y *= count;
+            size.x = m_rectTransform.sizeDelta.x;
         }
 
         content.sizeDelta = size;
@@ -255,6 +260,7 @@ public class ReusingScrollRect : ScrollRectInput
         itemTmp.m_RectTransform.pivot = GetPivot();
         itemTmp.m_RectTransform.anchorMin = GetMinAchors();
         itemTmp.m_RectTransform.anchorMax = GetMaxAchors();
+        itemTmp.m_RectTransform.sizeDelta = GetItemSize();
 
         itemTmp.m_RectTransform.anchoredPosition3D = GetItemPos(index);
 
@@ -287,7 +293,6 @@ public class ReusingScrollRect : ScrollRectInput
     {
         return new Bounds(GetItemPos(index) + GetRealItemOffset() + content.localPosition, m_itemSize);
     }
-
 
     Vector3 GetItemPos(int index)
     {
@@ -376,6 +381,8 @@ public class ReusingScrollRect : ScrollRectInput
             {
                 minAchors.x = 1;
             }
+
+            minAchors.y = 0;
         }
 
         if (vertical)
@@ -388,6 +395,7 @@ public class ReusingScrollRect : ScrollRectInput
             {
                 minAchors.y = 0;
             }
+            minAchors.x = 0;
         }
 
         return minAchors;
@@ -407,6 +415,8 @@ public class ReusingScrollRect : ScrollRectInput
             {
                 maxAchors.x = 1;
             }
+
+            maxAchors.y = 1;
         }
 
         if (vertical)
@@ -419,9 +429,29 @@ public class ReusingScrollRect : ScrollRectInput
             {
                 maxAchors.y = 0;
             }
+            maxAchors.x = 1;
         }
 
         return maxAchors;
+    }
+
+    Vector2 GetItemSize()
+    {
+        Vector3 size = m_itemSize;
+
+        if (horizontal)
+        {
+            size.y = m_rectTransform.sizeDelta.y;
+        }
+
+        if (vertical)
+        {
+            size.x = m_rectTransform.sizeDelta.x;
+        }
+
+        content.sizeDelta = size;
+
+        return size;
     }
 
     //void OnDrawGizmos()
