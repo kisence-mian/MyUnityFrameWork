@@ -48,34 +48,46 @@ public class SingleField
         m_content = contrnt.ToString();
     }
 
-    public SingleField(float contrnt)
+    public SingleField(float content)
     {
         m_type = FieldType.Float;
-        m_content = contrnt.ToString();
+        m_content = content.ToString();
     }
 
-    public SingleField(bool contrnt)
+    public SingleField(bool content)
     {
         m_type = FieldType.Bool;
-        m_content = contrnt.ToString();
+        m_content = content.ToString();
     }
 
-    public SingleField(Vector2 contrnt)
+    public SingleField(Vector2 content)
     {
         m_type = FieldType.Vector2;
-        m_content = contrnt.ToSaveString();
+        m_content = content.ToSaveString();
     }
 
-    public SingleField(Vector3 contrnt)
+    public SingleField(Vector3 content)
     {
         m_type = FieldType.Vector3;
-        m_content = contrnt.ToSaveString();
+        m_content = content.ToSaveString();
     }
 
-    public SingleField(Color contrnt)
+    public SingleField(Color content)
     {
         m_type = FieldType.Color;
-        m_content = contrnt.ToSaveString();
+        m_content = content.ToSaveString();
+    }
+
+    public SingleField(List<string> content)
+    {
+        m_type = FieldType.StringArray;
+        m_content = content.ToSaveString();
+    }
+
+    public SingleField(Enum content)
+    {
+        m_type = FieldType.Enum;
+        m_content = content.ToString();
     }
 
     #endregion
@@ -122,6 +134,10 @@ public class SingleField
 
     #region 取值封装
 
+    /// <summary>
+    /// 显示在编辑器UI上的字符串
+    /// </summary>
+    /// <returns></returns>
     public string GetShowString()
     {
         switch (m_type)

@@ -551,9 +551,18 @@ public class UIBase : MonoBehaviour
         GetInputField(TextID).text = content;
     }
 
-    public void SetTextByLangeage(string textID, string langeageID, params object[] objs)
+    /// <summary>
+    /// 不再建议使用
+    /// </summary>
+    [Obsolete]
+    public void SetTextByLangeage(string textID, string contentID, params object[] objs)
     {
-        GetText(textID).text = LanguageManager.GetContent(langeageID, objs);
+        GetText(textID).text = LanguageManager.GetContent(LanguageManager.c_defaultModuleKey,contentID, objs);
+    }
+
+    public void SetTextByLangeage(string textID,string moduleName ,string contentID, params object[] objs)
+    {
+        GetText(textID).text = LanguageManager.GetContent(moduleName, contentID, objs);
     }
 
     public void SetSlider(string sliderID,float value)

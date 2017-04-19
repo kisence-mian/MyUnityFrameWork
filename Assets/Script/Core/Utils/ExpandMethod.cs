@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Text;
+using System.Collections.Generic;
 
 public static class ExpandMethod 
 {
@@ -40,6 +41,23 @@ public static class ExpandMethod
         sb.Append(color.b.ToString());
         sb.Append("|");
         sb.Append(color.a.ToString());
+
+        return sb.ToString();
+    }
+
+    public static string ToSaveString(this List<string> list)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            sb.Append(list[i]);
+
+            if(i != list.Count -1)
+            {
+                sb.Append("|");
+            }
+        }
 
         return sb.ToString();
     }

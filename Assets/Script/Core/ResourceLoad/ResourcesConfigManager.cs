@@ -6,11 +6,8 @@ using System;
 public static class ResourcesConfigManager 
 {
     public const string c_ManifestFileName = "ResourcesManifest";
-
-
-
-    public const string c_relyBundleKey = "relyBundles";
-    public const string c_bundlesKey = "AssetsBundles";
+    public const string c_relyBundleKey    = "relyBundles";
+    public const string c_bundlesKey       = "AssetsBundles";
 
     public static Dictionary<string, ResourcesConfig> m_relyBundleConfigs;
     public static Dictionary<string, ResourcesConfig> m_bundleConfigs ;
@@ -84,8 +81,6 @@ public static class ResourcesConfigManager
         }
     }
 
-
-
     public static string ReadResourceConfigContent()
     {
         string dataJson = "";
@@ -119,10 +114,6 @@ public static class ResourcesConfigManager
 
                 ab.Unload(true);
             }
-
-            Debug.Log("loadType: " + type);
-
-
         }
 
         return dataJson;
@@ -172,11 +163,6 @@ public static class ResourcesConfigManager
 
         return result;
     }
-
-    public static string SerializeResourcesConfig()
-    {
-        return "";
-    }
 }
 
 public class ResourcesConfig
@@ -192,4 +178,3 @@ public class ResourcesConfigStruct
     public Dictionary<string,ResourcesConfig> relyList;
     public Dictionary<string, ResourcesConfig> bundleList;
 }
-

@@ -45,7 +45,7 @@ public class DataTable : Dictionary<string, SingleData>
     /// <summary>
     /// 数据所有的Key
     /// </summary>
-    public List<string> TableIDs;
+    public List<string> TableIDs = new List<string>();
 
     /// <summary>
     /// 将文本解析为表单数据

@@ -84,6 +84,14 @@ public class DataManager
     //只在编辑器下能够使用
 #if UNITY_EDITOR
 
+    public static bool GetIsExistDataEditor(string DataName)
+    {
+        return "" != ResourceIOTool.ReadStringByResource(
+                        PathTool.GetRelativelyPath(c_directoryName,
+                                                    DataName,
+                                                    c_expandName));
+    }
+
     [NoToLuaAttribute]
     public static void SaveData(string ConfigName, DataTable data)
     {

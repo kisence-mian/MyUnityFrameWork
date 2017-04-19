@@ -717,10 +717,8 @@ public class BundleConfigEditorWindow : EditorWindow
         }
 
         EditorGUILayout.EndVertical();
-
-        //}
-
     }
+
     #endregion
 
     #endregion
@@ -874,7 +872,6 @@ public class BundleConfigEditorWindow : EditorWindow
             }
         }
 
-
         return result;
     }
 
@@ -992,7 +989,10 @@ public class BundleConfigEditorWindow : EditorWindow
 
     void ReLoadEditObject(EditorObject editObj)
     {
-        editObj.obj = AssetDatabase.LoadAssetAtPath<Object>(editObj.path);
+        if (editObj.obj == null)
+        {
+            editObj.obj = AssetDatabase.LoadAssetAtPath<Object>(editObj.path);
+        }
     }
 
     string GetExportPath(string path, string name)
@@ -1511,7 +1511,6 @@ public class BundleConfigEditorWindow : EditorWindow
     /// </summary>
     bool GetResIsUseByRelyBundle(EditPackageConfig pack, EditorObject res)
     {
-
         //根据mask获取所有依赖包
         List<EditPackageConfig> relysBundles = GetRelyPackListByMask(pack.relyPackagesMask);
 
