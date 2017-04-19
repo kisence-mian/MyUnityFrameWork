@@ -122,13 +122,13 @@ public class LanguageManager
     {
         string content = null;
 
-        DataTable data = s_languageDataDict[moduleName];
-
-        if(data == null)
+        if (!s_languageDataDict.ContainsKey(moduleName))
         {
             Debug.LogError("Dont find language moduleName:->" + moduleName + "<- contentID: ->" + contentID + "<-");
             return "Dont find language : ->" + contentID + "<-";
         }
+
+        DataTable data = s_languageDataDict[moduleName];
 
         if (data.ContainsKey(contentID))
         {
