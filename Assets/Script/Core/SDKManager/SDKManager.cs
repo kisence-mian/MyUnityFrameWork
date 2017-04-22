@@ -31,6 +31,8 @@ public class SDKManager
                 SchemeData tmp = JsonUtility.FromJson<SchemeData>(configData[c_KeyName].GetString());
 
                 LoadService(tmp);
+
+                InitSDK();
             }
         }
         catch(Exception e)
@@ -160,6 +162,23 @@ public class SDKManager
         for (int i = 0; i < data.OtherScheme.Count; i++)
         {
             s_otherServiceList.Add((OtherSDKInterface)AnalysisConfig(data.OtherScheme[i]));
+        }
+    }
+
+    static void InitSDK()
+    {
+        s_loginService.Init();
+        s_ADService.Init();
+        s_payService.Init();
+
+        for (int i = 0; i < s_logServiceList.Count; i++)
+        {
+            s_logServiceList[i].Init();
+        }
+
+        for (int i = 0; i < s_otherServiceList.Count; i++)
+        {
+            s_otherServiceList[i].Init();
         }
     }
 
