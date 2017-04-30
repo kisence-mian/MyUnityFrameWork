@@ -7,11 +7,13 @@ public abstract class IApplicationStatus
 {
     List<UIWindowBase> m_uiList = new List<UIWindowBase>();
 
-    public void OpenUI<T>() where T: UIWindowBase
+    public T OpenUI<T>() where T: UIWindowBase
     {
         UIWindowBase ui =  UIManager.OpenUIWindow<T>();
 
         m_uiList.Add(ui);
+
+        return (T)ui;
     }
 
     public void CloseUI<T>() where T:UIWindowBase
