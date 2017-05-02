@@ -594,7 +594,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
     string GetLanguageSavePath(string langeuageName, string modelName)
     {
-        return c_DataPath + "/" + m_currentLanguage + "/" + LanguageManager.GetLanguageDataName(langeuageName, modelName);
+        return c_DataPath + "/" + langeuageName + "/" + LanguageManager.GetLanguageDataName(langeuageName, modelName);
     }
 
     #endregion

@@ -52,7 +52,7 @@ public class LanguageManager
         }
         else
         {
-            Debug.Log("当前语言不存在 " + lang);
+            //Debug.Log("当前语言不存在 " + lang);
 
             Loadlanguage(s_defaultlanguage);
         }
@@ -91,7 +91,7 @@ public class LanguageManager
 
         for (int i = 0; i < s_modelList.Count; i++)
         {
-            s_languageDataDict.Add(s_modelList[i], DataManager.GetData(GetLanguageDataName(language.ToString(), s_modelList[i])));
+            s_languageDataDict.Add(s_modelList[i], DataManager.GetData(GetLanguageDataSaveName(language.ToString(), s_modelList[i])));
         }
     }
 
@@ -154,9 +154,22 @@ public class LanguageManager
         }
     }
 
+    public static string GetLanguageDataSaveName(string langeuageName, string modelName)
+    {
+        if(Application.isPlaying)
+        {
+            return GetLanguageDataName(langeuageName, modelName);
+        }
+        else
+        {
+            return "Language" + "/" + langeuageName + "/" + GetLanguageDataName(langeuageName, modelName);
+        }
+
+    }
+
     public static string GetLanguageDataName(string langeuageName, string modelName)
     {
-        return LanguageManager.c_DataFilePrefix + langeuageName + "_" + modelName;
+        return c_DataFilePrefix + langeuageName + "_" + modelName;
     }
 }
 
