@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public abstract class IInputProxyBase
 {
@@ -24,7 +25,7 @@ public abstract class IInputProxyBase
 
     public static T GetEvent<T>(string eventKey) where T : IInputEventBase, new()
     {
-        T tmp = HeapObjectPoolTool<T>.GetHeapObject();
+        T tmp = HeapObjectPool<T>.GetObject();
         tmp.EventKey = eventKey;
 
         return tmp;
@@ -33,10 +34,14 @@ public abstract class IInputProxyBase
     #endregion
 }
 
-public class InputEventRegisterInfo<T> : HeapObjectBase where T : IInputEventBase
+public class InputEventRegisterInfo<T> : IHeapObjectInterface where T : IInputEventBase
 {
     public string eventKey;
     public InputEventHandle<T> callBack;
+
+    public InputEventRegisterInfo()
+    {
+    }
 
     public void AddListener()
     {
@@ -46,6 +51,11 @@ public class InputEventRegisterInfo<T> : HeapObjectBase where T : IInputEventBas
     public virtual void RemoveListener()
     {
         InputManager.RemoveListener<T>(eventKey, callBack);
-        Release();
+        HeapObjectPool<InputEventRegisterInfo<T>>.PutObject(this);
     }
+    public void OnInit() { }
+
+    public void OnPop() { }
+
+    public void OnPush() { }
 }

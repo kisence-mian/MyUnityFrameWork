@@ -43,15 +43,6 @@ public class AnimSystem : MonoBehaviour
         return instance;
     }
 
-    #region 初始化
-
-    public static void InitAnimData()
-    {
-        HeapObjectPool.Init<AnimData>();
-    }
-
-    #endregion
-
     #region UGUI_Color
     /// <summary>
     /// 动画过度到目标颜色
@@ -88,7 +79,7 @@ public class AnimSystem : MonoBehaviour
             }
         }
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();
 
         l_tmp.m_animGameObejct = animObject;
         l_tmp.m_animType = AnimType.UGUI_Color;
@@ -150,7 +141,7 @@ public class AnimSystem : MonoBehaviour
             }
         }
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();
 
         l_tmp.m_animGameObejct = animObject;
         l_tmp.m_animType = AnimType.UGUI_Alpha;
@@ -190,7 +181,7 @@ public class AnimSystem : MonoBehaviour
 
         Vector3 fromTmp = from ?? animObject.GetComponent<RectTransform>().anchoredPosition;
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animGameObejct = animObject;
         l_tmp.m_animType = AnimType.UGUI_AnchoredPosition;
@@ -228,7 +219,7 @@ public class AnimSystem : MonoBehaviour
     {
         Vector2 fromTmp = from ?? animObject.GetComponent<RectTransform>().sizeDelta;
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animGameObejct = animObject;
         l_tmp.m_animType = AnimType.UGUI_SizeDetal;
@@ -266,7 +257,7 @@ public class AnimSystem : MonoBehaviour
         AnimCallBack callBack  = null, 
         object[] parameter = null)
     {
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animGameObejct = animObject;
         l_tmp.m_animType = AnimType.Color;
@@ -301,7 +292,7 @@ public class AnimSystem : MonoBehaviour
       AnimCallBack callBack = null, object[] parameter = null)
     {
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animGameObejct = animObject;
         l_tmp.m_animType = AnimType.Alpha;
@@ -368,7 +359,7 @@ public class AnimSystem : MonoBehaviour
             animType = AnimType.Position;
         }
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animGameObejct = animObject;
         l_tmp.m_animType = animType;
@@ -422,7 +413,7 @@ public class AnimSystem : MonoBehaviour
             animType = AnimType.Rotate;
         }
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animGameObejct = animObject;
         l_tmp.m_animType = animType;
@@ -463,7 +454,7 @@ public class AnimSystem : MonoBehaviour
 
         Vector3 fromTmp = from ?? animObject.transform.localScale;
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animGameObejct = animObject;
         l_tmp.m_animType = AnimType.LocalScale;
@@ -497,7 +488,7 @@ public class AnimSystem : MonoBehaviour
         int repeatCount = -1, 
         AnimCallBack callBack = null, object[] parameter = null)
     {
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animType = AnimType.Custom_Float;
         l_tmp.m_fromFloat = from;
@@ -528,7 +519,7 @@ public class AnimSystem : MonoBehaviour
         int repeatCount = -1, 
         AnimCallBack callBack = null, object[] parameter = null)
     {
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animType = AnimType.Custom_Vector2;
         l_tmp.m_fromV2 = from;
@@ -559,7 +550,7 @@ public class AnimSystem : MonoBehaviour
         int repeatCount = -1, 
         AnimCallBack callBack = null, object[] parameter = null)
     {
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animType = AnimType.Custom_Vector3;
         l_tmp.m_fromV3 = from;
@@ -596,7 +587,7 @@ public class AnimSystem : MonoBehaviour
         AnimCallBack callBack = null, object[] parameter = null)
     {
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         if (isLocal)
         {
@@ -674,7 +665,7 @@ public class AnimSystem : MonoBehaviour
         AnimCallBack callBack = null, object[] parameter = null)
     {
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         if (isLocal)
         {
@@ -784,7 +775,7 @@ public class AnimSystem : MonoBehaviour
         object[] parameter = null)
     {
 
-        AnimData l_tmp = HeapObjectPool.GetObject<AnimData>("AnimData");
+        AnimData l_tmp = HeapObjectPool<AnimData>.GetObject();;
 
         l_tmp.m_animType = AnimType.Blink;
         l_tmp.m_animGameObejct = animObject;
@@ -844,7 +835,7 @@ public class AnimSystem : MonoBehaviour
 
         public AnimData GetAnimData()
         {
-            AnimData DataTmp = HeapObjectPool.GetObject<AnimData>();
+            AnimData DataTmp = HeapObjectPool<AnimData>.GetObject();
 
             foreach (var hash in this)
             {
@@ -1005,7 +996,8 @@ public class AnimSystem : MonoBehaviour
                     i--;
 
                     //释放
-                    animTmp.Release();
+                    //animTmp.Release();
+                    HeapObjectPool<AnimData>.PutObject(animTmp);
                 }
 
                 //执行回调

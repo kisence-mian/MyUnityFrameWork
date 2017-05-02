@@ -56,7 +56,7 @@ public class INetworkInterface
 
     protected NetWorkMessage GetMessageByPool()
     {
-        NetWorkMessage result = HeapObjectPoolTool<NetWorkMessage>.GetHeapObject();
+        NetWorkMessage result = HeapObjectPool<NetWorkMessage>.GetObject();
 
         return result;
     }

@@ -143,7 +143,7 @@ public class ProtocolService : INetworkInterface
 
     public override void SendMessage(string MessageType,Dictionary<string, object> data)
     {
-        ByteArray msg = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+        ByteArray msg = HeapObjectPool<ByteArray>.GetObject();
         //ByteArray msg = new ByteArray()
         msg.clear();
 
@@ -162,6 +162,7 @@ public class ProtocolService : INetworkInterface
             msg.WriteInt(0);
 
         Send(msg.Buffer);
+        HeapObjectPool<ByteArray>.PutObject(msg);
     }
 
     #region 缓冲区
@@ -264,7 +265,7 @@ public class ProtocolService : INetworkInterface
     {
         try
         {
-            ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+            ByteArray ba = HeapObjectPool<ByteArray>.GetObject();
 
             //用于做数据处理,加解密,或者压缩于解压缩    
             ba.clear();
@@ -272,6 +273,8 @@ public class ProtocolService : INetworkInterface
 
             NetWorkMessage msg = Analysis(ba);
             m_messageCallBack(msg);
+
+            HeapObjectPool<ByteArray>.PutObject(ba);
         }
         catch(Exception e)
         {
@@ -477,8 +480,8 @@ public class ProtocolService : INetworkInterface
         int repeatType = 0;
         try
         {
-            Dictionary<string, object> data = HeapObjectPool.SafeGetSODict();
-            ByteArray ba = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            ByteArray ba = HeapObjectPool<ByteArray>.GetObject();
 
             ba.clear();
             ba.Add(bytes);
@@ -598,7 +601,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<string> ReadStringList(ByteArray ba)
     {
-        List<string> tbl = HeapObjectPoolTool<List<string>>.GetHeapObject();
+        List<string> tbl = new List<string>();
         tbl.Clear();
 
         int len1 = ba.ReadUShort();
@@ -616,7 +619,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<bool> ReadBoolList(ByteArray ba)
     {
-        List<bool> tbl = HeapObjectPoolTool<List<bool>>.GetHeapObject();
+        List<bool> tbl = new List<bool>();
         tbl.Clear();
 
         int len1 = ba.ReadUShort();
@@ -648,8 +651,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<int> ReadIntList(ByteArray ba)
     {
-        List<int> tbl = HeapObjectPoolTool<List<int>>.GetHeapObject();
-        tbl.Clear();
+        List<int> tbl = new List<int>();
 
         int len1 = ba.ReadUShort();
         ba.ReadUInt();
@@ -665,8 +667,7 @@ public class ProtocolService : INetworkInterface
 
     private List<int> ReadShortList(ByteArray ba)
     {
-        List<int> tbl = HeapObjectPoolTool<List<int>>.GetHeapObject();
-        tbl.Clear();
+        List<int> tbl = new List<int>();
 
         int len1 = ba.ReadUShort();
         ba.ReadUInt();
@@ -682,8 +683,7 @@ public class ProtocolService : INetworkInterface
 
     private List<int> ReadInt8List(ByteArray ba)
     {
-        List<int> tbl = HeapObjectPoolTool<List<int>>.GetHeapObject();
-        tbl.Clear();
+        List<int> tbl = new List<int>();
 
         int len1 = ba.ReadUShort();
         ba.ReadUInt();
@@ -704,8 +704,7 @@ public class ProtocolService : INetworkInterface
     }
     private List<double> ReadDoubleList(ByteArray ba)
     {
-        List<double> tbl = HeapObjectPoolTool<List<double>>.GetHeapObject();
-        tbl.Clear();
+        List<double> tbl = new List<double>();
 
         int len1 = ba.ReadUShort();
         ba.ReadUInt();
@@ -728,7 +727,7 @@ public class ProtocolService : INetworkInterface
         {
             int st_len = ba.ReadUInt();
 
-            Dictionary<string, object> tbl = HeapObjectPool.SafeGetSODict();
+            Dictionary<string, object> tbl = new Dictionary<string, object>();
 
             if (st_len == 0)
             {
@@ -839,9 +838,8 @@ public class ProtocolService : INetworkInterface
 
     private List<Dictionary<string, object>> ReadDictionaryList(string str, ByteArray ba)
     {
-        List<Dictionary<string, object>> stbl = HeapObjectPoolTool<List<Dictionary<string, object>>>.GetHeapObject();
+        List<Dictionary<string, object>> stbl = new List<Dictionary<string, object>>();
 
-        stbl.Clear();
         int len1 = ba.ReadUShort();
         ba.ReadUInt();
 
@@ -911,7 +909,7 @@ public class ProtocolService : INetworkInterface
 
         try
         {
-            ByteArray Bytes = HeapObjectPoolTool<ByteArray>.GetHeapObject();
+            ByteArray Bytes = HeapObjectPool<ByteArray>.GetObject();
             //ByteArray Bytes = new ByteArray();
             Bytes.clear();
 
@@ -1081,7 +1079,7 @@ public class ProtocolService : INetworkInterface
                     }
                 }
             }
-
+            HeapObjectPool<ByteArray>.PutObject(Bytes);
             return Bytes.bytes;
         }
         catch(Exception e)

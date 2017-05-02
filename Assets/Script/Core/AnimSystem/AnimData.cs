@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
 
-public class AnimData : HeapObjectBase
+public class AnimData : IHeapObjectInterface
 {
     #region 参数
 
@@ -239,14 +239,18 @@ public class AnimData : HeapObjectBase
         }
     }
 
-    public override void OnRelease()
+    public void OnInit(){}
+
+    public void OnPop(){}
+
+    public void OnPush()
     {
         m_ignoreTimeScale = false;
 
-        m_delayTime   = 0;
-        m_isDone      = false;
+        m_delayTime = 0;
+        m_isDone = false;
         m_currentTime = 0;
-        m_totalTime   = 0;
+        m_totalTime = 0;
         m_repeatCount = -1;
 
         m_pathType = PathType.Line;
@@ -1100,6 +1104,7 @@ public class AnimData : HeapObjectBase
 
         }
     }
+
 
     //outInExpo,
     //inBack,

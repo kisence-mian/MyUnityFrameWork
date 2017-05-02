@@ -9,7 +9,6 @@ public class Timer
     public static void Init()
     {
         ApplicationManager.s_OnApplicationUpdate += Update;
-        HeapObjectPool.Init<TimerEvent>(50);
     }
 
 	static void Update () 
@@ -27,7 +26,7 @@ public class Timer
                 if (e.m_repeatCount == 0)
                 {
                     m_timers.Remove(e);
-                    e.Release();
+                    HeapObjectPool<TimerEvent>.PutObject(e);
                     i--;
                 }
             }
@@ -165,7 +164,7 @@ public class Timer
     /// <returns></returns>
     public static TimerEvent AddTimer(float spaceTime, bool isIgnoreTimeScale, int callBackCount, string timerName,TimerCallBack callBack, params object[] objs)
     {
-        TimerEvent te = HeapObjectPool.GetObject<TimerEvent>("TimerEvent");
+        TimerEvent te = HeapObjectPool<TimerEvent>.GetObject();
 
         te.m_timerName = timerName;
 
@@ -193,7 +192,7 @@ public class Timer
             }
 
             m_timers.Remove(timer);
-            timer.Release();
+            HeapObjectPool<TimerEvent>.PutObject(timer);
         }
         else
         {
@@ -220,7 +219,7 @@ public class Timer
             {
                 m_timers[i].CallBackTimer();
             }
-            m_timers[i].Release();
+            HeapObjectPool<TimerEvent>.PutObject(m_timers[i]);
         }
 
         m_timers.Clear();

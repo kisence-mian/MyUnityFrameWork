@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class TimerEvent : HeapObjectBase
+public class TimerEvent : IHeapObjectInterface
 {
 
     public string m_timerName = "";
@@ -42,19 +42,6 @@ public class TimerEvent : HeapObjectBase
         }
     }
 
-    public override void OnRelease()
-    {
-        m_timerName = "";
-        m_repeatCount   = 0;
-        m_currentRepeat = 0;
-        m_isIgnoreTimeScale = false;
-        m_callBack = null;
-        m_objs = null;
-        m_timerSpace = 0; ;
-        m_currentTimer = 0;
-        m_isDone = false;
-    }
-
     public void CompleteTimer()
     {
         CallBackTimer();
@@ -90,6 +77,23 @@ public class TimerEvent : HeapObjectBase
     {
         m_currentTimer = 0;
         m_currentRepeat = 0;
+    }
+
+    public void OnInit(){ }
+
+    public void OnPop(){ }
+
+    public void OnPush()
+    {
+        m_timerName = "";
+        m_repeatCount = 0;
+        m_currentRepeat = 0;
+        m_isIgnoreTimeScale = false;
+        m_callBack = null;
+        m_objs = null;
+        m_timerSpace = 0; ;
+        m_currentTimer = 0;
+        m_isDone = false;
     }
 }
 

@@ -9,7 +9,7 @@ public class InputUIEventProxy : IInputProxyBase
     #region 添加监听
     public static InputEventRegisterInfo<InputUIOnClickEvent> AddOnClickListener(Button button, string UIName, string ComponentName, string parm, InputEventHandle<InputUIOnClickEvent> callback)
     {
-        InputButtonClickRegisterInfo info = HeapObjectPool.GetObject<InputButtonClickRegisterInfo>();
+        InputButtonClickRegisterInfo info = HeapObjectPool<InputButtonClickRegisterInfo>.GetObject();
 
         info.eventKey = InputUIOnClickEvent.GetEventKey(UIName, ComponentName, parm);
         info.callBack = callback;
@@ -28,7 +28,7 @@ public class InputUIEventProxy : IInputProxyBase
 
     public static InputEventRegisterInfo<InputUILongPressEvent> AddLongPressListener(LongPressAcceptor acceptor, string UIName, string ComponentName, string parm, InputEventHandle<InputUILongPressEvent> callback)
     {
-        InputlongPressRegisterInfo info = HeapObjectPool.GetObject<InputlongPressRegisterInfo>();
+        InputlongPressRegisterInfo info = HeapObjectPool<InputlongPressRegisterInfo>.GetObject();
 
         info.eventKey = InputUILongPressEvent.GetEventKey(UIName, ComponentName, parm);
         info.callBack = callback;
@@ -46,7 +46,7 @@ public class InputUIEventProxy : IInputProxyBase
 
     public static InputEventRegisterInfo<InputUIOnScrollEvent> AddOnScrollListener(string UIName, string ComponentName, InputEventHandle<InputUIOnScrollEvent> callback)
     {
-        InputEventRegisterInfo<InputUIOnScrollEvent> info = HeapObjectPool.GetObject<InputEventRegisterInfo<InputUIOnScrollEvent>>();
+        InputEventRegisterInfo<InputUIOnScrollEvent> info = HeapObjectPool<InputEventRegisterInfo<InputUIOnScrollEvent>>.GetObject();
 
         info.eventKey = InputUIOnScrollEvent.GetEventKey(UIName, ComponentName);
         info.callBack = callback;
@@ -59,7 +59,7 @@ public class InputUIEventProxy : IInputProxyBase
 
     public static InputEventRegisterInfo<InputUIOnDragEvent> AddOnDragListener(string UIName, string ComponentName, InputEventHandle<InputUIOnDragEvent> callback)
     {
-        InputEventRegisterInfo<InputUIOnDragEvent> info = HeapObjectPool.GetObject<InputEventRegisterInfo<InputUIOnDragEvent>>();
+        InputEventRegisterInfo<InputUIOnDragEvent> info = HeapObjectPool<InputEventRegisterInfo<InputUIOnDragEvent>>.GetObject();
 
         info.eventKey = InputUIOnDragEvent.GetEventKey(UIName, ComponentName);
         info.callBack = callback;
@@ -72,7 +72,7 @@ public class InputUIEventProxy : IInputProxyBase
 
     public static InputEventRegisterInfo<InputUIOnBeginDragEvent> AddOnBeginDragListener(string UIName, string ComponentName, InputEventHandle<InputUIOnBeginDragEvent> callback)
     {
-        InputEventRegisterInfo<InputUIOnBeginDragEvent> info = HeapObjectPool.GetObject<InputEventRegisterInfo<InputUIOnBeginDragEvent>>();
+        InputEventRegisterInfo<InputUIOnBeginDragEvent> info = HeapObjectPool<InputEventRegisterInfo<InputUIOnBeginDragEvent>>.GetObject();
 
         info.eventKey = InputUIOnDragEvent.GetEventKey(UIName, ComponentName);
         info.callBack = callback;
@@ -85,7 +85,7 @@ public class InputUIEventProxy : IInputProxyBase
 
     public static InputEventRegisterInfo<InputUIOnEndDragEvent> AddOnEndDragListener(string UIName, string ComponentName, InputEventHandle<InputUIOnEndDragEvent> callback)
     {
-        InputEventRegisterInfo<InputUIOnEndDragEvent> info = HeapObjectPool.GetObject<InputEventRegisterInfo<InputUIOnEndDragEvent>>();
+        InputEventRegisterInfo<InputUIOnEndDragEvent> info = HeapObjectPool<InputEventRegisterInfo<InputUIOnEndDragEvent>>.GetObject();
 
         info.eventKey = InputUIOnEndDragEvent.GetEventKey(UIName, ComponentName);
         info.callBack = callback;
@@ -180,7 +180,7 @@ public class InputUIEventProxy : IInputProxyBase
 
     static T GetUIEvent<T>(string UIName, string ComponentName, string parm) where T:InputUIEventBase,new()
     {
-        T msg = HeapObjectPoolTool<T>.GetHeapObject();
+        T msg = HeapObjectPool<T>.GetObject();
         msg.Reset();
         msg.m_name = UIName;
         msg.m_compName = ComponentName;
