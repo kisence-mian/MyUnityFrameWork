@@ -27,7 +27,7 @@ public class TCPService : INetworkInterface
 
     public override void Init()
     {
-        InitMessagePool(50);
+
     }
 
     public override void GetIPAddress()

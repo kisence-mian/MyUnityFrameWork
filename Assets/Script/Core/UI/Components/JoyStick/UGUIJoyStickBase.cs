@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System;
 using System.Collections;
-using UnityEngine.UI;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.EventSystems;
-using System;
 
-public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHandler
+public class UGUIJoyStickBase : UIBase, IDragHandler, IEndDragHandler, IBeginDragHandler
 {
+
     protected float mRadius;
 
     public RectTransform content;
@@ -13,19 +14,26 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHand
     public UGUIJoyStickHandle onJoyStick;
 
     protected bool canMove = true;
+
     void Start()
     {
-        //计算摇杆块的半径
-        mRadius = ((transform as RectTransform).sizeDelta.x-content.sizeDelta.x) * 0.5f;
+        MyStart();
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    virtual public void MyStart()
+    {
+        //计算摇杆块的半径
+        mRadius = ((transform as RectTransform).sizeDelta.x - content.sizeDelta.x) * 0.5f;
+        
+    }
+
+    virtual public void OnBeginDrag(PointerEventData eventData)
     {
         canMove = true;
     }
 
 
-    public void OnDrag(PointerEventData eventData)
+    virtual public void OnDrag(PointerEventData eventData)
     {
         Vector3 contentPostion = content.anchoredPosition + eventData.delta;
         if (contentPostion.magnitude > mRadius)
@@ -35,16 +43,15 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHand
 
         content.anchoredPosition3D = contentPostion;
 
-        //onJoyStick(GetDir());
     }
 
-    public void OnEndDrag(PointerEventData eventData)
+    virtual public void OnEndDrag(PointerEventData eventData)
     {
         content.anchoredPosition3D = Vector3.zero;
         onJoyStick(Vector3.zero);
     }
 
-    public Vector3 GetDir()
+    protected Vector3 GetDir()
     {
         Vector3 dir = new Vector3(content.anchoredPosition3D.x, 0, content.anchoredPosition3D.y);
 
@@ -79,5 +86,3 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHand
         onJoyStick(Vector3.zero);
     }
 }
-
-public delegate void UGUIJoyStickHandle(Vector3 dir);

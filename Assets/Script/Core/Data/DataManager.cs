@@ -83,7 +83,7 @@ public class DataManager
 
     //只在编辑器下能够使用
 #if UNITY_EDITOR
-
+    [NoToLuaAttribute]
     public static bool GetIsExistDataEditor(string DataName)
     {
         return "" != ResourceIOTool.ReadStringByResource(

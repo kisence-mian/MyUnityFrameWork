@@ -48,17 +48,18 @@ public class UIBase : MonoBehaviour
     string m_UIName = null;
     public string UIName
     {
-        get {
+        get
+        {
             if (m_UIName == null)
             {
                 m_UIName = name;
             }
 
-            return m_UIName; 
+            return m_UIName;
         }
-        set 
+        set
         {
-            m_UIName = value; 
+            m_UIName = value;
         }
     }
 
@@ -95,6 +96,7 @@ public class UIBase : MonoBehaviour
         m_inputFields.Clear();
         m_Sliders.Clear();
         m_joySticks.Clear();
+        m_joySticks_ro.Clear();
         m_longPressList.Clear();
         m_Canvas.Clear();
 
@@ -104,7 +106,7 @@ public class UIBase : MonoBehaviour
             {
                 if (m_objects.ContainsKey(m_objectList[i].name))
                 {
-                    Debug.LogError("CreateObjectTable ContainsKey ->" + m_objectList[i].name+"<-");
+                    Debug.LogError("CreateObjectTable ContainsKey ->" + m_objectList[i].name + "<-");
                 }
                 else
                 {
@@ -133,6 +135,7 @@ public class UIBase : MonoBehaviour
     Dictionary<string, Canvas> m_Canvas = new Dictionary<string, Canvas>();
 
     Dictionary<string, UGUIJoyStick> m_joySticks = new Dictionary<string, UGUIJoyStick>();
+    Dictionary<string, UGUIJoyStickBase> m_joySticks_ro = new Dictionary<string, UGUIJoyStickBase>();
     Dictionary<string, LongPressAcceptor> m_longPressList = new Dictionary<string, LongPressAcceptor>();
 
     public GameObject GetGameObject(string name)
@@ -333,7 +336,7 @@ public class UIBase : MonoBehaviour
         return tmp;
     }
 
-    public Vector3 GetPosition(string name,bool islocal)
+    public Vector3 GetPosition(string name, bool islocal)
     {
         Vector3 tmp = Vector3.zero;
         GameObject go = GetGameObject(name);
@@ -400,6 +403,25 @@ public class UIBase : MonoBehaviour
         return tmp;
     }
 
+    public UGUIJoyStickBase GetJoyStick_ro(string name)
+    {
+        if (m_joySticks_ro.ContainsKey(name))
+        {
+            return m_joySticks_ro[name];
+        }
+
+        UGUIJoyStickBase tmp = GetGameObject(name).GetComponent<UGUIJoyStickBase>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetJoyStick_ro ->" + name + "<- is Null !");
+        }
+
+        m_joySticks_ro.Add(name, tmp);
+        return tmp;
+    }
+
+
     public LongPressAcceptor GetLongPressComp(string name)
     {
         if (m_longPressList.ContainsKey(name))
@@ -459,7 +481,7 @@ public class UIBase : MonoBehaviour
         m_OnClickEvents.Add(info);
     }
 
-    public void AddOnClickListenerByCreate(Button button, string compName,InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
+    public void AddOnClickListenerByCreate(Button button, string compName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
         InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(button, UIEventKey, compName, parm, callback);
         m_OnClickEvents.Add(info);
@@ -488,14 +510,14 @@ public class UIBase : MonoBehaviour
 
     List<UIBase> m_ChildList = new List<UIBase>();
     int m_childUIIndex = 0;
-    public UIBase CreateItem(string itemName,string prantName)
+    public UIBase CreateItem(string itemName, string prantName)
     {
         GameObject item = GameObjectManager.CreatGameObjectByPool(itemName, GetGameObject(prantName), true);
 
         item.transform.localScale = Vector3.one;
         UIBase UIItem = item.GetComponent<UIBase>();
 
-        if(UIItem == null)
+        if (UIItem == null)
         {
             throw new Exception("CreateItem Error : ->" + itemName + "<- don't have UIBase Component!");
         }
@@ -510,7 +532,7 @@ public class UIBase : MonoBehaviour
 
     public void DestroyItem(UIBase item)
     {
-        if(m_ChildList.Contains(item))
+        if (m_ChildList.Contains(item))
         {
             m_ChildList.Remove(item);
             item.OnUIDestroy();
@@ -557,30 +579,30 @@ public class UIBase : MonoBehaviour
     [Obsolete]
     public void SetTextByLangeage(string textID, string contentID, params object[] objs)
     {
-        GetText(textID).text = LanguageManager.GetContent(LanguageManager.c_defaultModuleKey,contentID, objs);
+        GetText(textID).text = LanguageManager.GetContent(LanguageManager.c_defaultModuleKey, contentID, objs);
     }
 
-    public void SetTextByLangeage(string textID,string moduleName ,string contentID, params object[] objs)
+    public void SetTextByLangeage(string textID, string moduleName, string contentID, params object[] objs)
     {
         GetText(textID).text = LanguageManager.GetContent(moduleName, contentID, objs);
     }
 
-    public void SetSlider(string sliderID,float value)
+    public void SetSlider(string sliderID, float value)
     {
         GetSlider(sliderID).value = value;
     }
 
-    public void SetActive(string gameObjectID,bool isShow)
+    public void SetActive(string gameObjectID, bool isShow)
     {
         GetGameObject(gameObjectID).SetActive(isShow);
     }
 
-    public void SetRectWidth(string TextID,float value,float height)
+    public void SetRectWidth(string TextID, float value, float height)
     {
         GetRectTransform(TextID).sizeDelta = Vector2.right * -value * 2 + Vector2.up * height;
     }
 
-    public void SetPosition(string TextID,float x,float y,float z,bool islocal)
+    public void SetPosition(string TextID, float x, float y, float z, bool islocal)
     {
         if (islocal)
             GetRectTransform(TextID).localPosition = Vector3.right * x + Vector3.up * y + Vector3.forward * z;
@@ -589,11 +611,27 @@ public class UIBase : MonoBehaviour
 
     }
 
-    public void SetScale(string TextID,float x,float y,float z)
+    public void SetScale(string TextID, float x, float y, float z)
     {
         GetGameObject(TextID).transform.localScale = Vector3.right * x + Vector3.up * y + Vector3.forward * z;
     }
 
     #endregion
+
+    [ContextMenu("Clear Object List")]
+    public void Clearobject()
+    {
+        List<GameObject> ls = new List<GameObject>();
+        int len = m_objectList.Count;
+        for (int i = 0; i < len; i++)
+        {
+            GameObject go = m_objectList[i];
+            if (go != null)
+            {
+                if (!ls.Contains(go)) ls.Add(go);
+            }
+        }
+        m_objectList = ls;
+    }
 
 }

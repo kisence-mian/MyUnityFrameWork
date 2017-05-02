@@ -143,25 +143,28 @@ public static class CustomSettings
 
     #region Custom
 
-         //_GT(typeof(GameLogic)), 
+         _GT(typeof(GameLogic)), 
          //_GT(typeof(List<PlayerInfo>)), 
-         //_GT(typeof(RouteRule)),
-         //_GT(typeof(InputCmdHelper)),
-         //_GT(typeof(SyncService)),
+         _GT(typeof(RouteRule)),
+         _GT(typeof(InputCmdHelper)),
+         _GT(typeof(SyncService)),
          //_GT(typeof(PVPMatchService)),
-         //_GT(typeof(UserData)),
-         //_GT(typeof(Camp)),
+         _GT(typeof(UserData)),
+         _GT(typeof(Camp)),
          //_GT(typeof( CharacterManager)),
          //_GT(typeof( CharacterEventType)),
          //_GT(typeof(CharacterBase)),
-         // _GT(typeof(SkillData)),
-         // _GT(typeof(UGUITool)),
+          //_GT(typeof(SkillData)),
+          _GT(typeof(UGUITool)),
           _GT(typeof(GameObjectLuaHelper)),
 
-         // _GT(typeof(StoryServiceLuaHelper)),
-          //_GT(typeof(ResurgenceLuaHelper)),
-          //_GT(typeof(ResurgenceStatus)),
-          //_GT(typeof(CharacterLuaHelper)),
+          _GT(typeof(StoryServiceLuaHelper)),
+          _GT(typeof(ResurgenceLuaHelper)),
+          _GT(typeof(ResurgenceStatus)),
+          _GT(typeof(CharacterLuaHelper)),
+          _GT(typeof(SystemInfoTool)),
+
+          _GT(typeof(CityServiceLuaHelper)),
           
 
     #endregion
@@ -189,7 +192,7 @@ public static class CustomSettings
         //_GT(typeof(Shader)),        
         //_GT(typeof(Renderer)),
         //_GT(typeof(WWW)),
-        //_GT(typeof(Screen)),        
+        _GT(typeof(Screen)),        
         //_GT(typeof(CameraClearFlags)),
         //_GT(typeof(AudioClip)),        
         //_GT(typeof(AssetBundle)),
@@ -198,7 +201,7 @@ public static class CustomSettings
         //_GT(typeof(LightType)),
         //_GT(typeof(SleepTimeout)),
         //_GT(typeof(Animator)),
-        //_GT(typeof(Input)),
+        _GT(typeof(Input)),
         //_GT(typeof(KeyCode)),
         //_GT(typeof(SkinnedMeshRenderer)),
         //_GT(typeof(Space)),      

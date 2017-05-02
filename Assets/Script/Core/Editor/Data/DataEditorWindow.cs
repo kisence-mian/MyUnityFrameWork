@@ -25,7 +25,7 @@ public class DataEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        ConvertUtf8();
+        //ConvertUtf8();
 
         m_currentSelectIndex = 0;
         EditorGUIStyleData.Init();
@@ -44,7 +44,7 @@ public class DataEditorWindow : EditorWindow
     {
         if (!Application.isPlaying)
         {
-            ConvertUtf8();
+            //ConvertUtf8();
 
             FindAllDataName();
 

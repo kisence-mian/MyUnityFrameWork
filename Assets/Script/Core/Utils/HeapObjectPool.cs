@@ -8,7 +8,7 @@ public class HeapObjectPool
 {
     #region string, object字典
 
-    public const float c_timerSpace = 0.5f;
+    public const float c_timerSpace = 1f;
     public const float c_safeTimerSpace = 5f;
 
     public static ApplicationVoidCallback OnUpdate;
@@ -28,15 +28,16 @@ public class HeapObjectPool
 
     public static Dictionary<string, object> GetSODict()
     {
+
         return SafeGetSODict();
     }
 
     public static Dictionary<string, object> SafeGetSODict()
     {
-        Dictionary<string, object> dict = HeapObjectPoolTool<Dictionary<string, object>>.GetHeapObject();
-        dict.Clear();
+        //Dictionary<string, object> dict = HeapObjectPoolTool<Dictionary<string, object>>.GetHeapObject();
+        //dict.Clear();
 
-        return dict;
+        return new Dictionary<string,object>();
     }
 
     #endregion
@@ -291,22 +292,24 @@ public class HeapObjectPoolTool<T> where T : new()
 
     public static T GetObject()
     {
-        if (s_pool == null)
-        {
-            Init();
-        }
+        return new T();
 
-        T obj = s_pool[s_poolIndex];
+        //if (s_pool == null)
+        //{
+        //    Init();
+        //}
 
-        s_poolIndex++;
+        //T obj = s_pool[s_poolIndex];
 
-        if (s_poolIndex >= s_pool.Length)
-        {
-            s_poolIndex = 0;
-            s_isOverLength = true;
-        }
+        //s_poolIndex++;
 
-        return obj;
+        //if (s_poolIndex >= s_pool.Length)
+        //{
+        //    s_poolIndex = 0;
+        //    s_isOverLength = true;
+        //}
+
+        //return obj;
     }
 
     static void JudgeTimer()
