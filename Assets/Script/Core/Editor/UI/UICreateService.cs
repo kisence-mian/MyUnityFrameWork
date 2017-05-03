@@ -75,8 +75,8 @@ public class UICreateService
 
         l_goTmp = new GameObject("Fixed");
         l_goTmp.layer = LayerMask.NameToLayer("UI");
-        l_goTmp.transform.localScale = Vector3.one;
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
+        l_goTmp.transform.localScale = Vector3.one;
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
         l_rtTmp.anchorMin = new Vector2(0, 0);
@@ -86,8 +86,8 @@ public class UICreateService
 
         l_goTmp = new GameObject("Normal");
         l_goTmp.layer = LayerMask.NameToLayer("UI");
-        l_goTmp.transform.localScale = Vector3.one;
         l_goTmp.transform.SetParent(l_UIManagerGo.transform);
+        l_goTmp.transform.localScale = Vector3.one;
         l_rtTmp = l_goTmp.AddComponent<RectTransform>();
         l_rtTmp.anchorMax = new Vector2(1, 1);
         l_rtTmp.anchorMin = new Vector2(0, 0);
