@@ -631,6 +631,11 @@ public class UIBase : MonoBehaviour
                 if (!ls.Contains(go)) ls.Add(go);
             }
         }
+
+        ls.Sort((a,b) => {
+            return a.name.CompareTo(b.name);
+        });
+
         m_objectList = ls;
     }
 

@@ -143,7 +143,7 @@ public class ProtocolService : INetworkInterface
 
     public override void SendMessage(string MessageType,Dictionary<string, object> data)
     {
-        ByteArray msg = HeapObjectPool<ByteArray>.GetObject();
+        ByteArray msg = new ByteArray();
         //ByteArray msg = new ByteArray()
         msg.clear();
 
@@ -162,7 +162,6 @@ public class ProtocolService : INetworkInterface
             msg.WriteInt(0);
 
         Send(msg.Buffer);
-        HeapObjectPool<ByteArray>.PutObject(msg);
     }
 
     #region 缓冲区
@@ -265,7 +264,7 @@ public class ProtocolService : INetworkInterface
     {
         try
         {
-            ByteArray ba = HeapObjectPool<ByteArray>.GetObject();
+            ByteArray ba = new ByteArray();
 
             //用于做数据处理,加解密,或者压缩于解压缩    
             ba.clear();
@@ -273,8 +272,6 @@ public class ProtocolService : INetworkInterface
 
             NetWorkMessage msg = Analysis(ba);
             m_messageCallBack(msg);
-
-            HeapObjectPool<ByteArray>.PutObject(ba);
         }
         catch(Exception e)
         {
@@ -481,7 +478,7 @@ public class ProtocolService : INetworkInterface
         try
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
-            ByteArray ba = HeapObjectPool<ByteArray>.GetObject();
+            ByteArray ba = new ByteArray();
 
             ba.clear();
             ba.Add(bytes);
@@ -909,7 +906,7 @@ public class ProtocolService : INetworkInterface
 
         try
         {
-            ByteArray Bytes = HeapObjectPool<ByteArray>.GetObject();
+            ByteArray Bytes = new ByteArray();
             //ByteArray Bytes = new ByteArray();
             Bytes.clear();
 
@@ -1079,7 +1076,6 @@ public class ProtocolService : INetworkInterface
                     }
                 }
             }
-            HeapObjectPool<ByteArray>.PutObject(Bytes);
             return Bytes.bytes;
         }
         catch(Exception e)
