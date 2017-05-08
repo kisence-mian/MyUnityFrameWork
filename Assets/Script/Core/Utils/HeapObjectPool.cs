@@ -34,7 +34,7 @@ public interface IHeapObjectInterface
 
 #endregion
 
-#region HeapObjectPoolTool
+#region HeapObjectPool
 
 public class HeapObjectPool<T> where T : new()
 {
@@ -54,10 +54,11 @@ public class HeapObjectPool<T> where T : new()
         {
             obj = new T();
             heapObj = obj as IHeapObjectInterface;
-            if (heapObj != null)
+            if(heapObj != null)
             {
                 heapObj.OnInit();
             }
+            
         }
 
         if (heapObj != null)
@@ -71,11 +72,11 @@ public class HeapObjectPool<T> where T : new()
     public static void PutObject(T obj)
     {
         IHeapObjectInterface heapObj = obj as IHeapObjectInterface;
+
         if (heapObj != null)
         {
             heapObj.OnPush();
         }
-        
 
         s_pool.Push(obj);
     }

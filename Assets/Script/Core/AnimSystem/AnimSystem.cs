@@ -1068,10 +1068,16 @@ public enum InterpType
     OutSine,
     InOutSine,
     OutInSine,
+
     InExpo,
     OutExpo,
     InOutExpo,
     OutInExpo,
+
+    OutBounce,
+    InBounce,
+    InOutBounce,
+    OutInBounce,
 }
 
 public enum AnimParamType
