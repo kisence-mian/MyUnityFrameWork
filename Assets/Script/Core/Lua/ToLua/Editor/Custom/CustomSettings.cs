@@ -93,8 +93,8 @@ public static class CustomSettings
             _GT(typeof(UIWindowBase)),
             _GT(typeof(UIManager)),
             _GT(typeof(UIWindowLuaHelper)),
-
-            //_GT(typeof(LongPressAcceptor)),
+            _GT(typeof(UISystemEvent)),
+            _GT(typeof(UIEvent)),
 
         #endregion
 

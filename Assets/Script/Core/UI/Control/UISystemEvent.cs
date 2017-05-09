@@ -13,15 +13,27 @@ public class UISystemEvent
     /// </summary>
     /// <param name="Event">事件类型</param>
     /// <param name="callback">回调函数</param>
-    public static void RegisterAllUIEvent(UIEvent l_UIEvent, UICallBack l_CallBack)
+    public static void RegisterAllUIEvent(UIEvent UIEvent, UICallBack l_CallBack)
     {
-        if (s_allUIEvents.ContainsKey(l_UIEvent))
+        if (s_allUIEvents.ContainsKey(UIEvent))
         {
-            s_allUIEvents[l_UIEvent] += l_CallBack;
+            s_allUIEvents[UIEvent] += l_CallBack;
         }
         else
         {
-            s_allUIEvents.Add(l_UIEvent,l_CallBack);
+            s_allUIEvents.Add(UIEvent,l_CallBack);
+        }
+    }
+
+    public static void RemoveAllUIEvent(UIEvent UIEvent, UICallBack l_CallBack)
+    {
+        if (s_allUIEvents.ContainsKey(UIEvent))
+        {
+            s_allUIEvents[UIEvent] -= l_CallBack;
+        }
+        else
+        {
+            Debug.LogError("RemoveAllUIEvent don't exits: " + UIEvent);
         }
     }
 
@@ -61,17 +73,14 @@ public class UISystemEvent
 
         if (s_allUIEvents.ContainsKey(l_UIEvent))
         {
-            //遍历委托链表
-            foreach (UICallBack callBack in s_allUIEvents[l_UIEvent].GetInvocationList())
+            try
             {
-                try
-                {
-                    callBack(l_UI, l_objs);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError("UISystemEvent Dispatch error:" + e.ToString());
-                }
+                if(s_allUIEvents[l_UIEvent] != null)
+                    s_allUIEvents[l_UIEvent](l_UI, l_objs);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("UISystemEvent Dispatch error:" + e.ToString());
             }
         }
 
@@ -79,17 +88,14 @@ public class UISystemEvent
         {
             if (s_singleUIEvents[l_UI.name].ContainsKey(l_UIEvent))
             {
-                //遍历委托链表
-                foreach (UICallBack callBack in s_singleUIEvents[l_UI.name][l_UIEvent].GetInvocationList())
+                try
                 {
-                    try
-                    {
-                        callBack(l_UI, l_objs);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError("UISystemEvent Dispatch error:" + e.ToString());
-                    }
+                    if (s_singleUIEvents[l_UI.name][l_UIEvent] != null)
+                        s_singleUIEvents[l_UI.name][l_UIEvent](l_UI, l_objs);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("UISystemEvent Dispatch error:" + e.ToString());
                 }
             }
         }

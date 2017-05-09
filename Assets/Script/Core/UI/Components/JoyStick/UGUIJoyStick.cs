@@ -41,7 +41,7 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHand
     public void OnEndDrag(PointerEventData eventData)
     {
         content.anchoredPosition3D = Vector3.zero;
-        onJoyStick(Vector3.zero);
+        //onJoyStick(Vector3.zero);
     }
 
     public Vector3 GetDir()

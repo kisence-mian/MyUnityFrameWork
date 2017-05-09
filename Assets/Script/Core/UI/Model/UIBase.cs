@@ -13,11 +13,11 @@ public class UIBase : MonoBehaviour
     //当UI第一次打开时调用OnInit方法，调用时机在OnOpen之前
     public virtual void OnInit()
     {
-
     }
 
     public void DestroyUI()
     {
+        ClearGuideModel();
         RemoveAllListener();
         CleanItem();
         OnUIDestroy();
@@ -552,6 +552,19 @@ public class UIBase : MonoBehaviour
         m_childUIIndex = 0;
     }
 
+    public UIBase GetItem(string itemName)
+    {
+        for (int i = 0; i < m_ChildList.Count; i++)
+        {
+            if(m_ChildList[i].name == itemName)
+            {
+                return m_ChildList[i];
+            }
+        }
+
+        throw new Exception(UIName + " GetItem Exception Dont find Item: " + itemName);
+    }
+
     #endregion
 
     #endregion
@@ -614,6 +627,67 @@ public class UIBase : MonoBehaviour
     public void SetScale(string TextID, float x, float y, float z)
     {
         GetGameObject(TextID).transform.localScale = Vector3.right * x + Vector3.up * y + Vector3.forward * z;
+    }
+
+    #endregion
+
+    #region 新手引导使用
+
+    List<GameObject> m_GuideList = new List<GameObject>();
+
+    public void SetGuideMode(string objName)
+    {
+        SetGuideMode(GetGameObject(objName));
+    }
+
+    public void SetItemGuideMode(string itemName)
+    {
+        SetGuideMode(GetItem(itemName).gameObject);
+    }
+
+    public void SetGuideMode(GameObject go)
+    {
+        Canvas canvas = go.GetComponent<Canvas>();
+        GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
+
+        if(canvas == null)
+        {
+            canvas = go.AddComponent<Canvas>();
+        }
+
+        if(graphic == null)
+        {
+            graphic = go.AddComponent<GraphicRaycaster>();
+        }
+
+        canvas.overrideSorting = true;
+        canvas.sortingOrder = 2;
+
+        m_GuideList.Add(go);
+    }
+
+    public void CancelGuideModel(GameObject go)
+    {
+        Canvas canvas = go.GetComponent<Canvas>();
+        GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
+
+        if (canvas != null)
+        {
+            canvas.overrideSorting = false;
+        }
+
+        if (graphic != null)
+        {
+            Destroy(graphic);
+        }
+    }
+
+    public void ClearGuideModel()
+    {
+        for (int i = 0; i < m_GuideList.Count; i++)
+        {
+            CancelGuideModel(m_GuideList[i]);
+        }
     }
 
     #endregion
