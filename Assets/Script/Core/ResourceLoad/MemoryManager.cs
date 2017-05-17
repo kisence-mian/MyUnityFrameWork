@@ -63,8 +63,8 @@ public class MemoryManager
     {
         if (s_enable)
         {
-            GUILayout.TextField("总内存：" + ByteToM(Profiler.GetTotalAllocatedMemory()) + "M");
-            GUILayout.TextField("堆内存：" + ByteToM(Profiler.GetMonoUsedSize()) + "M");
+            GUILayout.TextField("总内存：" + ByteToM(UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory()) + "M");
+            GUILayout.TextField("堆内存：" + ByteToM(UnityEngine.Profiling.Profiler.GetMonoUsedSize()) + "M");
         }
     }
 
@@ -210,7 +210,7 @@ public class MemoryManager
     /// <param name="tag"></param>
     static void MonitorMemorySize()
     {
-        if(ByteToM( Profiler.GetTotalReservedMemory() ) > s_MaxMemoryUse * 0.7f)
+        if(ByteToM( UnityEngine.Profiling.Profiler.GetTotalReservedMemory() ) > s_MaxMemoryUse * 0.7f)
         {
             if (!s_isFreeMemory)
             {
@@ -218,13 +218,13 @@ public class MemoryManager
                 FreeMemory();
             }
 
-            if (ByteToM( Profiler.GetMonoHeapSize()) > s_MaxMemoryUse)
+            if (ByteToM( UnityEngine.Profiling.Profiler.GetMonoHeapSize()) > s_MaxMemoryUse)
             {
                 if (!s_isFreeMemory2)
                 {
                     s_isFreeMemory2 = true;
                     FreeMemory();
-                    Debug.LogError("总内存超标告警 ！当前总内存使用量： " + ByteToM( Profiler.GetTotalAllocatedMemory()) + "M");
+                    Debug.LogError("总内存超标告警 ！当前总内存使用量： " + ByteToM( UnityEngine.Profiling.Profiler.GetTotalAllocatedMemory()) + "M");
                 }
             }
             else
@@ -237,19 +237,19 @@ public class MemoryManager
             s_isFreeMemory = false;
         }
 
-        if (ByteToM( Profiler.GetMonoUsedSize() ) > s_MaxHeapMemoryUse * 0.7f)
+        if (ByteToM( UnityEngine.Profiling.Profiler.GetMonoUsedSize() ) > s_MaxHeapMemoryUse * 0.7f)
         {
             if (!s_isFreeHeapMemory)
             {
                 s_isFreeHeapMemory = true;
             }
 
-            if (ByteToM( Profiler.GetMonoUsedSize()) > s_MaxHeapMemoryUse)
+            if (ByteToM( UnityEngine.Profiling.Profiler.GetMonoUsedSize()) > s_MaxHeapMemoryUse)
             {
                 if (!s_isFreeHeapMemory2)
                 {
                     s_isFreeHeapMemory2 = true;
-                    Debug.LogError("堆内存超标告警 ！当前堆内存使用量： " + ByteToM( Profiler.GetMonoUsedSize()) + "M");
+                    Debug.LogError("堆内存超标告警 ！当前堆内存使用量： " + ByteToM( UnityEngine.Profiling.Profiler.GetMonoUsedSize()) + "M");
                 }
             }
             else

@@ -9,7 +9,9 @@ public class SystemInfoTool
         name = name.ToLower();
         if (name == "all") isall = true;
         string str = "";
-        if (isall || name == "bundleidentifier") str = isall ? str + Application.bundleIdentifier+"\n" : Application.bundleIdentifier;
+        #if UNITY_5_6
+        if (isall || name == "bundleidentifier") str = isall ? str + Application.identifier+"\n" : Application.identifier;
+        #endif
         if (isall || name == "version") str = isall ? str + Application.version+"\n" : Application.version;
         if (isall || name == "devicemodel") str = isall ? str + SystemInfo.deviceModel+"\n" : SystemInfo.deviceModel;
         if (isall || name == "devicename") str = isall ? str + SystemInfo.deviceName+"\n" : SystemInfo.deviceName;

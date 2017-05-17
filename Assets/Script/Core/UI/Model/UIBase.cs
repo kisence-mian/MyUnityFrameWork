@@ -138,6 +138,13 @@ public class UIBase : MonoBehaviour
     Dictionary<string, UGUIJoyStickBase> m_joySticks_ro = new Dictionary<string, UGUIJoyStickBase>();
     Dictionary<string, LongPressAcceptor> m_longPressList = new Dictionary<string, LongPressAcceptor>();
 
+    public bool HaveObject(string name)
+    {
+        bool has = false;
+        has = m_objects.ContainsKey(name);
+        return has;
+    }
+
     public GameObject GetGameObject(string name)
     {
         if (m_objects == null)
@@ -540,6 +547,17 @@ public class UIBase : MonoBehaviour
         }
     }
 
+    public void DestroyItem(UIBase item,float t)
+    {
+        if (m_ChildList.Contains(item))
+        {
+            m_ChildList.Remove(item);
+            item.OnUIDestroy();
+            GameObjectManager.DestroyGameObjectByPool(item.gameObject,t);
+        }
+    }
+
+
     public void CleanItem()
     {
         for (int i = 0; i < m_ChildList.Count; i++)
@@ -565,6 +583,19 @@ public class UIBase : MonoBehaviour
         throw new Exception(UIName + " GetItem Exception Dont find Item: " + itemName);
     }
 
+    public bool GetItemIsExist(string itemName)
+    {
+        for (int i = 0; i < m_ChildList.Count; i++)
+        {
+            if (m_ChildList[i].name == itemName)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     #endregion
 
     #endregion
@@ -579,6 +610,13 @@ public class UIBase : MonoBehaviour
     public void SetImageColor(string ImageID, Color color)
     {
         GetImage(ImageID).color = color;
+    }
+
+    public void SetImageAlpha(string ImageID, float alpha)
+    {
+        Color col = GetImage(ImageID).color;
+        col.a = alpha;
+        GetImage(ImageID).color = col;
     }
 
     public void SetInputText(string TextID, string content)

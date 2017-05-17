@@ -18,7 +18,7 @@ public class Log
 
         if (isOpenLog)
         {
-            s_LogOutPutThread.Init();
+            //s_LogOutPutThread.Init();
             Application.logMessageReceivedThreaded += UnityLogCallBackThread;
             Application.logMessageReceived += UnityLogCallBack;
         }
