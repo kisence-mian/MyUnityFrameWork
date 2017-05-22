@@ -16,7 +16,6 @@ public class LanguageComponent : MonoBehaviour
         {
             m_text = GetComponent<Text>();
         }
-
         Init();
     }
 

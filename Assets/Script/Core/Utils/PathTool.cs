@@ -58,6 +58,22 @@ public class PathTool
         return GetPath(loadType) + relativelyPath;
     }
 
+#if UNITY_WEBGL
+    /// <summary>
+    /// 获取加载URL
+    /// </summary>
+    /// <param name="relativelyPath">相对路径</param>
+    /// <returns></returns>
+    public static string GetLoadURL(string relativelyPath)
+    {
+#if UNITY_EDITOR
+        return "file://" + Application.streamingAssetsPath + "/" + relativelyPath;
+#else
+        return Application.absoluteURL + "StreamingAssets/" + relativelyPath;
+#endif
+    }
+#endif
+
     //获取相对路径
     public static string GetRelativelyPath(string path, string fileName, string expandName)
     {

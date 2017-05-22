@@ -735,6 +735,8 @@ public class BundleConfigEditorWindow : EditorWindow
             target = BuildTarget.Android;
 #elif UNITY_IOS //iPhone
                 target = BuildTarget.iOS;
+#elif UNITY_WEBGL //WebGL
+            target = BuildTarget.WebGL;
 #endif
 
             return target;
@@ -1887,7 +1889,15 @@ public class BundleConfigEditorWindow : EditorWindow
     {
         string version = ResourceIOTool.ReadStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Resource, HotUpdateManager.c_versionFileName + ".json"));
 
-        Dictionary<string, object> VersionData = (Dictionary<string, object>)MiniJSON.Json.Deserialize(version);
+        Dictionary<string, object> VersionData= null;
+        if (version == "")
+        {
+            VersionData = null;
+        }
+        else
+        {
+            VersionData = (Dictionary<string, object>)MiniJSON.Json.Deserialize(version);
+        }
 
         if (VersionData == null)
         {

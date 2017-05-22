@@ -3,13 +3,13 @@ using System.Collections;
 using System.IO;
 using System;
 using System.Text;
+using System.Collections.Generic;
 
 /// <summary>
 /// 资源读取器，负责从不同路径读取资源
 /// </summary>
 public class ResourceIOTool :MonoBehaviour
 {
-
     static ResourceIOTool instance;
     public static ResourceIOTool GetInstance()
     {
@@ -53,8 +53,13 @@ public class ResourceIOTool :MonoBehaviour
 
     public static string ReadStringByBundle(string path)
     {
+#if UNITY_WEBGL
+        AssetBundle ab = AssetsBundleLoadByWWW(path);
+#else
         AssetBundle ab = AssetBundle.LoadFromFile(path);
+#endif
         TextAsset ta = (TextAsset)ab.mainAsset;
+
         string content = ta.ToString();
         ab.Unload(true);
 
@@ -73,6 +78,40 @@ public class ResourceIOTool :MonoBehaviour
         else
         {
             return text.text;
+        }
+    }
+
+    /// <summary>
+    /// WWW同步加载一个对象
+    /// </summary>
+    /// <param name="url"></param>
+    /// <returns></returns>
+    public static AssetBundle AssetsBundleLoadByWWW(string url)
+    {
+        AssetBundle result = null;
+
+        foreach (AssetBundle obj in LoadWWW(url))
+        {
+            result = obj;
+        }
+
+        if(result == null)
+        {
+            throw new Exception("AssetsBundleLoadByWWW Exception: URL: ->" + url + "<- ");
+        }
+
+        return result;
+    }
+
+    public static IEnumerable<AssetBundle> LoadWWW(string url)
+    {
+        WWW www = new WWW(url);
+
+        yield return www.assetBundle;
+
+        if (www.isDone == false || www.error != null)
+        {
+            Debug.LogError("LoadWWW Error URL: ->" + url + "<- error: " + www.error);
         }
     }
 
@@ -120,6 +159,7 @@ public class ResourceIOTool :MonoBehaviour
 
     public IEnumerator MonoLoadByAssetsBundleAsync(string path, AssetBundleLoadCallBack callback)
     {
+#if !UNITY_WEBGL
         AssetBundleCreateRequest status = AssetBundle.LoadFromFileAsync(path);
         LoadState loadState = new LoadState();
 
@@ -137,6 +177,25 @@ public class ResourceIOTool :MonoBehaviour
 
         loadState.UpdateProgress(status);
         callback(loadState, status.assetBundle);
+#else
+        WWW www = new WWW(path);
+        LoadState loadState = new LoadState();
+
+        while (!www.isDone)
+        {
+            loadState.UpdateProgress(www);
+            callback(loadState, null);
+
+            yield return 0;
+        }
+        if (www.assetBundle != null)
+        {
+            www.assetBundle.name = path;
+        }
+
+        loadState.UpdateProgress(www);
+        callback(loadState, www.assetBundle);
+#endif
     }
 
     #endregion
@@ -183,6 +242,7 @@ public class ResourceIOTool :MonoBehaviour
 
 }
 
+#region 回调声明
 public delegate void AssetBundleLoadCallBack(LoadState state, AssetBundle bundlle);
 public delegate void LoadCallBack(LoadState loadState, object resObject);
 public class LoadState
@@ -218,4 +278,12 @@ public class LoadState
         progress = assetBundleCreateRequest.progress;
     }
 
+    public void UpdateProgress(WWW www)
+    {
+        isDone = www.isDone;
+        progress = www.progress;
+    }
+
 }
+
+#endregion

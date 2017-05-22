@@ -263,6 +263,18 @@ public class UIManager : MonoBehaviour
 
     #endregion
 
+    #region UI的打开与关闭 异步方法
+
+    public static void OpenUIAsync<T>(string UIName , UICallBack callback, params object[] objs) where T : UIWindowBase
+    {
+        ResourceManager.LoadAsync(UIName, (loadState,resObject) =>
+         {
+             OpenUIWindow(UIName, callback, objs);
+         });
+    }
+
+    #endregion
+
     #region UI内存管理
 
     public static void DestroyUI(UIWindowBase UI)

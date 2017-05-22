@@ -14,6 +14,7 @@ public static class AssetsBundleManager
     static Dictionary<string, Bundle> s_bundles        = new Dictionary<string, Bundle>();
     static Dictionary<string, RelyBundle> s_relyBundle = new Dictionary<string, RelyBundle>(); //所有依赖包
 
+#if !UNITY_WEBGL
     /// <summary>
     /// 同步加载一个bundles
     /// </summary>
@@ -52,12 +53,12 @@ public static class AssetsBundleManager
         {
             ResourcesConfig configTmp = ResourcesConfigManager.GetRelyBundleConfig(relyBundleName);
             string path = GetBundlePath(configTmp);
-
             tmp = AddRelyBundle(relyBundleName, AssetBundle.LoadFromFile(path));
         }
 
         return tmp;
     }
+#endif
 
     /// <summary>
     /// 异步加载一个bundle
@@ -76,7 +77,6 @@ public static class AssetsBundleManager
         string path = GetBundlePath(configTmp);
 
         LoadState state = new LoadState();
-        //Dictionary<string, LoadState> loadStateDict = new Dictionary<string, LoadState>();
 
         int LoadCount = 0;
 
@@ -134,8 +134,6 @@ public static class AssetsBundleManager
                 }
             });
         }
-
-
     }
 
     /// <summary>
@@ -187,6 +185,7 @@ public static class AssetsBundleManager
         }
         else
         {
+#if !UNITY_WEBGL
             if (MemoryManager.s_allowDynamicLoad)
             {
                 return LoadBundle(name).mainAsset;
@@ -195,6 +194,9 @@ public static class AssetsBundleManager
             {
                 throw new Exception("已禁止资源动态加载，请检查静态资源加载列表 ->" + name + "<-");
             }
+#else
+            throw new Exception("WEBGL 不能同步加载Bundle，请先异步加载对应资源！ ->" + name + "<-");
+#endif
         }
     }
 
@@ -206,6 +208,7 @@ public static class AssetsBundleManager
         }
         else
         {
+#if !UNITY_WEBGL
             if (MemoryManager.s_allowDynamicLoad)
             {
                 return (T)LoadBundle(name).mainAsset;
@@ -214,6 +217,9 @@ public static class AssetsBundleManager
             {
                 throw new Exception("已禁止资源动态加载，请检查静态资源加载列表 ->" + name + "<-");
             }
+#else
+        throw new Exception("WEBGL 不能同步加载Bundle，请先异步加载对应资源！ ->" + name + "<-");
+#endif
         }
     }
 
@@ -320,7 +326,7 @@ public static class AssetsBundleManager
         }
     }
 
-    static Bundle AddBundle(string bundleName, AssetBundle aess)
+    static Bundle AddBundle(string bundleName, AssetBundle asset)
     {
         Bundle bundleTmp = new Bundle();
         ResourcesConfig configTmp = ResourcesConfigManager.GetBundleConfig(bundleName);
@@ -336,9 +342,9 @@ public static class AssetsBundleManager
 
         bundleTmp.bundleConfig = configTmp;
 
-        if (aess != null)
+        if (asset != null)
         {
-            bundleTmp.bundle = aess;
+            bundleTmp.bundle = asset;
             bundleTmp.bundle.name = bundleName;
             bundleTmp.mainAsset = bundleTmp.bundle.mainAsset;
             bundleTmp.bundle.Unload(false);
@@ -364,12 +370,12 @@ public static class AssetsBundleManager
         return bundleTmp;
     }
 
-    static RelyBundle AddRelyBundle(string relyBundleName, AssetBundle aess)
+    static RelyBundle AddRelyBundle(string relyBundleName, AssetBundle asset)
     {
         RelyBundle tmp = new RelyBundle();
 
         tmp.relyCount = 1;
-        tmp.bundle = aess;
+        tmp.bundle = asset;
 
         if (s_relyBundle.ContainsKey(relyBundleName))
         {
@@ -399,10 +405,6 @@ public static class AssetsBundleManager
 #if !UNITY_WEBGL
 
         bool isLoadByPersistent = RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(config.name, "null") =="null" ? false:true;
-#else
-        bool isLoadByPersistent = true;
-#endif
-
         ResLoadLocation loadType = ResLoadLocation.Streaming;
 
         //加载路径由 加载根目录 和 相对路径 合并而成
@@ -413,6 +415,10 @@ public static class AssetsBundleManager
         }
 
         return PathTool.GetAbsolutePath(loadType, config.path + "." + c_AssetsBundlesExpandName);
+#else
+
+        return PathTool.GetLoadURL(config.path + "." + c_AssetsBundlesExpandName);
+#endif
     }
 }
 
