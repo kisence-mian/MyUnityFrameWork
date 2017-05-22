@@ -53,6 +53,8 @@ public class RecordManager
 
     public static void SaveData(string RecordName, RecordTable data)
     {
+#if !UNITY_WEBGL
+
         ResourceIOTool.WriteStringByFile(
             PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
                 PathTool.GetRelativelyPath(c_directoryName,
@@ -63,6 +65,7 @@ public class RecordManager
         #if UNITY_EDITOR
                 UnityEditor.AssetDatabase.Refresh();
         #endif
+#endif
     }
 
     public static void CleanRecord(string recordName)
@@ -83,7 +86,7 @@ public class RecordManager
         s_RecordCatch.Clear();
     }
 
-    #region 保存封装
+#region 保存封装
 
     public static void SaveRecord(string RecordName, string key, string value)
     {
@@ -135,6 +138,6 @@ public class RecordManager
     }
 
 
-    #endregion
+#endregion
 
 }

@@ -142,7 +142,8 @@ public class ResourceIOTool :MonoBehaviour
     #endregion
 
     #region 写操作
-
+#if !UNITY_WEBGL
+   //web Player 不支持写操作
     public static void WriteStringByFile(string path, string content)
     {
         byte[] dataByte = Encoding.GetEncoding("UTF-8").GetBytes(content);
@@ -162,14 +163,12 @@ public class ResourceIOTool :MonoBehaviour
         }
     }
 
-    //web Player 不支持该函数
-#if !UNITY_WEBPLAYER
+
     public static void CreateFile(string path, byte[] byt)
     {
         try
         {
             FileTool.CreatFilePath(path);
-
             File.WriteAllBytes(path, byt);
         }
         catch (Exception e)

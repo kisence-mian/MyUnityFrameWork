@@ -1553,7 +1553,7 @@ public class BundleConfigEditorWindow : EditorWindow
         editorConfig.Add(key_bundles, JsonTool.List2Json<EditPackageConfig>(bundles));    //Bundle包
 
         //保存编辑器配置文件
-        ConfigManager.SaveEditorConfigData(configFileName, editorConfig);
+        ConfigEditorWindow.SaveEditorConfigData(configFileName, editorConfig);
     }
 
     /// <summary>
@@ -1563,7 +1563,7 @@ public class BundleConfigEditorWindow : EditorWindow
     {
         float time = Time.realtimeSinceStartup;
 
-        Dictionary<string, object> final = ConfigManager.GetEditorConfigData(configFileName);
+        Dictionary<string, object> final = ConfigEditorWindow.GetEditorConfigData(configFileName);
 
         Debug.Log("读取配置时间 " + (Time.realtimeSinceStartup - time));
         time = Time.realtimeSinceStartup;
@@ -1857,7 +1857,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
         float time = Time.realtimeSinceStartup;
 
-        ResourceIOTool.WriteStringByFile(
+        EditorUtil.WriteStringByFile(
             PathTool.GetAbsolutePath(ResLoadLocation.Resource,
             ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName)
             , MiniJSON.Json.Serialize(data));
@@ -1875,7 +1875,7 @@ public class BundleConfigEditorWindow : EditorWindow
         VersionData.Add(HotUpdateManager.c_largeVersionKey, largeVersion);
         VersionData.Add(HotUpdateManager.c_smallVersonKey, smallVersion);
 
-        ResourceIOTool.WriteStringByFile(
+        EditorUtil.WriteStringByFile(
             PathTool.GetAbsolutePath(ResLoadLocation.Resource, HotUpdateManager.c_versionFileName + ".json"),
             MiniJSON.Json.Serialize(VersionData));
 
@@ -1929,7 +1929,7 @@ public class BundleConfigEditorWindow : EditorWindow
                 hotUpdateConfig.Add(HotUpdateManager.c_downLoadPathKey, new SingleField(""));
                 hotUpdateConfig.Add(HotUpdateManager.c_UseTestDownLoadPathKey, new SingleField(false));
 
-                ConfigManager.SaveData(HotUpdateManager.c_HotUpdateConfigName, hotUpdateConfig);
+                ConfigEditorWindow.SaveData(HotUpdateManager.c_HotUpdateConfigName, hotUpdateConfig);
             }
         }
     }

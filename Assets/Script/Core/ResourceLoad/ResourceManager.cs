@@ -39,15 +39,15 @@ public static class ResourceManager
         }
     }
 
-    //保存一个文本
-    public static void WriteTextFile(string path,string content ,ResLoadLocation type)
-    {
-        #if UNITY_EDITOR
-            ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(type, path), content);
-        #else
+    ////保存一个文本
+    //public static void WriteTextFile(string path,string content ,ResLoadLocation type)
+    //{
+    //    #if UNITY_EDITOR
+    //        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(type, path), content);
+    //    #else
             
-        #endif
-    }
+    //    #endif
+    //}
 
     public static object Load(string name)
     {

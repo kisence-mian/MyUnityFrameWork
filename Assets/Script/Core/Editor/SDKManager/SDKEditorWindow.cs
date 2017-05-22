@@ -89,6 +89,8 @@ public class SDKEditorWindow : EditorWindow
 
 #if UNITY_ANDROID
                     ChangeSchemeFile(newName,oldName);
+#else
+                    Debug.Log(oldName +"-->>"+ newName);
 #endif
                 }
             }
@@ -116,7 +118,7 @@ public class SDKEditorWindow : EditorWindow
                 if (GUILayout.Button("新增", GUILayout.Width(position.width - 60)))
                 {
                     Dictionary<string, SingleField> dict = new Dictionary<string, SingleField>();
-                    ConfigManager.SaveData(configName, dict);
+                    ConfigEditorWindow.SaveData(configName, dict);
 
                     //LoadConfig(configName);
 
@@ -430,7 +432,7 @@ public class SDKEditorWindow : EditorWindow
         m_configList = new List<SchemeData>();
         m_configNameList = new List<string>();
 
-        Dictionary<string, object> editConfig = ConfigManager.GetEditorConfigData(s_editorConfigName);
+        Dictionary<string, object> editConfig = ConfigEditorWindow.GetEditorConfigData(s_editorConfigName);
         if (editConfig != null)
         {
             string currentSchemeName = editConfig[s_currentSchemeKey].ToString();
@@ -515,8 +517,8 @@ public class SDKEditorWindow : EditorWindow
 
         config.Add(SDKManager.c_KeyName, new SingleField(JsonUtility.ToJson(currentSchemeData)));
 
-        ConfigManager.SaveEditorConfigData(s_editorConfigName, editConfig);
-        ConfigManager.SaveData(SDKManager.c_ConfigName, config);
+        ConfigEditorWindow.SaveEditorConfigData(s_editorConfigName, editConfig);
+        ConfigEditorWindow.SaveData(SDKManager.c_ConfigName, config);
 
         UnityEditor.AssetDatabase.Refresh();
     }

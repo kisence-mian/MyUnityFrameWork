@@ -782,5 +782,28 @@ public class SingleData : Dictionary<string, string>
 
         throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-");// throw  
     }
+
+    public int[] GetIntArray(string key)
+    {
+        try
+        {
+            if (this.ContainsKey(key))
+            {
+                return ParseTool.String2IntArray(this[key]);
+            }
+
+            if (data.m_defaultValue.ContainsKey(key))
+            {
+                return ParseTool.String2IntArray(data.m_defaultValue[key]);
+            }
+
+        }
+        catch (Exception e)
+        {
+            throw new Exception("SingleData GetIntArray Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- \n" + e.ToString());
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-");// throw  
+    }
 }
 

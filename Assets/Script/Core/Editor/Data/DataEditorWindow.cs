@@ -7,6 +7,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using MiniJSON;
+
 public class DataEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
@@ -128,7 +130,7 @@ public class DataEditorWindow : EditorWindow
                     DataTable data = new DataTable();
                     data.TableKeys.Add(mainKey);
 
-                    DataManager.SaveData(dataName, data);
+                    SaveData(dataName, data);
                     AssetDatabase.Refresh();
 
                     LoadData(dataName);
@@ -669,7 +671,7 @@ public class DataEditorWindow : EditorWindow
     {
         if (GUILayout.Button("保存"))
         {
-            DataManager.SaveData(m_currentDataName, m_currentData);
+            SaveData(m_currentDataName, m_currentData);
             AssetDatabase.Refresh();
             LoadData(m_currentDataName);
         }
@@ -861,7 +863,7 @@ public class DataEditorWindow : EditorWindow
 
         string SavePath = Application.dataPath + "/Script/DataClassGenerate/" + className + ".cs";
 
-        ResourceIOTool.WriteStringByFile(SavePath, content.ToString());
+        EditorUtil.WriteStringByFile(SavePath, content.ToString());
     }
 
     string OutPutFieldFunction(FieldType fileType,string enumType)
@@ -911,6 +913,67 @@ public class DataEditorWindow : EditorWindow
     }
 
     #endregion
+
+    #region 保存数据
+
+    public static bool GetIsExistDataEditor(string DataName)
+    {
+        return "" != ResourceIOTool.ReadStringByResource(
+                        PathTool.GetRelativelyPath(DataManager.c_directoryName,
+                                                    DataName,
+                                                    DataManager.c_expandName));
+    }
+
+    public static void SaveData(string ConfigName, DataTable data)
+    {
+        EditorUtil.WriteStringByFile(
+            PathTool.GetAbsolutePath(
+                ResLoadLocation.Resource,
+                PathTool.GetRelativelyPath(
+                    DataManager.c_directoryName,
+                    ConfigName,
+                    DataManager.c_expandName)),
+            DataTable.Serialize(data));
+
+        UnityEditor.AssetDatabase.Refresh();
+    }
+
+    /// <summary>
+    /// 读取编辑器数据
+    /// </summary>
+    /// <param name="ConfigName">数据名称</param>
+    public static Dictionary<string, object> GetEditorData(string dataName)
+    {
+        UnityEditor.AssetDatabase.Refresh();
+
+        string dataJson = ResourceIOTool.ReadStringByFile(PathTool.GetEditorPath(DataManager.c_directoryName, dataName, DataManager.c_expandName));
+
+        if (dataJson == "")
+        {
+            Debug.Log(dataName + " dont find!");
+            return new Dictionary<string, object>();
+        }
+        else
+        {
+            return Json.Deserialize(dataJson) as Dictionary<string, object>;
+        }
+    }
+
+    /// <summary>
+    /// 保存编辑器数据
+    /// </summary>
+    /// <param name="ConfigName">数据名称</param>
+    /// <param name="data">数据表</param>
+    public static void SaveEditorData(string ConfigName, Dictionary<string, object> data)
+    {
+        string configDataJson = Json.Serialize(data);
+
+        EditorUtil.WriteStringByFile(PathTool.GetEditorPath(DataManager.c_directoryName, ConfigName, DataManager.c_expandName), configDataJson);
+
+        UnityEditor.AssetDatabase.Refresh();
+    }
+
+#endregion
 }
 
 

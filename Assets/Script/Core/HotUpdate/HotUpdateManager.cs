@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +23,8 @@ public class HotUpdateManager
     public static string c_testDownLoadPathKey = "TestDownLoadPath";
 
     public const string c_useHotUpdateRecordKey = "UseHotUpdate";
+
+#if !UNITY_WEBGL
 
     static Dictionary<string, object> m_versionConfig;
     static Dictionary<string, SingleField> m_hotUpdateConfig;
@@ -430,6 +434,8 @@ public struct HotUpdateStatusInfo
 
         return s_info;
     }
+    
+#endif
 }
 
 public enum HotUpdateStatusEnum
@@ -446,3 +452,4 @@ public enum HotUpdateStatusEnum
     DownLoadingMd5File,      //下载Md5文件中
     Updating,                //更新中
 }
+

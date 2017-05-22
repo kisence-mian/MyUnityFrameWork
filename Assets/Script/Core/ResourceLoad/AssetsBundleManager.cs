@@ -9,7 +9,6 @@ using System;
 /// </summary>
 public static class AssetsBundleManager 
 {
-
     public const string c_AssetsBundlesExpandName = "assetBundle";
 
     static Dictionary<string, Bundle> s_bundles        = new Dictionary<string, Bundle>();
@@ -397,7 +396,12 @@ public static class AssetsBundleManager
     /// <returns></returns>
     static string GetBundlePath(ResourcesConfig config)
     {
+#if !UNITY_WEBGL
+
         bool isLoadByPersistent = RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(config.name, "null") =="null" ? false:true;
+#else
+        bool isLoadByPersistent = true;
+#endif
 
         ResLoadLocation loadType = ResLoadLocation.Streaming;
 

@@ -77,46 +77,4 @@ public static class ConfigManager
     {
         s_configCatch.Clear();
     }
-
-
-//只在编辑器下能够使用
-#if UNITY_EDITOR
-    [NoToLuaAttribute]
-    public static void SaveData(string ConfigName, Dictionary<string, SingleField> data)
-    {
-        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Resource,
-            PathTool.GetRelativelyPath(c_directoryName,
-                                                ConfigName,
-                                                c_expandName)),
-                                        JsonTool.Dictionary2Json<SingleField>(data));
-
-        UnityEditor.AssetDatabase.Refresh();
-    }
-    [NoToLuaAttribute]
-    public static Dictionary<string, object> GetEditorConfigData(string ConfigName)
-    {
-        UnityEditor.AssetDatabase.Refresh();
-
-        string dataJson = ResourceIOTool.ReadStringByFile(PathTool.GetEditorPath(c_directoryName, ConfigName, c_expandName));
-
-        if (dataJson == "")
-        {
-            return null;
-        }
-        else
-        {
-            return Json.Deserialize(dataJson) as Dictionary<string, object>;
-        }
-    }
-
-    [NoToLuaAttribute]
-    public static void SaveEditorConfigData(string ConfigName, Dictionary<string, object> data)
-    {
-        string configDataJson = Json.Serialize(data);
-
-        ResourceIOTool.WriteStringByFile(PathTool.GetEditorPath(c_directoryName, ConfigName, c_expandName), configDataJson);
-
-        UnityEditor.AssetDatabase.Refresh();
-    }
-#endif
 }

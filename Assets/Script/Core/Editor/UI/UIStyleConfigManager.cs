@@ -23,7 +23,7 @@ public class UIStyleConfigManager
 
         dataTmp.Add(DataName, JsonTool.Dictionary2Json<UIStyleInfo>(s_StyleData));
 
-        ConfigManager.SaveEditorConfigData(ConfigName, dataTmp);
+        ConfigEditorWindow.SaveEditorConfigData(ConfigName, dataTmp);
     }
 
     public static void AddData(string key,UIStyleInfo styleData)
@@ -78,7 +78,7 @@ public class UIStyleConfigManager
     {
         if (s_StyleData == null)
         {
-            Dictionary<string, object> dataTmp = ConfigManager.GetEditorConfigData(ConfigName);
+            Dictionary<string, object> dataTmp = ConfigEditorWindow.GetEditorConfigData(ConfigName);
 
             if (dataTmp != null && dataTmp.ContainsKey(DataName))
             {

@@ -241,7 +241,7 @@ public class UICreateService
         string l_UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
         string l_classContent = l_UItemplate.Replace("{0}", l_UIWindowName);
 
-        ResourceIOTool.WriteStringByFile(SavePath, l_classContent);
+        EditorUtil.WriteStringByFile(SavePath, l_classContent);
 
         AssetDatabase.Refresh();
     }
@@ -254,7 +254,7 @@ public class UICreateService
         string l_UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
         string l_classContent = l_UItemplate.Replace("{0}", l_UIWindowName);
 
-        ResourceIOTool.WriteStringByFile(SavePath, l_classContent);
+        EditorUtil.WriteStringByFile(SavePath, l_classContent);
 
         AssetDatabase.Refresh();
     }

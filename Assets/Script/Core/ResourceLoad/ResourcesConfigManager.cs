@@ -83,6 +83,7 @@ public static class ResourcesConfigManager
 
     public static string ReadResourceConfigContent()
     {
+#if !UNITY_WEBGL
         string dataJson = "";
 
         if (ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
@@ -117,7 +118,18 @@ public static class ResourcesConfigManager
         }
 
         return dataJson;
+#else
+        return WEBGLReadResourceConfigContent();
+#endif
     }
+
+#if UNITY_WEBGL
+    //WEbGL 下获取Bundle Setting
+    static string WEBGLReadResourceConfigContent()
+    {
+        return "";
+    }
+#endif
 
     public static ResourcesConfigStruct AnalysisResourcesConfig2Struct(string content)
     {

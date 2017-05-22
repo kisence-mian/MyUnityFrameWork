@@ -197,7 +197,7 @@ public class LuaEditorWindow : EditorWindow
         sb.AppendLine("\t}");
         sb.AppendLine("}");
 
-        ResourceIOTool.WriteStringByFile(CustomSettings.saveDir + "/LuaBinderCatch.cs", sb.ToString());
+        EditorUtil.WriteStringByFile(CustomSettings.saveDir + "/LuaBinderCatch.cs", sb.ToString());
     }
 
     #endregion
@@ -255,7 +255,7 @@ public class LuaEditorWindow : EditorWindow
             m_luaConfig[LuaManager.c_LuaLibraryListKey].m_content = luaLibConfig;
         }
 
-        ConfigManager.SaveData(LuaManager.c_LuaConfigName, m_luaConfig);
+        ConfigEditorWindow.SaveData(LuaManager.c_LuaConfigName, m_luaConfig);
     }
 
     void GetLuaFileList()

@@ -81,6 +81,18 @@ public class ParseTool : MonoBehaviour
 
     }
 
-
-
+    public static int[] String2IntArray(string value)
+    {
+        int[] intArray = new int[0];
+        if (!string.IsNullOrEmpty(value))
+        {
+            string[] strs = value.Split('|');
+            intArray = Array.ConvertAll(strs, s => int.Parse(s));
+            return intArray;
+        }
+        else
+        {
+            return intArray;
+        }
+    }
 }
