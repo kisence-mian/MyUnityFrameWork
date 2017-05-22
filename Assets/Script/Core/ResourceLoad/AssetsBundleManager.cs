@@ -328,6 +328,8 @@ public static class AssetsBundleManager
 
     static Bundle AddBundle(string bundleName, AssetBundle asset)
     {
+        Debug.Log("AddBundle " + bundleName);
+
         Bundle bundleTmp = new Bundle();
         ResourcesConfig configTmp = ResourcesConfigManager.GetBundleConfig(bundleName);
 

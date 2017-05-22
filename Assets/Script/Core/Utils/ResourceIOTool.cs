@@ -53,11 +53,8 @@ public class ResourceIOTool :MonoBehaviour
 
     public static string ReadStringByBundle(string path)
     {
-#if UNITY_WEBGL
-        AssetBundle ab = AssetsBundleLoadByWWW(path);
-#else
         AssetBundle ab = AssetBundle.LoadFromFile(path);
-#endif
+
         TextAsset ta = (TextAsset)ab.mainAsset;
 
         string content = ta.ToString();
@@ -81,39 +78,39 @@ public class ResourceIOTool :MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// WWW同步加载一个对象
-    /// </summary>
-    /// <param name="url"></param>
-    /// <returns></returns>
-    public static AssetBundle AssetsBundleLoadByWWW(string url)
-    {
-        AssetBundle result = null;
+    ///// <summary>
+    ///// WWW同步加载一个对象
+    ///// </summary>
+    ///// <param name="url"></param>
+    ///// <returns></returns>
+    //public static AssetBundle AssetsBundleLoadByWWW(string url)
+    //{
+    //    AssetBundle result = null;
 
-        foreach (AssetBundle obj in LoadWWW(url))
-        {
-            result = obj;
-        }
+    //    foreach (AssetBundle obj in LoadWWW(url))
+    //    {
+    //        result = obj;
+    //    }
 
-        if(result == null)
-        {
-            throw new Exception("AssetsBundleLoadByWWW Exception: URL: ->" + url + "<- ");
-        }
+    //    if(result == null)
+    //    {
+    //        throw new Exception("AssetsBundleLoadByWWW Exception: URL: ->" + url + "<- ");
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    public static IEnumerable<AssetBundle> LoadWWW(string url)
-    {
-        WWW www = new WWW(url);
+    //public static IEnumerable<AssetBundle> LoadWWW(string url)
+    //{
+    //    WWW www = new WWW(url);
 
-        yield return www.assetBundle;
+    //    yield return www.assetBundle;
 
-        if (www.isDone == false || www.error != null)
-        {
-            Debug.LogError("LoadWWW Error URL: ->" + url + "<- error: " + www.error);
-        }
-    }
+    //    if (www.isDone == false || www.error != null)
+    //    {
+    //        Debug.LogError("LoadWWW Error URL: ->" + url + "<- error: " + www.error);
+    //    }
+    //}
 
     public static void ResourceLoadAsync(string path,LoadCallBack callback)
     {

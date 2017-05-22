@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
+
 public class BundleConfigEditorWindow : EditorWindow
 {
     const string configFileName = "BundleConfigEditor";
@@ -34,8 +34,10 @@ public class BundleConfigEditorWindow : EditorWindow
         EditorGUIStyleData.Init();
 
         m_NoPackagekFile.Clear();
-        //m_NoPackagekFile.Add(HotUpdateManager.c_versionFileName);
-        //m_NoPackagekFile.Add(ResourcesConfigManager.c_ManifestFileName);
+#if UNITY_WEBGL
+        m_NoPackagekFile.Add(HotUpdateManager.c_versionFileName);
+        m_NoPackagekFile.Add(ResourcesConfigManager.c_ManifestFileName);
+#endif
 
         LoadAndAnalysisJson();
         AnalysisVersionFile();
@@ -1688,10 +1690,10 @@ public class BundleConfigEditorWindow : EditorWindow
             yield return 0;
         }
 
-        for (int i = 0; i < m_NoPackagekFile.Count; i++)
-        {
-            CopyFile(m_NoPackagekFile[i]);
-        }
+        //for (int i = 0; i < m_NoPackagekFile.Count; i++)
+        //{
+        //    CopyFile(m_NoPackagekFile[i]);
+        //}
 
         EndProgress();
 

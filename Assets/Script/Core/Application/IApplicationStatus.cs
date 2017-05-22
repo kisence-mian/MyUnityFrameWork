@@ -16,6 +16,14 @@ public abstract class IApplicationStatus
         return (T)ui;
     }
 
+    public void OpenUIAsync<T>() where T:UIWindowBase
+    {
+        UIManager.OpenUIAsync<T>((ui,objs)=>
+        {
+            m_uiList.Add(ui);
+        });
+    }
+
     public void CloseUI<T>() where T:UIWindowBase
     {
         UIWindowBase ui = UIManager.GetUI<T>();

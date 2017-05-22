@@ -129,17 +129,17 @@ public static class ResourcesConfigManager
     {
         string dataJson = "";
 
-        if (ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
-        {
+        //if (ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
+        //{
             dataJson = ResourceIOTool.ReadStringByResource(
                 c_ManifestFileName + "." + ConfigManager.c_expandName);
-        }
-        else
-        {
-            dataJson = ResourceIOTool.ReadStringByBundle(
-            PathTool.GetLoadURL(c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName)
-            );
-        }
+        //}
+        //else
+        //{
+        //    dataJson = ResourceIOTool.ReadStringByBundle(
+        //    PathTool.GetLoadURL(c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName)
+        //    );
+        //}
 
         return dataJson;
     }
