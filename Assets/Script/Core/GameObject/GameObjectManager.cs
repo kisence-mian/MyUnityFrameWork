@@ -40,7 +40,7 @@ public class GameObjectManager :MonoBehaviour
 
         if (goTmp == null)
         {
-            throw new Exception("CreatGameObject error dont find :" + gameObjectName);
+            throw new Exception("CreateGameObject error dont find :" + gameObjectName);
         }
 
         return CreateGameObject(goTmp, parent);
@@ -50,7 +50,7 @@ public class GameObjectManager :MonoBehaviour
     {
         if (prefab == null)
         {
-            throw new Exception("CreatGameObject error : l_prefab  is null");
+            throw new Exception("CreateGameObject error : l_prefab  is null");
         }
 
         GameObject instanceTmp = Instantiate(prefab);

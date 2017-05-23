@@ -83,7 +83,7 @@ public class ParseTool : MonoBehaviour
 
     public static int[] String2IntArray(string value)
     {
-        int[] intArray = new int[0];
+        int[] intArray = null;
         if (!string.IsNullOrEmpty(value))
         {
             string[] strs = value.Split('|');
@@ -92,7 +92,7 @@ public class ParseTool : MonoBehaviour
         }
         else
         {
-            return intArray;
+            return new int[0];
         }
     }
 }

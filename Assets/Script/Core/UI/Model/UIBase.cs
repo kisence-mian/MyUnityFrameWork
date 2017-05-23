@@ -671,7 +671,7 @@ public class UIBase : MonoBehaviour
 
     #region 新手引导使用
 
-    List<GameObject> m_GuideList = new List<GameObject>();
+    protected List<GameObject> m_GuideList = new List<GameObject>();
 
     public void SetGuideMode(string objName)
     {

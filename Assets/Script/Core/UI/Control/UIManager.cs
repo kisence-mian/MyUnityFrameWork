@@ -177,6 +177,7 @@ public class UIManager : MonoBehaviour
 
     public static UIWindowBase ShowUI(UIWindowBase ui)
     {
+        UISystemEvent.Dispatch(ui, UIEvent.OnShow);  //派发OnShow事件
         try
         {
             ui.Show();
@@ -198,7 +199,7 @@ public class UIManager : MonoBehaviour
 
     public static UIWindowBase HideUI(UIWindowBase ui)
     {
-        UISystemEvent.Dispatch(ui, UIEvent.OnHide);  //派发OnShow事件
+        UISystemEvent.Dispatch(ui, UIEvent.OnHide);  //派发OnHide事件
 
         try
         {
