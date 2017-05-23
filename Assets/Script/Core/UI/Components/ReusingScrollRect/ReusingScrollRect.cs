@@ -284,7 +284,7 @@ public class ReusingScrollRect : ScrollRectInput
             return result;
         }
 
-        result = GameObjectManager.CreatGameObjectByPool(m_itemPrefab).GetComponent<ReusingScrollItemBase>();
+        result = GameObjectManager.CreateGameObjectByPool(m_itemPrefab).GetComponent<ReusingScrollItemBase>();
         result.Init(m_items.Count);
         m_items.Add(result);
 

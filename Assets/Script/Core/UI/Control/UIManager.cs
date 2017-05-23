@@ -23,7 +23,7 @@ public class UIManager : MonoBehaviour
 
         if (l_instance == null)
         {
-            l_instance = GameObjectManager.CreatGameObject("UIManager");
+            l_instance = GameObjectManager.CreateGameObject("UIManager");
         }
 
         s_UIManagerGo = l_instance;
@@ -50,7 +50,7 @@ public class UIManager : MonoBehaviour
     }
     public static UIWindowBase CreateUIWindow(string UIName)
     {
-        GameObject UItmp = GameObjectManager.CreatGameObject(UIName, s_UIManagerGo);
+        GameObject UItmp = GameObjectManager.CreateGameObject(UIName, s_UIManagerGo);
         UIWindowBase UIbase = UItmp.GetComponent<UIWindowBase>();
         UISystemEvent.Dispatch(UIbase, UIEvent.OnInit);  //派发OnInit事件
         try{

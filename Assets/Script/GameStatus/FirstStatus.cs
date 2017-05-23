@@ -11,7 +11,7 @@ public class FirstStatus : IApplicationStatus
         InputOperationEventProxy.LoadEventCreater<CustomEvent>();
         InputManager.AddListener<CustomEvent>(OnEventCallBack);
 
-        GameObject go =  GameObjectManager.CreatGameObjectByPool("gogo");
+        GameObject go =  GameObjectManager.CreateGameObjectByPool("gogo");
 
         go.transform.position = new Vector3(0,0,300);
 

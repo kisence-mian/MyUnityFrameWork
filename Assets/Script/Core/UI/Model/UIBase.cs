@@ -519,7 +519,7 @@ public class UIBase : MonoBehaviour
     int m_childUIIndex = 0;
     public UIBase CreateItem(string itemName, string prantName)
     {
-        GameObject item = GameObjectManager.CreatGameObjectByPool(itemName, GetGameObject(prantName), true);
+        GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, GetGameObject(prantName), true);
 
         item.transform.localScale = Vector3.one;
         UIBase UIItem = item.GetComponent<UIBase>();
