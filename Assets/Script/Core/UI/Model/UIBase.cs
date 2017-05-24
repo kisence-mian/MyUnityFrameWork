@@ -530,7 +530,7 @@ public class UIBase : MonoBehaviour
         }
 
         UIItem.Init(m_childUIIndex++);
-        UIItem.UIName = UIEventKey + UIItem.UIName;
+        UIItem.UIName = UIEventKey + "_" + UIItem.UIName;
 
         m_ChildList.Add(UIItem);
 
