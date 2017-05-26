@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-class ProjectBuild : Editor
+class ProjectBuildService : Editor
 {
     #region 参数解析
 
@@ -81,7 +81,7 @@ class ProjectBuild : Editor
     {
         get
         {
-            return Application.version;
+            return Application.version + "." + VersionService.LargeVersion + "." + VersionService.SmallVersion;
         }
     }
 
@@ -97,9 +97,17 @@ class ProjectBuild : Editor
         //    PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, "USE_SHARE");
         //}
 
+        //切换渠道
+
+
         if(isUseAssetsBundle)
         {
             BundlePackage();
+        }
+        else
+        {
+            //不使用 Bundle 则删除 StreamingAssets 文件夹
+            FileTool.DeleteDirectory(Application.dataPath + "/StreamingAssets");
         }
 
         string path = ExportPath + "/" + GetPackageName() + ".apk";
@@ -108,10 +116,14 @@ class ProjectBuild : Editor
 
     static void BundlePackage()
     {
-        //打Bundle包
-        //BundleConfigEditorWindow.
+        //自动增加小版本号
+        VersionService.SmallVersion++;
+        VersionService.CreateVersionFile();
 
-        //删除Resources文件夹
+        //打Bundle包
+        PackageService.Package(PackageEditorConfigService.RelyPackages, PackageEditorConfigService.Bundles);
+
+        //删除 Resources 文件夹
         FileTool.DeleteDirectory(Application.dataPath + "/Resources");
     }
 
