@@ -41,7 +41,7 @@ class ProjectBuildService : Editor
                     return arg.Split("-"[0])[1];
                 }
             }
-            return Application.dataPath + "/Export";
+            return Application.dataPath + "/"+ ChannelName + "/"+ ApplicationMode+"/";
         }
     }
 

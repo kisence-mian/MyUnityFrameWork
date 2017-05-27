@@ -34,7 +34,7 @@ public class UGUITool
         }
         catch (System.Exception e)
         {
-            Debug.LogError(e.Message);           
+            Debug.LogError("set_icon Exception:" + e.ToString());           
         }
     }
    
