@@ -1,11 +1,13 @@
 # MyUnityFrameWork  
 　　Unity框架，组件可插拔，可视化编辑，代码自动生成。  
 　　包含资源加载，配置加载，数据加载，UI管理，音频管理,日志管理，动画系统，特效系统等，以及对应编辑器工具  
+　　支持Android、Ios、PC、WEBGL
 
 ## 应用  
 　　1.快速配置开发模式和发布模式（开发模式资源直接从Resources文件夹加载，不需要重新打包）  
 　　2.支持快速定位到某一个游戏流程（某游戏场景，结算界面等），方便测试  
 　　3.开发模式支持运行时性能监控和Debug小窗。  
+　　4.提供Jenkins自动化打包接口ProjectBuildService ( 接收ChannelName、AppMode、UseAssetsBundle、ExportPath四个参数，教程会在以后给出 )  
 　
 ## 游戏流程管理  
 　　1.游戏逻辑入口从某一个游戏流程开始（创建一个流程继承IGameStatus,然后再ApplicationManager中选择它作为第一个流程）  
@@ -72,7 +74,9 @@
 　　8.多语言支持  
 　　9.方便好用的拓展组件  
 　　　　·重用Item的scrollRect，不会一下子加载太多item，节约性能。  
-　　　　·内置摇杆。   　
+　　　　·内置摇杆。  
+　　10.对新手引导做了内置支持  
+　
 
 ## 游戏对象管理器  
 　　1.方便加载游戏对象  
@@ -80,7 +84,7 @@
 
 ## SDK管理器  
 　　1.预留登陆，支付，广告，事件上报以及其他事件接口  
-　　2.提供编辑器一键切换不同平台SDK设置以及插件库（要切换的插件放在Assets/SDKPath目录下） 
+　　2.提供编辑器一键切换不同平台SDK设置以及插件库（要切换的插件放在Assets/SDKPath目录下）  
 
 ## 音频管理  
 　　1.总音量，音乐音量，音效音量控制  
@@ -112,4 +116,5 @@
 ## 其他功能  
 　　1.Timer  
 　　2.EventDispatch  
+　　3.HeapObjectPool  
 
