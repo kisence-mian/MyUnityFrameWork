@@ -19,10 +19,19 @@ public class ApplicationManager : MonoBehaviour
 
     public static AppMode AppMode
     {
-        get { return instance.m_AppMode; }
-        //set { m_AppMode = value; }
+        get
+        {
+#if APPMODE_DEV
+            return AppMode.Developing;
+#elif APPMODE_QA
+            return AppMode.QA;
+#elif APPMODE_Release
+            return AppMode.Release;
+#else
+            return instance.m_AppMode;
+#endif
+        }
     }
-    //public bool runInBackground = false;
 
     //快速启动
     public bool m_quickLunch = true;
@@ -60,7 +69,7 @@ public class ApplicationManager : MonoBehaviour
         ApplicationStatusManager.Init();     //游戏流程状态机初始化
         GlobalLogicManager.Init();           //初始化全局逻辑
 
-        if (m_AppMode != AppMode.Release)
+        if (AppMode != AppMode.Release)
         {
             GUIConsole.Init(); //运行时Console
 
@@ -91,7 +100,7 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-    #region 程序生命周期事件派发
+#region 程序生命周期事件派发
  
     public static ApplicationVoidCallback s_OnApplicationQuit = null;
     public static ApplicationBoolCallback s_OnApplicationPause = null;
@@ -160,9 +169,9 @@ public class ApplicationManager : MonoBehaviour
             s_OnApplicationOnGUI();
     }
 
-    #endregion
+#endregion
 
-    #region 程序启动细节
+#region 程序启动细节
     /// <summary>
     /// 设置资源加载方式
     /// </summary>
@@ -188,7 +197,7 @@ public class ApplicationManager : MonoBehaviour
             GlobalLogicManager.InitLogic(m_globalLogic[i]);
         }
     }
-    #endregion
+#endregion
 }
 
 public enum AppMode

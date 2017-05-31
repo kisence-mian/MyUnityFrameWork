@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 
@@ -38,7 +39,7 @@ class ProjectBuildService : Editor
             {
                 if (arg.StartsWith("ExportPath"))
                 {
-                    return arg.Split("-"[0])[1];
+                    return arg.Split("-"[0])[1] + "/" + ChannelName + "/" + ApplicationMode + "/";
                 }
             }
             return Application.dataPath + "/"+ ChannelName + "/"+ ApplicationMode+"/";
@@ -52,7 +53,7 @@ class ProjectBuildService : Editor
             //这里遍历所有参数，找到 AppMpde 开头的参数， 然后把-符号 后面的字符串返回，
             foreach (string arg in Environment.GetCommandLineArgs())
             {
-                if (arg.StartsWith("AppMpde"))
+                if (arg.StartsWith("AppMode"))
                 {
                     return (AppMode)Enum.Parse(typeof(AppMode), arg.Split("-"[0])[1]);
                 }
@@ -91,27 +92,94 @@ class ProjectBuildService : Editor
 
     static void BuildForAndroid()
     {
+        //输出日志
+        PrintDebug();
+
+        //发布模式
+        SetApplicationMode(ApplicationMode);
+
+        //切换渠道
+        ChangeChannel(ChannelName);
+
+        //使用Resource或者使用Bundle
+        UseResourcesOrBundle(isUseAssetsBundle);
+
+        //打包
+        string path = ExportPath + "/" + GetPackageName() + ".apk";
+        BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.Android, BuildOptions.None);
+    }
+
+    static void PrintDebug()
+    {
+        string debugString = "";
+
+        debugString += ">>>============================================================自动打包输出============================================================<<<\n";
+
+        foreach (string arg in Environment.GetCommandLineArgs())
+        {
+            debugString += "参数：" + arg + "\n";
+        }
+
+        debugString += "是否使用 Bundle 打包: " + isUseAssetsBundle + "\n";
+        debugString += "渠道名: " + ChannelName + "\n";
+        debugString += "发布模式: " + ApplicationMode + "\n";
+        debugString += "导出路径: " + ExportPath + "\n";
+        debugString += ">>>====================================================================================================================================<<<\n";
+
+        Debug.Log(debugString);
+    }
+
+    static void SetApplicationMode(AppMode mode)
+    {
+        string appModeDefine = "";
+
+        switch(mode)
+        {
+            case AppMode.Developing:
+                appModeDefine = "APPMODE_DEV"; break;
+            case AppMode.QA:
+                appModeDefine = "APPMODE_QA"; break;
+            case AppMode.Release:
+                appModeDefine = "APPMODE_REL"; break;
+        }
+
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, appModeDefine);
+    }
+
+    /// <summary>
+    /// 切换渠道
+    /// </summary>
+    static void ChangeChannel(string channelName)
+    {
         //if (projectName == "91")
         //{
         //    Function.CopyDirectory(Application.dataPath + "/91", Application.dataPath + "/Plugins/Android");
         //    PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, "USE_SHARE");
         //}
 
-        //切换渠道
+#if UNITY_ANDROID
+        SchemeDataService.ChangeScheme(channelName);
+#endif
 
+    }
 
-        if(isUseAssetsBundle)
+    /// <summary>
+    ///打包或者使用Bundle流程
+    /// </summary>
+    static void UseResourcesOrBundle(bool useBundle)
+    {
+        if (useBundle)
         {
             BundlePackage();
         }
         else
         {
-            //不使用 Bundle 则删除 StreamingAssets 文件夹
-            FileTool.DeleteDirectory(Application.dataPath + "/StreamingAssets");
+            if (File.Exists(Application.dataPath + "/StreamingAssets"))
+            {
+                //不使用 Bundle 则删除 StreamingAssets 文件夹
+                FileTool.DeleteDirectory(Application.dataPath + "/StreamingAssets");
+            }
         }
-
-        string path = ExportPath + "/" + GetPackageName() + ".apk";
-        BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.Android, BuildOptions.None);
     }
 
     static void BundlePackage()
@@ -147,7 +215,28 @@ class ProjectBuildService : Editor
 
     static string GetPackageName()
     {
-        return Application.productName + "_" + Version + "_"+ ChannelName + "_" + ApplicationMode;
+        return Application.productName + "_" + Version + "_"+ ChannelName + "_" + GetModeName(ApplicationMode) +"_"+ GetTimeString();
+    }
+
+    static string GetTimeString()
+    {
+        DateTime date = DateTime.Now;
+
+        return date.Year + string.Format("{0:d2}", date.Month) + string.Format("{0:d2}", date.Day) + "_" + string.Format("{0:d2}", date.Hour) + string.Format("{0:d2}", date.Minute);
+    }
+
+    static string GetModeName(AppMode mode)
+    {
+        switch (mode)
+        {
+            case AppMode.Developing:
+                return "Dev"; ;
+            case AppMode.QA:
+                return "QA"; ;
+            case AppMode.Release:
+                return "Rel"; ;
+            default: return "unknow";
+        }
     }
 
     #endregion

@@ -13,9 +13,6 @@ public class BundleConfigEditorWindow : EditorWindow
 
     public const string c_ResourceParentPath = "/Resources/";
 
-    //int largeVersion = 1;  //大版本号 
-    //int smallVersion = 1; //小版本号
-
     //所有依赖包
     List<EditPackageConfig> relyPackages = new List<EditPackageConfig>();
     //所有普通包
@@ -1022,6 +1019,11 @@ public class BundleConfigEditorWindow : EditorWindow
     //递归所有目录
     void RecursionDirectory(string path)
     {
+        if(!File.Exists(path))
+        {
+            FileTool.CreatPath(path);
+        }
+
         string[] dires = Directory.GetDirectories(path);
 
         for (int i = 0; i < dires.Length; i++)
