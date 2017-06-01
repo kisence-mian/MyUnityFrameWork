@@ -165,14 +165,15 @@ class ProjectBuildService : Editor
             case AppMode.Release:
                 appModeDefine = "APPMODE_REL"; break;
         }
-        PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, appModeDefine);
+
+        SetScriptDefine(appModeDefine);
     }
 
     static void SetLua(bool useLua)
     {
         if(useLua)
         {
-            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, "USE_LUA");
+            SetScriptDefine("USE_LUA");
         }
     }
 
@@ -181,11 +182,6 @@ class ProjectBuildService : Editor
     /// </summary>
     static void ChangeChannel(string channelName)
     {
-        //if (projectName == "91")
-        //{
-        //    Function.CopyDirectory(Application.dataPath + "/91", Application.dataPath + "/Plugins/Android");
-        //    PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, "USE_SHARE");
-        //}
 
 #if UNITY_ANDROID
         SchemeDataService.ChangeScheme(channelName);
@@ -267,6 +263,24 @@ class ProjectBuildService : Editor
                 return "Rel"; ;
             default: return "unknow";
         }
+    }
+
+    public static void SetScriptDefine(string symbols)
+    {
+        BuildTargetGroup targetGroup = BuildTargetGroup.Unknown;
+#if UNITY_ANDROID
+        targetGroup = BuildTargetGroup.Android;
+#elif UNITY_IOS
+        targetGroup = BuildTargetGroup.iOS;
+#endif
+        string define = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
+
+        if (!define.Contains(symbols))
+        {
+            define += ";" + symbols;
+        }
+
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, define);
     }
 
     #endregion

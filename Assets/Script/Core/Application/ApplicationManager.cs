@@ -15,10 +15,6 @@ public class ApplicationManager : MonoBehaviour
 
     public AppMode m_AppMode = AppMode.Developing;
 
-#if !USE_LUA
-    public bool m_useLua = false;
-#endif
-
     public bool m_useAssetsBundle = false;
 
     public static AppMode AppMode
@@ -33,18 +29,6 @@ public class ApplicationManager : MonoBehaviour
             return AppMode.Release;
 #else
             return instance.m_AppMode;
-#endif
-        }
-    }
-
-    public bool UseLua
-    {
-        get
-        {
-#if USE_LUA
-            return true;
-#else
-            return m_useLua;
 #endif
         }
     }
@@ -87,10 +71,9 @@ public class ApplicationManager : MonoBehaviour
 
             DevelopReplayManager.OnLunchCallBack += () =>
             {
-                if (UseLua)
-                {
-                    LuaManager.Init();
-                }
+#if USE_LUA
+                LuaManager.Init();
+#endif
                 InitGlobalLogic();                                //全局逻辑
                 ApplicationStatusManager.EnterTestModel(m_Status);//可以从此处进入测试流程
             };
@@ -101,11 +84,9 @@ public class ApplicationManager : MonoBehaviour
         {
             Log.Init(false); //关闭 Debug
 
-            if (UseLua)
-            {
-                LuaManager.Init();
-            }
-
+#if USE_LUA
+            LuaManager.Init();
+#endif
             InitGlobalLogic();                             //全局逻辑
             ApplicationStatusManager.EnterStatus(m_Status);//游戏流程状态机，开始第一个状态
         }

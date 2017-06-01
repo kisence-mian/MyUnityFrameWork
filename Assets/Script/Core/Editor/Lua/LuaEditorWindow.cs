@@ -69,11 +69,13 @@ public class LuaEditorWindow : EditorWindow
 
         //复制lua初始库文件
         FileTool.CopyDirectory(resPath, aimPath);
+
+        ProjectBuildService.SetScriptDefine("USE_LUA");
     }
 
-    #endregion
+#endregion
 
-    #region 读取Lua配置
+#region 读取Lua配置
     void LoadLuaConfig()
     {
         if (ConfigManager.GetIsExistConfig(LuaManager.c_LuaConfigName))
@@ -104,9 +106,9 @@ public class LuaEditorWindow : EditorWindow
             m_LuaLibFileList = new List<string>();
         }
     }
-    #endregion
+#endregion
 
-    #region Lua信息检视
+#region Lua信息检视
 
     bool m_isFold = false;
     bool m_isFoldLib = false;
@@ -153,9 +155,9 @@ public class LuaEditorWindow : EditorWindow
         EditorGUI.indentLevel--;
     }
 
-    #endregion
+#endregion
 
-    #region ULua原生功能
+#region ULua原生功能
 
     void LuaWarpFileGUI()
     {
@@ -200,9 +202,9 @@ public class LuaEditorWindow : EditorWindow
         EditorUtil.WriteStringByFile(CustomSettings.saveDir + "/LuaBinderCatch.cs", sb.ToString());
     }
 
-    #endregion
+#endregion
 
-    #region 自动生成Lua设置
+#region 自动生成Lua设置
 
     void AutoLuaConfigGUI()
     {
@@ -305,5 +307,5 @@ public class LuaEditorWindow : EditorWindow
         }
     }
 
-    #endregion
+#endregion
 }

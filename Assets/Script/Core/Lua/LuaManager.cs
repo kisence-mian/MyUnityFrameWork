@@ -23,9 +23,9 @@ public class LuaManager
     /// </summary>
     public static void Init()
     {
+#if USE_LUA
         try
         {
-            //Debug.Log("LuaBinder Init");
             s_state.Start();
             LuaBinder.Bind(s_state);
             ApplicationManager.s_OnApplicationUpdate += Update;
@@ -34,6 +34,9 @@ public class LuaManager
         {
             Debug.LogError("Lua Init Execption " + e.ToString());
         }
+#else
+        throw new Exception("USE_LUA not Define ! ");
+#endif
     }
 
     /// <summary>
