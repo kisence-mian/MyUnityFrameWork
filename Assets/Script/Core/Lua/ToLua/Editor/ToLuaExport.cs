@@ -1,4 +1,5 @@
-﻿/*
+﻿
+/*
 Copyright (c) 2015-2016 topameng(topameng@qq.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

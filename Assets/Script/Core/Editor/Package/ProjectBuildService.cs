@@ -21,11 +21,11 @@ class ProjectBuildService : Editor
                     return arg.Split("-"[0])[1];
                 }
             }
-            return "android";
+            return "Android";
 #elif UNITY_IOS
-            return "ios";
+            return "Ios";
 #else
-            return "general";
+            return "General";
 #endif
         }
     }
@@ -78,6 +78,22 @@ class ProjectBuildService : Editor
         }
     }
 
+    public static bool isUseLua
+    {
+        get
+        {
+            //这里遍历所有参数，找到 UseLua 开头的参数， 然后把-符号 后面的字符串返回，
+            foreach (string arg in Environment.GetCommandLineArgs())
+            {
+                if (arg.StartsWith("UseLua"))
+                {
+                    return bool.Parse(arg.Split("-"[0])[1]);
+                }
+            }
+            return false;
+        }
+    }
+
     public static string Version
     {
         get
@@ -95,6 +111,9 @@ class ProjectBuildService : Editor
         //输出日志
         PrintDebug();
 
+        //使用Lua
+        SetLua(isUseLua);
+
         //发布模式
         SetApplicationMode(ApplicationMode);
 
@@ -106,6 +125,7 @@ class ProjectBuildService : Editor
 
         //打包
         string path = ExportPath + "/" + GetPackageName() + ".apk";
+
         BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.Android, BuildOptions.None);
     }
 
@@ -120,7 +140,10 @@ class ProjectBuildService : Editor
             debugString += "参数：" + arg + "\n";
         }
 
+        debugString += "\n";
+
         debugString += "是否使用 Bundle 打包: " + isUseAssetsBundle + "\n";
+        debugString += "是否使用 Lua : " + isUseLua + "\n";
         debugString += "渠道名: " + ChannelName + "\n";
         debugString += "发布模式: " + ApplicationMode + "\n";
         debugString += "导出路径: " + ExportPath + "\n";
@@ -142,8 +165,15 @@ class ProjectBuildService : Editor
             case AppMode.Release:
                 appModeDefine = "APPMODE_REL"; break;
         }
-
         PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, appModeDefine);
+    }
+
+    static void SetLua(bool useLua)
+    {
+        if(useLua)
+        {
+            PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Android, "USE_LUA");
+        }
     }
 
     /// <summary>

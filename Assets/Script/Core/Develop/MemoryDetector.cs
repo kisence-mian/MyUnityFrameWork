@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-#if UNITY_5_5 
+#if UNITY_5_5_OR_NEWER
 using UnityEngine.Profiling;
 #endif
 	/// <summary>
@@ -54,16 +54,16 @@ using UnityEngine.Profiling;
             ResetGUISize();
 
 			GUI.Label(this.allocMemoryRect, 
-				string.Format(TotalAllocMemroyFormation,  Profiler.GetTotalAllocatedMemory() * ByteToM));
+				string.Format(TotalAllocMemroyFormation, Profiler.GetTotalAllocatedMemory() * ByteToM));
 			GUI.Label(this.reservedMemoryRect, 
-				string.Format(TotalReservedMemoryFormation,  Profiler.GetTotalReservedMemory() * ByteToM));
+				string.Format(TotalReservedMemoryFormation, Profiler.GetTotalReservedMemory() * ByteToM));
 			GUI.Label(this.unusedReservedMemoryRect, 
-				string.Format(TotalUnusedReservedMemoryFormation,  Profiler.GetTotalUnusedReservedMemory() * ByteToM));
+				string.Format(TotalUnusedReservedMemoryFormation, Profiler.GetTotalUnusedReservedMemory() * ByteToM));
             //GUI.Label(this.RuntimeMemorySizeRect,
             //    string.Format(TotalUnusedReservedMemoryFormation, Profiler.GetRuntimeMemorySize( .) * ByteToM));
 			GUI.Label(this.monoHeapRect,
-				string.Format(MonoHeapFormation,  Profiler.GetMonoHeapSize() * ByteToM));
+				string.Format(MonoHeapFormation, Profiler.GetMonoHeapSize() * ByteToM));
 			GUI.Label(this.monoUsedRect,
-				string.Format(MonoUsedFormation,  Profiler.GetMonoUsedSize() * ByteToM));
+				string.Format(MonoUsedFormation, Profiler.GetMonoUsedSize() * ByteToM));
 		}
 	}

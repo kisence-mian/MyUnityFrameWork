@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
-#if UNITY_5_5
+#if UNITY_5_5_OR_NEWER
 using UnityEngine.Profiling;
 #endif
 
@@ -210,7 +210,7 @@ public class MemoryManager
     /// <param name="tag"></param>
     static void MonitorMemorySize()
     {
-        if(ByteToM( Profiler.GetTotalReservedMemory() ) > s_MaxMemoryUse * 0.7f)
+        if(ByteToM(Profiler.GetTotalReservedMemory() ) > s_MaxMemoryUse * 0.7f)
         {
             if (!s_isFreeMemory)
             {
@@ -218,7 +218,7 @@ public class MemoryManager
                 FreeMemory();
             }
 
-            if (ByteToM( Profiler.GetMonoHeapSize()) > s_MaxMemoryUse)
+            if (ByteToM(Profiler.GetMonoHeapSize()) > s_MaxMemoryUse)
             {
                 if (!s_isFreeMemory2)
                 {
@@ -237,7 +237,7 @@ public class MemoryManager
             s_isFreeMemory = false;
         }
 
-        if (ByteToM(Profiler.GetMonoUsedSize() ) > s_MaxHeapMemoryUse * 0.7f)
+        if (ByteToM( Profiler.GetMonoUsedSize() ) > s_MaxHeapMemoryUse * 0.7f)
         {
             if (!s_isFreeHeapMemory)
             {

@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections;
 using LuaInterface;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,7 @@ public class LuaManager
 
     public static LuaState LuaState
     {
-        get { return LuaManager.s_state; }
+        get { return s_state; }
     }
 
     public const string c_LuaConfigName = "LuaConfig";
@@ -26,11 +25,10 @@ public class LuaManager
     {
         try
         {
+            //Debug.Log("LuaBinder Init");
             s_state.Start();
-            //LuaBinder.Bind(s_state);
-
+            LuaBinder.Bind(s_state);
             ApplicationManager.s_OnApplicationUpdate += Update;
-
         }
         catch (Exception e)
         {
@@ -43,6 +41,8 @@ public class LuaManager
     /// </summary>
     public static void LoadLua()
     {
+        //Debug.Log("LoadLua");
+
         try
         {
             Dictionary<string,SingleField> data = ConfigManager.GetData(c_LuaConfigName);
@@ -72,6 +72,7 @@ public class LuaManager
     /// </summary>
     public static void LaunchLua()
     {
+        //Debug.Log("LaunchLua");
         try
         {
             s_state.GetFunction("Main").Call();
