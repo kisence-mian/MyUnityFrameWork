@@ -7,7 +7,7 @@
 　　1.快速配置开发模式和发布模式（开发模式资源直接从Resources文件夹加载，不需要重新打包）  
 　　2.支持快速定位到某一个游戏流程（某游戏场景，结算界面等），方便测试  
 　　3.开发模式支持运行时性能监控和Debug小窗。  
-　　4.提供Jenkins自动化打包接口ProjectBuildService ( 接收ChannelName、AppMode、UseAssetsBundle、ExportPath四个参数，教程会在以后给出 )  
+　　4.提供Jenkins自动化打包接口ProjectBuildService ([打包教程](http://www.kisence.com/2017/06/01/shi-yong-jenkinsjin-xing-zi-dong-da-bao/) ) 
 　
 ## 游戏流程管理  
 　　1.游戏逻辑入口从某一个游戏流程开始（创建一个流程继承IGameStatus,然后再ApplicationManager中选择它作为第一个流程）  
