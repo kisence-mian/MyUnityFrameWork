@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using UnityEngine.Profiling;
 #endif
 
+#pragma warning disable
 public class MemoryManager
 {
     /// <summary>

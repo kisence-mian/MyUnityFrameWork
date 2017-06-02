@@ -392,8 +392,6 @@ public class DevelopReplayManager
                 RecordManager.SaveRecord(c_recordName, c_qucikLunchKey, true);
             }
         }
-
-
     }
 
     /// <summary>
@@ -401,7 +399,38 @@ public class DevelopReplayManager
     /// </summary>
     static void ReplayModeGUI()
     {
+        consoleRect = new Rect(margin, Screen.height * 0.3f, Screen.width * 0.45f, Screen.height * 0.7f - margin);
 
+        GUILayout.Window(2, consoleRect, ReplayModeGUIWindow, "Replay Panel");
+    }
+
+    static void ReplayModeGUIWindow(int id)
+    {
+
+        if (GUILayout.Button("0.25倍速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 0.25f;
+        }
+
+        if (GUILayout.Button("0.5倍速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 0.5f;
+        }
+
+        if (GUILayout.Button("正常速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 1;
+        }
+
+        if (GUILayout.Button("2倍速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 2;
+        }
+
+        if (GUILayout.Button("4倍速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 4;
+        }
     }
 
     #endregion

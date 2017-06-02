@@ -62,7 +62,7 @@ class ProjectBuildService : Editor
         }
     }
 
-    public static bool isUseAssetsBundle
+    public static bool IsUseAssetsBundle
     {
         get
         {
@@ -78,7 +78,7 @@ class ProjectBuildService : Editor
         }
     }
 
-    public static bool isUseLua
+    public static bool IsUseLua
     {
         get
         {
@@ -112,16 +112,19 @@ class ProjectBuildService : Editor
         PrintDebug();
 
         //使用Lua
-        SetLua(isUseLua);
+        SetLua(IsUseLua);
 
         //发布模式
         SetApplicationMode(ApplicationMode);
 
+        //使用Resource或者使用Bundle
+        UseResourcesOrBundle(IsUseAssetsBundle);
+
         //切换渠道
         ChangeChannel(ChannelName);
 
-        //使用Resource或者使用Bundle
-        UseResourcesOrBundle(isUseAssetsBundle);
+        //设置编译指令
+        ApplyScriptDefine();
 
         //打包
         string path = ExportPath + "/" + GetPackageName() + ".apk";
@@ -142,8 +145,8 @@ class ProjectBuildService : Editor
 
         debugString += "\n";
 
-        debugString += "是否使用 Bundle 打包: " + isUseAssetsBundle + "\n";
-        debugString += "是否使用 Lua : " + isUseLua + "\n";
+        debugString += "是否使用 Bundle 打包: " + IsUseAssetsBundle + "\n";
+        debugString += "是否使用 Lua : " + IsUseLua + "\n";
         debugString += "渠道名: " + ChannelName + "\n";
         debugString += "发布模式: " + ApplicationMode + "\n";
         debugString += "导出路径: " + ExportPath + "\n";
@@ -166,14 +169,14 @@ class ProjectBuildService : Editor
                 appModeDefine = "APPMODE_REL"; break;
         }
 
-        SetScriptDefine(appModeDefine);
+        AddScriptDefine(appModeDefine);
     }
 
     static void SetLua(bool useLua)
     {
         if(useLua)
         {
-            SetScriptDefine("USE_LUA");
+            AddScriptDefine("USE_LUA");
         }
     }
 
@@ -182,11 +185,9 @@ class ProjectBuildService : Editor
     /// </summary>
     static void ChangeChannel(string channelName)
     {
-
 #if UNITY_ANDROID
         SchemeDataService.ChangeScheme(channelName);
 #endif
-
     }
 
     /// <summary>
@@ -196,11 +197,12 @@ class ProjectBuildService : Editor
     {
         if (useBundle)
         {
+            AddScriptDefine("USE_BUNDLE");
             BundlePackage();
         }
         else
         {
-            if (File.Exists(Application.dataPath + "/StreamingAssets"))
+            if (Directory.Exists(Application.dataPath + "/StreamingAssets"))
             {
                 //不使用 Bundle 则删除 StreamingAssets 文件夹
                 FileTool.DeleteDirectory(Application.dataPath + "/StreamingAssets");
@@ -218,7 +220,7 @@ class ProjectBuildService : Editor
         PackageService.Package(PackageEditorConfigService.RelyPackages, PackageEditorConfigService.Bundles);
 
         //删除 Resources 文件夹
-        FileTool.DeleteDirectory(Application.dataPath + "/Resources");
+        FileTool.SafeDeleteDirectory(Application.dataPath + "/Resources");
     }
 
     #endregion
@@ -278,6 +280,36 @@ class ProjectBuildService : Editor
         if (!define.Contains(symbols))
         {
             define += ";" + symbols;
+        }
+
+        PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, define);
+    }
+
+    static List<string> s_defines = new List<string>();
+    static void AddScriptDefine(string symbols)
+    {
+        if(!s_defines.Contains(symbols))
+        {
+            s_defines.Add(symbols);
+        }
+    }
+
+    static void ApplyScriptDefine()
+    {
+        BuildTargetGroup targetGroup = BuildTargetGroup.Unknown;
+#if UNITY_ANDROID
+        targetGroup = BuildTargetGroup.Android;
+#elif UNITY_IOS
+        targetGroup = BuildTargetGroup.iOS;
+#endif
+        string define = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
+
+        for (int i = 0; i < s_defines.Count; i++)
+        {
+            if(!define.Contains(s_defines[i]))
+            {
+                define += ";" + s_defines[i];
+            }
         }
 
         PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, define);

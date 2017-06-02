@@ -714,15 +714,17 @@ public class UIBase : MonoBehaviour
         Canvas canvas = go.GetComponent<Canvas>();
         GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
 
-        if (canvas != null)
-        {
-            canvas.overrideSorting = false;
-        }
-
         if (graphic != null)
         {
             Destroy(graphic);
         }
+
+        if (canvas != null)
+        {
+            //canvas.overrideSorting = false;
+            Destroy(canvas);
+        }
+
     }
 
     public void ClearGuideModel()

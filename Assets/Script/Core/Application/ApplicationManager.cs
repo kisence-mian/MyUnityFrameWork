@@ -33,6 +33,18 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
+    public bool UseAssetsBundle
+    {
+        get
+        {
+#if USE_BUNDLE
+            return true;
+#else
+            return m_useAssetsBundle;
+#endif
+        }
+    }
+
     //快速启动
     public bool m_quickLunch = true;
 
@@ -169,7 +181,7 @@ public class ApplicationManager : MonoBehaviour
     /// </summary>
     void SetResourceLoadType()
     {
-        if (m_useAssetsBundle)
+        if (UseAssetsBundle)
         {
             ResourceManager.m_gameLoadType = ResLoadLocation.Streaming;
         }
