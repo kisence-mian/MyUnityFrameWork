@@ -111,7 +111,7 @@ class ProjectBuildService : Editor
 
     #endregion
 
-#region 打包函数
+    #region 打包函数
 
     #region 通用
 
@@ -277,7 +277,7 @@ class ProjectBuildService : Editor
 
     #endregion
 
-#region 功能函数
+    #region 功能函数
 
     //在这里找出你当前工程所有的场景文件，假设你只想把部分的scene文件打包 那么这里可以写你的条件判断 总之返回一个字符串数组。
     static string[] GetBuildScenes()
@@ -372,41 +372,4 @@ class ProjectBuildService : Editor
     }
 
     #endregion
-
-    static void Test(IApplicationStatus a)
-    {
-        Debug.Log("IApplicationStatus " + a);
-    }
-
-    static void Test(MainMenuStatus a)
-    {
-        Debug.Log("MainMenuStatus "+a);
-    }
-
-    [MenuItem("Window/TestA", priority = 500)]
-    static void TestA()
-    {
-        int sum = 0;
-        for (int i = 1; i <= 5000; i++)
-        {
-            if(i % 2 == 0)
-            {
-                sum += i;
-            }
-        }
-
-        Debug.Log(sum);
-
-        sum = 0;
-        for (int i = 1; i <= 5000; i++)
-        {
-            sum += i;
-            //if (i % 2 == 0)
-            //{
-            //    sum += i;
-            //}
-        }
-
-        Debug.Log(sum/2);
-    }
 }
