@@ -233,7 +233,13 @@ class ProjectBuildService : Editor
         //打包
         string path = ExportPath + "/" + GetPackageName() + ".apk";
 
-        BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.Android, BuildOptions.None);
+        BuildOptions option = BuildOptions.None;
+        if (ApplicationMode == AppMode.Release)
+        {
+            option = BuildOptions.Il2CPP;
+        }
+
+        BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.Android, option);
     }
 
 #endregion
