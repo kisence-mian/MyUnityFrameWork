@@ -46,7 +46,7 @@ class ProjectBuildService : Editor
             }
 
 #if UNITY_WEBGL
-            return path;
+            return path + "/" + ApplicationMode;
 #else
             return path += "/" + ChannelName + "/" + ApplicationMode + "/";
 #endif
