@@ -42,9 +42,7 @@ public class FileTool
 
             if (Directory.Exists(pathTmp))
             {
-
                 Directory.Delete(pathTmp, true);
-
             }
         }
 

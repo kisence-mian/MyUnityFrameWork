@@ -34,15 +34,22 @@ class ProjectBuildService : Editor
     {
         get
         {
+            string path = Application.dataPath;
+
             //这里遍历所有参数，找到 ExportPath 开头的参数， 然后把-符号 后面的字符串返回，
             foreach (string arg in Environment.GetCommandLineArgs())
             {
                 if (arg.StartsWith("ExportPath"))
                 {
-                    return arg.Split("-"[0])[1] + "/" + ChannelName + "/" + ApplicationMode + "/";
+                    path =  arg.Split("-"[0])[1];
                 }
             }
-            return Application.dataPath + "/"+ ChannelName + "/"+ ApplicationMode+"/";
+
+#if UNITY_WEBGL
+            return path;
+#else
+            return path += "/" + ChannelName + "/" + ApplicationMode + "/";
+#endif
         }
     }
 
@@ -104,33 +111,9 @@ class ProjectBuildService : Editor
 
     #endregion
 
-    #region 打包函数
+#region 打包函数
 
-    static void BuildForAndroid()
-    {
-        //输出日志
-        PrintDebug();
-
-        //使用Lua
-        SetLua(IsUseLua);
-
-        //发布模式
-        SetApplicationMode(ApplicationMode);
-
-        //使用Resource或者使用Bundle
-        UseResourcesOrBundle(IsUseAssetsBundle);
-
-        //切换渠道
-        ChangeChannel(ChannelName);
-
-        //设置编译指令
-        ApplyScriptDefine();
-
-        //打包
-        string path = ExportPath + "/" + GetPackageName() + ".apk";
-
-        BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.Android, BuildOptions.None);
-    }
+    #region 通用
 
     static void PrintDebug()
     {
@@ -159,7 +142,7 @@ class ProjectBuildService : Editor
     {
         string appModeDefine = "";
 
-        switch(mode)
+        switch (mode)
         {
             case AppMode.Developing:
                 appModeDefine = "APPMODE_DEV"; break;
@@ -174,7 +157,7 @@ class ProjectBuildService : Editor
 
     static void SetLua(bool useLua)
     {
-        if(useLua)
+        if (useLua)
         {
             AddScriptDefine("USE_LUA");
         }
@@ -205,7 +188,7 @@ class ProjectBuildService : Editor
             if (Directory.Exists(Application.dataPath + "/StreamingAssets"))
             {
                 //不使用 Bundle 则删除 StreamingAssets 文件夹
-                FileTool.DeleteDirectory(Application.dataPath + "/StreamingAssets");
+                FileTool.SafeDeleteDirectory(Application.dataPath + "/StreamingAssets");
             }
         }
     }
@@ -225,7 +208,76 @@ class ProjectBuildService : Editor
 
     #endregion
 
-    #region 功能函数
+    #region Android
+
+    static void BuildForAndroid()
+    {
+        //输出日志
+        PrintDebug();
+
+        //使用Lua
+        SetLua(IsUseLua);
+
+        //发布模式
+        SetApplicationMode(ApplicationMode);
+
+        //使用Resource或者使用Bundle
+        UseResourcesOrBundle(IsUseAssetsBundle);
+
+        //切换渠道
+        ChangeChannel(ChannelName);
+
+        //设置编译指令
+        ApplyScriptDefine();
+
+        //打包
+        string path = ExportPath + "/" + GetPackageName() + ".apk";
+
+        BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.Android, BuildOptions.None);
+    }
+
+#endregion
+
+    #region WEBGL
+
+    static void BuildForWEBGL()
+    {
+        //输出日志
+        PrintDebug();
+
+        //使用Lua
+        SetLua(IsUseLua);
+
+        //发布模式
+        SetApplicationMode(ApplicationMode);
+
+        //使用Resource或者使用Bundle
+        UseResourcesOrBundle(IsUseAssetsBundle);
+
+        //切换渠道
+        ChangeChannel(ChannelName);
+
+        //设置编译指令
+        ApplyScriptDefine();
+
+        //打包
+        string path = ExportPath + "/" + GetPackageName();
+
+        BuildOptions option = BuildOptions.None;
+        if (ApplicationMode != AppMode.Release)
+        {
+            option = BuildOptions.Development;
+        }
+
+        BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.WebGL, option);
+    }
+
+
+#endregion
+
+    #endregion
+
+#region 功能函数
 
     //在这里找出你当前工程所有的场景文件，假设你只想把部分的scene文件打包 那么这里可以写你的条件判断 总之返回一个字符串数组。
     static string[] GetBuildScenes()
@@ -243,7 +295,11 @@ class ProjectBuildService : Editor
 
     static string GetPackageName()
     {
+#if UNITY_WEBGL
+        return Application.productName;
+#else
         return Application.productName + "_" + Version + "_"+ ChannelName + "_" + GetModeName(ApplicationMode) +"_"+ GetTimeString();
+#endif
     }
 
     static string GetTimeString()
@@ -316,4 +372,41 @@ class ProjectBuildService : Editor
     }
 
     #endregion
+
+    static void Test(IApplicationStatus a)
+    {
+        Debug.Log("IApplicationStatus " + a);
+    }
+
+    static void Test(MainMenuStatus a)
+    {
+        Debug.Log("MainMenuStatus "+a);
+    }
+
+    [MenuItem("Window/TestA", priority = 500)]
+    static void TestA()
+    {
+        int sum = 0;
+        for (int i = 1; i <= 5000; i++)
+        {
+            if(i % 2 == 0)
+            {
+                sum += i;
+            }
+        }
+
+        Debug.Log(sum);
+
+        sum = 0;
+        for (int i = 1; i <= 5000; i++)
+        {
+            sum += i;
+            //if (i % 2 == 0)
+            //{
+            //    sum += i;
+            //}
+        }
+
+        Debug.Log(sum/2);
+    }
 }

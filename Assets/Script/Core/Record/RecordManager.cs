@@ -138,6 +138,108 @@ public class RecordManager
     }
 
 
-#endregion
+    #endregion
+
+    #region 取值封装
+
+    public static int GetIntRecord(string RecordName, string key)
+    {
+        RecordTable table = GetData(RecordName);
+
+        if(table.ContainsKey(key))
+        {
+            return table[key].GetInt();
+        }
+        else
+        {
+            throw new Exception("GetIntRecord Exception not find RecordName:->"+ RecordName + " key: ->" + key+"<-");
+        }
+    }
+
+    public static string GetStringRecord(string RecordName, string key, int value)
+    {
+        RecordTable table = GetData(RecordName);
+
+        if (table.ContainsKey(key))
+        {
+            return table[key].GetString();
+        }
+        else
+        {
+            throw new Exception("GetStringRecord Exception not find RecordName:->" + RecordName + " key: ->" + key + "<-");
+        }
+    }
+
+    public static bool GetBoolRecord(string RecordName, string key, bool value)
+    {
+        RecordTable table = GetData(RecordName);
+
+        if (table.ContainsKey(key))
+        {
+            return table[key].GetBool();
+        }
+        else
+        {
+            throw new Exception("GetBoolRecord Exception not find RecordName:->" + RecordName + " key: ->" + key + "<-");
+        }
+    }
+
+    public static float GetFloatRecord(string RecordName, string key, float value)
+    {
+        RecordTable table = GetData(RecordName);
+
+        if (table.ContainsKey(key))
+        {
+            return table[key].GetFloat();
+        }
+        else
+        {
+            throw new Exception("GetFloatRecord Exception not find RecordName:->" + RecordName + " key: ->" + key + "<-");
+        }
+    }
+
+    public static Vector2 GetVector2Record(string RecordName, string key, Vector2 value)
+    {
+        RecordTable table = GetData(RecordName);
+
+        if (table.ContainsKey(key))
+        {
+            return table[key].GetVector2();
+        }
+        else
+        {
+            throw new Exception("GetVector2Record Exception not find RecordName:->" + RecordName + " key: ->" + key + "<-");
+        }
+    }
+
+    public static Vector3 GetVector3Record(string RecordName, string key, Vector3 value)
+    {
+        RecordTable table = GetData(RecordName);
+
+        if (table.ContainsKey(key))
+        {
+            return table[key].GetVector3();
+        }
+        else
+        {
+            throw new Exception("GetVector3Record Exception not find RecordName:->" + RecordName + " key: ->" + key + "<-");
+        }
+    }
+
+    public static Color GetColorRecord(string RecordName, string key, Vector3 value)
+    {
+        RecordTable table = GetData(RecordName);
+
+        if (table.ContainsKey(key))
+        {
+            return table[key].GetColor();
+        }
+        else
+        {
+            throw new Exception("GetColorRecord Exception not find RecordName:->" + RecordName + " key: ->" + key + "<-");
+        }
+    }
+
+    #endregion
 
 }
