@@ -230,13 +230,16 @@ public class GameObjectManager :MonoBehaviour
     {
         ResourceManager.LoadAsync(name, (status, res) =>
         {
-            try
+            if(status.isDone)
             {
-                callback(CreateGameObjectByPool(name, parent, isSetActive));
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("CreateGameObjectByPoolAsync Exception: " + e.ToString());
+                try
+                {
+                    callback(CreateGameObjectByPool(name, parent, isSetActive));
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("CreateGameObjectByPoolAsync Exception: " + e.ToString());
+                }
             }
         });
     }

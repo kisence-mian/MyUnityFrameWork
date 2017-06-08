@@ -198,7 +198,7 @@ public class ResourceIOTool :MonoBehaviour
     #endregion
 
     #region 写操作
-#if !UNITY_WEBGL
+#if !UNITY_WEBGL || UNITY_EDITOR
    //web Player 不支持写操作
     public static void WriteStringByFile(string path, string content)
     {

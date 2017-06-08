@@ -72,7 +72,12 @@ public class ApplicationManager : MonoBehaviour
         MemoryManager.Init();                //内存管理初始化
         Timer.Init();                        //计时器启动
         InputManager.Init();                 //输入管理器启动
+
+#if !UNITY_WEBGL
         UIManager.Init();                    //UIManager启动
+#else
+        UIManager.InitAsync();               //异步加载UIManager
+#endif
 
         ApplicationStatusManager.Init();     //游戏流程状态机初始化
         GlobalLogicManager.Init();           //初始化全局逻辑
