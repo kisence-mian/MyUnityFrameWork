@@ -95,7 +95,7 @@ public class PackageService
         //删除streaming下所有旧资源
         if (Directory.Exists(Application.dataPath + "/StreamingAssets"))
         {
-            FileTool.DeleteDirectory(Application.dataPath + "/StreamingAssets");
+            FileTool.SafeDeleteDirectory(Application.dataPath + "/StreamingAssets");
         }
 
 

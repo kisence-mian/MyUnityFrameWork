@@ -267,7 +267,6 @@ class ProjectBuildService : Editor
         ApplyScriptDefine();
 
         //打包
-        string path = ExportPath + "/" + GetPackageName();
 
         BuildOptions option = BuildOptions.None;
         if (ApplicationMode != AppMode.Release)
@@ -275,7 +274,7 @@ class ProjectBuildService : Editor
             option = BuildOptions.Development;
         }
 
-        BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.WebGL, option);
+        BuildPipeline.BuildPlayer(GetBuildScenes(), ExportPath, BuildTarget.WebGL, option);
     }
 
 
@@ -363,6 +362,8 @@ class ProjectBuildService : Editor
         targetGroup = BuildTargetGroup.Android;
 #elif UNITY_IOS
         targetGroup = BuildTargetGroup.iOS;
+#elif UNITY_WEBGL
+        targetGroup = BuildTargetGroup.WebGL;
 #endif
         string define = PlayerSettings.GetScriptingDefineSymbolsForGroup(targetGroup);
 
