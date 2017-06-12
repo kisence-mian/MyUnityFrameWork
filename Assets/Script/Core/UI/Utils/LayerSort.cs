@@ -8,7 +8,7 @@ public class LayerSort : MonoBehaviour {
     void Start()
     {
         Canvas canvas = GetComponent<Canvas>();
-        if (canvas!=null)
+        if (canvas != null)
         {
             canvas.overrideSorting = true;
             canvas.sortingOrder = order;
