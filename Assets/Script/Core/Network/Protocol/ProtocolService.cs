@@ -157,11 +157,11 @@ public class ProtocolService : INetworkInterface
         }
     }
 
-
     void StartReceive()
     {
         m_Socket.BeginReceive(m_readData, 0, m_readData.Length, SocketFlags.None, m_acb, m_Socket);
     }
+
     void EndReceive(IAsyncResult iar) //接收数据
     {
         Socket remote = (Socket)iar.AsyncState;
@@ -173,6 +173,7 @@ public class ProtocolService : INetworkInterface
 
         StartReceive();
     }
+
 #else
 
     public void OnClosed()
