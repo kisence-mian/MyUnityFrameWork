@@ -90,10 +90,8 @@ public class FileTool
                 {
                     File.Delete(pathTmp);
                 }
-                catch (Exception e)
-                {
-                    //Debug.LogWarning("DeleteDirectory File.Delete Path: ->" + pathTmp + "<- Exception: " + e.ToString());
-                }
+                catch
+                { }
             }
         }
     }
@@ -133,9 +131,9 @@ public class FileTool
         foreach (FileSystemInfo fsi in info.GetFileSystemInfos())
         {
             string destName = Path.Combine(destinationPath, fsi.Name);
-            Debug.Log(destName);
+            //Debug.Log(destName);
 
-            if (fsi is System.IO.FileInfo)          //如果是文件，复制文件
+            if (fsi is FileInfo)          //如果是文件，复制文件
                 File.Copy(fsi.FullName, destName);
             else                                    //如果是文件夹，新建文件夹，递归
             {

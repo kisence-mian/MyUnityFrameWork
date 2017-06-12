@@ -8,7 +8,7 @@ public class UGUITool
     static PointerEventData eventDatas = new PointerEventData(EventSystem.current);
     static List<RaycastResult> hit = new List<RaycastResult>();
 
-    static public bool isHitUI()
+    static public bool IsHitUI()
     {
         eventDatas.position = Input.mousePosition;
         eventDatas.pressPosition = Input.mousePosition;

@@ -59,7 +59,13 @@ public class LuaEditorWindow : EditorWindow
 
     void InitLua()
     {
-        ToLuaMenu.GenLuaAll();
+        //创建导出列表文件
+        CreateLuaExportFile();
+
+        //创建空LuaBinder文件
+        CreateEmptyLuaBinder();
+
+        ToLuaMenu.ClearLuaFiles();
         //创建Lua目录
         Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaLibFilePath));
         Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaFilePath));
@@ -71,11 +77,42 @@ public class LuaEditorWindow : EditorWindow
         FileTool.CopyDirectory(resPath, aimPath);
 
         ProjectBuildService.SetScriptDefine("USE_LUA");
+
+        AssetDatabase.Refresh();
     }
 
-#endregion
+    void CreateLuaExportFile()
+    {
+        string LoadPath = Application.dataPath + "/Script/Core/Editor/res/LuaExportListTemplate.txt";
+        string SavePath = Application.dataPath + "/Script/UI/Editor/Lua/LuaExportList.cs";
 
-#region 读取Lua配置
+        string ExportListContent = ResourceIOTool.ReadStringByFile(LoadPath);
+
+        EditorUtil.WriteStringByFile(SavePath, ExportListContent);
+    }
+
+    static void CreateEmptyLuaBinder()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("using System;");
+        sb.AppendLine("using LuaInterface;");
+        sb.AppendLine();
+        sb.AppendLine("public static class LuaBinder");
+        sb.AppendLine("{");
+        sb.AppendLine("\tpublic static void Bind(LuaState L)");
+        sb.AppendLine("\t{");
+        sb.AppendLine("\t\tthrow new LuaException(\"Please generate LuaBinder files first!\");");
+        sb.AppendLine("\t}");
+        sb.AppendLine("}");
+
+        string filePath = CustomSettings.saveDir + "/LuaBinder.cs";
+
+        EditorUtil.WriteStringByFile(filePath, sb.ToString());
+    }
+
+    #endregion
+
+    #region 读取Lua配置
     void LoadLuaConfig()
     {
         if (ConfigManager.GetIsExistConfig(LuaManager.c_LuaConfigName))
