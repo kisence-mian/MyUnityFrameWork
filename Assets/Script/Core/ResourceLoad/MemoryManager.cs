@@ -24,14 +24,12 @@ public class MemoryManager
     /// </summary>
     public static int s_MaxHeapMemoryUse = 50;
 
-    public static bool s_enable = true;
-
     public static void Init()
     {
         ApplicationManager.s_OnApplicationUpdate += Update;
 
-        if(ApplicationManager.AppMode != AppMode.Release)
-            ApplicationManager.s_OnApplicationOnGUI += GUI;
+        if (ApplicationManager.AppMode != AppMode.Release)
+            DevelopReplayManager.s_ProfileGUICallBack += GUI;
     }
 
     static void Update()
@@ -39,34 +37,25 @@ public class MemoryManager
         //资源加载
         LoadResources();
 
-        #if !UNITY_EDITOR
+#if !UNITY_EDITOR
         //内存管理
         MonitorMemorySize();
+#else
 
-        #else
-
-        if (Input.GetKeyDown(KeyCode.F2))
-        {
-            s_enable = !s_enable;
-        }
-
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.F3))
         {
             FreeHeapMemory();
         }
-#endif
+    #endif
 
-        #endif
+#endif
     }
 
     static void GUI()
     {
-        if (s_enable)
-        {
-            GUILayout.TextField("总内存：" + ByteToM(Profiler.GetTotalAllocatedMemory()) + "M");
-            GUILayout.TextField("堆内存：" + ByteToM(Profiler.GetMonoUsedSize()) + "M");
-        }
+        GUILayout.TextField("总内存：" + ByteToM(Profiler.GetTotalAllocatedMemory()) + "M");
+        GUILayout.TextField("堆内存：" + ByteToM(Profiler.GetMonoUsedSize()) + "M");
     }
 
     /// <summary>
@@ -104,16 +93,9 @@ public class MemoryManager
 
     public static void LoadRes(List<string> resList,LoadProgressCallBack callBack)
     {
-        //if(ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
-        //{
-        //    callBack(LoadState.CompleteState);
-        //}
-        //else
-        //{
             s_loadCallBack += callBack;
             s_LoadList.AddRange(resList);
             s_loadCount += resList.Count;
-        //}
     }
 
     public static void UnLoadRes(List<string> resList)
@@ -123,7 +105,6 @@ public class MemoryManager
             for (int i = 0; i < resList.Count; i++)
             {
                 ResourceManager.UnLoad(resList[i]);
-                //AssetsBundleManager.UnLoadBundle(resList[i]);
             }
         }
     }
