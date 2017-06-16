@@ -138,6 +138,59 @@ public class RecordManager
     }
 
 
-#endregion
+    #endregion
+
+    #region 取值封装
+
+    public static int GetIntRecord(string RecordName, string key,int defaultValue)
+    {
+        RecordTable table = GetData(RecordName);
+
+        return table.GetRecord(key, defaultValue);
+    }
+
+    public static string GetStringRecord(string RecordName, string key, string defaultValue)
+    {
+        RecordTable table = GetData(RecordName);
+
+        return table.GetRecord(key, defaultValue);
+    }
+
+    public static bool GetBoolRecord(string RecordName, string key, bool defaultValue)
+    {
+        RecordTable table = GetData(RecordName);
+
+        return table.GetRecord(key, defaultValue);
+    }
+
+    public static float GetFloatRecord(string RecordName, string key, float defaultValue)
+    {
+        RecordTable table = GetData(RecordName);
+
+        return table.GetRecord(key, defaultValue);
+    }
+
+    public static Vector2 GetVector2Record(string RecordName, string key, Vector2 defaultValue)
+    {
+        RecordTable table = GetData(RecordName);
+
+        return table.GetRecord(key, defaultValue);
+    }
+
+    public static Vector3 GetVector3Record(string RecordName, string key, Vector3 defaultValue)
+    {
+        RecordTable table = GetData(RecordName);
+
+        return table.GetRecord(key, defaultValue);
+    }
+
+    public static Color GetColorRecord(string RecordName, string key, Color defaultValue)
+    {
+        RecordTable table = GetData(RecordName);
+
+        return table.GetRecord(key, defaultValue);
+    }
+
+    #endregion
 
 }

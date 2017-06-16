@@ -372,6 +372,11 @@ public class UIBase : MonoBehaviour
         set { m_rectTransform = value; }
     }
 
+    public void SetSizeDelta(float w,float h)
+    {
+        m_RectTransform.sizeDelta = new Vector2(w,h);
+    }
+
     #region 自定义组件
 
     public ReusingScrollRect GetReusingScrollRect(string name)
@@ -709,15 +714,17 @@ public class UIBase : MonoBehaviour
         Canvas canvas = go.GetComponent<Canvas>();
         GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
 
-        if (canvas != null)
-        {
-            canvas.overrideSorting = false;
-        }
-
         if (graphic != null)
         {
             Destroy(graphic);
         }
+
+        if (canvas != null)
+        {
+            //canvas.overrideSorting = false;
+            Destroy(canvas);
+        }
+
     }
 
     public void ClearGuideModel()

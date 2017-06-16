@@ -59,7 +59,13 @@ public class LuaEditorWindow : EditorWindow
 
     void InitLua()
     {
-        ToLuaMenu.GenLuaAll();
+        //创建导出列表文件
+        CreateLuaExportFile();
+
+        //创建空LuaBinder文件
+        CreateEmptyLuaBinder();
+
+        ToLuaMenu.ClearLuaFiles();
         //创建Lua目录
         Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaLibFilePath));
         Directory.CreateDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Resource, c_LuaFilePath));
@@ -69,6 +75,39 @@ public class LuaEditorWindow : EditorWindow
 
         //复制lua初始库文件
         FileTool.CopyDirectory(resPath, aimPath);
+
+        ProjectBuildService.SetScriptDefine("USE_LUA");
+
+        AssetDatabase.Refresh();
+    }
+
+    void CreateLuaExportFile()
+    {
+        string LoadPath = Application.dataPath + "/Script/Core/Editor/res/LuaExportListTemplate.txt";
+        string SavePath = Application.dataPath + "/Script/UI/Editor/Lua/LuaExportList.cs";
+
+        string ExportListContent = ResourceIOTool.ReadStringByFile(LoadPath);
+
+        EditorUtil.WriteStringByFile(SavePath, ExportListContent);
+    }
+
+    static void CreateEmptyLuaBinder()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("using System;");
+        sb.AppendLine("using LuaInterface;");
+        sb.AppendLine();
+        sb.AppendLine("public static class LuaBinder");
+        sb.AppendLine("{");
+        sb.AppendLine("\tpublic static void Bind(LuaState L)");
+        sb.AppendLine("\t{");
+        sb.AppendLine("\t\tthrow new LuaException(\"Please generate LuaBinder files first!\");");
+        sb.AppendLine("\t}");
+        sb.AppendLine("}");
+
+        string filePath = CustomSettings.saveDir + "/LuaBinder.cs";
+
+        EditorUtil.WriteStringByFile(filePath, sb.ToString());
     }
 
     #endregion
@@ -104,9 +143,9 @@ public class LuaEditorWindow : EditorWindow
             m_LuaLibFileList = new List<string>();
         }
     }
-    #endregion
+#endregion
 
-    #region Lua信息检视
+#region Lua信息检视
 
     bool m_isFold = false;
     bool m_isFoldLib = false;
@@ -153,9 +192,9 @@ public class LuaEditorWindow : EditorWindow
         EditorGUI.indentLevel--;
     }
 
-    #endregion
+#endregion
 
-    #region ULua原生功能
+#region ULua原生功能
 
     void LuaWarpFileGUI()
     {
@@ -200,9 +239,9 @@ public class LuaEditorWindow : EditorWindow
         EditorUtil.WriteStringByFile(CustomSettings.saveDir + "/LuaBinderCatch.cs", sb.ToString());
     }
 
-    #endregion
+#endregion
 
-    #region 自动生成Lua设置
+#region 自动生成Lua设置
 
     void AutoLuaConfigGUI()
     {
@@ -305,5 +344,5 @@ public class LuaEditorWindow : EditorWindow
         }
     }
 
-    #endregion
+#endregion
 }

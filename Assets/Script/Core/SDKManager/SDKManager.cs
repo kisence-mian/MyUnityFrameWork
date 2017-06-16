@@ -6,10 +6,7 @@ using UnityEngine;
 public class SDKManager 
 {
     public const string c_ConfigName = "SDKConfig";
-    public const string c_KeyName = "SDKconfig";
-
-    //static LoginCallBack LoginCallBack = null;
-    //static PayCallBack   PayCallBack   = null; 
+    public const string c_KeyName = "SDKInfo";
 
     static LoginInterface s_loginService = null;
     static PayInterface s_payService = null;

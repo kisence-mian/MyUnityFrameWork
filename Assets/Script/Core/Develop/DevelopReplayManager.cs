@@ -21,6 +21,7 @@ public class DevelopReplayManager
     const string c_serializeInfoKey = "s";
 
     static bool s_isReplay = false;
+    public static bool s_isProfile = true;
 
     static List<Dictionary<string, string>> s_eventStreamSerialize;
     static List<IInputEventBase> s_eventStream;
@@ -31,6 +32,8 @@ public class DevelopReplayManager
 
     private static StreamWriter m_EventWriter = null;
     private static StreamWriter m_RandomWriter = null;
+
+    public static CallBack s_ProfileGUICallBack;
 
     public static Action OnLunchCallBack
     {
@@ -69,13 +72,14 @@ public class DevelopReplayManager
             LoadReplayFile(replayFileName);
             ApplicationManager.s_OnApplicationUpdate += OnReplayUpdate;
             GUIConsole.onGUICallback += ReplayModeGUI;
+            GUIConsole.onGUICloseCallback += ProfileGUI;
 
             //传入随机数列
             RandomService.SetRandomList(s_randomList);
 
             //关闭正常输入，保证回放数据准确
             InputUIEventProxy.IsActive = false;
-            InputOperationEventProxy.IsActive = false;
+            IInputProxyBase.IsActive = false;
             InputNetworkEventProxy.IsActive = false;
         }
         else
@@ -85,6 +89,9 @@ public class DevelopReplayManager
             ApplicationManager.s_OnApplicationUpdate += OnRecordUpdate;
             InputManager.OnEveryEventDispatch += OnEveryEventCallBack;
             GUIConsole.onGUICallback += RecordModeGUI;
+            GUIConsole.onGUICloseCallback += ProfileGUI;
+
+            //记录随机数列
             RandomService.OnRandomCreat += OnGetRandomCallBack;
 
             OpenWriteFileStream(GetLogFileName());
@@ -366,18 +373,64 @@ public class DevelopReplayManager
 
     #endregion
 
+    #region ProfileGUI
+
+    static void SwitchProfileGUI()
+    {
+#if UNITY_EDITOR
+        string hotKey = " (F2)";
+#else
+        string hotKey = "";
+#endif
+
+        if (s_isProfile)
+        {
+            s_ProfileGUICallBack();
+
+            if (GUILayout.Button("关闭 性能数据" + hotKey, GUILayout.ExpandHeight(true)))
+            {
+                s_isProfile = false;
+            }
+        }
+        else
+        {
+            if (GUILayout.Button("开启 性能数据" + hotKey, GUILayout.ExpandHeight(true)))
+            {
+                s_isProfile = true;
+            }
+        }
+    }
+
+    static void ProfileGUI()
+    {
+        if(s_isProfile)
+        {
+            s_ProfileGUICallBack();
+        }
+    }
+
+    static void ProfileUpdateLogic()
+    {
+        if (Input.GetKeyDown(KeyCode.F2))
+        {
+            s_isProfile = !s_isProfile;
+        }
+    }
+
+    #endregion
+
     static int margin = 3;
 
-    static Rect consoleRect = new Rect(margin, Screen.height * 0.6f, Screen.width * 0.3f, Screen.height * 0.4f - margin);
+    static Rect consoleRect = new Rect(margin, margin, Screen.width * 0.5f - margin, Screen.height  - 2 * margin);
 
     static void RecordModeGUI()
     {
-        consoleRect = new Rect(margin, Screen.height * 0.5f, Screen.width * 0.4f, Screen.height * 0.5f - margin);
-
         GUILayout.Window(2, consoleRect, RecordModeGUIWindow, "Replay Panel");
     }
     static void RecordModeGUIWindow(int id)
     {
+        SwitchProfileGUI();
+
         if (RecordManager.GetData(c_recordName).GetRecord(c_qucikLunchKey, true))
         {
             if (GUILayout.Button("开启后台", GUILayout.ExpandHeight(true)))
@@ -392,8 +445,6 @@ public class DevelopReplayManager
                 RecordManager.SaveRecord(c_recordName, c_qucikLunchKey, true);
             }
         }
-
-
     }
 
     /// <summary>
@@ -401,7 +452,37 @@ public class DevelopReplayManager
     /// </summary>
     static void ReplayModeGUI()
     {
+        GUILayout.Window(2, consoleRect, ReplayModeGUIWindow, "Replay Panel");
+    }
 
+    static void ReplayModeGUIWindow(int id)
+    {
+        SwitchProfileGUI();
+
+        if (GUILayout.Button("0.25倍速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 0.25f;
+        }
+
+        if (GUILayout.Button("0.5倍速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 0.5f;
+        }
+
+        if (GUILayout.Button("正常速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 1;
+        }
+
+        if (GUILayout.Button("2倍速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 2;
+        }
+
+        if (GUILayout.Button("4倍速度", GUILayout.ExpandHeight(true)))
+        {
+            Time.timeScale = 4;
+        }
     }
 
     #endregion
@@ -418,6 +499,8 @@ public class DevelopReplayManager
 
     public static void OnReplayUpdate()
     {
+        ProfileUpdateLogic();
+
         for (int i = 0; i < s_eventStream.Count; i++)
         {
             if (s_eventStream[i].m_t < Time.time)
@@ -432,6 +515,8 @@ public class DevelopReplayManager
 
     static void OnRecordUpdate()
     {
+        ProfileUpdateLogic();
+
         s_currentTime += Time.deltaTime;
     }
 

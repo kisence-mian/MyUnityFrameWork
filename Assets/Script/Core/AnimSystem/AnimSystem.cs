@@ -575,7 +575,8 @@ public class AnimSystem : MonoBehaviour
     #endregion
 
     #region 贝塞尔
-    public static AnimData BezierMove(GameObject animObject, Vector3 from, Vector3 to, 
+    public static AnimData BezierMove(GameObject animObject, Vector3? from, Vector3 to,
+        Vector3[] bezier_contral,
         float time = 0.5f,
         float delayTime = 0,
         RepeatType repeatType = RepeatType.Once, 
@@ -583,7 +584,7 @@ public class AnimSystem : MonoBehaviour
         InterpType interp = InterpType.Default, 
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
-        Vector3[] bezier_contral = null,
+        
         AnimCallBack callBack = null, object[] parameter = null)
     {
 
@@ -592,14 +593,17 @@ public class AnimSystem : MonoBehaviour
         if (isLocal)
         {
             l_tmp.m_animType = AnimType.LocalPosition;
+            l_tmp.m_fromV3 = from ?? animObject.transform.localPosition;
         }
         else
         {
             l_tmp.m_animType = AnimType.Position;
+            l_tmp.m_fromV3 = from ?? animObject.transform.position;
         }
 
         l_tmp.m_animGameObejct = animObject;
-        l_tmp.m_fromV3 = from;
+
+        
         l_tmp.m_toV3 = to;
         l_tmp.m_isLocal = isLocal;
         l_tmp.m_pathType = bezierMoveType;
@@ -619,25 +623,27 @@ public class AnimSystem : MonoBehaviour
         return l_tmp;
     }
 
-    public static AnimData BezierMove(GameObject animObject, Vector3 from, Vector3 to,
+    public static AnimData BezierMove(GameObject animObject, Vector3? from, Vector3 to,
+        Vector3[] t_Bezier_contral,
         float time = 0.5f,
         InterpType interp = InterpType.Default,
         bool isLocal = true, 
         PathType bezierMoveType = PathType.Bezier2, 
-        Vector3[] t_Bezier_contral = null, 
+        
         AnimCallBack callBack = null, object[] parameter = null)
     {
-        return BezierMove(animObject, from, to, time,0, RepeatType.Once,-1, interp, isLocal, bezierMoveType, t_Bezier_contral, callBack, parameter);
+        return BezierMove(animObject, from, to, t_Bezier_contral,time, 0, RepeatType.Once,-1, interp, isLocal, bezierMoveType,  callBack, parameter);
     }
 
     //不传From，传准确控制点
-    public static AnimData BezierMove(GameObject animObject, Vector3 to, 
+    public static AnimData BezierMove(GameObject animObject, Vector3 to,
+        Vector3[] t_Bezier_contral,
         float time = 0.5f,
         InterpType interp = InterpType.Default,
         RepeatType repeatType = RepeatType.Once,
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
-        Vector3[] t_Bezier_contral = null,
+        
         AnimCallBack callBack = null, object[] parameter = null)
     {
         Vector3 from;
@@ -650,18 +656,19 @@ public class AnimSystem : MonoBehaviour
             from = animObject.transform.position;
         }
 
-        return BezierMove(animObject, from, to, time,0, repeatType,-1, interp, isLocal, bezierMoveType, t_Bezier_contral, callBack, parameter);
+        return BezierMove(animObject, from, to, t_Bezier_contral,time, 0, repeatType,-1, interp, isLocal, bezierMoveType, callBack, parameter);
     }
 
     //传From，传准确控制点随机范围
-    public static AnimData BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time, 
+    public static AnimData BezierMove(GameObject animObject, Vector3? from, Vector3 to, float time,
+        float[] t_Bezier_contralRadius,
         RepeatType repeatType,
         int repeatCount = -1,
         float delayTime = 0,
         InterpType interp = InterpType.Default,
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
-        float[] t_Bezier_contralRadius = null,
+        
         AnimCallBack callBack = null, object[] parameter = null)
     {
 
@@ -670,14 +677,16 @@ public class AnimSystem : MonoBehaviour
         if (isLocal)
         {
             l_tmp.m_animType = AnimType.LocalPosition;
+            l_tmp.m_fromV3 = from ?? animObject.transform.localPosition;
         }
         else
         {
             l_tmp.m_animType = AnimType.Position;
+            l_tmp.m_fromV3 = from ?? animObject.transform.position;
         }
 
         l_tmp.m_animGameObejct = animObject;
-        l_tmp.m_fromV3 = from;
+        
         l_tmp.m_toV3 = to;
         l_tmp.m_isLocal = isLocal;
         l_tmp.m_pathType = bezierMoveType;
@@ -729,23 +738,24 @@ public class AnimSystem : MonoBehaviour
     }
 
     public static AnimData BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time,
+        float[] t_Bezier_contralRadius,
         float delayTime = 0,
         InterpType interp = InterpType.Default, bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
-        float[] t_Bezier_contralRadius = null,
         AnimCallBack callBack = null, object[] parameter = null)
     {
-        return BezierMove(animObject, from, to, time, RepeatType.Once,1,delayTime, interp, isLocal, bezierMoveType, t_Bezier_contralRadius, callBack, parameter);
+        return BezierMove(animObject, from, to, time, t_Bezier_contralRadius, RepeatType.Once,1,delayTime, interp, isLocal, bezierMoveType,  callBack, parameter);
     }
 
 
     //不传From，传准确控制点随机范围
     public static AnimData BezierMove(GameObject animObject, Vector3 to, float time, RepeatType repeatType,
+        float[] t_Bezier_contralRadius,
         InterpType interp = InterpType.Default,
         float delayTime = 0,
         bool isLocal = true,
         PathType bezierMoveType = PathType.Bezier2,
-        float[] t_Bezier_contralRadius = null,
+        
         AnimCallBack callBack = null, object[] parameter = null)
     {
         Vector3 from;
@@ -758,7 +768,7 @@ public class AnimSystem : MonoBehaviour
             from = animObject.transform.position;
         }
 
-        return BezierMove(animObject, from, to, time, repeatType,1, delayTime,interp, isLocal, bezierMoveType, t_Bezier_contralRadius, callBack, parameter);
+        return BezierMove(animObject, from, to, time, t_Bezier_contralRadius,repeatType, 1, delayTime,interp, isLocal, bezierMoveType, callBack, parameter);
     }
 
     #endregion
