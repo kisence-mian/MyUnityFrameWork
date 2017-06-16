@@ -46,6 +46,6 @@ using System.Collections;
 
         void OnGUI()
         {
-            GUILayout.TextField("FPS:" + fps.ToString());
+            GUILayout.TextField("FPS：" + fps.ToString());
         }
 	}

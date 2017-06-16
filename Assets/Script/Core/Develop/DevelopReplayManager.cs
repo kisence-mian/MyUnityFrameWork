@@ -425,7 +425,7 @@ public class DevelopReplayManager
 
     static void RecordModeGUI()
     {
-        GUILayout.Window(2, consoleRect, RecordModeGUIWindow, "Replay Panel");
+        GUILayout.Window(2, consoleRect, RecordModeGUIWindow, "Develop Control Panel");
     }
     static void RecordModeGUIWindow(int id)
     {
@@ -452,21 +452,18 @@ public class DevelopReplayManager
     /// </summary>
     static void ReplayModeGUI()
     {
-        GUILayout.Window(2, consoleRect, ReplayModeGUIWindow, "Replay Panel");
+        GUILayout.Window(2, consoleRect, ReplayModeGUIWindow, "Replay Control Panel");
     }
 
     static void ReplayModeGUIWindow(int id)
     {
+        ReplayProgressGUI();
+
         SwitchProfileGUI();
 
-        if (GUILayout.Button("0.25倍速度", GUILayout.ExpandHeight(true)))
+        if (GUILayout.Button("暂停", GUILayout.ExpandHeight(true)))
         {
-            Time.timeScale = 0.25f;
-        }
-
-        if (GUILayout.Button("0.5倍速度", GUILayout.ExpandHeight(true)))
-        {
-            Time.timeScale = 0.5f;
+            Time.timeScale = 0f;
         }
 
         if (GUILayout.Button("正常速度", GUILayout.ExpandHeight(true)))
@@ -474,15 +471,41 @@ public class DevelopReplayManager
             Time.timeScale = 1;
         }
 
-        if (GUILayout.Button("2倍速度", GUILayout.ExpandHeight(true)))
+        if (GUILayout.Button("速度加倍", GUILayout.ExpandHeight(true)))
         {
-            Time.timeScale = 2;
+            if(Time.timeScale == 0)
+            {
+                Time.timeScale = 1;
+            }
+            Time.timeScale *= 2f;
         }
 
-        if (GUILayout.Button("4倍速度", GUILayout.ExpandHeight(true)))
+        if (GUILayout.Button("速度减半", GUILayout.ExpandHeight(true)))
         {
-            Time.timeScale = 4;
+            if (Time.timeScale == 0)
+            {
+                Time.timeScale = 1;
+            }
+
+            Time.timeScale *= 0.5f;
         }
+    }
+
+    static void ReplayProgressGUI()
+    {
+        string timeContent = "当前时间：" + Time.time.ToString("F");
+        timeContent = timeContent.PadRight(20);
+
+        string eventContent = "剩余输入：" + s_eventStream.Count;
+        eventContent = eventContent.PadRight(20);
+
+        string RandomContent = "剩余随机数：" + RandomService.GetRandomListCount();
+        RandomContent = RandomContent.PadRight(20);
+
+        string speedContent = "当前速度：X" + Time.timeScale;
+        speedContent = speedContent.PadRight(20);
+
+        GUILayout.TextField(timeContent + eventContent + RandomContent + speedContent);
     }
 
     #endregion

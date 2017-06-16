@@ -54,8 +54,8 @@ public class MemoryManager
 
     static void GUI()
     {
-        GUILayout.TextField("总内存：" + ByteToM(Profiler.GetTotalAllocatedMemory()) + "M");
-        GUILayout.TextField("堆内存：" + ByteToM(Profiler.GetMonoUsedSize()) + "M");
+        GUILayout.TextField("总内存：" + ByteToM(Profiler.GetTotalAllocatedMemory()).ToString("F") + "M");
+        GUILayout.TextField("堆内存：" + ByteToM(Profiler.GetMonoUsedSize()).ToString("F") + "M");
     }
 
     /// <summary>
