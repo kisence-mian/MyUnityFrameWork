@@ -31,7 +31,7 @@ public class FileTool
     /// 删掉某个目录下的所有子目录和子文件，但是保留这个目录
     /// </summary>
     /// <param name="path"></param>
-     public static void DeleteDirectory(string path)
+    public static void DeleteDirectory(string path)
     {
         string[] directorys = Directory.GetDirectories(path);
 
@@ -55,6 +55,43 @@ public class FileTool
             if (File.Exists(pathTmp))
             {
                 File.Delete(pathTmp);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 删除所有可以删除的文件
+    /// </summary>
+    /// <param name="path"></param>
+    public static void SafeDeleteDirectory(string path)
+    {
+        string[] directorys = Directory.GetDirectories(path);
+
+        //删掉所有子目录
+        for (int i = 0; i < directorys.Length; i++)
+        {
+            string pathTmp = directorys[i];
+
+            if (Directory.Exists(pathTmp))
+            {
+                SafeDeleteDirectory(pathTmp);
+            }
+        }
+
+        //删掉所有子文件
+        string[] files = Directory.GetFiles(path);
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            string pathTmp = files[i];
+            if (File.Exists(pathTmp))
+            {
+                try
+                {
+                    File.Delete(pathTmp);
+                }
+                catch
+                { }
             }
         }
     }
@@ -94,9 +131,9 @@ public class FileTool
         foreach (FileSystemInfo fsi in info.GetFileSystemInfos())
         {
             string destName = Path.Combine(destinationPath, fsi.Name);
-            Debug.Log(destName);
+            //Debug.Log(destName);
 
-            if (fsi is System.IO.FileInfo)          //如果是文件，复制文件
+            if (fsi is FileInfo)          //如果是文件，复制文件
                 File.Copy(fsi.FullName, destName);
             else                                    //如果是文件夹，新建文件夹，递归
             {

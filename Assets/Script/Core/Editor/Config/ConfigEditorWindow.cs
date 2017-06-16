@@ -339,22 +339,17 @@ public class ConfigEditorWindow : EditorWindow
 
     public void FindConfigName(string path)
     {
+        FileTool.CreatPath(path);
+
         string[] allUIPrefabName = Directory.GetFiles(path);
         foreach (var item in allUIPrefabName)
         {
-            
             if (item.EndsWith(".json"))
             {
                 string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
                 m_configNameList.Add(configName);
             }
         }
-
-        //string[] dires = Directory.GetDirectories(path);
-        //for (int i = 0; i < dires.Length; i++)
-        //{
-        //    FindConfigName(dires[i]);
-        //}
     }
 
     #endregion

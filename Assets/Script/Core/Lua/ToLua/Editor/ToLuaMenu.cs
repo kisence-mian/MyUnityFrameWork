@@ -144,6 +144,17 @@ public static class ToLuaMenu
 
         public BindType(Type t)
         {
+            //if (CustomSettings.staticClassTypes == null)
+            //{
+            //    Debug.LogError("\nCustomSettings.staticClassTypes is null ! ");
+            //    return;
+            //}
+
+            if (t == null)
+            {
+                throw new NotSupportedException("\nBindType Type is null ! ");
+            }
+
             if (typeof(System.MulticastDelegate).IsAssignableFrom(t))
             {
                 throw new NotSupportedException(string.Format("\nDon't export Delegate {0} as a class, register it in customDelegateList", LuaMisc.GetTypeName(t)));
@@ -175,9 +186,7 @@ public static class ToLuaMenu
                 wrapName = ToLuaExport.ConvertToLibSign(wrapName);
             }
 
-            int index = CustomSettings.staticClassTypes.IndexOf(type);
-
-            if (index >= 0 || (type.IsAbstract && type.IsSealed))
+            if ((type.IsAbstract && type.IsSealed))
             {
                 IsStatic = true;
             }
@@ -823,6 +832,11 @@ public static class ToLuaMenu
         ToLuaExport.GenDelegates(list.ToArray());
         ToLuaExport.Clear();
 
+
+    }
+
+    static void CreateEmptyLuaBinder()
+    {
         StringBuilder sb = new StringBuilder();
         sb.AppendLineEx("using System;");
         sb.AppendLineEx("using LuaInterface;");

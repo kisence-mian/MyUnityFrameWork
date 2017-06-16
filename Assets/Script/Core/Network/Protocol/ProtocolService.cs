@@ -7,6 +7,10 @@ using System.Net;
 using System.Threading;
 using System.Text;
 using System.Text.RegularExpressions;
+using UnityEngine.Networking;
+#if !UNITY_EDITOR && UNITY_WEBGL
+using YLWebSocket;
+#endif
 
 public class ProtocolService : INetworkInterface 
 {
@@ -24,45 +28,64 @@ public class ProtocolService : INetworkInterface
     const string m_ProtocolFileName = "ProtocolInfo";
     const string m_methodNameInfoFileName = "MethodInfo";
 
-
     Dictionary<string, List<Dictionary<string, object>>> m_protocolInfo;
 
     Dictionary<int, string> m_methodNameInfo;
     Dictionary<string, int> m_methodIndexInfo;
 
+#if !UNITY_EDITOR && UNITY_WEBGL
+    private WebSocket m_scoket;
+
+#else
+
     private Socket m_Socket;
     private byte[] m_readData;
-
     AsyncCallback m_acb = null;
-    
-
     private Thread m_connThread;
+#endif
 
     public override void Init()
     {
         ReadProtocolInfo();
         ReadMethodNameInfo();
 
+#if !UNITY_EDITOR && UNITY_WEBGL
+        GameObject web = new GameObject("WebSocket");
+        WebSocketManager manager = web.AddComponent<WebSocketManager>();
+        m_scoket = WebSocketManager.instance.GetSocket(m_IPaddress);
+#else
         m_acb = new AsyncCallback(EndReceive);
         m_readData = new byte[102400];
         m_messageBuffer = new byte[204800];
 
         m_head = 0;
         m_total = 0;
+#endif
     }
 
     public override void GetIPAddress()
     {
-        m_IPaddress = "192.168.0.10";
+        m_IPaddress = "127.0.0.1";
         m_port = 7001;
     }
     public override void SetIPAddress(string IP, int port)
     {
         m_IPaddress = IP;
         m_port = port;
+
+#if !UNITY_EDITOR && UNITY_WEBGL
+        m_IPaddress = "ws://" + m_IPaddress + ":" + port;
+#endif
     }
     public override void Close()
     {
+#if !UNITY_EDITOR && UNITY_WEBGL
+        if (m_scoket.state == WebSocket.State.Connecting
+            || m_scoket.state == WebSocket.State.Connected)
+        {
+            m_scoket.Close();
+        }
+#else
         isConnect = false;
         if (m_Socket != null)
         {
@@ -75,17 +98,39 @@ public class ProtocolService : INetworkInterface
             m_connThread.Abort();
         }
         m_connThread = null;
+#endif
     }
 
     public override void Connect()
     {
         Close();
 
+#if !UNITY_EDITOR && UNITY_WEBGL
+        try
+        {
+            m_scoket = WebSocketManager.instance.GetSocket(m_IPaddress);
+            if (m_scoket.state == WebSocket.State.Closed)
+            {
+                m_scoket.onConnected += OnConnected;
+                m_scoket.onClosed += OnClosed;
+                m_scoket.onReceived += OnReceived;
+                m_scoket.Connect();
+                m_ConnectStatusCallback(NetworkState.Connecting);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("WebSocket connect Excption :" + e.ToString());
+        }
+#else
+
         m_connThread = null;
         m_connThread = new Thread(new ThreadStart(requestConnect));
         m_connThread.Start();
-    }
 
+#endif
+    }
+#if !(!UNITY_EDITOR && UNITY_WEBGL)
     //请求数据服务连接线程
     void requestConnect()
     {
@@ -116,6 +161,7 @@ public class ProtocolService : INetworkInterface
     {
         m_Socket.BeginReceive(m_readData, 0, m_readData.Length, SocketFlags.None, m_acb, m_Socket);
     }
+
     void EndReceive(IAsyncResult iar) //接收数据
     {
         Socket remote = (Socket)iar.AsyncState;
@@ -128,9 +174,33 @@ public class ProtocolService : INetworkInterface
         StartReceive();
     }
 
+#else
+
+    public void OnClosed()
+    {
+        m_scoket.onConnected -= OnConnected;
+        m_scoket.onClosed -= OnClosed;
+        m_scoket.onReceived -= OnReceived;
+
+        m_ConnectStatusCallback(NetworkState.ConnectBreak);
+    }
+
+    public void OnConnected()
+    {
+        Debug.Log("connected on " + m_scoket.address);
+        m_ConnectStatusCallback(NetworkState.Connected);
+    }
+
+    public void OnReceived(byte[] data)
+    {
+        ReceiveDataLoad(data);
+    }
+#endif
+
     //发包
     public void Send(byte[] sendbytes)
     {
+#if !(!UNITY_EDITOR && UNITY_WEBGL)
         try
         {
             m_Socket.Send(sendbytes);
@@ -139,6 +209,9 @@ public class ProtocolService : INetworkInterface
         {
             Debug.LogError("Send Message Error : " + e.Message);
         }
+#else
+        m_scoket.Send(sendbytes);
+#endif
     }
 
     public override void SendMessage(string MessageType,Dictionary<string, object> data)
@@ -164,7 +237,7 @@ public class ProtocolService : INetworkInterface
         Send(msg.Buffer);
     }
 
-    #region 缓冲区
+#region 缓冲区
 
     byte[] m_messageBuffer;
     int m_head = 0;
@@ -257,7 +330,7 @@ public class ProtocolService : INetworkInterface
         return bytes;
     }
 
-    #endregion
+#endregion
 
     //解包
     private void ReceiveDataLoad(byte[] bytes)
@@ -279,7 +352,7 @@ public class ProtocolService : INetworkInterface
         }
     }
 
-    #region 读取protocol信息
+#region 读取protocol信息
 
     void ReadProtocolInfo()
     {
@@ -403,9 +476,9 @@ public class ProtocolService : INetworkInterface
         Message
     }
 
-    #endregion
+#endregion
 
-    #region 读取消息号映射
+#region 读取消息号映射
 
     void ReadMethodNameInfo()
     {
@@ -444,9 +517,9 @@ public class ProtocolService : INetworkInterface
         }
     }
 
-    #endregion
+#endregion
 
-    #region 解包
+#region 解包
 
     NetWorkMessage  Analysis(ByteArray bytes)
     {
@@ -465,7 +538,7 @@ public class ProtocolService : INetworkInterface
         return msg;
     }
 
-    #region 解析数据
+#region 解析数据
 
     Dictionary<string, object> AnalysisData(string MessageType, byte[] bytes)
     {
@@ -847,11 +920,11 @@ public class ProtocolService : INetworkInterface
         return stbl;
     }
 
-    #endregion
+#endregion
 
-    #endregion
+#endregion
 
-    #region 发包
+#region 发包
 
     List<byte> GetSendByte(string messageType, Dictionary<string, object> data)
     {
@@ -1114,9 +1187,9 @@ public class ProtocolService : INetworkInterface
         }
     }
 
-    #endregion
+#endregion
 
-    #region 特性
+#region 特性
 
     [AttributeUsage(AttributeTargets.Field)]
     public class Int16Attribute : System.Attribute
@@ -1127,5 +1200,5 @@ public class ProtocolService : INetworkInterface
     {
     }
 
-    #endregion
+#endregion
 }

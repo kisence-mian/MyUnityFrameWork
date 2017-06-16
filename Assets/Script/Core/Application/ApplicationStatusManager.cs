@@ -27,7 +27,7 @@ public class ApplicationStatusManager
         EnterStatus(typeof(T).Name);
     }
 
-    public static void EnterStatus(string l_statusName)
+    public static void EnterStatus(string statusName)
     {
         if (s_currentAppStatus != null)
         {
@@ -35,7 +35,7 @@ public class ApplicationStatusManager
             s_currentAppStatus.OnExitStatus();
         }
 
-        s_currentAppStatus = GetStatus(l_statusName);
+        s_currentAppStatus = GetStatus(statusName);
 
         ApplicationManager.Instance.StartCoroutine(s_currentAppStatus.InChangeScene(() =>
         {
@@ -48,18 +48,18 @@ public class ApplicationStatusManager
         return (T)GetStatus(typeof(T).Name);
     }
 
-    public static IApplicationStatus GetStatus(string l_statusName)
+    public static IApplicationStatus GetStatus(string statusName)
     {
-        if (s_status.ContainsKey(l_statusName))
+        if (s_status.ContainsKey(statusName))
         {
-            return s_status[l_statusName];
+            return s_status[statusName];
         }
         else
         {
-            IApplicationStatus l_statusTmp = (IApplicationStatus)Activator.CreateInstance(Type.GetType(l_statusName));
-            s_status.Add(l_statusName, l_statusTmp);
+            IApplicationStatus statusTmp = (IApplicationStatus)Activator.CreateInstance(Type.GetType(statusName));
+            s_status.Add(statusName, statusTmp);
 
-            return l_statusTmp;
+            return statusTmp;
         }
     }
 
@@ -83,7 +83,7 @@ public class ApplicationStatusManager
         EnterTestModel(typeof(T).Name);
     }
 
-    public static void EnterTestModel(string l_statusName)
+    public static void EnterTestModel(string statusName)
     {
         if (s_currentAppStatus != null)
         {
@@ -91,12 +91,11 @@ public class ApplicationStatusManager
             s_currentAppStatus.OnExitStatus();
         }
 
-        s_currentAppStatus = GetStatus(l_statusName);
+        s_currentAppStatus = GetStatus(statusName);
 
         ApplicationManager.Instance.StartCoroutine(s_currentAppStatus.InChangeScene(()=>{
             s_currentAppStatus.EnterStatusTestData();
             s_currentAppStatus.OnEnterStatus();
         }));
-
     }
 }

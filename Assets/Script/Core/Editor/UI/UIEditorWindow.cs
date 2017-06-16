@@ -114,7 +114,7 @@ public class UIEditorWindow : EditorWindow
             EditorGUILayout.LabelField("提示： 脚本和 UI 名称会自动添加Window后缀");
             m_UIname = EditorGUILayout.TextField("UI Name:", m_UIname);
             m_UIType = (UIType)EditorGUILayout.EnumPopup("UI Type:", m_UIType);
-            
+
             isUseLua = EditorGUILayout.Toggle("使用 Lua", isUseLua);
             if (isUseLua)
             {

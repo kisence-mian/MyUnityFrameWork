@@ -1138,7 +1138,7 @@ public class AnimData : IHeapObjectInterface
     public float InBounce(float b, float to, float t, float d)
     {
         float c = to - b;
-        return c - OutBounce(0, to, t, d) + b;
+        return c - OutBounce(0 , to, d - t, d) + b;
     }
 
     public float InOutBounce(float b, float to, float t, float d)

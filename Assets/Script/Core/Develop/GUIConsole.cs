@@ -39,6 +39,7 @@ public class GUIConsole
 
     static public OnUpdateCallback onUpdateCallback = null;
     static public OnGUICallback onGUICallback = null;
+    static public OnGUICallback onGUICloseCallback = null;
     /// <summary>
     /// FPS计数器
     /// </summary>
@@ -59,7 +60,7 @@ public class GUIConsole
 
     const int margin = 3;
     const int offset = 0;
-    static Rect windowRect = new Rect(margin + Screen.width * 0.5f - offset, margin, Screen.width * 0.5f - (2 * margin) + offset, Screen.height - (2 * margin));
+    static Rect windowRect = new Rect(margin + Screen.width * 0.6f - offset, margin, Screen.width * 0.6f - (2 * margin) + offset, Screen.height - (2 * margin));
 
     public static void Init()
     {
@@ -71,17 +72,12 @@ public class GUIConsole
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationOnGUI += OnGUI;
         Application.logMessageReceived += HandleLog;
-
-        //consoleStyle = GUI.skin.label;
-
-        //consoleStyle.fontSize = 20;
     }
 
     ~GUIConsole()
     {
         Application.logMessageReceived -= HandleLog;
     }
-
 
     static void Update()
     {
@@ -105,21 +101,19 @@ public class GUIConsole
     static void OnGUI()
     {
         if (!showGUI)
+        {
+            if(onGUICloseCallback != null)
+            {
+                onGUICloseCallback();
+            }
             return;
+        }
 
         GUIUtil.SetGUIStyle();
 
         if (onGUICallback != null)
             onGUICallback();
 
-        //if (GUI.Button (new Rect (100, 100, 200, 100), "清空数据")) {
-        //    PlayerPrefs.DeleteAll ();
-        //    #if UNITY_EDITOR
-        //    EditorApplication.isPlaying = false;
-        //    #else
-        //    Application.Quit();
-        //    #endif
-        //}
         windowRect = new Rect(margin + Screen.width * 0.5f ,
                                 margin,
                                 Screen.width * 0.5f - (2 * margin),
@@ -134,7 +128,6 @@ public class GUIConsole
     /// </summary>
     static void ConsoleWindow(int windowID)
     {
-
         if (scrollToBottom)
         {
             GUILayout.BeginScrollView(Vector2.up * entries.Count * 100.0f);
@@ -166,8 +159,6 @@ public class GUIConsole
                     GUI.contentColor = Color.white;
                     break;
             }
-
-
 
             if (entry.type == LogType.Exception)
             {

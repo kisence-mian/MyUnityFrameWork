@@ -54,7 +54,7 @@ public class RecordTable : Dictionary<string, SingleField>
         }
         else
         {
-            return new SingleField(defaultValue).GetString();
+            return defaultValue;
         }
     }
 
@@ -66,7 +66,7 @@ public class RecordTable : Dictionary<string, SingleField>
         }
         else
         {
-            return new SingleField(defaultValue).GetBool();
+            return defaultValue;
         }
     }
 
@@ -78,7 +78,7 @@ public class RecordTable : Dictionary<string, SingleField>
         }
         else
         {
-            return new SingleField(defaultValue).GetInt();
+            return defaultValue;
         }
     }
 
@@ -90,7 +90,7 @@ public class RecordTable : Dictionary<string, SingleField>
         }
         else
         {
-            return new SingleField(defaultValue).GetFloat();
+            return defaultValue;
         }
     }
 
@@ -102,7 +102,7 @@ public class RecordTable : Dictionary<string, SingleField>
         }
         else
         {
-            return new SingleField(defaultValue).GetVector2();
+            return defaultValue;
         }
     }
 
@@ -114,7 +114,7 @@ public class RecordTable : Dictionary<string, SingleField>
         }
         else
         {
-            return new SingleField(defaultValue).GetVector3();
+            return defaultValue;
         }
     }
 
@@ -126,7 +126,7 @@ public class RecordTable : Dictionary<string, SingleField>
         }
         else
         {
-            return new SingleField(defaultValue).GetColor();
+            return defaultValue;
         }
     }
 
@@ -138,7 +138,7 @@ public class RecordTable : Dictionary<string, SingleField>
         }
         else
         {
-            return new SingleField(defaultValue.ToString()).GetEnum<T>();
+            return defaultValue;
         }
     }
 

@@ -19,16 +19,34 @@ public class ApplicationManager : MonoBehaviour
 
     public static AppMode AppMode
     {
-        get { return instance.m_AppMode; }
-        //set { m_AppMode = value; }
+        get
+        {
+#if APPMODE_DEV
+            return AppMode.Developing;
+#elif APPMODE_QA
+            return AppMode.QA;
+#elif APPMODE_REL
+            return AppMode.Release;
+#else
+            return instance.m_AppMode;
+#endif
+        }
     }
-    //public bool runInBackground = false;
+
+    public bool UseAssetsBundle
+    {
+        get
+        {
+#if USE_BUNDLE
+            return true;
+#else
+            return m_useAssetsBundle;
+#endif
+        }
+    }
 
     //快速启动
     public bool m_quickLunch = true;
-
-    //启用Lua
-    public bool m_useLua = false;
 
     [HideInInspector]
     public string m_Status = "";
@@ -40,7 +58,6 @@ public class ApplicationManager : MonoBehaviour
     {
         instance = this;
         AppLaunch();
-        //Application.runInBackground = runInBackground;
     }
 
     /// <summary>
@@ -55,22 +72,25 @@ public class ApplicationManager : MonoBehaviour
         MemoryManager.Init();                //内存管理初始化
         Timer.Init();                        //计时器启动
         InputManager.Init();                 //输入管理器启动
+
+#if !UNITY_WEBGL
         UIManager.Init();                    //UIManager启动
+#else
+        UIManager.InitAsync();               //异步加载UIManager
+#endif
 
         ApplicationStatusManager.Init();     //游戏流程状态机初始化
         GlobalLogicManager.Init();           //初始化全局逻辑
 
-        if (m_AppMode != AppMode.Release)
+        if (AppMode != AppMode.Release)
         {
             GUIConsole.Init(); //运行时Console
 
             DevelopReplayManager.OnLunchCallBack += () =>
             {
-                if (m_useLua)
-                {
-                    LuaManager.Init();
-                }
-
+#if USE_LUA
+                LuaManager.Init();
+#endif
                 InitGlobalLogic();                                //全局逻辑
                 ApplicationStatusManager.EnterTestModel(m_Status);//可以从此处进入测试流程
             };
@@ -81,17 +101,15 @@ public class ApplicationManager : MonoBehaviour
         {
             Log.Init(false); //关闭 Debug
 
-            if (m_useLua)
-            {
-                LuaManager.Init();
-            }
-
+#if USE_LUA
+            LuaManager.Init();
+#endif
             InitGlobalLogic();                             //全局逻辑
             ApplicationStatusManager.EnterStatus(m_Status);//游戏流程状态机，开始第一个状态
         }
     }
 
-    #region 程序生命周期事件派发
+#region 程序生命周期事件派发
  
     public static ApplicationVoidCallback s_OnApplicationQuit = null;
     public static ApplicationBoolCallback s_OnApplicationPause = null;
@@ -160,15 +178,15 @@ public class ApplicationManager : MonoBehaviour
             s_OnApplicationOnGUI();
     }
 
-    #endregion
+#endregion
 
-    #region 程序启动细节
+#region 程序启动细节
     /// <summary>
     /// 设置资源加载方式
     /// </summary>
     void SetResourceLoadType()
     {
-        if (m_useAssetsBundle)
+        if (UseAssetsBundle)
         {
             ResourceManager.m_gameLoadType = ResLoadLocation.Streaming;
         }
@@ -188,7 +206,7 @@ public class ApplicationManager : MonoBehaviour
             GlobalLogicManager.InitLogic(m_globalLogic[i]);
         }
     }
-    #endregion
+#endregion
 }
 
 public enum AppMode
