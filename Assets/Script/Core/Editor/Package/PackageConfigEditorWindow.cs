@@ -1794,9 +1794,14 @@ public class EditorObject
 
 public class PathPoint
 {
+    //是否折叠
     public bool isFold = false;
+    //当前节点的名字
     public string s_nowPathPoint;
+    //上一个节点（父节点）
     public PathPoint lastPathPoint;
+    //子节点列表
     public Dictionary<string, PathPoint> nextPathPoint;
+    //改路径点上面的bundle
     public List<EditPackageConfig> bundles;
 }
