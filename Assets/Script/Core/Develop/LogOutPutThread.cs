@@ -53,9 +53,9 @@ public class LogOutPutThread
                 this.mFileLogThread = new Thread(new ThreadStart(WriteLog));
                 this.mFileLogThread.Start();
             }
-            catch(Exception e)
+            catch
             {
-                Debug.LogError(e);
+                //Debug.LogError(e);
             }
 #endif
         }
