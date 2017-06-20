@@ -11,7 +11,6 @@ public class Log
     //日志输出线程
     static LogOutPutThread s_LogOutPutThread = new LogOutPutThread();
 
-
 	public static void Init(bool isOpenLog = true)
     {
         Debug.logger.logEnabled = isOpenLog;

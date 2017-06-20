@@ -1066,9 +1066,13 @@ public class BundleConfigEditorWindow : EditorWindow
         objTmp.obj = obj;
         objTmp.path = GetObjectPath(obj);
 
-        if (isExist_AllBundle(objTmp) || !IsPackage(objTmp))
+        if (isExist_AllBundle(objTmp))
         {
-            //Debug.Log(obj.name + " 已经存在！");
+            Debug.LogWarning(obj.name + " 已经存在！");
+        }
+        else if(!IsPackage(objTmp))
+        {
+            //Debug.LogWarning(obj.name + " 资源不打包！");
         }
         else
         {

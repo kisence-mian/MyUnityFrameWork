@@ -1,12 +1,7 @@
-﻿using UnityEngine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using LuaInterface;
-
+using UnityEngine;
 using BindType = ToLuaMenu.BindType;
-using System.Reflection;
-using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
 public static class CustomSettings
 {
@@ -31,5 +26,4 @@ public static class CustomSettings
     public static List<Type> dynamicList = new List<Type>();
     public static List<Type> outList = new List<Type>();
 #endif
-
 }

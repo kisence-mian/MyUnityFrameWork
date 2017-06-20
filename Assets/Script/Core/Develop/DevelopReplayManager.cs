@@ -45,7 +45,7 @@ public class DevelopReplayManager
     {
         if (isQuickLunch)
         {
-            //复盘模式可以手动开启
+            //复盘模式可以手动开关
             if (!RecordManager.GetData(c_recordName).GetRecord(c_qucikLunchKey, true))
             {
                 isQuickLunch = false;
@@ -250,13 +250,23 @@ public class DevelopReplayManager
 
     #region GUI
 
-    #region ReplayMenu
+    static int margin = 3;
+    static Rect consoleRect = new Rect(margin, margin, Screen.width * 0.5f - margin, Screen.height - 2 * margin);
+
+    #region Develop Menu
 
     static Rect windowRect = new Rect(Screen.width * 0.2f, Screen.height * 0.05f, Screen.width * 0.6f, Screen.height * 0.9f);
 
     static void ReplayMenuGUI()
     {
+        GUIUtil.SetGUIStyle();
+
         GUILayout.Window(1, windowRect, MenuWindow, "Develop Menu");
+
+        if(s_isOpenWarnPanel)
+        {
+            GUILayout.Window(2, s_warnPanelRect, WarnWindow, "Warning");
+        }
     }
 
     static DevMenuEnum MenuStatus = DevMenuEnum.MainMenu;
@@ -265,10 +275,6 @@ public class DevelopReplayManager
     static Vector2 scrollPos = Vector2.one;
     static void MenuWindow(int windowID)
     {
-        GUIUtil.SetGUIStyle();
-
-        windowRect = new Rect(Screen.width * 0.2f, Screen.height * 0.05f, Screen.width * 0.6f, Screen.height * 0.9f);
-
         if (MenuStatus == DevMenuEnum.MainMenu)
         {
             if (GUILayout.Button("正常启动", GUILayout.ExpandHeight(true)))
@@ -290,28 +296,47 @@ public class DevelopReplayManager
         }
         else if (MenuStatus  == DevMenuEnum.Replay)
         {
-            scrollPos = GUILayout.BeginScrollView(scrollPos);
-
-            for (int i = 0; i < FileNameList.Length; i++)
-            {
-                if (GUILayout.Button(FileNameList[i]))
-                {
-                    ChoseReplayMode(true, FileNameList[i]);
-                }
-            }
-
-            GUILayout.EndScrollView();
-
-            if (GUILayout.Button("返回上层"))
-            {
-                MenuStatus = DevMenuEnum.MainMenu;
-            }
+            ReplayListGUI();
         }
         else if (MenuStatus == DevMenuEnum.Log)
         {
             LogGUI();
         }
     }
+
+    #region ReplayListGUI
+
+    static void ReplayListGUI()
+    {
+        scrollPos = GUILayout.BeginScrollView(scrollPos);
+
+        for (int i = 0; i < FileNameList.Length; i++)
+        {
+            if (GUILayout.Button(FileNameList[i]))
+            {
+                ChoseReplayMode(true, FileNameList[i]);
+            }
+        }
+
+        GUILayout.EndScrollView();
+
+        if (GUILayout.Button("清除记录"))
+        {
+            OpenWarnWindow("确定要删除所有记录吗？", () =>
+            {
+                Debug.Log("已删除所有记录");
+                FileTool.SafeDeleteDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, c_directoryName));
+                FileNameList = new string[0];
+            });
+        }
+
+        if (GUILayout.Button("返回上层"))
+        {
+            MenuStatus = DevMenuEnum.MainMenu;
+        }
+    }
+
+    #endregion
 
     #region LogGUI
 
@@ -347,6 +372,16 @@ public class DevelopReplayManager
 
         GUILayout.EndScrollView();
 
+        if (GUILayout.Button("清除日志"))
+        {
+            OpenWarnWindow("确定要删除所有日志吗？", () =>
+             {
+                 Debug.Log("已删除所有日志");
+                 FileTool.SafeDeleteDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Persistent,LogOutPutThread.LogPath));
+                 FileNameList = new string[0];
+             });
+        }
+
         if (GUILayout.Button("返回上层"))
         {
             MenuStatus = DevMenuEnum.MainMenu;
@@ -367,7 +402,44 @@ public class DevelopReplayManager
         }
     }
 
+    #endregion
 
+    #region WarnPanel
+
+    static Rect s_warnPanelRect = new Rect(Screen.width * 0.1f, Screen.height * 0.25f, Screen.width * 0.8f, Screen.height * 0.5f);
+
+    static bool s_isOpenWarnPanel = false;
+    static string s_warnContent = "";
+    static CallBack s_warnCallBack;
+
+    static void OpenWarnWindow(string content,CallBack callBack)
+    {
+        s_isOpenWarnPanel = true;
+        s_warnContent = content;
+        s_warnCallBack = callBack;
+    }
+
+    static void WarnWindow(int windowID)
+    {
+        GUILayout.Label(s_warnContent, GUILayout.ExpandHeight(true));
+
+        if(GUILayout.Button("取消", GUILayout.ExpandHeight(true)))
+        {
+            s_isOpenWarnPanel = false;
+            s_warnContent = "";
+        }
+
+        if (GUILayout.Button("确定",GUILayout.ExpandHeight(true)))
+        {
+            s_isOpenWarnPanel = false;
+            s_warnContent = "";
+
+            if (s_warnCallBack != null)
+            {
+                s_warnCallBack();
+            }
+        }
+    }
 
     #endregion
 
@@ -377,24 +449,18 @@ public class DevelopReplayManager
 
     static void SwitchProfileGUI()
     {
-#if UNITY_EDITOR
-        string hotKey = " (F2)";
-#else
-        string hotKey = "";
-#endif
-
         if (s_isProfile)
         {
             s_ProfileGUICallBack();
 
-            if (GUILayout.Button("关闭 性能数据" + hotKey, GUILayout.ExpandHeight(true)))
+            if (GUILayout.Button("关闭 性能数据" + GetHotKey(2), GUILayout.ExpandHeight(true)))
             {
                 s_isProfile = false;
             }
         }
         else
         {
-            if (GUILayout.Button("开启 性能数据" + hotKey, GUILayout.ExpandHeight(true)))
+            if (GUILayout.Button("开启 性能数据" + GetHotKey(2), GUILayout.ExpandHeight(true)))
             {
                 s_isProfile = true;
             }
@@ -409,23 +475,52 @@ public class DevelopReplayManager
         }
     }
 
-    static void ProfileUpdateLogic()
+    static void DevelopHotKeyLogic()
     {
         if (Input.GetKeyDown(KeyCode.F2))
         {
             s_isProfile = !s_isProfile;
         }
+
+        if (Input.GetKeyDown(KeyCode.F3))
+        {
+            if (Time.timeScale != 0)
+            {
+                Time.timeScale = 0;
+            }
+            else
+            {
+                Time.timeScale = 1;
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.F4))
+        {
+            if (Time.timeScale == 0)
+            {
+                Time.timeScale = 1;
+            }
+
+            Time.timeScale *= 2;
+        }
+
+        if (Input.GetKeyDown(KeyCode.F5))
+        {
+            if (Time.timeScale == 0)
+            {
+                Time.timeScale = 1;
+            }
+
+            Time.timeScale *= 0.5f;
+        }
     }
 
-    #endregion
+        #endregion
 
-    static int margin = 3;
-
-    static Rect consoleRect = new Rect(margin, margin, Screen.width * 0.5f - margin, Screen.height  - 2 * margin);
-
+    #region RecordMode
     static void RecordModeGUI()
     {
-        GUILayout.Window(2, consoleRect, RecordModeGUIWindow, "Replay Panel");
+        GUILayout.Window(2, consoleRect, RecordModeGUIWindow, "Develop Control Panel");
     }
     static void RecordModeGUIWindow(int id)
     {
@@ -447,43 +542,98 @@ public class DevelopReplayManager
         }
     }
 
+    #endregion
+
+    #region ReplayMode
+
     /// <summary>
     /// 回放模式的GUI
     /// </summary>
     static void ReplayModeGUI()
     {
-        GUILayout.Window(2, consoleRect, ReplayModeGUIWindow, "Replay Panel");
+        GUILayout.Window(2, consoleRect, ReplayModeGUIWindow, "Replay Control Panel");
     }
 
     static void ReplayModeGUIWindow(int id)
     {
+        ReplayProgressGUI();
+
         SwitchProfileGUI();
 
-        if (GUILayout.Button("0.25倍速度", GUILayout.ExpandHeight(true)))
+        if (GUILayout.Button("暂停" + GetHotKey(3), GUILayout.ExpandHeight(true)))
         {
-            Time.timeScale = 0.25f;
+            Time.timeScale = 0f;
         }
 
-        if (GUILayout.Button("0.5倍速度", GUILayout.ExpandHeight(true)))
-        {
-            Time.timeScale = 0.5f;
-        }
-
-        if (GUILayout.Button("正常速度", GUILayout.ExpandHeight(true)))
+        if (GUILayout.Button("正常速度" + GetHotKey(3,false), GUILayout.ExpandHeight(true)))
         {
             Time.timeScale = 1;
         }
 
-        if (GUILayout.Button("2倍速度", GUILayout.ExpandHeight(true)))
+        if (GUILayout.Button("速度加倍" + GetHotKey(4), GUILayout.ExpandHeight(true)))
         {
-            Time.timeScale = 2;
+            if(Time.timeScale == 0)
+            {
+                Time.timeScale = 1;
+            }
+            Time.timeScale *= 2f;
         }
 
-        if (GUILayout.Button("4倍速度", GUILayout.ExpandHeight(true)))
+        if (GUILayout.Button("速度减半" + GetHotKey(5), GUILayout.ExpandHeight(true)))
         {
-            Time.timeScale = 4;
+            if (Time.timeScale == 0)
+            {
+                Time.timeScale = 1;
+            }
+
+            Time.timeScale *= 0.5f;
         }
     }
+
+    static void ReplayProgressGUI()
+    {
+        string timeContent = "当前时间：" + Time.time.ToString("F");
+        timeContent = timeContent.PadRight(20);
+
+        string eventContent = "剩余输入：" + s_eventStream.Count;
+        eventContent = eventContent.PadRight(20);
+
+        string RandomContent = "剩余随机数：" + RandomService.GetRandomListCount();
+        RandomContent = RandomContent.PadRight(20);
+
+        string speedContent = "当前速度：X" + Time.timeScale;
+        speedContent = speedContent.PadRight(20);
+
+        GUILayout.TextField(timeContent + eventContent + RandomContent + speedContent);
+    }
+
+    static string GetHotKey(int fn,bool isShowInRun = true)
+    {
+
+#if UNITY_EDITOR
+
+        if (fn == 3)
+        {
+            if ((Time.timeScale != 0 && isShowInRun)
+                ||(Time.timeScale == 0 && !isShowInRun))
+            {
+                return "(F" + fn + ")";
+            }
+            else
+            {
+                return "";
+            }
+        }
+        else
+        {
+            return "(F" + fn + ")";
+        }
+#else
+        return "";
+#endif
+    }
+
+    #endregion
 
     #endregion
 
@@ -499,7 +649,7 @@ public class DevelopReplayManager
 
     public static void OnReplayUpdate()
     {
-        ProfileUpdateLogic();
+        DevelopHotKeyLogic();
 
         for (int i = 0; i < s_eventStream.Count; i++)
         {
@@ -515,12 +665,12 @@ public class DevelopReplayManager
 
     static void OnRecordUpdate()
     {
-        ProfileUpdateLogic();
+        DevelopHotKeyLogic();
 
         s_currentTime += Time.deltaTime;
     }
 
-    #endregion
+#endregion
 
     public static string[] GetRelpayFileNames()
     {

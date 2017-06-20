@@ -8,7 +8,7 @@ public class RandomService
     static RandomHandel s_onRandomCreat;
 
     static bool s_isFixedRandom = false;
-    static List<int> s_randomList;
+    static List<int> s_randomList = new List<int>();
 
     public static RandomHandel OnRandomCreat
     {
@@ -20,6 +20,11 @@ public class RandomService
     {
         s_isFixedRandom = true;
         s_randomList = list;
+    }
+
+    public static int GetRandomListCount()
+    {
+        return s_randomList.Count;
     }
 
     public static int GetRand(int min, int max)

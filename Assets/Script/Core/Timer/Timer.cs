@@ -49,107 +49,107 @@ public class Timer
     /// <summary>
     /// 延迟调用
     /// </summary>
-    /// <param name="l_delayTime">间隔时间</param>
-    /// <param name="l_callBack">回调函数</param>
-    /// <param name="l_objs">回调函数的参数</param>
+    /// <param name="delayTime">间隔时间</param>
+    /// <param name="callBack">回调函数</param>
+    /// <param name="objs">回调函数的参数</param>
     /// <returns></returns>
-    public static TimerEvent DelayCallBack(float l_delayTime,TimerCallBack l_callBack,params object[] l_objs)
+    public static TimerEvent DelayCallBack(float delayTime,TimerCallBack callBack,params object[] objs)
     {
-        return AddTimer(l_delayTime, false, 0, "", l_callBack, l_objs); 
+        return AddTimer(delayTime, false, 0, null, callBack, objs); 
     }
 
     /// <summary>
     /// 延迟调用
     /// </summary>
-    /// <param name="l_delayTime">间隔时间</param>
-    /// <param name="l_isIgnoreTimeScale">是否忽略时间缩放</param>
-    /// <param name="l_callBack">回调函数</param>
-    /// <param name="l_objs">回调函数的参数</param>
+    /// <param name="delayTime">间隔时间</param>
+    /// <param name="isIgnoreTimeScale">是否忽略时间缩放</param>
+    /// <param name="callBack">回调函数</param>
+    /// <param name="objs">回调函数的参数</param>
     /// <returns></returns>
-    public static TimerEvent DelayCallBack(float l_delayTime, bool l_isIgnoreTimeScale, TimerCallBack l_callBack, params object[] l_objs)
+    public static TimerEvent DelayCallBack(float delayTime, bool isIgnoreTimeScale, TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(l_delayTime, l_isIgnoreTimeScale, 0, "", l_callBack, l_objs);
+        return AddTimer(delayTime, isIgnoreTimeScale, 0, null, callBack, objs);
     }
 
     /// <summary>
     /// 间隔一定时间重复调用
     /// </summary>
-    /// <param name="l_spaceTime">间隔时间</param>
-    /// <param name="l_callBack">回调函数</param>
-    /// <param name="l_objs">回调函数的参数</param>
+    /// <param name="spaceTime">间隔时间</param>
+    /// <param name="callBack">回调函数</param>
+    /// <param name="objs">回调函数的参数</param>
     /// <returns></returns>
-    public static TimerEvent CallBackOfIntervalTimer(float l_spaceTime,TimerCallBack l_callBack, params object[] l_objs)
+    public static TimerEvent CallBackOfIntervalTimer(float spaceTime,TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(l_spaceTime, false, -1, "", l_callBack, l_objs); 
+        return AddTimer(spaceTime, false, -1, null, callBack, objs); 
     }
 
     /// <summary>
     /// 间隔一定时间重复调用
     /// </summary>
-    /// <param name="l_spaceTime">间隔时间</param>
-    /// <param name="l_isIgnoreTimeScale">是否忽略时间缩放</param>
-    /// <param name="l_callBack">回调函数</param>
-    /// <param name="l_objs">回调函数的参数</param>
+    /// <param name="spaceTime">间隔时间</param>
+    /// <param name="isIgnoreTimeScale">是否忽略时间缩放</param>
+    /// <param name="callBack">回调函数</param>
+    /// <param name="objs">回调函数的参数</param>
     /// <returns></returns>
-    public static TimerEvent CallBackOfIntervalTimer(float l_spaceTime, bool l_isIgnoreTimeScale, TimerCallBack l_callBack, params object[] l_objs)
+    public static TimerEvent CallBackOfIntervalTimer(float spaceTime, bool isIgnoreTimeScale, TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(l_spaceTime, l_isIgnoreTimeScale, -1, "", l_callBack, l_objs);
+        return AddTimer(spaceTime, isIgnoreTimeScale, -1, null, callBack, objs);
     }
 
     /// <summary>
     /// 间隔一定时间重复调用
     /// </summary>
-    /// <param name="l_spaceTime">间隔时间</param>
-    /// <param name="l_isIgnoreTimeScale">是否忽略时间缩放</param>
-    /// <param name="l_timerName">Timer的名字</param>
-    /// <param name="l_callBack">回调函数</param>
-    /// <param name="l_objs">回调函数的参数</param>
+    /// <param name="spaceTime">间隔时间</param>
+    /// <param name="isIgnoreTimeScale">是否忽略时间缩放</param>
+    /// <param name="timerName">Timer的名字</param>
+    /// <param name="callBack">回调函数</param>
+    /// <param name="objs">回调函数的参数</param>
     /// <returns></returns>
-    public static TimerEvent CallBackOfIntervalTimer(float l_spaceTime, bool l_isIgnoreTimeScale, string l_timerName,TimerCallBack l_callBack, params object[] l_objs)
+    public static TimerEvent CallBackOfIntervalTimer(float spaceTime, bool isIgnoreTimeScale, string timerName,TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(l_spaceTime, l_isIgnoreTimeScale, -1, l_timerName, l_callBack, l_objs);
+        return AddTimer(spaceTime, isIgnoreTimeScale, -1, timerName, callBack, objs);
     }
 
     /// <summary>
     /// 有限次数的重复调用
     /// </summary>
-    /// <param name="l_spaceTime">间隔时间</param>
-    /// <param name="l_callBackCount">重复调用的次数</param>
-    /// <param name="l_callBack">回调函数</param>
-    /// <param name="l_objs">回调函数的参数</param>
+    /// <param name="spaceTime">间隔时间</param>
+    /// <param name="callBackCount">重复调用的次数</param>
+    /// <param name="callBack">回调函数</param>
+    /// <param name="objs">回调函数的参数</param>
     /// <returns></returns>
-    public static TimerEvent CallBackOfIntervalTimer(float l_spaceTime, int l_callBackCount, TimerCallBack l_callBack, params object[] l_objs)
+    public static TimerEvent CallBackOfIntervalTimer(float spaceTime, int callBackCount, TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(l_spaceTime, false, -1, "",l_callBack, l_objs);
+        return AddTimer(spaceTime, false, -1, null, callBack, objs);
     }
 
     /// <summary>
     /// 有限次数的重复调用
     /// </summary>
-    /// <param name="l_spaceTime">间隔时间</param>
-    /// <param name="l_isIgnoreTimeScale">是否忽略时间缩放</param>
-    /// <param name="l_callBackCount">重复调用的次数</param>
-    /// <param name="l_callBack">回调函数</param>
-    /// <param name="l_objs">回调函数的参数</param>
+    /// <param name="spaceTime">间隔时间</param>
+    /// <param name="isIgnoreTimeScale">是否忽略时间缩放</param>
+    /// <param name="callBackCount">重复调用的次数</param>
+    /// <param name="callBack">回调函数</param>
+    /// <param name="objs">回调函数的参数</param>
     /// <returns></returns>
-    public static TimerEvent CallBackOfIntervalTimer(float l_spaceTime, bool l_isIgnoreTimeScale, int l_callBackCount, TimerCallBack l_callBack, params object[] l_objs)
+    public static TimerEvent CallBackOfIntervalTimer(float spaceTime, bool isIgnoreTimeScale, int callBackCount, TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(l_spaceTime, l_isIgnoreTimeScale, -1, "",l_callBack, l_objs); ;
+        return AddTimer(spaceTime, isIgnoreTimeScale, -1, null,callBack, objs); ;
     }
 
     /// <summary>
     /// 有限次数的重复调用
     /// </summary>
-    /// <param name="l_spaceTime">间隔时间</param>
-    /// <param name="l_isIgnoreTimeScale">是否忽略时间缩放</param>
-    /// <param name="l_callBackCount">重复调用的次数</param>
-    /// <param name="l_timerName">Timer的名字</param>
-    /// <param name="l_callBack">回调函数</param>
-    /// <param name="l_objs">回调函数的参数</param>
+    /// <param name="spaceTime">间隔时间</param>
+    /// <param name="isIgnoreTimeScale">是否忽略时间缩放</param>
+    /// <param name="callBackCount">重复调用的次数</param>
+    /// <param name="timerName">Timer的名字</param>
+    /// <param name="callBack">回调函数</param>
+    /// <param name="objs">回调函数的参数</param>
     /// <returns></returns>
-    public static TimerEvent CallBackOfIntervalTimer(float l_spaceTime, bool l_isIgnoreTimeScale, int l_callBackCount, string l_timerName, TimerCallBack l_callBack, params object[] l_objs)
+    public static TimerEvent CallBackOfIntervalTimer(float spaceTime, bool isIgnoreTimeScale, int callBackCount, string timerName, TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(l_spaceTime, l_isIgnoreTimeScale, -1, l_timerName, l_callBack, l_objs);
+        return AddTimer(spaceTime, isIgnoreTimeScale, -1, timerName, callBack, objs);
     }
 
     /// <summary>
@@ -166,7 +166,7 @@ public class Timer
     {
         TimerEvent te = HeapObjectPool<TimerEvent>.GetObject();
 
-        te.m_timerName = timerName;
+        te.m_timerName = timerName ?? te.GetHashCode().ToString();
 
         te.m_currentTimer = 0;
         te.m_timerSpace = spaceTime;

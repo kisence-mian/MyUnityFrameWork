@@ -11,11 +11,8 @@ using System;
 /// </summary>
 public class LogOutPutThread
 {
-
-       //string mDevicePersistentPath = Application.persistentDataPath;
-
-		public static string LogPath = "Log";
-        public static string expandName = "txt";
+		public const string LogPath = "Log";
+        public const string expandName = "txt";
 
 		private Queue<LogInfo> mWritingLogQueue = null;
 		private Queue<LogInfo> mWaitingLogQueue = null;
@@ -26,10 +23,9 @@ public class LogOutPutThread
 
         public void Init()
         {
-            try
-            {
-                //#if !UNITY_EDITOR
-
+#if !(UNITY_WEBGL && !UNITY_EDITOR)
+        try
+        {
                 ApplicationManager.s_OnApplicationQuit += Close;
 
                 this.mWritingLogQueue = new Queue<LogInfo>();
@@ -57,19 +53,17 @@ public class LogOutPutThread
                 this.mFileLogThread = new Thread(new ThreadStart(WriteLog));
                 this.mFileLogThread.Start();
             }
-            catch(Exception e)
+            catch
             {
-                Debug.LogError(e);
+                //Debug.LogError(e);
             }
-
-        //#endif
+#endif
         }
 
 		void WriteLog()
 		{
             try
             {
-
                 while (this.mIsRunning)
                 {
                     if (this.mWritingLogQueue.Count == 0)

@@ -1,0 +1,13 @@
+{
+    "group": "GameCenter",
+    "libs": [],
+    "frameworks": [],
+    "headerpaths": ["iOS/GameCenter/**"],
+    "files":   ["iOS/GameCenter/GKWrapper.m",
+                "iOS/GameCenter/GKWrapper.h"
+                ],
+    "folders": [],    
+    "excludes": ["^.*.meta$", "^.*.mdown$", "^.*.pdf$"],
+    "compiler_flags": [],
+    "linker_flags": []
+}
