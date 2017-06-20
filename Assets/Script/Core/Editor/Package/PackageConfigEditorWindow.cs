@@ -776,7 +776,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
     #region 各种判断存在
 
-    Dictionary<string, EditPackageConfig> m_BundleDictCatch = new Dictionary<string, EditPackageConfig>();
+    Dictionary<string, EditPackageConfig> m_BundleDictCache = new Dictionary<string, EditPackageConfig>();
 
     /// <summary>
     /// 判断一个资源是否已经在bundle列表中
@@ -785,7 +785,7 @@ public class BundleConfigEditorWindow : EditorWindow
     /// <returns>是否存在</returns>
     bool isExist_AllBundle(EditorObject obj)
     {
-        if (obj != null && obj.obj != null && m_BundleDictCatch != null && m_BundleDictCatch.ContainsKey(obj.obj.name))
+        if (obj != null && obj.obj != null && m_BundleDictCache != null && m_BundleDictCache.ContainsKey(obj.obj.name))
         {
             return true;
         }
@@ -1009,7 +1009,7 @@ public class BundleConfigEditorWindow : EditorWindow
         float time = Time.realtimeSinceStartup;
 
         bundles.Clear();
-        m_BundleDictCatch.Clear();
+        m_BundleDictCache.Clear();
 
         RecursionDirectory(resourcePath);
 
@@ -1127,7 +1127,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
             bundles.Add(EditPackageConfigTmp);
 
-            m_BundleDictCatch.Add(EditPackageConfigTmp.name, EditPackageConfigTmp);
+            m_BundleDictCache.Add(EditPackageConfigTmp.name, EditPackageConfigTmp);
         }
     }
 

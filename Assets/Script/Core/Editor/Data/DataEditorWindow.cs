@@ -75,7 +75,7 @@ public class DataEditorWindow : EditorWindow
 
         GenerateAllDataClassGUI();
 
-        CleanCatchGUI();
+        CleanCacheGUI();
 
         EditorGUILayout.EndVertical();
     }
@@ -173,11 +173,11 @@ public class DataEditorWindow : EditorWindow
         }
     }
 
-    void CleanCatchGUI()
+    void CleanCacheGUI()
     {
         if (GUILayout.Button("清除缓存"))
         {
-            DataManager.CleanCatch();
+            DataManager.CleanCache();
         }
     }
 

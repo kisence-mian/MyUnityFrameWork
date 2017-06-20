@@ -98,15 +98,15 @@ public class ByteArray
         return result;
     }
 
-    byte[] int32Catch = new byte[4];
+    byte[] int32Cache = new byte[4];
     public int ReadInt32()
     {
-        int32Catch[3] = bytes[Postion];
-        int32Catch[2] = bytes[Postion + 1];
-        int32Catch[1] = bytes[Postion + 2];
-        int32Catch[0] = bytes[Postion + 3];
+        int32Cache[3] = bytes[Postion];
+        int32Cache[2] = bytes[Postion + 1];
+        int32Cache[1] = bytes[Postion + 2];
+        int32Cache[0] = bytes[Postion + 3];
 
-        int result = BitConverter.ToInt32(int32Catch, 0);
+        int result = BitConverter.ToInt32(int32Cache, 0);
         Postion += 4;
         return result;
     }

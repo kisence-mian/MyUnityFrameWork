@@ -35,8 +35,8 @@ public class HotUpdateManager
 
     static HotUpdateCallBack s_UpdateCallBack;
 
-    static string m_versionFileCatch;
-    static string m_Md5FileCatch;
+    static string m_versionFileCache;
+    static string m_Md5FileCache;
 
     public static void StartHotUpdate(HotUpdateCallBack CallBack)
     {
@@ -105,7 +105,7 @@ public class HotUpdateManager
             yield break;
         }
 
-        m_versionFileCatch = ((TextAsset)www.assetBundle.mainAsset).text;
+        m_versionFileCache = ((TextAsset)www.assetBundle.mainAsset).text;
 
         www.assetBundle.Unload(true);
 
@@ -113,7 +113,7 @@ public class HotUpdateManager
 
         //Debug.Log("Version File :text: " + m_versionFileCatch);
 
-        Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)MiniJSON.Json.Deserialize(m_versionFileCatch);
+        Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)MiniJSON.Json.Deserialize(m_versionFileCache);
 
         //服务器大版本比较大，需要整包更新
         if ( GetInt(m_versionConfig[c_largeVersionKey])
@@ -173,13 +173,13 @@ public class HotUpdateManager
             yield break;
         }
 
-        m_Md5FileCatch = ((TextAsset)www.assetBundle.mainAsset).text;
+        m_Md5FileCache = ((TextAsset)www.assetBundle.mainAsset).text;
 
         www.assetBundle.Unload(true);
 
         UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingMd5File, GetHotUpdateProgress(true, false, 1));
 
-        ResourcesConfigStruct serviceFileConfig = ResourcesConfigManager.AnalysisResourcesConfig2Struct(m_Md5FileCatch);
+        ResourcesConfigStruct serviceFileConfig = ResourcesConfigManager.AnalysisResourcesConfig2Struct(m_Md5FileCache);
         ResourcesConfigStruct localFileConfig   = ResourcesConfigManager.AnalysisResourcesConfig2Struct(ResourcesConfigManager.ReadResourceConfigContent());
 
         s_downLoadList = new List<ResourcesConfig>();
@@ -260,8 +260,8 @@ public class HotUpdateManager
 
         //保存版本信息
         //保存文件信息
-        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, HotUpdateManager.c_versionFileName + "." + ConfigManager.c_expandName), m_versionFileCatch);
-        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName), m_Md5FileCatch);
+        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, HotUpdateManager.c_versionFileName + "." + ConfigManager.c_expandName), m_versionFileCache);
+        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName), m_Md5FileCache);
 
         //从stream读取配置
         RecordManager.SaveRecord(c_HotUpdateRecordName, c_useHotUpdateRecordKey, true);

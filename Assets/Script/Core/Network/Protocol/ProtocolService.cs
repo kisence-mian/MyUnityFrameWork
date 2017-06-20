@@ -957,15 +957,15 @@ public class ProtocolService : INetworkInterface
         return len;
     }
 
-    List<List<byte>> m_arrayCatch = new List<List<byte>>();
+    List<List<byte>> m_arrayCache = new List<List<byte>>();
     int GetCustomListLength(string customType,List<object> list)
     {
-        m_arrayCatch.Clear();
+        m_arrayCache.Clear();
         int len = 0;
         for (int i = 0; i < list.Count; i++)
         {
             List<byte> bs = GetCustomTypeByte(customType, (Dictionary<string, object>)list[i]);
-            m_arrayCatch.Add(bs);
+            m_arrayCache.Add(bs);
             len = len + bs.Count + 4;
         }
         return len;
@@ -1139,9 +1139,9 @@ public class ProtocolService : INetworkInterface
                             //这里会修改m_arrayCatch的值，下面就可以直接使用
                             Bytes.WriteInt(GetCustomListLength(customType, tb));
 
-                            for (int j = 0; j < m_arrayCatch.Count; j++)
+                            for (int j = 0; j < m_arrayCache.Count; j++)
                             {
-                                List<byte> tempb = m_arrayCatch[j];
+                                List<byte> tempb = m_arrayCache[j];
                                 Bytes.WriteInt(tempb.Count);
                                 Bytes.bytes.AddRange(tempb);
                             }
