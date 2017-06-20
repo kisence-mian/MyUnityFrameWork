@@ -43,7 +43,7 @@ public class RecordEditorWindow : EditorWindow
 
         AddRecordGUI();
 
-        CleanCatchGUI();
+        CleanCacheGUI();
 
         EditorGUILayout.EndVertical();
     }
@@ -151,11 +151,11 @@ public class RecordEditorWindow : EditorWindow
         }
     }
 
-    void CleanCatchGUI()
+    void CleanCacheGUI()
     {
         if (GUILayout.Button("清空缓存"))
         {
-            RecordManager.CleanCatch();
+            RecordManager.CleanCache();
         }
     }
 

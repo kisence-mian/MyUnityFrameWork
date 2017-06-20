@@ -12,13 +12,13 @@ public class RecordManager
     /// <summary>
     /// 记录缓存
     /// </summary>
-    static Dictionary<string, RecordTable> s_RecordCatch = new Dictionary<string, RecordTable>();
+    static Dictionary<string, RecordTable> s_RecordCache = new Dictionary<string, RecordTable>();
 
     public static RecordTable GetData(string RecordName)
     {
-        if (s_RecordCatch.ContainsKey(RecordName))
+        if (s_RecordCache.ContainsKey(RecordName))
         {
-            return s_RecordCatch[RecordName];
+            return s_RecordCache[RecordName];
         }
 
         RecordTable record = null;
@@ -46,7 +46,7 @@ public class RecordManager
             record = RecordTable.Analysis(dataJson);
         }
 
-        s_RecordCatch.Add(RecordName, record);
+        s_RecordCache.Add(RecordName, record);
 
         return record;
     }
@@ -78,12 +78,12 @@ public class RecordManager
     public static void CleanAllRecord()
     {
         FileTool.DeleteDirectory(Application.persistentDataPath + "/" + RecordManager.c_directoryName);
-        CleanCatch();
+        CleanCache();
     }
 
-    public static void CleanCatch()
+    public static void CleanCache()
     {
-        s_RecordCatch.Clear();
+        s_RecordCache.Clear();
     }
 
 #region 保存封装

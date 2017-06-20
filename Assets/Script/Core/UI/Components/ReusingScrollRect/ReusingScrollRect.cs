@@ -14,7 +14,7 @@ public class ReusingScrollRect : ScrollRectInput
 
     public List<Dictionary<string, object>> m_datas = new List<Dictionary<string, object>>();
     public List<ReusingScrollItemBase> m_items = new List<ReusingScrollItemBase>();
-    public List<ReusingScrollItemBase> m_itemCatchs = new List<ReusingScrollItemBase>();
+    public List<ReusingScrollItemBase> m_itemCaches = new List<ReusingScrollItemBase>();
 
     RectTransform m_rectTransform;
 
@@ -49,11 +49,11 @@ public class ReusingScrollRect : ScrollRectInput
         }
         m_items.Clear();
 
-        for (int i = 0; i < m_itemCatchs.Count; i++)
+        for (int i = 0; i < m_itemCaches.Count; i++)
         {
-            GameObjectManager.DestroyGameObjectByPool(m_itemCatchs[i].gameObject);
+            GameObjectManager.DestroyGameObjectByPool(m_itemCaches[i].gameObject);
         }
-        m_itemCatchs.Clear();
+        m_itemCaches.Clear();
     }
 
 
@@ -209,7 +209,7 @@ public class ReusingScrollRect : ScrollRectInput
 
                 //隐藏并移到缓存
                 itemTmp.gameObject.SetActive(false);
-                m_itemCatchs.Add(itemTmp);
+                m_itemCaches.Add(itemTmp);
 
                 m_indexList[itemTmp.m_index].status =  ReusingStatus.Hide;
             }
@@ -273,12 +273,12 @@ public class ReusingScrollRect : ScrollRectInput
     {
         ReusingScrollItemBase result = null;
 
-        if (m_itemCatchs.Count>0)
+        if (m_itemCaches.Count>0)
         {
-            result = m_itemCatchs[0];
+            result = m_itemCaches[0];
             result.gameObject.SetActive(true);
             result.OnShow();
-            m_itemCatchs.RemoveAt(0);
+            m_itemCaches.RemoveAt(0);
 
             m_items.Add(result);
             return result;

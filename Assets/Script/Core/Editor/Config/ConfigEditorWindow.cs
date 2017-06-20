@@ -46,7 +46,7 @@ public class ConfigEditorWindow : EditorWindow
 
         AddConfigGUI();
 
-        CleanCatchGUI();
+        CleanCacheGUI();
 
 
         EditorGUILayout.EndVertical();
@@ -157,9 +157,9 @@ public class ConfigEditorWindow : EditorWindow
         }
     }
 
-    public void CleanCatchGUI()
+    public void CleanCacheGUI()
     {
-        ConfigManager.CleanCatch();
+        ConfigManager.CleanCache();
     }
 
     #endregion

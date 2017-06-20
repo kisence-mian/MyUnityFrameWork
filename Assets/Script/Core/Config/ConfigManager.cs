@@ -17,7 +17,7 @@ public static class ConfigManager
     /// <summary>
     /// 配置缓存
     /// </summary>
-    static Dictionary<string, Dictionary<string, SingleField>> s_configCatch = new Dictionary<string,Dictionary<string, SingleField>>();
+    static Dictionary<string, Dictionary<string, SingleField>> s_configCache = new Dictionary<string,Dictionary<string, SingleField>>();
 
     public static bool GetIsExistConfig(string ConfigName)
     {
@@ -44,9 +44,9 @@ public static class ConfigManager
 
     public static Dictionary<string, SingleField> GetData(string ConfigName)
     {
-        if (s_configCatch.ContainsKey(ConfigName))
+        if (s_configCache.ContainsKey(ConfigName))
         {
-            return s_configCatch[ConfigName];
+            return s_configCache[ConfigName];
         }
 
         string dataJson = "";
@@ -68,13 +68,13 @@ public static class ConfigManager
         {
             Dictionary<string, SingleField> config = JsonTool.Json2Dictionary<SingleField>(dataJson);
 
-            s_configCatch.Add(ConfigName, config);
+            s_configCache.Add(ConfigName, config);
             return config;
         }
     }
 
-    public static void CleanCatch()
+    public static void CleanCache()
     {
-        s_configCatch.Clear();
+        s_configCache.Clear();
     }
 }

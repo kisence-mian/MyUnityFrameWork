@@ -86,9 +86,9 @@ public class MemoryManager
     {
         GlobalEvent.DispatchEvent(MemoryEvent.FreeHeapMemory);
 
-        DataManager.CleanCatch();
-        ConfigManager.CleanCatch();
-        RecordManager.CleanCatch();
+        DataManager.CleanCache();
+        ConfigManager.CleanCache();
+        RecordManager.CleanCache();
     }
 
     public static void LoadRes(List<string> resList,LoadProgressCallBack callBack)

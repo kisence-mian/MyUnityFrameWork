@@ -21,7 +21,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
         if (!s_isInit)
         {
             s_isInit = true;
-            GlobalEvent.AddEvent(MemoryEvent.FreeHeapMemory, CleanCatch);
+            GlobalEvent.AddEvent(MemoryEvent.FreeHeapMemory, CleanCache);
         }
 
         if (s_dict.ContainsKey(key))
@@ -46,7 +46,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
         if (!s_isInit)
         {
             s_isInit = true;
-            GlobalEvent.AddEvent(MemoryEvent.FreeHeapMemory, CleanCatch);
+            GlobalEvent.AddEvent(MemoryEvent.FreeHeapMemory, CleanCache);
         }
 
         string dataName = typeof(T).Name.Replace("Generate","");
@@ -58,7 +58,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
         }
     }
 
-    public static void CleanCatch(params object[] objs)
+    public static void CleanCache(params object[] objs)
     {
         s_dict.Clear();
     }

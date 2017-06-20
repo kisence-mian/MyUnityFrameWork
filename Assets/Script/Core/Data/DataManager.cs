@@ -14,7 +14,7 @@ public class DataManager
     /// <summary>
     /// 数据缓存
     /// </summary>
-    static Dictionary<string, DataTable> s_dataCatch = new Dictionary<string, DataTable>();
+    static Dictionary<string, DataTable> s_dataCache = new Dictionary<string, DataTable>();
 
     public static bool GetIsExistData(string DataName)
     {
@@ -26,9 +26,9 @@ public class DataManager
         try
         {
             //编辑器下不处理缓存
-            if (s_dataCatch.ContainsKey(DataName))
+            if (s_dataCache.ContainsKey(DataName))
             {
-                return s_dataCatch[DataName];
+                return s_dataCache[DataName];
             }
 
             DataTable data = null;
@@ -59,7 +59,7 @@ public class DataManager
             data = DataTable.Analysis(dataJson);
             data.m_tableName = DataName;
 
-            s_dataCatch.Add(DataName, data);
+            s_dataCache.Add(DataName, data);
             return data;
         }
         catch (Exception e)
@@ -71,8 +71,8 @@ public class DataManager
     /// <summary>
     /// 清除缓存
     /// </summary>
-    public static void CleanCatch()
+    public static void CleanCache()
     {
-        s_dataCatch.Clear();
+        s_dataCache.Clear();
     }
 }
