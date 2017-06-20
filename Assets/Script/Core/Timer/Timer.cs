@@ -164,10 +164,11 @@ public class Timer
     /// <returns></returns>
     public static TimerEvent AddTimer(float spaceTime, bool isIgnoreTimeScale, int callBackCount, string timerName,TimerCallBack callBack, params object[] objs)
     {
-        TimerEvent te = HeapObjectPool<TimerEvent>.GetObject();
+
+        TimerEvent te = new TimerEvent();
 
         te.m_timerName = timerName ?? te.GetHashCode().ToString();
-
+        //Debug.Log("AddTimer  ----TIMER "  + " " + te.m_timerName);
         te.m_currentTimer = 0;
         te.m_timerSpace = spaceTime;
 
@@ -184,7 +185,8 @@ public class Timer
 
     public static void DestroyTimer(TimerEvent timer,bool isCallBack = false)
     {
-        if(m_timers.Contains(timer))
+        //Debug.Log("DestroyTimer1  ----TIMER " + timer.m_timerName);
+        if (m_timers.Contains(timer))
         {
             if (isCallBack)
             {
@@ -202,6 +204,7 @@ public class Timer
 
     public static void DestroyTimer(string timerName, bool isCallBack = false)
     {
+        //Debug.Log("DestroyTimer2  ----TIMER " + timerName);
         for (int i = 0; i < m_timers.Count;i++ )
         {
             if (m_timers[i].m_timerName.Equals(timerName))
@@ -213,6 +216,7 @@ public class Timer
 
     public static void DestroyAllTimer(bool isCallBack = false)
     {
+        //Debug.Log("DestroyAllTimer  ----TIMER");
         for (int i = 0; i < m_timers.Count; i++)
         {
             if (isCallBack)

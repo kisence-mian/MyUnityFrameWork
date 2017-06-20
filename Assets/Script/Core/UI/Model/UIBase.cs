@@ -522,9 +522,9 @@ public class UIBase : MonoBehaviour
 
     List<UIBase> m_ChildList = new List<UIBase>();
     int m_childUIIndex = 0;
-    public UIBase CreateItem(string itemName, string prantName)
+    public UIBase CreateItem(string itemName, string prantName,bool isActive = true)
     {
-        GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, GetGameObject(prantName), true);
+        GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, GetGameObject(prantName), isActive);
 
         item.transform.localScale = Vector3.one;
         UIBase UIItem = item.GetComponent<UIBase>();
@@ -542,13 +542,13 @@ public class UIBase : MonoBehaviour
         return UIItem;
     }
 
-    public void DestroyItem(UIBase item)
+    public void DestroyItem(UIBase item, bool isActive = true)
     {
         if (m_ChildList.Contains(item))
         {
             m_ChildList.Remove(item);
             item.OnUIDestroy();
-            GameObjectManager.DestroyGameObjectByPool(item.gameObject);
+            GameObjectManager.DestroyGameObjectByPool(item.gameObject, isActive);
         }
     }
 
@@ -563,12 +563,12 @@ public class UIBase : MonoBehaviour
     }
 
 
-    public void CleanItem()
+    public void CleanItem(bool isActive = true)
     {
         for (int i = 0; i < m_ChildList.Count; i++)
         {
             m_ChildList[i].OnUIDestroy();
-            GameObjectManager.DestroyGameObjectByPool(m_ChildList[i].gameObject);
+            GameObjectManager.DestroyGameObjectByPool(m_ChildList[i].gameObject, isActive);
         }
 
         m_ChildList.Clear();

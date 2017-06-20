@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System;
 
 public class ReusingScrollRect : ScrollRectInput
 {
@@ -27,6 +28,12 @@ public class ReusingScrollRect : ScrollRectInput
 
     public  void Init(string UIEventKey,string itemName)
     {
+        if (content == null)
+        {
+            throw new Exception("SetItemDisplay Exception: content is null !");
+        }
+
+
         base.Init(UIEventKey);
 
         m_ItemName = itemName;
@@ -41,8 +48,10 @@ public class ReusingScrollRect : ScrollRectInput
         m_itemSize = m_itemPrefab.GetComponent<RectTransform>().sizeDelta;
     }
 
-    public void Dispose()
+    public override void Dispose()
     {
+        base.Dispose();
+
         for (int i = 0; i < m_items.Count; i++)
         {
             GameObjectManager.DestroyGameObjectByPool(m_items[i].gameObject);
@@ -82,11 +91,21 @@ public class ReusingScrollRect : ScrollRectInput
 
     public Vector3 GetItemAnchorPos(int index)
     {
+        if (content == null)
+        {
+            throw new Exception("SetItemDisplay Exception: content is null !");
+        }
+
         return GetItemPos(index) + GetRealItemOffset() + content.localPosition;
     }
 
     public void SetPos(Vector3 pos)
     {
+        if (content == null)
+        {
+            throw new Exception("SetItemDisplay Exception: content is null !");
+        }
+
         content.anchoredPosition3D = pos;
 
         SetItemDisplay();
@@ -181,6 +200,12 @@ public class ReusingScrollRect : ScrollRectInput
     int m_startPos = 0;
     void SetItemDisplay()
     {
+        if(content == null)
+        {
+            throw new Exception("SetItemDisplay Exception: content is null !");
+        }
+
+
         m_clip = false;
         //计算已显示的哪些需要隐藏
         for (int i = 0; i < m_items.Count; i++)
