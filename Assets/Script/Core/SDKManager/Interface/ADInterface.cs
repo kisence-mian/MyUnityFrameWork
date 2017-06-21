@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class ADInterface  : SDKInterfaceBase 
 {
+    public CallBack m_ADLoadFinish;
+
+
     public override void Init()
     {
 
@@ -23,6 +26,7 @@ public class ADInterface  : SDKInterfaceBase
     {
 
     }
+
 }
 
 public enum ADType

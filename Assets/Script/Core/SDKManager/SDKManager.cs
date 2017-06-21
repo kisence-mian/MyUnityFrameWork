@@ -43,7 +43,7 @@ public class SDKManager
     /// <summary>
     /// 登陆
     /// </summary>
-    public static void Login()
+    public static void Login(string SDKName)
     {
         try
         {

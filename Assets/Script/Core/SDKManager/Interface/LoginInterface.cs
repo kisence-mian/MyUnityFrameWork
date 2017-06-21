@@ -11,7 +11,7 @@ public class LoginInterface : SDKInterfaceBase
     {
         base.Init();
     }
-    public void Login()
+    public virtual void Login()
     {
 
     }

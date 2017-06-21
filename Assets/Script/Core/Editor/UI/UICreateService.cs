@@ -7,255 +7,335 @@ using System;
 public class UICreateService 
 {
 
-    public static void CreatUIManager(Vector2 l_referenceResolution, CanvasScaler.ScreenMatchMode l_MatchMode, bool l_isOnlyUICamera, bool l_isVertical)
+    public static void CreatUIManager(Vector2 referenceResolution, CanvasScaler.ScreenMatchMode MatchMode, bool isOnlyUICamera, bool isVertical)
     {
         //UIManager
-        GameObject l_UIManagerGo = new GameObject("UIManager");
-        l_UIManagerGo.layer = LayerMask.NameToLayer("UI");
-        //UIManager l_UIManager = l_UIManagerGo.AddComponent<UIManager>();
-        l_UIManagerGo.AddComponent<UIManager>();
+        GameObject UIManagerGo = new GameObject("UIManager");
+        UIManagerGo.layer = LayerMask.NameToLayer("UI");
+        //UIManager UIManager = UIManagerGo.AddComponent<UIManager>();
+        UIManagerGo.AddComponent<UIManager>();
 
         //UIcamera
-        GameObject l_cameraGo = new GameObject("UICamera");
-        l_cameraGo.transform.SetParent(l_UIManagerGo.transform);
-        l_cameraGo.transform.localPosition = new Vector3(0, 0, -1000);
-        Camera l_camera = l_cameraGo.AddComponent<Camera>();
-        l_camera.cullingMask = LayerMask.GetMask("UI");
-        l_camera.orthographic = true;
-        if (!l_isOnlyUICamera)
+        GameObject cameraGo = new GameObject("UICamera");
+        cameraGo.transform.SetParent(UIManagerGo.transform);
+        cameraGo.transform.localPosition = new Vector3(0, 0, -1000);
+        Camera camera = cameraGo.AddComponent<Camera>();
+        camera.cullingMask = LayerMask.GetMask("UI");
+        camera.orthographic = true;
+        if (!isOnlyUICamera)
         {
-            l_camera.clearFlags = CameraClearFlags.Depth;
-            l_camera.depth = 1;
+            camera.clearFlags = CameraClearFlags.Depth;
+            camera.depth = 1;
         }
         else
         {
-            l_camera.clearFlags = CameraClearFlags.SolidColor;
-            l_camera.backgroundColor = Color.black;
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = Color.black;
         }
 
         //Canvas
-        Canvas canvas = l_UIManagerGo.AddComponent<Canvas>();
+        Canvas canvas = UIManagerGo.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = l_camera;
+        canvas.worldCamera = camera;
 
         //UI Raycaster
-        //GraphicRaycaster l_Graphic = l_UIManagerGo.AddComponent<GraphicRaycaster>();
-        l_UIManagerGo.AddComponent<GraphicRaycaster>();
+        //GraphicRaycaster Graphic = UIManagerGo.AddComponent<GraphicRaycaster>();
+        UIManagerGo.AddComponent<GraphicRaycaster>();
 
         //CanvasScaler
-        CanvasScaler l_scaler = l_UIManagerGo.AddComponent<CanvasScaler>();
-        l_scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        l_scaler.referenceResolution = l_referenceResolution;
-        l_scaler.screenMatchMode = l_MatchMode;
+        CanvasScaler scaler = UIManagerGo.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = referenceResolution;
+        scaler.screenMatchMode = MatchMode;
 
-        if (l_isVertical)
+        if (isVertical)
         {
-            l_scaler.matchWidthOrHeight = 1;
+            scaler.matchWidthOrHeight = 1;
         }
         else
         {
-            l_scaler.matchWidthOrHeight = 0;
+            scaler.matchWidthOrHeight = 0;
         }
 
         //挂载点
-        GameObject l_goTmp = null;
-        RectTransform l_rtTmp = null;
-        UILayerManager l_layerTmp = l_UIManagerGo.GetComponent<UILayerManager>();
+        GameObject goTmp = null;
+        RectTransform rtTmp = null;
+        UILayerManager layerTmp = UIManagerGo.GetComponent<UILayerManager>();
 
-        l_goTmp = new GameObject("GameUI");
-        l_goTmp.layer = LayerMask.NameToLayer("UI");
-        l_goTmp.transform.SetParent(l_UIManagerGo.transform);
-        l_goTmp.transform.localScale = Vector3.one;
-        l_rtTmp = l_goTmp.AddComponent<RectTransform>();
-        l_rtTmp.anchorMax = new Vector2(1, 1);
-        l_rtTmp.anchorMin = new Vector2(0, 0);
-        l_rtTmp.anchoredPosition3D = Vector3.zero;
-        l_rtTmp.sizeDelta = Vector2.zero;
-        l_layerTmp.m_GameUILayerParent = l_goTmp.transform;
+        goTmp = new GameObject("GameUI");
+        goTmp.layer = LayerMask.NameToLayer("UI");
+        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.localScale = Vector3.one;
+        rtTmp = goTmp.AddComponent<RectTransform>();
+        rtTmp.anchorMax = new Vector2(1, 1);
+        rtTmp.anchorMin = new Vector2(0, 0);
+        rtTmp.anchoredPosition3D = Vector3.zero;
+        rtTmp.sizeDelta = Vector2.zero;
+        layerTmp.m_GameUILayerParent = goTmp.transform;
 
-        l_goTmp = new GameObject("Fixed");
-        l_goTmp.layer = LayerMask.NameToLayer("UI");
-        l_goTmp.transform.SetParent(l_UIManagerGo.transform);
-        l_goTmp.transform.localScale = Vector3.one;
-        l_rtTmp = l_goTmp.AddComponent<RectTransform>();
-        l_rtTmp.anchorMax = new Vector2(1, 1);
-        l_rtTmp.anchorMin = new Vector2(0, 0);
-        l_rtTmp.anchoredPosition3D = Vector3.zero;
-        l_rtTmp.sizeDelta = Vector2.zero;
-        l_layerTmp.m_FixedLayerParent = l_goTmp.transform;
+        goTmp = new GameObject("Fixed");
+        goTmp.layer = LayerMask.NameToLayer("UI");
+        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.localScale = Vector3.one;
+        rtTmp = goTmp.AddComponent<RectTransform>();
+        rtTmp.anchorMax = new Vector2(1, 1);
+        rtTmp.anchorMin = new Vector2(0, 0);
+        rtTmp.anchoredPosition3D = Vector3.zero;
+        rtTmp.sizeDelta = Vector2.zero;
+        layerTmp.m_FixedLayerParent = goTmp.transform;
 
-        l_goTmp = new GameObject("Normal");
-        l_goTmp.layer = LayerMask.NameToLayer("UI");
-        l_goTmp.transform.SetParent(l_UIManagerGo.transform);
-        l_goTmp.transform.localScale = Vector3.one;
-        l_rtTmp = l_goTmp.AddComponent<RectTransform>();
-        l_rtTmp.anchorMax = new Vector2(1, 1);
-        l_rtTmp.anchorMin = new Vector2(0, 0);
-        l_rtTmp.anchoredPosition3D = Vector3.zero;
-        l_rtTmp.sizeDelta = Vector2.zero;
-        l_layerTmp.m_NormalLayerParent = l_goTmp.transform;
+        goTmp = new GameObject("Normal");
+        goTmp.layer = LayerMask.NameToLayer("UI");
+        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.localScale = Vector3.one;
+        rtTmp = goTmp.AddComponent<RectTransform>();
+        rtTmp.anchorMax = new Vector2(1, 1);
+        rtTmp.anchorMin = new Vector2(0, 0);
+        rtTmp.anchoredPosition3D = Vector3.zero;
+        rtTmp.sizeDelta = Vector2.zero;
+        layerTmp.m_NormalLayerParent = goTmp.transform;
 
-        l_goTmp = new GameObject("TopBar");
-        l_goTmp.layer = LayerMask.NameToLayer("UI");
-        l_goTmp.transform.SetParent(l_UIManagerGo.transform);
-        l_goTmp.transform.localScale = Vector3.one;
-        l_rtTmp = l_goTmp.AddComponent<RectTransform>();
-        l_rtTmp.anchorMax = new Vector2(1, 1);
-        l_rtTmp.anchorMin = new Vector2(0, 0);
-        l_rtTmp.anchoredPosition3D = Vector3.zero;
-        l_rtTmp.sizeDelta = Vector2.zero;
-        l_layerTmp.m_TopbarLayerParent = l_goTmp.transform;
+        goTmp = new GameObject("TopBar");
+        goTmp.layer = LayerMask.NameToLayer("UI");
+        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.localScale = Vector3.one;
+        rtTmp = goTmp.AddComponent<RectTransform>();
+        rtTmp.anchorMax = new Vector2(1, 1);
+        rtTmp.anchorMin = new Vector2(0, 0);
+        rtTmp.anchoredPosition3D = Vector3.zero;
+        rtTmp.sizeDelta = Vector2.zero;
+        layerTmp.m_TopbarLayerParent = goTmp.transform;
 
-        l_goTmp = new GameObject("PopUp");
-        l_goTmp.layer = LayerMask.NameToLayer("UI");
-        l_goTmp.transform.SetParent(l_UIManagerGo.transform);
-        l_goTmp.transform.localScale = Vector3.one;
-        l_rtTmp = l_goTmp.AddComponent<RectTransform>();
-        l_rtTmp.anchorMax = new Vector2(1, 1);
-        l_rtTmp.anchorMin = new Vector2(0, 0);
-        l_rtTmp.anchoredPosition3D = Vector3.zero;
-        l_rtTmp.sizeDelta = Vector2.zero;
-        l_layerTmp.m_PopUpLayerParent = l_goTmp.transform;
-        //m_UILayerManager = l_layerTmp;
+        goTmp = new GameObject("PopUp");
+        goTmp.layer = LayerMask.NameToLayer("UI");
+        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.localScale = Vector3.one;
+        rtTmp = goTmp.AddComponent<RectTransform>();
+        rtTmp.anchorMax = new Vector2(1, 1);
+        rtTmp.anchorMin = new Vector2(0, 0);
+        rtTmp.anchoredPosition3D = Vector3.zero;
+        rtTmp.sizeDelta = Vector2.zero;
+        layerTmp.m_PopUpLayerParent = goTmp.transform;
+        //m_UILayerManager = layerTmp;
 
-        ProjectWindowUtil.ShowCreatedAsset(l_UIManagerGo);
+        ProjectWindowUtil.ShowCreatedAsset(UIManagerGo);
 
         string Path = "Resources/UI/UIManager.prefab";
         FileTool.CreatFilePath(Application.dataPath + "/" + Path);
-        PrefabUtility.CreatePrefab("Assets/" + Path, l_UIManagerGo, ReplacePrefabOptions.ConnectToPrefab);
+        PrefabUtility.CreatePrefab("Assets/" + Path, UIManagerGo, ReplacePrefabOptions.ConnectToPrefab);
 
     }
 
-    public static void CreatUI(string l_UIWindowName, UIType l_UIType,UILayerManager l_UILayerManager,bool l_isAutoCreatePrefab)
+    public static void CreatUI(string UIWindowName, UIType UIType,UILayerManager UILayerManager,bool isAutoCreatePrefab)
     {
-        GameObject l_uiGo = new GameObject(l_UIWindowName);
+        GameObject uiGo = new GameObject(UIWindowName);
 
-        Type type = EditorTool.GetType(l_UIWindowName);
-        UIWindowBase l_uiBaseTmp = l_uiGo.AddComponent(type) as UIWindowBase;
+        Type type = EditorTool.GetType(UIWindowName);
+        UIWindowBase uiBaseTmp = uiGo.AddComponent(type) as UIWindowBase;
 
-        l_uiGo.layer = LayerMask.NameToLayer("UI");
+        uiGo.layer = LayerMask.NameToLayer("UI");
 
-        l_uiBaseTmp.m_UIType = l_UIType;
+        uiBaseTmp.m_UIType = UIType;
 
-        l_uiGo.AddComponent<Canvas>();
-        l_uiGo.AddComponent<GraphicRaycaster>();
+        uiGo.AddComponent<Canvas>();
+        uiGo.AddComponent<GraphicRaycaster>();
 
-        RectTransform l_ui = l_uiGo.GetComponent<RectTransform>();
-        l_ui.sizeDelta = Vector2.zero;
-        l_ui.anchorMin = Vector2.zero;
-        l_ui.anchorMax = Vector2.one;
+        RectTransform ui = uiGo.GetComponent<RectTransform>();
+        ui.sizeDelta = Vector2.zero;
+        ui.anchorMin = Vector2.zero;
+        ui.anchorMax = Vector2.one;
 
-        GameObject l_BgGo = new GameObject("BG");
+        GameObject BgGo = new GameObject("BG");
 
-        l_BgGo.layer = LayerMask.NameToLayer("UI");
-        RectTransform l_Bg = l_BgGo.AddComponent<RectTransform>();
-        l_Bg.SetParent(l_ui);
-        l_Bg.sizeDelta = Vector2.zero;
-        l_Bg.anchorMin = Vector2.zero;
-        l_Bg.anchorMax = Vector2.one;
+        BgGo.layer = LayerMask.NameToLayer("UI");
+        RectTransform Bg = BgGo.AddComponent<RectTransform>();
+        Bg.SetParent(ui);
+        Bg.sizeDelta = Vector2.zero;
+        Bg.anchorMin = Vector2.zero;
+        Bg.anchorMax = Vector2.one;
 
-        GameObject l_rootGo = new GameObject("root");
-        l_rootGo.layer = LayerMask.NameToLayer("UI");
-        RectTransform l_root = l_rootGo.AddComponent<RectTransform>();
-        l_root.SetParent(l_ui);
-        l_root.sizeDelta = Vector2.zero;
-        l_root.anchorMin = Vector2.zero;
-        l_root.anchorMax = Vector2.one;
+        GameObject rootGo = new GameObject("root");
+        rootGo.layer = LayerMask.NameToLayer("UI");
+        RectTransform root = rootGo.AddComponent<RectTransform>();
+        root.SetParent(ui);
+        root.sizeDelta = Vector2.zero;
+        root.anchorMin = Vector2.zero;
+        root.anchorMax = Vector2.one;
 
-        l_uiBaseTmp.m_bgMask = l_BgGo;
-        l_uiBaseTmp.m_uiRoot = l_rootGo;
+        uiBaseTmp.m_bgMask = BgGo;
+        uiBaseTmp.m_uiRoot = rootGo;
 
-        if (l_UILayerManager)
+        if (UILayerManager)
         {
-            l_UILayerManager.SetLayer(l_uiBaseTmp);
+            UILayerManager.SetLayer(uiBaseTmp);
         }
 
-        if (l_isAutoCreatePrefab)
+        if (isAutoCreatePrefab)
         {
-            string Path = "Resources/UI/" + l_UIWindowName + "/" + l_UIWindowName + ".prefab";
+            string Path = "Resources/UI/" + UIWindowName + "/" + UIWindowName + ".prefab";
             FileTool.CreatFilePath(Application.dataPath + "/" + Path);
-            PrefabUtility.CreatePrefab("Assets/" + Path, l_uiGo, ReplacePrefabOptions.ConnectToPrefab);
+            PrefabUtility.CreatePrefab("Assets/" + Path, uiGo, ReplacePrefabOptions.ConnectToPrefab);
         }
 
-        ProjectWindowUtil.ShowCreatedAsset(l_uiGo);
+        ProjectWindowUtil.ShowCreatedAsset(uiGo);
     }
 
-    public static void CreatUIbyLua(string l_UIWindowName, UIType l_UIType, UILayerManager l_UILayerManager, bool l_isAutoCreatePrefab)
+    public static void CreatUIbyLua(string UIWindowName, UIType UIType, UILayerManager UILayerManager, bool isAutoCreatePrefab)
     {
-        GameObject l_uiGo = new GameObject(l_UIWindowName);
+        GameObject uiGo = new GameObject(UIWindowName);
 
-        UIWindowLuaHelper l_uiBaseTmp = l_uiGo.AddComponent<UIWindowLuaHelper>();
+        UIWindowLuaHelper uiBaseTmp = uiGo.AddComponent<UIWindowLuaHelper>();
 
-        l_uiGo.layer = LayerMask.NameToLayer("UI");
+        uiGo.layer = LayerMask.NameToLayer("UI");
 
-        l_uiBaseTmp.m_UIType = l_UIType;
+        uiBaseTmp.m_UIType = UIType;
 
-        l_uiGo.AddComponent<Canvas>();
-        l_uiGo.AddComponent<GraphicRaycaster>();
+        uiGo.AddComponent<Canvas>();
+        uiGo.AddComponent<GraphicRaycaster>();
 
-        RectTransform l_ui = l_uiGo.GetComponent<RectTransform>();
-        l_ui.sizeDelta = Vector2.zero;
-        l_ui.anchorMin = Vector2.zero;
-        l_ui.anchorMax = Vector2.one;
+        RectTransform ui = uiGo.GetComponent<RectTransform>();
+        ui.sizeDelta = Vector2.zero;
+        ui.anchorMin = Vector2.zero;
+        ui.anchorMax = Vector2.one;
 
-        GameObject l_BgGo = new GameObject("BG");
+        GameObject BgGo = new GameObject("BG");
 
-        l_BgGo.layer = LayerMask.NameToLayer("UI");
-        RectTransform l_Bg = l_BgGo.AddComponent<RectTransform>();
-        l_Bg.SetParent(l_ui);
-        l_Bg.sizeDelta = Vector2.zero;
-        l_Bg.anchorMin = Vector2.zero;
-        l_Bg.anchorMax = Vector2.one;
+        BgGo.layer = LayerMask.NameToLayer("UI");
+        RectTransform Bg = BgGo.AddComponent<RectTransform>();
+        Bg.SetParent(ui);
+        Bg.sizeDelta = Vector2.zero;
+        Bg.anchorMin = Vector2.zero;
+        Bg.anchorMax = Vector2.one;
 
-        GameObject l_rootGo = new GameObject("root");
-        l_rootGo.layer = LayerMask.NameToLayer("UI");
-        RectTransform l_root = l_rootGo.AddComponent<RectTransform>();
-        l_root.SetParent(l_ui);
-        l_root.sizeDelta = Vector2.zero;
-        l_root.anchorMin = Vector2.zero;
-        l_root.anchorMax = Vector2.one;
+        GameObject rootGo = new GameObject("root");
+        rootGo.layer = LayerMask.NameToLayer("UI");
+        RectTransform root = rootGo.AddComponent<RectTransform>();
+        root.SetParent(ui);
+        root.sizeDelta = Vector2.zero;
+        root.anchorMin = Vector2.zero;
+        root.anchorMax = Vector2.one;
 
-        l_uiBaseTmp.m_bgMask = l_BgGo;
-        l_uiBaseTmp.m_uiRoot = l_rootGo;
+        uiBaseTmp.m_bgMask = BgGo;
+        uiBaseTmp.m_uiRoot = rootGo;
 
-        if (l_UILayerManager)
+        if (UILayerManager)
         {
-            l_UILayerManager.SetLayer(l_uiBaseTmp);
+            UILayerManager.SetLayer(uiBaseTmp);
         }
 
-        if (l_isAutoCreatePrefab)
+        if (isAutoCreatePrefab)
         {
-            string Path = "Resources/UI/" + l_UIWindowName + "/" + l_UIWindowName + ".prefab";
+            string Path = "Resources/UI/" + UIWindowName + "/" + UIWindowName + ".prefab";
             FileTool.CreatFilePath(Application.dataPath + "/" + Path);
-            PrefabUtility.CreatePrefab("Assets/" + Path, l_uiGo, ReplacePrefabOptions.ConnectToPrefab);
+            PrefabUtility.CreatePrefab("Assets/" + Path, uiGo, ReplacePrefabOptions.ConnectToPrefab);
         }
 
-        ProjectWindowUtil.ShowCreatedAsset(l_uiGo);
+        ProjectWindowUtil.ShowCreatedAsset(uiGo);
     }
 
-    public static void CreatUIScript(string l_UIWindowName)
+    public static void CreatUIScript(string UIWindowName)
     {
         string LoadPath = Application.dataPath + "/Script/Core/Editor/res/UIWindowClassTemplate.txt";
-        string SavePath = Application.dataPath + "/Script/UI/" + l_UIWindowName + "/" + l_UIWindowName + ".cs";
+        string SavePath = Application.dataPath + "/Script/UI/" + UIWindowName + "/" + UIWindowName + ".cs";
 
-        string l_UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
-        string l_classContent = l_UItemplate.Replace("{0}", l_UIWindowName);
+        string UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
+        string classContent = UItemplate.Replace("{0}", UIWindowName);
 
-        EditorUtil.WriteStringByFile(SavePath, l_classContent);
+        EditorUtil.WriteStringByFile(SavePath, classContent);
 
         AssetDatabase.Refresh();
     }
 
-    public static void CreatUILuaScript(string l_UIWindowName)
+    public static void CreatUILuaScript(string UIWindowName)
     {
         string LoadPath = Application.dataPath + "/Script/Core/Editor/res/UILuaScriptTemplate.txt";
-        string SavePath = Application.dataPath + "/Resources/Lua/UI/Lua" + l_UIWindowName + ".txt";
+        string SavePath = Application.dataPath + "/Resources/Lua/UI/Lua" + UIWindowName + ".txt";
 
-        string l_UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
-        string l_classContent = l_UItemplate.Replace("{0}", l_UIWindowName);
+        string UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
+        string classContent = UItemplate.Replace("{0}", UIWindowName);
 
-        EditorUtil.WriteStringByFile(SavePath, l_classContent);
+        EditorUtil.WriteStringByFile(SavePath, classContent);
 
         AssetDatabase.Refresh();
+    }
+
+    public static void CreatGuideWindowUIScript()
+    {
+        string UIWindowName = "GuideWindow";
+
+        string LoadPath = Application.dataPath + "/Script/Core/Editor/res/UIGuideWindowClassTemplate.txt";
+        string SavePath = Application.dataPath + "/Script/UI/" + UIWindowName + "/" + UIWindowName + ".cs";
+
+        string UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
+
+        EditorUtil.WriteStringByFile(SavePath, UItemplate);
+
+        LoadPath = Application.dataPath + "/Script/Core/Editor/res/GuideSyetemTemplate.txt";
+        SavePath = Application.dataPath + "/Script/GuideSystem/GuideSyetem.cs";
+
+        UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
+        EditorUtil.WriteStringByFile(SavePath, UItemplate);
+
+        AssetDatabase.Refresh();
+    }
+
+    public static void CreateGuideWindow()
+    {
+        string UIWindowName = "GuideWindow";
+        UIType UIType = UIType.TopBar;
+
+        GameObject uiGo = new GameObject(UIWindowName);
+
+        Type type = EditorTool.GetType(UIWindowName);
+        UIWindowBase uiBaseTmp = uiGo.AddComponent(type) as UIWindowBase;
+
+        uiGo.layer = LayerMask.NameToLayer("UI");
+
+        uiBaseTmp.m_UIType = UIType;
+
+        uiGo.AddComponent<Canvas>();
+        uiGo.AddComponent<GraphicRaycaster>();
+
+        RectTransform ui = uiGo.GetComponent<RectTransform>();
+        ui.sizeDelta = Vector2.zero;
+        ui.anchorMin = Vector2.zero;
+        ui.anchorMax = Vector2.one;
+
+        GameObject BgGo = new GameObject("BG");
+
+        BgGo.layer = LayerMask.NameToLayer("UI");
+        RectTransform Bg = BgGo.AddComponent<RectTransform>();
+        Bg.SetParent(ui);
+        Bg.sizeDelta = Vector2.zero;
+        Bg.anchorMin = Vector2.zero;
+        Bg.anchorMax = Vector2.one;
+
+        GameObject rootGo = new GameObject("root");
+        rootGo.layer = LayerMask.NameToLayer("UI");
+        RectTransform root = rootGo.AddComponent<RectTransform>();
+        root.SetParent(ui);
+        root.sizeDelta = Vector2.zero;
+        root.anchorMin = Vector2.zero;
+        root.anchorMax = Vector2.one;
+
+        GameObject mask = new GameObject("mask");
+        mask.layer = LayerMask.NameToLayer("UI");
+        RectTransform maskrt = mask.AddComponent<RectTransform>();
+        maskrt.SetParent(root);
+        maskrt.sizeDelta = Vector2.zero;
+        maskrt.anchorMin = Vector2.zero;
+        maskrt.anchorMax = Vector2.one;
+
+        Image img = mask.AddComponent<Image>();
+        img.color = new Color(0, 0, 0, 0.75f);
+
+        uiBaseTmp.m_bgMask = BgGo;
+        uiBaseTmp.m_uiRoot = rootGo;
+
+        string Path = "Resources/UI/" + UIWindowName + "/" + UIWindowName + ".prefab";
+        FileTool.CreatFilePath(Application.dataPath + "/" + Path);
+        PrefabUtility.CreatePrefab("Assets/" + Path, uiGo, ReplacePrefabOptions.ConnectToPrefab);
+
+        ProjectWindowUtil.ShowCreatedAsset(uiGo);
     }
 }

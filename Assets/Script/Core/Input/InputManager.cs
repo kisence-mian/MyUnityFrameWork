@@ -182,6 +182,12 @@ public class InputManager
 
     #region RemoveListener
 
+    public static void RemoveAllEventListener<T>(InputEventHandle<T> callback) where T : IInputEventBase
+    {
+        InputDispatcher<T> dispatcher = GetDispatcher<T>();
+        dispatcher.OnEventDispatch -= callback;
+    }
+
     public static void RemoveAllEventListener(string eventName, InputEventCallBack callback)
     {
         IInputDispatcher dispatcher = GetDispatcher(eventName);

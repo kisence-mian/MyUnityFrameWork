@@ -358,7 +358,7 @@ public class UIBase : MonoBehaviour
     }
 
     private RectTransform m_rectTransform;
-    public RectTransform m_RectTransform
+    public RectTransform RectTransform
     {
         get
         {
@@ -374,7 +374,7 @@ public class UIBase : MonoBehaviour
 
     public void SetSizeDelta(float w,float h)
     {
-        m_RectTransform.sizeDelta = new Vector2(w,h);
+        RectTransform.sizeDelta = new Vector2(w,h);
     }
 
     #region 自定义组件
@@ -522,7 +522,7 @@ public class UIBase : MonoBehaviour
 
     List<UIBase> m_ChildList = new List<UIBase>();
     int m_childUIIndex = 0;
-    public UIBase CreateItem(string itemName, string prantName,bool isActive = true)
+    public UIBase CreateItem(string itemName, string prantName,bool isActive)
     {
         GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, GetGameObject(prantName), isActive);
 
@@ -542,7 +542,18 @@ public class UIBase : MonoBehaviour
         return UIItem;
     }
 
-    public void DestroyItem(UIBase item, bool isActive = true)
+    public UIBase CreateItem(string itemName, string prantName)
+    {
+        return CreateItem(itemName, prantName, true);
+    }
+
+
+    public void DestroyItem(UIBase item)
+    {
+        DestroyItem(item, true);
+    }
+
+    public void DestroyItem(UIBase item, bool isActive)
     {
         if (m_ChildList.Contains(item))
         {

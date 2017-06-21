@@ -521,7 +521,7 @@ public class DataTable : Dictionary<string, SingleData>
     {
         if(data.ContainsKey(TableKeys[0]))
         {
-            data.m_SingleDataName = data[TableKeys[0]];
+            data.m_SingleDataKey = data[TableKeys[0]];
             Add(data[TableKeys[0]], data);
             TableIDs.Add(data[TableKeys[0]]);
         }
@@ -571,7 +571,10 @@ public class DataTable : Dictionary<string, SingleData>
 public class SingleData : Dictionary<string, string>
 {
     public DataTable data;
-    public string m_SingleDataName;
+    /// <summary>
+    /// 该记录的key
+    /// </summary>
+    public string m_SingleDataKey;
     public int GetInt(string key)
     {
         string content = null;
@@ -592,10 +595,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetInt Error TableName is :->" + data.m_tableName + "<- key : ->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- content: ->" + content + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetInt Error TableName is :->" + data.m_tableName + "<- key : ->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- content: ->" + content + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue TableName is :->" + data.m_tableName + "<- key : ->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<-");// throw  
+        throw new Exception("Don't Exist Value or DefaultValue TableName is :->" + data.m_tableName + "<- key : ->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<-");// throw  
     }
 
     public float GetFloat(string key)
@@ -614,10 +617,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetFloat Error TableName is :->" + data.m_tableName + "<- key :->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetFloat Error TableName is :->" + data.m_tableName + "<- key :->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
     }
 
     public bool GetBool(string key)
@@ -640,10 +643,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetBool Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- content: ->" + content + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetBool Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- content: ->" + content + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
     }
 
     public string GetString(string key)
@@ -663,10 +666,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetString Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetString Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-");// throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-");// throw  
     }
 
     public Vector2 GetVector2(string key)
@@ -686,10 +689,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetVector2 Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetVector2 Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
     }
 
     public Vector3 GetVector3(string key)
@@ -709,10 +712,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetVector3 Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetVector3 Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
     }
 
     public Color GetColor(string key)
@@ -731,10 +734,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetColor Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetColor Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
     }
 
     public T GetEnum<T>(string key) where T : struct
@@ -754,10 +757,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetEnum Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetEnum Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-"); // throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
     }
 
     public string[] GetStringArray(string key)
@@ -777,10 +780,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetStringArray Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetStringArray Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-");// throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-");// throw  
     }
 
     public int[] GetIntArray(string key)
@@ -800,10 +803,10 @@ public class SingleData : Dictionary<string, string>
         }
         catch (Exception e)
         {
-            throw new Exception("SingleData GetIntArray Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataName + "<- \n" + e.ToString());
+            throw new Exception("SingleData GetIntArray Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataName + "<-");// throw  
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-");// throw  
     }
 }
 

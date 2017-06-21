@@ -1,0 +1,11 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class GameGuideSyetem : GuideSystemBase
+{
+    public override void Init()
+    {
+        GameGuideSyetem.GetInstance<GuideWindow>();
+    }
+}

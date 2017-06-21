@@ -28,6 +28,7 @@ public class UGUITool
         {
             Texture2D tex = ResourceManager.Load<Texture2D>(name);
             img.overrideSprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);
+            img.sprite = img.overrideSprite;
 
             if (is_nativesize)
                 img.SetNativeSize();

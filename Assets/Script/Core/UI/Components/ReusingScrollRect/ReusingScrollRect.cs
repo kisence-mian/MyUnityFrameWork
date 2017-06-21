@@ -284,12 +284,12 @@ public class ReusingScrollRect : ScrollRectInput
 
         itemTmp.SetContent(index,data);
 
-        itemTmp.m_RectTransform.pivot = GetPivot();
-        itemTmp.m_RectTransform.anchorMin = GetMinAchors();
-        itemTmp.m_RectTransform.anchorMax = GetMaxAchors();
-        itemTmp.m_RectTransform.sizeDelta = GetItemSize();
+        itemTmp.RectTransform.pivot = GetPivot();
+        itemTmp.RectTransform.anchorMin = GetMinAchors();
+        itemTmp.RectTransform.anchorMax = GetMaxAchors();
+        itemTmp.RectTransform.sizeDelta = GetItemSize();
 
-        itemTmp.m_RectTransform.anchoredPosition3D = GetItemPos(index);
+        itemTmp.RectTransform.anchoredPosition3D = GetItemPos(index);
 
         itemTmp.m_index = index;
     }
