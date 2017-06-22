@@ -688,36 +688,54 @@ public class UIBase : MonoBehaviour
     #region 新手引导使用
 
     protected List<GameObject> m_GuideList = new List<GameObject>();
+    protected Dictionary<GameObject, GuideChangeData> m_CreateCanvasDict = new Dictionary<GameObject, GuideChangeData>(); //保存Canvas的创建状态
 
-    public void SetGuideMode(string objName)
+    public void SetGuideMode(string objName, int order = 1)
     {
-        SetGuideMode(GetGameObject(objName));
+        SetGuideMode(GetGameObject(objName), order);
     }
 
-    public void SetItemGuideMode(string itemName)
+    public void SetItemGuideMode(string itemName, int order = 1)
     {
-        SetGuideMode(GetItem(itemName).gameObject);
+        SetGuideMode(GetItem(itemName).gameObject, order);
     }
 
-    public void SetGuideMode(GameObject go)
+    public void SetSelfGuideMode(int order = 1)
+    {
+        SetGuideMode(gameObject,order);
+    }
+
+    public void SetGuideMode(GameObject go,int order = 1)
     {
         Canvas canvas = go.GetComponent<Canvas>();
         GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
 
+        GuideChangeData status = new GuideChangeData();
+
         if(canvas == null)
         {
             canvas = go.AddComponent<Canvas>();
+
+            status.isCreateCanvas = true;
         }
 
         if(graphic == null)
         {
             graphic = go.AddComponent<GraphicRaycaster>();
+
+            status.isCreateGraphic = true;
         }
 
+        status.OldOverrideSorting = canvas.overrideSorting;
+        status.OldSortingOrder = canvas.sortingOrder;
+        status.oldSortingLayerName = canvas.sortingLayerName;
+
         canvas.overrideSorting = true;
-        canvas.sortingOrder = 2;
+        canvas.sortingOrder = order;
+        canvas.sortingLayerName = "Guide";
 
         m_GuideList.Add(go);
+        m_CreateCanvasDict.Add(go, status);
     }
 
     public void CancelGuideModel(GameObject go)
@@ -725,17 +743,33 @@ public class UIBase : MonoBehaviour
         Canvas canvas = go.GetComponent<Canvas>();
         GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
 
-        if (graphic != null)
+        GuideChangeData status = m_CreateCanvasDict[go];
+
+        if (graphic != null && status.isCreateGraphic)
         {
-            Destroy(graphic);
+             Destroy(graphic);
         }
 
-        if (canvas != null)
+        if (canvas != null && status.isCreateCanvas)
         {
-            //canvas.overrideSorting = false;
             Destroy(canvas);
         }
+        else
+        {
+            canvas.overrideSorting = status.OldOverrideSorting;
+            canvas.sortingOrder = status.OldSortingOrder;
+            canvas.sortingLayerName = status.oldSortingLayerName;
+        }
+    }
 
+    protected struct GuideChangeData
+    {
+        public bool isCreateCanvas;
+        public bool isCreateGraphic;
+
+        public string oldSortingLayerName;
+        public int OldSortingOrder;
+        public bool OldOverrideSorting;
     }
 
     public void ClearGuideModel()
@@ -744,12 +778,14 @@ public class UIBase : MonoBehaviour
         {
             CancelGuideModel(m_GuideList[i]);
         }
+
+        m_CreateCanvasDict.Clear();
     }
 
     #endregion
 
-    [ContextMenu("Clear Object List")]
-    public void Clearobject()
+    [ContextMenu("ObjectList 去重")]
+    public void ClearObject()
     {
         List<GameObject> ls = new List<GameObject>();
         int len = m_objectList.Count;

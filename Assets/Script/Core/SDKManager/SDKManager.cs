@@ -164,9 +164,32 @@ public class SDKManager
 
     static void InitSDK()
     {
-        s_loginService.Init();
-        s_ADService.Init();
-        s_payService.Init();
+        if (s_loginService != null)
+        {
+            s_loginService.Init();
+        }
+        else
+        {
+            Debug.LogError("InitSDK error loginService is null ! ");
+        }
+
+        if(s_ADService != null)
+        {
+            s_ADService.Init();
+        }
+        else
+        {
+            Debug.LogError("InitSDK error ADService is null ! ");
+        }
+
+        if (s_payService != null)
+        {
+            s_payService.Init();
+        }
+        else
+        {
+            Debug.LogError("InitSDK error payService is null ! ");
+        }
 
         for (int i = 0; i < s_logServiceList.Count; i++)
         {

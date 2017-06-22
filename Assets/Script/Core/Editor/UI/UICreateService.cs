@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEditor;
 using UnityEngine.UI;
 using System;
+using FrameWork.GuideSystem;
 
 public class UICreateService 
 {
@@ -259,26 +260,6 @@ public class UICreateService
         AssetDatabase.Refresh();
     }
 
-    public static void CreatGuideWindowUIScript()
-    {
-        string UIWindowName = "GuideWindow";
-
-        string LoadPath = Application.dataPath + "/Script/Core/Editor/res/UIGuideWindowClassTemplate.txt";
-        string SavePath = Application.dataPath + "/Script/UI/" + UIWindowName + "/" + UIWindowName + ".cs";
-
-        string UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
-
-        EditorUtil.WriteStringByFile(SavePath, UItemplate);
-
-        LoadPath = Application.dataPath + "/Script/Core/Editor/res/GuideSyetemTemplate.txt";
-        SavePath = Application.dataPath + "/Script/GuideSystem/GuideSyetem.cs";
-
-        UItemplate = ResourceIOTool.ReadStringByFile(LoadPath);
-        EditorUtil.WriteStringByFile(SavePath, UItemplate);
-
-        AssetDatabase.Refresh();
-    }
-
     public static void CreateGuideWindow()
     {
         string UIWindowName = "GuideWindow";
@@ -287,14 +268,17 @@ public class UICreateService
         GameObject uiGo = new GameObject(UIWindowName);
 
         Type type = EditorTool.GetType(UIWindowName);
-        UIWindowBase uiBaseTmp = uiGo.AddComponent(type) as UIWindowBase;
+        GuideWindowBase guideBaseTmp = uiGo.AddComponent(type) as GuideWindowBase;
 
         uiGo.layer = LayerMask.NameToLayer("UI");
 
-        uiBaseTmp.m_UIType = UIType;
+        guideBaseTmp.m_UIType = UIType;
 
-        uiGo.AddComponent<Canvas>();
+        Canvas can = uiGo.AddComponent<Canvas>();
         uiGo.AddComponent<GraphicRaycaster>();
+
+        can.overrideSorting = true;
+        can.sortingLayerName = "Guide";
 
         RectTransform ui = uiGo.GetComponent<RectTransform>();
         ui.sizeDelta = Vector2.zero;
@@ -321,16 +305,17 @@ public class UICreateService
         GameObject mask = new GameObject("mask");
         mask.layer = LayerMask.NameToLayer("UI");
         RectTransform maskrt = mask.AddComponent<RectTransform>();
+        Image img = mask.AddComponent<Image>();
+        img.color = new Color(0, 0, 0, 0.75f);
         maskrt.SetParent(root);
         maskrt.sizeDelta = Vector2.zero;
         maskrt.anchorMin = Vector2.zero;
         maskrt.anchorMax = Vector2.one;
 
-        Image img = mask.AddComponent<Image>();
-        img.color = new Color(0, 0, 0, 0.75f);
+        guideBaseTmp.m_mask = img;
 
-        uiBaseTmp.m_bgMask = BgGo;
-        uiBaseTmp.m_uiRoot = rootGo;
+        guideBaseTmp.m_bgMask = BgGo;
+        guideBaseTmp.m_uiRoot = rootGo;
 
         string Path = "Resources/UI/" + UIWindowName + "/" + UIWindowName + ".prefab";
         FileTool.CreatFilePath(Application.dataPath + "/" + Path);

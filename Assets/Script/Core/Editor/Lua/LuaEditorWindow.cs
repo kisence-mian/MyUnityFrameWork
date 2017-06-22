@@ -31,7 +31,7 @@ public class LuaEditorWindow : EditorWindow
     {
         titleContent.text = "Lua设置编辑器";
 
-        if (!Directory.Exists(CustomSettings.saveDir))
+        if (!GetIsInit())
         {
             InitLuaGUI();
         }
@@ -48,6 +48,12 @@ public class LuaEditorWindow : EditorWindow
     #endregion
 
     #region 项目Lua初始化
+
+    bool GetIsInit()
+    {
+        string path = Application.dataPath + "/Resources/Lua";
+        return Directory.Exists(path);
+    }
 
     void InitLuaGUI()
     {

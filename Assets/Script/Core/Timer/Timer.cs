@@ -164,7 +164,8 @@ public class Timer
     /// <returns></returns>
     public static TimerEvent AddTimer(float spaceTime, bool isIgnoreTimeScale, int callBackCount, string timerName,TimerCallBack callBack, params object[] objs)
     {
-        TimerEvent te = HeapObjectPool<TimerEvent>.GetObject();
+        //TimerEvent te = HeapObjectPool<TimerEvent>.GetObject();
+        TimerEvent te = new TimerEvent();
 
         te.m_timerName = timerName ?? te.GetHashCode().ToString();
         //Debug.Log("AddTimer  ----TIMER "  + " " + te.m_timerName);
