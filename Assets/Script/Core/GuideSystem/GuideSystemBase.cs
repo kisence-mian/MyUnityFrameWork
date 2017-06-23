@@ -38,7 +38,7 @@ namespace FrameWork.GuideSystem
         bool m_isStart = false;
 
         bool m_isOperationUI = false;  //是否已经操作了UI
-        GuideWindowBase m_guideWindow; //当前引导界面
+        protected GuideWindowBase m_guideWindowBase; //当前引导界面
 
         UIWindowBase m_currentOperationWindow; //当前操作的界面
 
@@ -75,8 +75,6 @@ namespace FrameWork.GuideSystem
         /// </summary>
         public void Next()
         {
-            Debug.Log("调用新手引导去下一步");
-
             if (GetCallToNext(m_currentGuideData) && GuideCallFilter())
             {
                 NextGuide();
@@ -88,10 +86,11 @@ namespace FrameWork.GuideSystem
         /// </summary>
         public void Start()
         {
-            Debug.Log("新手引导开始点");
+            SingleData guideData = LoadFirstGuide();
 
             if (!m_isStart 
-                && GuideStartCondition(LoadFirstGuide()) 
+                && guideData != null
+                && GuideStartCondition(guideData)
                 && GetGuideSwitch())
             {
                 StartGuide();
@@ -101,6 +100,14 @@ namespace FrameWork.GuideSystem
         #endregion
 
         #region 重载方法
+
+        /// <summary>
+        /// 新手引导启动时调用
+        /// </summary>
+        protected virtual void OnStart()
+        {
+
+        }
 
         /// <summary>
         /// 请求引导记录
@@ -127,9 +134,6 @@ namespace FrameWork.GuideSystem
         /// <returns></returns>
         protected virtual bool GuideStartCondition(SingleData data)
         {
-            Debug.Log("m_currentGuideKey :" + m_currentGuideKey);
-            Debug.Log("data key:" + data.m_SingleDataKey);
-
             return GetGuideStartPoint(data);
         }
 
@@ -164,8 +168,6 @@ namespace FrameWork.GuideSystem
         /// </summary>
         protected virtual void GuideBehaveByUI(UIWindowBase ui)
         {
-            Debug.Log("引导表现 (对UI的操作)");
-
             //高亮ObjectName
             string[] objNames = GetGuideObjectNames(m_currentGuideData);
 
@@ -183,11 +185,11 @@ namespace FrameWork.GuideSystem
             }
 
             //显示文本
-            m_guideWindow.ShowTips(GetTipContent(m_currentGuideData)
+            m_guideWindowBase.ShowTips(GetTipContent(m_currentGuideData)
                                   , GetTipContentPos(m_currentGuideData));
 
             //调整背景遮罩Alpha
-            m_guideWindow.SetMaskAlpha(GetMaskAlpha(m_currentGuideData));
+            m_guideWindowBase.SetMaskAlpha(GetMaskAlpha(m_currentGuideData));
 
             //创建特效
 
@@ -205,10 +207,10 @@ namespace FrameWork.GuideSystem
             ui.ClearGuideModel();
 
             //清除特效
-            m_guideWindow.ClearEffect();
+            m_guideWindowBase.ClearEffect();
             
             //清除手指
-            m_guideWindow.HideAllGuideUI();
+            m_guideWindowBase.HideAllGuideUI();
         }
 
         /// <summary>
@@ -241,8 +243,6 @@ namespace FrameWork.GuideSystem
 
         void ReceviceClickEvent(InputUIOnClickEvent e)
         {
-            Debug.Log("接收点击事件");
-
             if (GetClickToNext(m_currentGuideData) && GuideClickFilter(e))
             {
                 NextGuide();
@@ -297,7 +297,7 @@ namespace FrameWork.GuideSystem
         {
             m_isStart = true;
 
-            m_guideWindow = (GuideWindowBase)UIManager.OpenUIWindow(c_guideWindowName);
+            m_guideWindowBase = (GuideWindowBase)UIManager.OpenUIWindow(c_guideWindowName);
 
             InputManager.AddAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
             UISystemEvent.RegisterAllUIEvent(UIEvent.OnOpen, ReceviceUIOpenEvent);
@@ -308,14 +308,16 @@ namespace FrameWork.GuideSystem
 
             SetCurrent(LoadFirstGuide());
             GuideLogic();
+
+            OnStart();
         }
 
         void EndGuide()
         {
             m_isStart = false;
 
-            UIManager.CloseUIWindow(m_guideWindow);
-            m_guideWindow = null;
+            UIManager.CloseUIWindow(m_guideWindowBase);
+            m_guideWindowBase = null;
 
             InputManager.RemoveAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
             UISystemEvent.RemoveAllUIEvent(UIEvent.OnOpen, ReceviceUIOpenEvent);
@@ -328,7 +330,7 @@ namespace FrameWork.GuideSystem
         void NextGuide()
         {
             //判断是否满足进行下一步的条件
-            if(GuideNextCondition())
+            if (GuideNextCondition())
             {
                 //清除上一步的操作
                 ClearGuideLogic();
@@ -336,11 +338,14 @@ namespace FrameWork.GuideSystem
                 //保存这一步
                 SaveGuideRecord(m_currentGuideData);
 
+                SingleData nextGuideData = GetNextGuideData(m_currentGuideData);
+
                 //退出判断
-                if (!GuideEndCondition())
+                if (!GuideEndCondition() 
+                    && nextGuideData != null)
                 {
                     //读取下一步引导
-                    SetCurrent(GetNextGuideData(m_currentGuideData));
+                    SetCurrent(nextGuideData);
 
                     //引导逻辑
                     GuideLogic();
@@ -355,18 +360,12 @@ namespace FrameWork.GuideSystem
         //引导逻辑
         void GuideLogic()
         {
-            Debug.Log("GuideLogic");
-
             if (m_currentGuideData != null)
             {
-                Debug.Log("m_currentGuideData");
-
                 //处理非UI逻辑
                 GuideBehave();
 
                 string uiName = GetGuideWindowName(m_currentGuideData);
-
-                Debug.Log("uiName "+ uiName);
 
                 if(uiName != null 
                     && uiName != ""
@@ -429,7 +428,7 @@ namespace FrameWork.GuideSystem
             }
             else
             {
-                guideData = GetNextGuideData(m_guideData[m_currentGuideKey]); ;
+                guideData = GetNextGuideData(m_guideData[m_currentGuideKey]);
             }
 
             return guideData;
@@ -442,11 +441,13 @@ namespace FrameWork.GuideSystem
             {
                 m_currentGuideIndex = m_guideData.TableIDs.IndexOf(data.m_SingleDataKey);
                 m_currentGuideData = data;
+                m_currentGuideKey = m_currentGuideData.m_SingleDataKey;
             }
             else
             {
                 m_currentGuideIndex = -1;
                 m_currentGuideData = null;
+                m_currentGuideKey = "";
             }
         }
 
@@ -566,7 +567,8 @@ namespace FrameWork.GuideSystem
 
         void Update()
         {
-            if(!DevelopReplayManager.IsReplay)
+            if(!DevelopReplayManager.IsReplay 
+                && ApplicationManager.AppMode == AppMode.Developing)
             {
                 if(Input.GetKeyDown(KeyCode.F3))
                 {

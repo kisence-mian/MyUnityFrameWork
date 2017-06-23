@@ -50,6 +50,9 @@ public class GuideSystemEditor
             CreateGuideWindowScript();
 
             //增加Guide引导层
+
+            //添加引导开关
+            RecordManager.SaveRecord(GuideSystemBase.c_guideRecordName, GuideSystemBase.c_guideSwitchName, true);
             
         }
         else

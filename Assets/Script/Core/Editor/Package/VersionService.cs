@@ -72,7 +72,7 @@ public class VersionService
 
         EditorUtil.WriteStringByFile(
             PathTool.GetAbsolutePath(ResLoadLocation.Resource, HotUpdateManager.c_versionFileName + ".json"),
-            MiniJSON.Json.Serialize(VersionData));
+            FrameWork.Json.Serialize(VersionData));
 
         AssetDatabase.Refresh();
     }
@@ -89,7 +89,7 @@ public class VersionService
         }
         else
         {
-            VersionData = (Dictionary<string, object>)MiniJSON.Json.Deserialize(version);
+            VersionData = (Dictionary<string, object>)FrameWork.Json.Deserialize(version);
         }
 
         if (VersionData == null)

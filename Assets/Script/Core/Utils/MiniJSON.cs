@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace MiniJSON {
+namespace FrameWork {
     // Example usage:
     //
     //  using UnityEngine;

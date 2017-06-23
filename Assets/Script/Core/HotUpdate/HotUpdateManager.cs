@@ -69,7 +69,7 @@ public class HotUpdateManager
         ab.Unload(true);
 
         //stream版本
-        Dictionary<string, object> StreamVersion = (Dictionary<string, object>)MiniJSON.Json.Deserialize(StreamVersionContent);
+        Dictionary<string, object> StreamVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(StreamVersionContent);
 
         //Streaming版本如果比Persistent版本还要新，则更新Persistent版本
         if ((GetInt(StreamVersion[c_largeVersionKey]) > GetInt(m_versionConfig[c_largeVersionKey]))||
@@ -113,7 +113,7 @@ public class HotUpdateManager
 
         //Debug.Log("Version File :text: " + m_versionFileCatch);
 
-        Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)MiniJSON.Json.Deserialize(m_versionFileCache);
+        Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(m_versionFileCache);
 
         //服务器大版本比较大，需要整包更新
         if ( GetInt(m_versionConfig[c_largeVersionKey])
@@ -274,7 +274,7 @@ public class HotUpdateManager
 
     static void Init()
     {
-        m_versionConfig   = (Dictionary<string,object>) MiniJSON.Json.Deserialize(ReadVersionContent());
+        m_versionConfig   = (Dictionary<string,object>) FrameWork.Json.Deserialize(ReadVersionContent());
         m_hotUpdateConfig = ConfigManager.GetData(c_HotUpdateConfigName);
 
         string downLoadServicePath = null;

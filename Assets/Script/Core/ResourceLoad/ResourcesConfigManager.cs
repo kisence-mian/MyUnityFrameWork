@@ -154,7 +154,7 @@ public static class ResourcesConfigManager
 
         ResourcesConfigStruct result = new ResourcesConfigStruct();
 
-        Dictionary<string, object> data = (Dictionary<string, object>)MiniJSON.Json.Deserialize(content);
+        Dictionary<string, object> data = (Dictionary<string, object>)FrameWork.Json.Deserialize(content);
 
         Dictionary<string, object> gameRelyBundles = (Dictionary<string, object>)data[c_relyBundleKey];
         Dictionary<string, object> gameAssetsBundles = (Dictionary<string, object>)data[c_bundlesKey];

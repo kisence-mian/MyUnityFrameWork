@@ -1740,7 +1740,7 @@ public class BundleConfigEditorWindow : EditorWindow
         EditorUtil.WriteStringByFile(
             PathTool.GetAbsolutePath(ResLoadLocation.Resource,
             ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName)
-            , MiniJSON.Json.Serialize(data));
+            , FrameWork.Json.Serialize(data));
 
         Debug.Log("保存完毕 序列化时间: " + (Time.realtimeSinceStartup - time));
 

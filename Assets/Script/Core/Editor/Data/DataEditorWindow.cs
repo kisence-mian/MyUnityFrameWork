@@ -7,13 +7,13 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using MiniJSON;
+using FrameWork;
 
 public class DataEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
 
-    [MenuItem("Window/数据编辑器", priority = 500)]
+    [MenuItem("Window/数据编辑器", priority = 501)]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(DataEditorWindow));
