@@ -62,8 +62,11 @@ public class RecordManager
                                                     c_expandName)),
                 RecordTable.Serialize(data));
 
-        #if UNITY_EDITOR
-                UnityEditor.AssetDatabase.Refresh();
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            UnityEditor.AssetDatabase.Refresh();
+        }
         #endif
 #endif
     }

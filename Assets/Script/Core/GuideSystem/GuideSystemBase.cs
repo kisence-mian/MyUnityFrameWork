@@ -30,6 +30,10 @@ namespace FrameWork.GuideSystem
 
         public const string c_MaskAlphaKey = "MaskAlpha";             //遮罩Alpha
 
+        public const string c_guideRecordName = "GuideRecord";        //引导记录名
+        public const string c_guideSwitchName = "GuideSwitch";        //引导开关
+        public const string c_guideCurrentKeyName = "CurrentGuide";   //当前执行完毕的引导
+
         bool m_isInit = false;
         bool m_isStart = false;
 
@@ -60,6 +64,8 @@ namespace FrameWork.GuideSystem
                 m_isInit = false;
                 m_guideData = null;
 
+                //清除操作
+                ClearGuideLogic();
                 EndGuide();
             }
         }
@@ -84,7 +90,9 @@ namespace FrameWork.GuideSystem
         {
             Debug.Log("新手引导开始点");
 
-            if (!m_isStart && GuideStartCondition())
+            if (!m_isStart 
+                && GuideStartCondition(LoadFirstGuide()) 
+                && GetGuideSwitch())
             {
                 StartGuide();
             }
@@ -100,25 +108,29 @@ namespace FrameWork.GuideSystem
         /// </summary>
         protected virtual void GetGuideRecord()
         {
-
+            m_currentGuideKey = RecordManager.GetStringRecord(c_guideRecordName, c_guideCurrentKeyName, "");
         }
 
         /// <summary>
         /// 保存引导记录
         /// 可以根据情况选择是保存在本地还是发往服务器
         /// </summary>
-        protected virtual void SaveGuideRecord()
+        protected virtual void SaveGuideRecord(SingleData data)
         {
-
+            RecordManager.SaveRecord(c_guideRecordName, data.m_SingleDataKey, true);
+            RecordManager.SaveRecord(c_guideRecordName, c_guideCurrentKeyName, data.m_SingleDataKey);
         }
 
         /// <summary>
         /// 判断是否满足引导开始条件
         /// </summary>
         /// <returns></returns>
-        protected virtual bool GuideStartCondition()
+        protected virtual bool GuideStartCondition(SingleData data)
         {
-            return true;
+            Debug.Log("m_currentGuideKey :" + m_currentGuideKey);
+            Debug.Log("data key:" + data.m_SingleDataKey);
+
+            return GetGuideStartPoint(data);
         }
 
         /// <summary>
@@ -292,7 +304,9 @@ namespace FrameWork.GuideSystem
             UISystemEvent.RegisterAllUIEvent(UIEvent.OnShow, ReceviceUIShowEvent);
             UISystemEvent.RegisterAllUIEvent(UIEvent.OnClose, ReceviceUICloseEvent);
 
-            LoadFirstGuide();
+            ApplicationManager.s_OnApplicationUpdate += Update;
+
+            SetCurrent(LoadFirstGuide());
             GuideLogic();
         }
 
@@ -307,6 +321,8 @@ namespace FrameWork.GuideSystem
             UISystemEvent.RemoveAllUIEvent(UIEvent.OnOpen, ReceviceUIOpenEvent);
             UISystemEvent.RemoveAllUIEvent(UIEvent.OnShow, ReceviceUIShowEvent);
             UISystemEvent.RemoveAllUIEvent(UIEvent.OnClose, ReceviceUICloseEvent);
+
+            ApplicationManager.s_OnApplicationUpdate -= Update;
         }
 
         void NextGuide()
@@ -317,11 +333,14 @@ namespace FrameWork.GuideSystem
                 //清除上一步的操作
                 ClearGuideLogic();
 
+                //保存这一步
+                SaveGuideRecord(m_currentGuideData);
+
                 //退出判断
                 if (!GuideEndCondition())
                 {
                     //读取下一步引导
-                    SetCurrent(GetNextGuideData());
+                    SetCurrent(GetNextGuideData(m_currentGuideData));
 
                     //引导逻辑
                     GuideLogic();
@@ -389,7 +408,7 @@ namespace FrameWork.GuideSystem
         }
 
         //读取第一条引导
-        void LoadFirstGuide()
+        protected SingleData LoadFirstGuide()
         {
             if(m_guideData.TableIDs.Count == 0)
             {
@@ -401,16 +420,19 @@ namespace FrameWork.GuideSystem
 
             //如果新手引导启动时没有为m_currentGuideKey赋值
             //则认为从第一条记录开始
-            if (m_currentGuideKey == "")
+            if (m_currentGuideKey == "" 
+                || m_currentGuideKey == null
+                || m_currentGuideKey == "Null"
+                || m_currentGuideKey == "null")
             {
                 guideData = m_guideData[m_guideData.TableIDs[0]];
             }
             else
             {
-                guideData = m_guideData[m_currentGuideKey];
+                guideData = GetNextGuideData(m_guideData[m_currentGuideKey]); ;
             }
 
-            SetCurrent(guideData);
+            return guideData;
         }
 
         //将一条记录设为当前要执行的引导记录
@@ -431,6 +453,11 @@ namespace FrameWork.GuideSystem
         #endregion
 
         #region 读取数据
+
+        bool GetGuideSwitch()
+        {
+            return RecordManager.GetBoolRecord(c_guideRecordName, c_guideSwitchName,true);
+        }
 
         string GetPremise(SingleData data)
         {
@@ -492,16 +519,16 @@ namespace FrameWork.GuideSystem
             return data.GetFloat(c_MaskAlphaKey);
         }
 
-        SingleData GetNextGuideData()
+        SingleData GetNextGuideData(SingleData data)
         {
-            string next = GetNextGuideNeme(m_currentGuideData);
+            string next = GetNextGuideNeme(data);
 
             if (next == null
                 || next == "null"
                 || next == "Null"
                 || next == "")
             {
-                int newIndex = m_currentGuideIndex + 1;
+                int newIndex = m_guideData.TableIDs.IndexOf(data.m_SingleDataKey) + 1;
                 return GetGuideDataByIndex(newIndex);
             }
             else
@@ -531,6 +558,21 @@ namespace FrameWork.GuideSystem
             }
 
             return m_guideData[key];
+        }
+
+        #endregion
+
+        #region Update
+
+        void Update()
+        {
+            if(!DevelopReplayManager.IsReplay)
+            {
+                if(Input.GetKeyDown(KeyCode.F3))
+                {
+                    Dispose();
+                }
+            }
         }
 
         #endregion

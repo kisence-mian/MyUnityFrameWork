@@ -20,7 +20,17 @@ public class DevelopReplayManager
     const string c_eventNameKey = "e";
     const string c_serializeInfoKey = "s";
 
-    static bool s_isReplay = false;
+    private static bool s_isReplay = false;
+
+    public static bool IsReplay
+    {
+        get
+        {
+            return s_isReplay;
+        }
+    }
+
+
     public static bool s_isProfile = true;
 
     static List<Dictionary<string, string>> s_eventStreamSerialize;
@@ -646,6 +656,8 @@ public class DevelopReplayManager
         get { return DevelopReplayManager.s_currentTime; }
         //set { DevelopReplayManager.s_currentTime = value; }
     }
+
+
 
     public static void OnReplayUpdate()
     {
