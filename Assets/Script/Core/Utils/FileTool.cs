@@ -6,6 +6,10 @@ using System.Text;
 
 public class FileTool  
 {
+    #region 文件与路径的增加删除创建
+
+    #region 不忽视出错
+
     /// <summary>
     /// 判断有没有这个文件路径，如果没有则创建它(路径会去掉文件名)
     /// </summary>
@@ -60,65 +64,6 @@ public class FileTool
     }
 
     /// <summary>
-    /// 删除所有可以删除的文件
-    /// </summary>
-    /// <param name="path"></param>
-    public static void SafeDeleteDirectory(string path)
-    {
-        string[] directorys = Directory.GetDirectories(path);
-
-        //删掉所有子目录
-        for (int i = 0; i < directorys.Length; i++)
-        {
-            string pathTmp = directorys[i];
-
-            if (Directory.Exists(pathTmp))
-            {
-                SafeDeleteDirectory(pathTmp);
-            }
-        }
-
-        //删掉所有子文件
-        string[] files = Directory.GetFiles(path);
-
-        for (int i = 0; i < files.Length; i++)
-        {
-            string pathTmp = files[i];
-            if (File.Exists(pathTmp))
-            {
-                try
-                {
-                    File.Delete(pathTmp);
-                }
-                catch
-                { }
-            }
-        }
-    }
-
-    //移除拓展名
-    public static string RemoveExpandName(string name)
-    {
-        int dirIndex = name.LastIndexOf(".");
-
-        if (dirIndex != -1)
-        {
-            return name.Remove(dirIndex);
-        }
-        else
-        {
-            return name;
-        }
-    }
-
-    //取出一个路径下的文件名
-    public static string GetFileNameByPath(string path)
-    {
-        FileInfo fi = new FileInfo(path);
-        return fi.Name; // text.txt
-    }
-
-    /// <summary>
     /// 复制文件夹（及文件夹下所有子文件夹和文件）
     /// </summary>
     /// <param name="sourcePath">待复制的文件夹路径</param>
@@ -143,11 +88,123 @@ public class FileTool
         }
     }
 
+    #endregion
+
+    #region 忽视出错 (会跳过所有出错的操作,一般是用来无视权限)
+    /// <summary>
+    /// 删除所有可以删除的文件
+    /// </summary>
+    /// <param name="path"></param>
+    public static void SafeDeleteDirectory(string path)
+    {
+        string[] directorys = Directory.GetDirectories(path);
+
+        //删掉所有子目录
+        for (int i = 0; i < directorys.Length; i++)
+        {
+            string pathTmp = directorys[i];
+
+            if (Directory.Exists(pathTmp))
+            {
+                SafeDeleteDirectory(pathTmp);
+                try
+                {
+                    Directory.Delete(pathTmp,false);
+                }
+                catch(Exception e)
+                {
+                    Debug.LogError(e.ToString());
+                }
+            }
+        }
+
+        //删掉所有子文件
+        string[] files = Directory.GetFiles(path);
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            string pathTmp = files[i];
+            if (File.Exists(pathTmp))
+            {
+                try
+                {
+                    File.Delete(pathTmp);
+                }
+                catch(Exception e)
+                {
+                    Debug.LogError(e.ToString());
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 复制所有可以复制的文件夹（及文件夹下所有子文件夹和文件）
+    /// </summary>
+    /// <param name="sourcePath">待复制的文件夹路径</param>
+    /// <param name="destinationPath">目标路径</param>
+    public static void SafeCopyDirectory(string sourcePath, string destinationPath)
+    {
+        DirectoryInfo info = new DirectoryInfo(sourcePath);
+        Directory.CreateDirectory(destinationPath);
+
+        foreach (FileSystemInfo fsi in info.GetFileSystemInfos())
+        {
+            string destName = Path.Combine(destinationPath, fsi.Name);
+            //Debug.Log(destName);
+
+            if (fsi is FileInfo)          //如果是文件，复制文件
+                try
+                {
+                    File.Copy(fsi.FullName, destName);
+                }
+                catch{}
+            else                                    //如果是文件夹，新建文件夹，递归
+            {
+                Directory.CreateDirectory(destName);
+                SafeCopyDirectory(fsi.FullName, destName);
+            }
+        }
+    }
+
+    #endregion
+
+    #endregion
+
+    #region 文件名
+
+    //移除拓展名
+    public static string RemoveExpandName(string name)
+    {
+        int dirIndex = name.LastIndexOf(".");
+
+        if (dirIndex != -1)
+        {
+            return name.Remove(dirIndex);
+        }
+        else
+        {
+            return name;
+        }
+    }
+
+    //取出一个路径下的文件名
+    public static string GetFileNameByPath(string path)
+    {
+        FileInfo fi = new FileInfo(path);
+        return fi.Name; // text.txt
+    }
+
+    //取出一个相对路径下的文件名
     public static string GetFileNameBySring(string path)
     {
         string[] paths = path.Split('/');
         return paths[paths.Length - 1];
     }
+
+    #endregion
+
+    #region 文件编码
 
     /// <summary>
     /// 文件编码转换
@@ -161,44 +218,6 @@ public class FileTool
         Encoding sourEncoding = GetEncodingType(sourceFile);
 
         System.IO.File.WriteAllText(destFile, System.IO.File.ReadAllText(sourceFile, sourEncoding), targetEncoding);
-    }
-
-    /// <summary>
-    /// 递归处理某路径及其他的子目录
-    /// </summary>
-    /// <param name="path">目标路径</param>
-    /// <param name="expandName">要处理的特定拓展名</param>
-    /// <param name="handle">处理函数</param>
-    public static void RecursionFileExecute(string path, string expandName, FileExecuteHandle handle)
-    {
-        string[] allUIPrefabName = Directory.GetFiles(path);
-        foreach (var item in allUIPrefabName)
-        {
-            try
-            {
-                if (expandName != null)
-                {
-                    if (item.EndsWith("." + expandName))
-                    {
-                        handle(item);
-                    }
-                }
-                else
-                {
-                    handle(item);
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("RecursionFileExecute Error :" + item + " Exception:" + e.ToString());
-            }
-        }
-
-        string[] dires = Directory.GetDirectories(path);
-        for (int i = 0; i < dires.Length; i++)
-        {
-            RecursionFileExecute(dires[i], expandName, handle);
-        }
     }
 
     /// <summary> 
@@ -291,7 +310,49 @@ public class FileTool
             throw new Exception("非预期的byte格式");
         }
         return true;
-    } 
+    }
+    #endregion
+
+    #region 文件工具
+    /// <summary>
+    /// 递归处理某路径及其他的子目录
+    /// </summary>
+    /// <param name="path">目标路径</param>
+    /// <param name="expandName">要处理的特定拓展名</param>
+    /// <param name="handle">处理函数</param>
+    public static void RecursionFileExecute(string path, string expandName, FileExecuteHandle handle)
+    {
+        string[] allUIPrefabName = Directory.GetFiles(path);
+        foreach (var item in allUIPrefabName)
+        {
+            try
+            {
+                if (expandName != null)
+                {
+                    if (item.EndsWith("." + expandName))
+                    {
+                        handle(item);
+                    }
+                }
+                else
+                {
+                    handle(item);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("RecursionFileExecute Error :" + item + " Exception:" + e.ToString());
+            }
+        }
+
+        string[] dires = Directory.GetDirectories(path);
+        for (int i = 0; i < dires.Length; i++)
+        {
+            RecursionFileExecute(dires[i], expandName, handle);
+        }
+    }
+    #endregion
+
 }
 
 public delegate void FileExecuteHandle(string filePath);

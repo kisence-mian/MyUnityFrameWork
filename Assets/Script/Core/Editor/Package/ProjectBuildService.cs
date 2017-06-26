@@ -216,7 +216,7 @@ class ProjectBuildService : Editor
 
 #endregion
 
-#region Android
+    #region Android
 
     static void BuildForAndroid()
     {
@@ -252,7 +252,7 @@ class ProjectBuildService : Editor
 
 #endregion
 
-#region
+    #region
 
     static void BuildForIOS()
     {
@@ -287,7 +287,7 @@ class ProjectBuildService : Editor
 
 #endregion
 
-#region WEBGL
+    #region WEBGL
 
     static void BuildForWEBGL()
     {
@@ -323,9 +323,9 @@ class ProjectBuildService : Editor
 
 #endregion
 
-#endregion
+    #endregion
 
-#region 功能函数
+    #region 功能函数
 
     //在这里找出你当前工程所有的场景文件，假设你只想把部分的scene文件打包 那么这里可以写你的条件判断 总之返回一个字符串数组。
     static string[] GetBuildScenes()

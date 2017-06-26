@@ -12,20 +12,21 @@ public class ADInterface  : SDKInterfaceBase
 
     }
 
-    public virtual void LoadAD(ADType adType)
+    public virtual void LoadAD(ADType adType,string tag = "")
     {
 
     }
 
-    public virtual void PlayAD(ADType adType)
+    public virtual void PlayAD(ADType adType, string tag = "")
     {
 
     }
 
-    public virtual void CloseAD(ADType adType)
+    public virtual void CloseAD(ADType adType, string tag = "")
     {
 
     }
+
 
 }
 
@@ -34,4 +35,5 @@ public enum ADType
     Banner,
     Reward,
     Interstitial,
+    Video,
 }

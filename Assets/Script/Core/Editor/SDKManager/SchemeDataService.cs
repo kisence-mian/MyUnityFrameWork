@@ -1,126 +1,139 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
+using UnityEditor;
 using UnityEngine;
 
 public class SchemeDataService
 {
-    public static List<SchemeData> m_configList = new List<SchemeData>();
-    public static List<string> m_configNameList = new List<string>();
+    public const string c_SDKCachePath = ".SDKCache";
 
-    public static SchemeData currentSchemeData;
+    private static List<SchemeData> configList;
+    private static List<string> configNameList;
 
-    public static SDKInterfaceBase m_LoginScheme;
-    public static SDKInterfaceBase m_ADScheme;
-    public static SDKInterfaceBase m_PayScheme;
-    public static List<SDKInterfaceBase> m_LogScheme = new List<SDKInterfaceBase>();
-    public static List<SDKInterfaceBase> m_otherScheme = new List<SDKInterfaceBase>();
-
-    public static void LoadSchemeConfig()
+    public static List<SchemeData> ConfigList
     {
-        m_configList = new List<SchemeData>();
-        m_configNameList = new List<string>();
+        get
+        {
+            if (configList == null)
+            {
+                LoadEditorSchemeData();
+            }
+
+            return configList;
+        }
+    }
+
+    public static List<string> ConfigNameList
+    {
+        get
+        {
+            if(configNameList == null)
+            {
+                LoadEditorSchemeData();
+            }
+
+            return configNameList;
+        }
+    }
+
+    #region 存取配置
+
+    /// <summary>
+    ///加载编辑器设置
+    /// </summary>
+    static void LoadEditorSchemeData()
+    {
+        configList = new List<SchemeData>();
+        configNameList = new List<string>();
+        configNameList.Add("None");
 
         Dictionary<string, object> editConfig = ConfigEditorWindow.GetEditorConfigData(SDKEditorWindow.s_editorConfigName);
         if (editConfig != null)
         {
-            string currentSchemeName = editConfig[SDKEditorWindow.s_currentSchemeKey].ToString();
-
             List<object> list = (List<object>)editConfig[SDKEditorWindow.s_schemeKey];
 
             for (int i = 0; i < list.Count; i++)
             {
                 SchemeData tmp = JsonUtility.FromJson<SchemeData>(list[i].ToString());
-                if (tmp.SchemeName == currentSchemeName)
-                {
-                    currentSchemeData = tmp;
-                    LoadCurrentSchemeConfig(tmp);
-                }
-                m_configList.Add(tmp);
-                m_configNameList.Add(tmp.SchemeName);
+                configList.Add(tmp);
+                configNameList.Add(tmp.SchemeName);
             }
         }
     }
 
-    public static void LoadCurrentSchemeConfig(SchemeData data)
+    public static void SaveEditorSchemeData()
     {
-        m_LoginScheme = AnalysisConfig(data.LoginScheme);
-        m_ADScheme = AnalysisConfig(data.ADScheme);
-        m_PayScheme = AnalysisConfig(data.PayScheme);
-
-        m_LogScheme = new List<SDKInterfaceBase>();
-        for (int i = 0; i < data.LogScheme.Count; i++)
-        {
-            m_LogScheme.Add(AnalysisConfig(data.LogScheme[i]));
-        }
-
-        m_otherScheme = new List<SDKInterfaceBase>();
-        for (int i = 0; i < data.OtherScheme.Count; i++)
-        {
-            m_otherScheme.Add(AnalysisConfig(data.OtherScheme[i]));
-        }
-    }
-
-    public static void SaveSchemeConfig()
-    {
-        SaveCurrentSchemeConfig();
-
         Dictionary<string, object> editConfig = new Dictionary<string, object>();
-        Dictionary<string, SingleField> config = new Dictionary<string, SingleField>();
-
         List<string> list = new List<string>();
 
-        for (int i = 0; i < m_configList.Count; i++)
+        for (int i = 0; i < configList.Count; i++)
         {
-            list.Add(JsonUtility.ToJson(m_configList[i]));
+            list.Add(JsonUtility.ToJson(configList[i]));
         }
 
         editConfig.Add(SDKEditorWindow.s_schemeKey, list);
-        editConfig.Add(SDKEditorWindow.s_currentSchemeKey, currentSchemeData.SchemeName);
-
-        config.Add(SDKManager.c_KeyName, new SingleField(JsonUtility.ToJson(currentSchemeData)));
-
         ConfigEditorWindow.SaveEditorConfigData(SDKEditorWindow.s_editorConfigName, editConfig);
-        ConfigEditorWindow.SaveData(SDKManager.c_ConfigName, config);
     }
 
-    public static void SaveCurrentSchemeConfig()
+    /// <summary>
+    /// 将传入的SchemeData保存到游戏可以读取的地方
+    /// </summary>
+    /// <param name="schemeData"></param>
+    public static void SaveGameSchemeConfig(SchemeData schemeData)
     {
-        if (currentSchemeData != null)
+        if(schemeData != null)
         {
-            currentSchemeData.LoginScheme = SerializeConfig(m_LoginScheme);
-            currentSchemeData.ADScheme = SerializeConfig(m_ADScheme);
-            currentSchemeData.PayScheme = SerializeConfig(m_PayScheme);
-
-            currentSchemeData.LogScheme.Clear();
-
-            for (int i = 0; i < m_LogScheme.Count; i++)
-            {
-                currentSchemeData.LogScheme.Add(SerializeConfig(m_LogScheme[i]));
-            }
-
-            currentSchemeData.OtherScheme.Clear();
-
-            for (int i = 0; i < m_otherScheme.Count; i++)
-            {
-                currentSchemeData.OtherScheme.Add(SerializeConfig(m_otherScheme[i]));
-            }
-
-            Debug.Log(JsonUtility.ToJson(currentSchemeData));
-        }
-    }
-
-
-    public static SDKInterfaceBase AnalysisConfig(SDKConfigData data)
-    {
-        if (data == null)
-        {
-            return new NullSDKInterface();
+            Dictionary<string, SingleField> config = new Dictionary<string, SingleField>();
+            config.Add(SDKManager.c_KeyName, new SingleField(JsonUtility.ToJson(schemeData)));
+            ConfigEditorWindow.SaveData(SDKManager.c_ConfigName, config);
         }
         else
         {
-            return (SDKInterfaceBase)JsonUtility.FromJson(data.SDKContent, Assembly.Load("Assembly-CSharp").GetType(data.SDKName));
+            File.Delete( ConfigEditorWindow.GetConfigPath(SDKManager.c_ConfigName));
         }
+    }
+
+    public static SchemeData CreateSchemeData(
+
+    string schemeName,
+    List<LoginInterface> loginScheme,
+    List<ADInterface> ADScheme,
+    List<PayInterface> payScheme,
+    List<LoginInterface> logScheme,
+    List<OtherSDKInterface> otherScheme)
+    {
+        SchemeData schemeData = new SchemeData();
+
+        schemeData.SchemeName = schemeName;
+
+        for (int i = 0; i < loginScheme.Count; i++)
+        {
+            schemeData.LoginScheme.Add(SerializeConfig(loginScheme[i]));
+        }
+
+        for (int i = 0; i < ADScheme.Count; i++)
+        {
+            schemeData.ADScheme.Add(SerializeConfig(ADScheme[i]));
+        }
+
+        for (int i = 0; i < payScheme.Count; i++)
+        {
+            schemeData.PayScheme.Add(SerializeConfig(payScheme[i]));
+        }
+
+        for (int i = 0; i < logScheme.Count; i++)
+        {
+            schemeData.LogScheme.Add(SerializeConfig(logScheme[i]));
+        }
+
+        for (int i = 0; i < otherScheme.Count; i++)
+        {
+            schemeData.OtherScheme.Add(SerializeConfig(otherScheme[i]));
+        }
+
+        return schemeData;
     }
 
     static SDKConfigData SerializeConfig(SDKInterfaceBase sdkInterface)
@@ -141,11 +154,77 @@ public class SchemeDataService
         return result;
     }
 
+    #endregion
+
+    #region 切换方案
+
+    /// <summary>
+    /// 切换方案，打包用
+    /// </summary>
+    /// <param name="SchemeName"></param>
+    public static void ChangeScheme(string SchemeName)
+    {
+        SchemeData data = SDKManager.LoadGameSchemeConfig();
+        string oldSchemeName = "None";
+
+        if(data != null)
+        {
+            oldSchemeName = data.SchemeName;
+        }
+        else
+        {
+            Debug.Log("当前方案不存在！ ");
+        }
+
+        //方案相同不切换
+        if(SchemeName == oldSchemeName)
+        {
+            return;
+        }
+
+        //重新生成游戏内使用的配置
+        SaveGameSchemeConfig(GetSchemeData(SchemeName));
+
+        if (IsExitsSchemeName(SchemeName))
+        {
+            Debug.Log("Index: " + GetSchemeIndex(SchemeName));
+
+            //替换文件夹
+            if (oldSchemeName != "None")
+            {
+                UnloadPluginFile(oldSchemeName);
+                UnloadSchemeFile(oldSchemeName);
+            }
+            LoadPluginFile(SchemeName);
+            LoadSchemeFile(SchemeName);
+
+            //调整宏定义
+            EditorExpand.ChangeDefine(new string[] { SchemeName }, new string[] { oldSchemeName });
+        }
+        else
+        {
+            Debug.Log("不存在的方案名！ " + SchemeName);
+            if (oldSchemeName != "None")
+            {
+                //把当前方案收起来
+                UnloadPluginFile(oldSchemeName);
+                UnloadSchemeFile(oldSchemeName);
+
+                //移除宏定义
+                EditorExpand.ChangeDefine(new string[] {}, new string[] { oldSchemeName });
+            }
+        }
+
+        AssetDatabase.Refresh();
+    }
+
+    #region 功能函数
+
     public static bool IsExitsSchemeName(string name)
     {
-        for (int i = 0; i < m_configList.Count; i++)
+        for (int i = 0; i < configList.Count; i++)
         {
-            if (m_configList[i].SchemeName == name)
+            if (configList[i].SchemeName == name)
             {
                 return true;
             }
@@ -156,9 +235,9 @@ public class SchemeDataService
 
     public static int GetSchemeIndex(string name)
     {
-        for (int i = 0; i < m_configList.Count; i++)
+        for (int i = 0; i < configList.Count; i++)
         {
-            if (m_configList[i].SchemeName == name)
+            if (configList[i].SchemeName == name)
             {
                 return i;
             }
@@ -167,27 +246,132 @@ public class SchemeDataService
         return -1;
     }
 
-    /// <summary>
-    /// 切换方案，打包用
-    /// </summary>
-    /// <param name="SchemeName"></param>
-    public static void ChangeScheme(string SchemeName)
+    public static SchemeData GetSchemeData(string name)
     {
-        LoadSchemeConfig();
+        if (name == "None")
+            return null;
 
-        if (IsExitsSchemeName(SchemeName))
+        for (int i = 0; i < configList.Count; i++)
         {
-            //切换方案
-            LoadCurrentSchemeConfig(m_configList[GetSchemeIndex(SchemeName)]);
-            SaveCurrentSchemeConfig();
+            if (configList[i].SchemeName == name)
+            {
+                return configList[i];
+            }
+        }
 
-            //替换文件夹
-            SDKEditorWindow.ChangeSchemeFile(SchemeName, currentSchemeData.SchemeName);
+        throw new System.Exception("GetSchemeData Exception not find ->"+ name + "<-");
+    }
+    #endregion
+
+    #region 文件操作
+
+    /// <summary>
+    /// 把当前Plugin目录下的所有文件存在 .SDKCache文件夹下，并加上schemeName前缀
+    /// </summary>
+    /// <param name="schemeName">方案名</param>
+    public static void UnloadPluginFile(string schemeName)
+    {
+        string oldPath = Application.dataPath + "/Plugins";
+        string newPath = Application.dataPath + "/" + c_SDKCachePath + "/" + schemeName + "Plugins";
+
+        Debug.Log("SavePluginFile ：oldPath: ->" + oldPath + "<- newPath: ->" + newPath + "<-");
+
+        MoveFiles(oldPath, newPath);
+    }
+
+    /// <summary>
+    /// 把当前schemeName目录下的所有文件存在 .SDKCache文件夹下
+    /// </summary>
+    /// <param name="schemeName">方案名</param>
+    public static void UnloadSchemeFile(string schemeName)
+    {
+        string oldPath = Application.dataPath + "/" + schemeName;
+        string newPath = Application.dataPath + "/" + c_SDKCachePath + "/" + schemeName;
+
+        Debug.Log("SaveSchemeFile ：oldPath: ->" + oldPath + "<- newPath: ->" + newPath + "<-");
+
+        MoveFiles(oldPath, newPath);
+    }
+
+    /// <summary>
+    /// 加载 .SDKCache 目录下的所有Plugin文件，放回Plugins目录
+    /// 与SavePluginFile是相反操作
+    /// </summary>
+    /// <param name="schemeName">方案名</param>
+    public static void LoadPluginFile(string schemeName)
+    {
+        string oldPath = Application.dataPath + "/" + c_SDKCachePath + "/" + schemeName + "Plugins";
+        string newPath =  Application.dataPath + "/Plugins";
+
+        Debug.Log("LoadPluginFile ：oldPath: ->" + oldPath + "<- newPath: ->" + newPath + "<-");
+
+        MoveFiles(oldPath,newPath);
+    }
+
+    /// <summary>
+    /// 加载 .SDKCache 目录下的方案文件，放回项目目录
+    /// 与SaveSchemeFile是相反操作
+    /// </summary>
+    /// <param name="schemeName">方案名</param>
+    public static void LoadSchemeFile(string schemeName)
+    {
+        string oldPath = Application.dataPath + "/" + c_SDKCachePath + "/" + schemeName;
+        string newPath =  Application.dataPath + "/" + schemeName;
+
+        Debug.Log("SaveSchemeFile ：oldPath: ->" + oldPath + "<- newPath: ->" + newPath + "<-");
+
+        MoveFiles(oldPath, newPath);
+    }
+
+
+    /// <summary>
+    /// 清空newPath，并把oldPath的文件全部复制到newPath中
+    /// </summary>
+    /// <param name="oldPath">旧路径</param>
+    /// <param name="newPath">新路径</param>
+    public static void MoveFiles(string oldPath,string newPath)
+    {
+        //删除目标文件夹下所有文件
+        if (Directory.Exists(newPath))
+        {
+            FileTool.SafeDeleteDirectory(newPath);
         }
         else
         {
-            Debug.Log("不存在的方案名！ " + SchemeName);
+            FileTool.CreatPath(newPath);
+        }
+
+        if (Directory.Exists(oldPath))
+        {
+            //把当前文件加下的文件拷贝到旧文件夹下
+            FileTool.SafeCopyDirectory(oldPath, newPath);
+            FileTool.SafeDeleteDirectory(oldPath);
         }
     }
 
+    #endregion
+    #endregion
+
+    #region 删除方案
+
+    public static void DelectScheme(SchemeData data)
+    {
+        ConfigList.Remove(data);
+        ConfigNameList.Remove(data.SchemeName);
+
+        SaveEditorSchemeData();
+        SaveGameSchemeConfig(null);
+
+        string Path1 = Application.dataPath + "/" + c_SDKCachePath + "/" + data.SchemeName + "Plugins";
+        string Path2 = Application.dataPath + "/" + c_SDKCachePath + "/" + data.SchemeName;
+        string Path3 = Application.dataPath + "/Plugins";
+        string Path4 = Application.dataPath + "/" + data.SchemeName;
+
+        FileTool.SafeDeleteDirectory(Path1);
+        FileTool.SafeDeleteDirectory(Path2);
+        FileTool.SafeDeleteDirectory(Path3);
+        FileTool.SafeDeleteDirectory(Path4);
+    }
+
+    #endregion
 }

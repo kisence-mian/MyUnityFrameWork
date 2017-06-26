@@ -352,6 +352,14 @@ public class ConfigEditorWindow : EditorWindow
         }
     }
 
+    public static string GetConfigPath(string configName)
+    {
+        return PathTool.GetAbsolutePath(ResLoadLocation.Resource,
+            PathTool.GetRelativelyPath(ConfigManager.c_directoryName,
+                                                configName,
+                                                ConfigManager.c_expandName));
+    }
+
     #endregion
 
     #region 保存配置

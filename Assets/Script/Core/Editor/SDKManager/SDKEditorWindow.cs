@@ -11,24 +11,15 @@ public class SDKEditorWindow : EditorWindow
     public const string s_schemeKey = "schemeList";
     public const string s_currentSchemeKey = "current";
 
-    static string m_filePath = null;
+    public SchemeData m_currentSchemeData;
 
-    public static string FilePath
-    {
-        get
-        {
-            if(m_filePath == null)
-            {
-                m_filePath = Application.dataPath + "/SDKPath";
-            }
-
-            return m_filePath;
-        }
-    }
-    const string m_pluginsPath = "/Plugins/Android";
+    public List<LoginInterface> m_LoginScheme    = new List<LoginInterface>();
+    public List<ADInterface> m_ADScheme          = new List<ADInterface>();
+    public List<PayInterface> m_PayScheme        = new List<PayInterface>();
+    public List<LoginInterface> m_LogScheme      = new List<LoginInterface>();
+    public List<OtherSDKInterface> m_otherScheme = new List<OtherSDKInterface>();
 
     int m_currentSelectIndex = 0;
-
 
     [MenuItem("Window/SDK管理器")]
     public static void ShowWindow()
@@ -40,22 +31,17 @@ public class SDKEditorWindow : EditorWindow
     {
         ResourcesConfigManager.Initialize();
         EditorGUIStyleData.Init();
+        m_currentSchemeData = SDKManager.LoadGameSchemeConfig();
+        m_currentSelectIndex = GetCurrentSelectIndex();
 
-        SchemeDataService.LoadSchemeConfig();
-
-        CreateSDKFile();
-    }
-
-    void OnProjectChange()
-    {
-        SchemeDataService.LoadSchemeConfig();
+        CreateReadMe();
     }
 
     #region GUI
 
     void OnGUI()
     {
-        titleContent.text = "安卓插件管理器";
+        titleContent.text = "插件管理器";
         SelectConfigGUI();
 
         EditorSDKGUI();
@@ -67,11 +53,11 @@ public class SDKEditorWindow : EditorWindow
 
     #endregion
 
-    #region 选择方案GUI
+    #region 选择方案
 
     void SelectConfigGUI()
     {
-        string[] mask = SchemeDataService.m_configNameList.ToArray();
+        string[] mask = SchemeDataService.ConfigNameList.ToArray();
         int newIndex = EditorGUILayout.Popup("当前方案：", m_currentSelectIndex, mask);
         if (mask.Length != 0)
         {
@@ -79,17 +65,10 @@ public class SDKEditorWindow : EditorWindow
             {
                 if (EditorUtility.DisplayDialog("警告", "确定要切换方案吗？", "是", "取消"))
                 {
-                    string oldName = SchemeDataService.m_configList[m_currentSelectIndex].SchemeName;
-                    string newName = SchemeDataService.m_configList[newIndex].SchemeName;
+                    string oldName = SchemeDataService.ConfigNameList[m_currentSelectIndex];
+                    string newName = SchemeDataService.ConfigNameList[newIndex];
 
-                    m_currentSelectIndex = newIndex;
-                    SchemeDataService.LoadCurrentSchemeConfig(SchemeDataService.m_configList[newIndex]);
-
-#if UNITY_ANDROID
-                    ChangeSchemeFile(newName,oldName);
-#else
-                    Debug.Log(oldName +"-->>"+ newName);
-#endif
+                    ChangeScheme(newName,oldName);
                 }
             }
         }
@@ -97,46 +76,6 @@ public class SDKEditorWindow : EditorWindow
 
     bool isConfigFold = false;
     string configName = "";
-    void GetAllConfigName()
-    {
-        EditorGUI.indentLevel = 0;
-
-        isConfigFold = EditorGUILayout.Foldout(isConfigFold, "新增方案");
-
-        if (isConfigFold)
-        {
-            EditorGUI.indentLevel = 1;
-
-            configName = EditorGUILayout.TextField("方案名", configName);
-
-            if (!SchemeDataService.IsExitsSchemeName(configName) && configName != "")
-            {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.Space();
-                if (GUILayout.Button("新增", GUILayout.Width(position.width - 60)))
-                {
-                    Dictionary<string, SingleField> dict = new Dictionary<string, SingleField>();
-                    ConfigEditorWindow.SaveData(configName, dict);
-
-                    //LoadConfig(configName);
-
-                    configName = "";
-                }
-
-                EditorGUILayout.Space();
-                EditorGUILayout.EndHorizontal();
-            }
-            else
-            {
-                if (SchemeDataService.m_configNameList.Contains(configName))
-                {
-                    EditorGUILayout.LabelField("方案名重复");
-                }
-            }
-        }
-
-        EditorGUILayout.Space();
-    }
 
     /// <summary>
     /// 新建方案
@@ -159,15 +98,7 @@ public class SDKEditorWindow : EditorWindow
                 EditorGUILayout.Space();
                 if (GUILayout.Button("新增", GUILayout.Width(position.width - 60)))
                 {
-                    SchemeData data = new SchemeData();
-                    data.SchemeName = configName;
-
-                    SchemeDataService.m_configList.Add(data);
-                    SchemeDataService.m_configNameList.Add(data.SchemeName);
-
-                    SchemeDataService.currentSchemeData = data;
-
-                    configName = "";
+                    CreateScheme(configName);
                 }
 
                 EditorGUILayout.Space();
@@ -175,7 +106,7 @@ public class SDKEditorWindow : EditorWindow
             }
             else
             {
-                if (SchemeDataService.m_configNameList.Contains(configName))
+                if (SchemeDataService.ConfigNameList.Contains(configName))
                 {
                     EditorGUILayout.LabelField("方案名重复");
                 }
@@ -187,13 +118,48 @@ public class SDKEditorWindow : EditorWindow
 
     void SaveConfigGUI()
     {
-        if (SchemeDataService.currentSchemeData != null)
+        if (GUILayout.Button("保存"))
         {
-            if (GUILayout.Button("保存"))
+            SchemeDataService.SaveEditorSchemeData();
+            SchemeDataService.SaveGameSchemeConfig(m_currentSchemeData);
+        }
+    }
+
+    void CreateScheme(string SchemeName)
+    {
+        SchemeData data = new SchemeData();
+        data.SchemeName = SchemeName;
+
+        SchemeDataService.ConfigList.Add(data);
+        SchemeDataService.ConfigNameList.Add(data.SchemeName);
+
+        configName = "";
+        SchemeDataService.SaveEditorSchemeData();
+    }
+
+    void ChangeScheme(string newScheme,string oldScheme)
+    {
+        SchemeDataService.ChangeScheme(newScheme);
+        m_currentSchemeData = SDKManager.LoadGameSchemeConfig();
+        m_currentSelectIndex = GetCurrentSelectIndex();
+    }
+
+    int GetCurrentSelectIndex()
+    {
+        if(m_currentSchemeData == null)
+        {
+            return 0;
+        }
+
+        for (int i = 0; i < SchemeDataService.ConfigNameList.Count; i++)
+        {
+            if(m_currentSchemeData.SchemeName == SchemeDataService.ConfigNameList[i])
             {
-                SchemeDataService.SaveSchemeConfig();
+                return i;
             }
         }
+
+        return 0;
     }
 
     #endregion
@@ -202,7 +168,15 @@ public class SDKEditorWindow : EditorWindow
 
     void DelectSchemeGUI()
     {
-
+        if (GUILayout.Button("删除当前方案"))
+        {
+            if (EditorUtility.DisplayDialog("警告", "删除方案会删除对应的插件文件夹\n要继续吗？", "是", "取消"))
+            {
+                SchemeDataService.DelectScheme(m_currentSchemeData);
+                m_currentSchemeData = null;
+                m_currentSelectIndex = GetCurrentSelectIndex();
+            }
+        }
     }
 
     #endregion
@@ -212,18 +186,27 @@ public class SDKEditorWindow : EditorWindow
     bool m_isFoldSDKGUI = true;
 
     bool m_isFoldlogin = false;
-    bool m_isFoldAd = false;
-    bool m_isFoldPay = false;
-
-    bool m_isFoldLog = false;
-    List<bool> m_logFoldList = new List<bool>();
-
+    bool m_isFoldAd    = false;
+    bool m_isFoldPay   = false;
+    bool m_isFoldLog   = false;
     bool m_isFoldOther = false;
+
+    int selectLoginIndex = 0;
+    int selectADIndex = 0;
+    int selectPayIndex = 0;
+    int selectLogIndex = 0;
+    int selectOtherIndex = 0;
+
+    List<bool> m_loginFoldList = new List<bool>();
+    List<bool> m_AdFoldList = new List<bool>();
+    List<bool> m_PayFoldList = new List<bool>();
+    List<bool> m_LogFoldList = new List<bool>();
     List<bool> m_OtherFoldList = new List<bool>();
+
     Vector2 m_pos = new Vector2();
     void EditorSDKGUI()
     {
-        if (SchemeDataService.currentSchemeData != null)
+        if (m_currentSchemeData != null)
         {
             m_isFoldSDKGUI = EditorGUILayout.Foldout(m_isFoldSDKGUI, "配置插件类型和参数：");
 
@@ -232,20 +215,27 @@ public class SDKEditorWindow : EditorWindow
                 EditorGUI.indentLevel++;
                 m_pos = EditorGUILayout.BeginScrollView(m_pos);
 
-                SchemeDataService.m_LoginScheme = SelectSDKInterfaceGUI(ref m_isFoldlogin, typeof(LoginInterface), SchemeDataService.m_LoginScheme, "登陆SDK");
-                SchemeDataService.m_ADScheme = SelectSDKInterfaceGUI(ref m_isFoldAd, typeof(ADInterface), SchemeDataService.m_ADScheme, "广告SDK");
-                SchemeDataService.m_PayScheme = SelectSDKInterfaceGUI(ref m_isFoldPay, typeof(PayInterface), SchemeDataService.m_PayScheme, "支付SDK");
-                EditorSDKListGUI(ref m_isFoldLog, m_logFoldList, typeof(LogInterface), SchemeDataService.m_LogScheme, "事件上报SDK");
-                EditorSDKListGUI(ref m_isFoldOther, m_OtherFoldList, typeof(OtherSDKInterface), SchemeDataService.m_otherScheme, "其他SDK");
+                EditorSDKListGUI(ref m_isFoldlogin, ref selectLoginIndex, m_loginFoldList, typeof(LoginInterface)   , m_LoginScheme, "登陆SDK");
+                EditorSDKListGUI(ref m_isFoldAd   , ref selectADIndex   , m_AdFoldList   , typeof(ADInterface)      , m_ADScheme  , "广告SDK");
+                EditorSDKListGUI(ref m_isFoldPay  , ref selectPayIndex  , m_PayFoldList  , typeof(PayInterface)     , m_PayScheme  , "支付SDK");
+                EditorSDKListGUI(ref m_isFoldLog  , ref selectLogIndex  , m_LogFoldList  , typeof(LogInterface)     , m_LogScheme  , "事件上报SDK");
+                EditorSDKListGUI(ref m_isFoldOther, ref selectOtherIndex, m_OtherFoldList, typeof(OtherSDKInterface), m_otherScheme, "其他SDK");
+
                 EditorGUILayout.EndScrollView();
                 EditorGUI.indentLevel--;
             }
         }
+        else
+        {
+            EditorGUILayout.LabelField("没有方案");
+        }
+
+        DelectSchemeGUI();
     }
 
-    int selectTmp = 0;
 
-    void EditorSDKListGUI(ref bool isFold,List<bool> foldList,Type SDKType, List<SDKInterfaceBase> list, string title)
+
+    void EditorSDKListGUI<T>(ref bool isFold, ref int selectIndex ,List<bool> foldList,Type SDKType, List<T> list, string title) where T: SDKInterfaceBase
     {
         isFold = EditorGUILayout.Foldout(isFold, title + ":");
 
@@ -282,7 +272,7 @@ public class SDKEditorWindow : EditorWindow
             EditorGUILayout.Space();
 
             string[] mask = GetSDKNameList(SDKType);
-            selectTmp = EditorGUILayout.Popup("新增SDK类型：", selectTmp, mask);
+            selectIndex = EditorGUILayout.Popup("新增SDK类型：", selectIndex, mask);
 
             EditorGUILayout.BeginHorizontal();
 
@@ -290,20 +280,19 @@ public class SDKEditorWindow : EditorWindow
 
             if(GUILayout.Button("新增SDK"))
             {
-
-                Type type = Assembly.Load("Assembly-CSharp").GetType(mask[selectTmp]);
+                Type type = Assembly.Load("Assembly-CSharp").GetType(mask[selectIndex]);
 
                 if (type != null)
                 {
-                    list.Add((SDKInterfaceBase)Activator.CreateInstance(type));
+                    list.Add((T)Activator.CreateInstance(type));
                     foldList.Add(true);
                 }
                 else
                 {
-                    Debug.LogError("Load " + mask[selectTmp] + " Fail!");
+                    Debug.LogError("Load " + mask[selectIndex] + " Fail!");
                 }
 
-                selectTmp = 0;
+                selectIndex = 0;
             }
 
             EditorGUILayout.Space();
@@ -314,7 +303,7 @@ public class SDKEditorWindow : EditorWindow
         }
     }
 
-    SDKInterfaceBase SelectSDKInterfaceGUI(ref bool isFold,Type SDKType,SDKInterfaceBase sdk,string title)
+    T SelectSDKInterfaceGUI<T>(ref bool isFold,Type SDKType, T sdk,string title) where T: SDKInterfaceBase
     {
         isFold = EditorGUILayout.Foldout(isFold, title + ":");
 
@@ -332,7 +321,7 @@ public class SDKEditorWindow : EditorWindow
                 Type type = Assembly.Load("Assembly-CSharp").GetType(mask[index]);
 
                 if (type != null)
-                    sdk = (SDKInterfaceBase)Activator.CreateInstance(type);
+                    sdk = (T)Activator.CreateInstance(type);
                 else
                 {
                     Debug.LogError("Load " + mask[index] + " Fail!");
@@ -386,39 +375,20 @@ public class SDKEditorWindow : EditorWindow
 
     #endregion
 
-    #region 文件/插件管理
+    #region ReadMe
 
-    //默认旧文件夹是当前SDK文件夹
-    public static void ChangeSchemeFile(string newSchemeName,string oldSchemeName)
+    void CreateReadMe()
     {
-        string oldPath = FilePath + "/." + oldSchemeName;
-        string newPath = FilePath + "/." + newSchemeName;
-        //删除旧文件夹下所有文件
-        if (Directory.Exists(oldPath))
+        if(Directory.Exists(Application.dataPath + "/" + SchemeDataService.c_SDKCachePath))
         {
-            FileTool.DeleteDirectory(oldPath);
+            string path = Application.dataPath + "/" + SchemeDataService.c_SDKCachePath + "/Readme.txt";
+            if (!File.Exists(path))
+            {
+                string LoadPath = Application.dataPath + "/Script/Core/Editor/res/readme/SDKCacheReadme.txt";
+                string content = ResourceIOTool.ReadStringByFile(LoadPath);
+                ResourceIOTool.WriteStringByFile(path, content);
+            }
         }
-        else
-        {
-            FileTool.CreatPath(oldPath);
-        }
-        //把当前文件加下的文件拷贝到旧文件夹下
-        FileTool.CopyDirectory(FilePath + m_pluginsPath, oldPath);
-        FileTool.DeleteDirectory(FilePath + m_pluginsPath);
-
-        //找当前方案有没有文件夹
-        //如果有，则全部复制过来
-        if (Directory.Exists(newPath))
-        {
-            FileTool.CopyDirectory(newPath, FilePath + m_pluginsPath);
-        }
-
-        AssetDatabase.Refresh();
-    }
-
-    void CreateSDKFile()
-    {
-        FileTool.CreatPath(FilePath);
     }
 
     #endregion
