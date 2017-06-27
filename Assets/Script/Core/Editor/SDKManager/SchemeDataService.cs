@@ -18,7 +18,7 @@ public class SchemeDataService
         {
             if (configList == null)
             {
-                LoadEditorSchemeData();
+                ReloadEditorSchemeData();
             }
 
             return configList;
@@ -31,7 +31,7 @@ public class SchemeDataService
         {
             if(configNameList == null)
             {
-                LoadEditorSchemeData();
+                ReloadEditorSchemeData();
             }
 
             return configNameList;
@@ -43,7 +43,7 @@ public class SchemeDataService
     /// <summary>
     ///加载编辑器设置
     /// </summary>
-    static void LoadEditorSchemeData()
+    public static void ReloadEditorSchemeData()
     {
         configList = new List<SchemeData>();
         configNameList = new List<string>();
@@ -101,7 +101,7 @@ public class SchemeDataService
     List<LoginInterface> loginScheme,
     List<ADInterface> ADScheme,
     List<PayInterface> payScheme,
-    List<LoginInterface> logScheme,
+    List<LogInterface> logScheme,
     List<OtherSDKInterface> otherScheme)
     {
         SchemeData schemeData = new SchemeData();

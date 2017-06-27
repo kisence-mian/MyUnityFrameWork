@@ -1,0 +1,15 @@
+d_UnityEditor.ConsoleWindow
+d_Project
+d_UnityEditor.SceneHierarchyWindow
+d_UnityEditor.AnimationWindow
+UnityEditor.ASMainWindow
+d_Asset Store
+d_Audio Mixer
+d_UnityEditor.GameView
+d_UnityEditor.InspectorWindow
+d_UnityEditor.ProfilerWindow
+d_Lighting
+d_Navigation
+d_Occlusion
+d_UnityEditor.SceneView
+d_UnityEditor.VersionControl

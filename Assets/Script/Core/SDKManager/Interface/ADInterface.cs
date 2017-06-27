@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class ADInterface  : SDKInterfaceBase 
 {
+    [HideInInspector]
     public CallBack m_ADLoadFinish;
 
 

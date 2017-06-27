@@ -5,7 +5,7 @@ using UnityEngine;
 public class PayInterface : SDKInterfaceBase
 {
     public PayCallBack m_callBack;
-    public void Pay(string goodsID)
+    virtual public void Pay(string goodsID)
     {
 
     }

@@ -90,11 +90,8 @@ public class EditorUtilGUI
     #endregion
 
     #region 反射类并显示在GUI
-    public static object DrawObjectDataEditorDefultOneField(string name, object value)
+    public static object DrawObjectDataEditorDefultOneField(Type type,string name, object value)
     {
-        if (value == null)
-            return value;
-        Type type = value.GetType();
         object obj = null;
         if (type == typeof(int))
         {
@@ -118,17 +115,15 @@ public class EditorUtilGUI
         }
         else if (type.FullName == typeof(string).FullName)
         {
-            obj = EditorGUILayout.TextField(new GUIContent(name), value.ToString());
+            obj = EditorGUILayout.TextField(new GUIContent(name), (string)value);
         }
         else if (type.BaseType.FullName == typeof(UnityEngine.Object).FullName || type.BaseType.FullName == typeof(UnityEngine.Component).FullName)
         {
             obj = EditorGUILayout.ObjectField(name, (UnityEngine.Object)value, type, true);
-            // Debug.Log("GameObject type : " + f.FieldType.Name);
         }
         else if (type.BaseType == typeof(Enum))
         {
             obj = EditorGUILayout.EnumPopup(new GUIContent(name), (Enum)Enum.Parse(type, value.ToString()));
-            // Debug.Log("Enum type : " + f.FieldType.Name);
         }
         else if (type.FullName == typeof(Vector3).FullName)
         {
@@ -144,11 +139,11 @@ public class EditorUtilGUI
         }
         else if (type.Name == typeof(List<>).Name)
         {
-            obj = DrawList(name, value);
+            obj = DrawList(type,name, value);
         }
         else if (type.IsClass)
         {
-            obj = DrawClassData(type.Name, value, name);
+            obj = DrawClassData(type,type.Name, value, name);
         }
         else
         {
@@ -157,33 +152,22 @@ public class EditorUtilGUI
 
         return obj;
     }
-    public static object DrawObjectDataEditorDefultOneField(object data, FieldInfo field)
+
+
+    public static object DrawClassData(Type type,string className, object obj, string fieldName = null)
     {
-        if (data == null || field == null)
-            return null;
-        object d = DrawObjectDataEditorDefultOneField(field.Name, field.GetValue(data));
-        field.SetValue(data, d);
-        return d;
-    }
-
-
-    public static object DrawClassData(string className, object obj, string fieldName = null)
-    {
-        Assembly tmp = Assembly.Load("Assembly-CSharp");
-        Type t = tmp.GetType(className);
-
         if (obj == null)
-            obj = Activator.CreateInstance(t);
+            obj = Activator.CreateInstance(type);
         else
         {
-            if (t == null)
+            if (type == null)
             {
                 return obj;
             }
 
-            if (t.Name != obj.GetType().Name)
+            if (type.Name != obj.GetType().Name)
             {
-                obj = Activator.CreateInstance(t);
+                obj = Activator.CreateInstance(type);
             }
         }
         return DrawClassData(obj, fieldName);
@@ -203,7 +187,11 @@ public class EditorUtilGUI
 
         foreach (FieldInfo f in fs)
         {
-            obj = DrawInternalVariableGUI(obj, f);
+            if (f.GetCustomAttributes(typeof(HideInInspector),true).Length == 0
+                && f.IsStatic == false)
+            {
+                obj = DrawInternalVariableGUI(obj, f);
+            }
         }
 
         GUILayout.EndVertical();
@@ -268,11 +256,8 @@ public class EditorUtilGUI
         GUILayout.EndVertical();
         return obj;
     }
-    public static object DrawList(string name, object obj)
+    public static object DrawList(Type type,string name, object obj)
     {
-        if (obj == null)
-            return null;
-        Type type = obj.GetType();
         Type t = type.GetGenericArguments()[0];
 
         MethodInfo methodInfo = type.GetMethod("get_Item", BindingFlags.Instance | BindingFlags.Public);
@@ -299,14 +284,14 @@ public class EditorUtilGUI
         {
             object da = methodInfo.Invoke(obj, new object[] { i });
             GUILayout.BeginHorizontal();
-            da = DrawObjectDataEditorDefultOneField("", da);
+            da = DrawObjectDataEditorDefultOneField(type, "", da);
             methodInfo1.Invoke(obj, new object[] { i, da });
 
             if (GUILayout.Button("-", GUILayout.Width(50)))
             {
                 methodInfo2.Invoke(obj, new object[] { i });
                 break;
-            }
+            } 
             GUILayout.EndHorizontal();
         }
         GUILayout.EndVertical();
@@ -315,16 +300,9 @@ public class EditorUtilGUI
 
     public static object DrawInternalVariableGUI(object obj, FieldInfo f)
     {
-        object value = DrawObjectDataEditorDefultOneField(f.Name, f.GetValue(obj));
+        object value = DrawObjectDataEditorDefultOneField(f.FieldType,f.Name, f.GetValue(obj));
         f.SetValue(obj, value);
         return obj;
-    }
-    public static object DrawInternalVariableGUI(object obj, string fieldName)
-    {
-        if (obj == null || string.IsNullOrEmpty(fieldName))
-            return obj;
-        FieldInfo f = obj.GetType().GetField(fieldName);
-        return DrawInternalVariableGUI(obj, f);
     }
 
     public static string[] FindDataName(string path)
@@ -339,10 +317,8 @@ public class EditorUtilGUI
         foreach (var item in allUIPrefabName)
         {
             string[] tempFileName = new string[0];
-            //  Debug.Log("item:" + item);
             if (Directory.Exists(item))
             {
-                // Debug.Log("tempPath:" + item);
                 tempFileName = FindDataName(item);
             }
 
@@ -366,6 +342,14 @@ public class EditorUtilGUI
         }
         return m_dataNameList.ToArray();
 
+    }
+
+    /// <summary>
+    /// 使用这个特性的字段不会显示在面板上
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class HideByGUIAttribute : System.Attribute
+    {
     }
 
     #endregion

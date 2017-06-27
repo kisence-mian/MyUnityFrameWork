@@ -16,7 +16,7 @@ public class SDKEditorWindow : EditorWindow
     public List<LoginInterface> m_LoginScheme    = new List<LoginInterface>();
     public List<ADInterface> m_ADScheme          = new List<ADInterface>();
     public List<PayInterface> m_PayScheme        = new List<PayInterface>();
-    public List<LoginInterface> m_LogScheme      = new List<LoginInterface>();
+    public List<LogInterface> m_LogScheme        = new List<LogInterface>();
     public List<OtherSDKInterface> m_otherScheme = new List<OtherSDKInterface>();
 
     int m_currentSelectIndex = 0;
@@ -31,10 +31,17 @@ public class SDKEditorWindow : EditorWindow
     {
         ResourcesConfigManager.Initialize();
         EditorGUIStyleData.Init();
+        SchemeDataService.ReloadEditorSchemeData();
         m_currentSchemeData = SDKManager.LoadGameSchemeConfig();
         m_currentSelectIndex = GetCurrentSelectIndex();
+        LoadSchemeData(m_currentSchemeData);
 
         CreateReadMe();
+    }
+
+    void OnProjectChange()
+    {
+        SchemeDataService.ReloadEditorSchemeData();
     }
 
     #region GUI
@@ -121,7 +128,15 @@ public class SDKEditorWindow : EditorWindow
         if (GUILayout.Button("保存"))
         {
             SchemeDataService.SaveEditorSchemeData();
-            SchemeDataService.SaveGameSchemeConfig(m_currentSchemeData);
+            SchemeDataService.SaveGameSchemeConfig(
+                SchemeDataService.CreateSchemeData(
+                    m_currentSchemeData.SchemeName,
+                m_LoginScheme,
+                m_ADScheme,
+                m_PayScheme,
+                m_LogScheme,
+                m_otherScheme
+                ));
         }
     }
 
@@ -135,6 +150,13 @@ public class SDKEditorWindow : EditorWindow
 
         configName = "";
         SchemeDataService.SaveEditorSchemeData();
+
+        if (m_currentSchemeData == null)
+        {
+            m_currentSchemeData = data;
+            m_currentSelectIndex = GetCurrentSelectIndex();
+            LoadSchemeData(m_currentSchemeData);
+        }
     }
 
     void ChangeScheme(string newScheme,string oldScheme)
@@ -142,6 +164,18 @@ public class SDKEditorWindow : EditorWindow
         SchemeDataService.ChangeScheme(newScheme);
         m_currentSchemeData = SDKManager.LoadGameSchemeConfig();
         m_currentSelectIndex = GetCurrentSelectIndex();
+        LoadSchemeData(m_currentSchemeData);
+    }
+
+    void LoadSchemeData(SchemeData data)
+    {
+        SDKManager.AnalyzeSchemeData(data,
+            out m_LoginScheme,
+            out m_ADScheme,
+            out m_PayScheme,
+            out m_LogScheme,
+            out m_otherScheme
+            );
     }
 
     int GetCurrentSelectIndex()

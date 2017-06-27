@@ -1,0 +1,229 @@
+MonoLogo
+AgeiaLogo
+AboutWindow.MainHeader
+Animation.AddEvent
+lightMeter/greenLight
+lightMeter/lightRim
+lightMeter/orangeLight
+lightMeter/redLight
+Animation.PrevKey
+Animation.NextKey
+Animation.AddKeyframe
+Animation.EventMarker
+Animation.Play
+Animation.Record
+Animation.PrevKey
+Animation.NextKey
+Animation.AddKeyframe
+Animation.AddEvent
+WaitSpin00
+WaitSpin01
+WaitSpin02
+WaitSpin03
+WaitSpin04
+WaitSpin05
+WaitSpin06
+WaitSpin07
+WaitSpin08
+WaitSpin09
+WaitSpin10
+WaitSpin11
+AS Badge Delete
+AS Badge Move
+AS Badge New
+WelcomeScreen.AssetStoreLogo
+WelcomeScreen.AssetStoreLogo
+preAudioAutoPlayOff
+preAudioAutoPlayOn
+preAudioPlayOff
+preAudioPlayOn
+preAudioLoopOff
+preAudioLoopOn
+Animation.Record
+AvatarInspector/BodySilhouette
+AvatarInspector/HeadZoomSilhouette
+AvatarInspector/LeftHandZoomSilhouette
+AvatarInspector/RightHandZoomSilhouette
+AvatarInspector/Torso
+AvatarInspector/Head
+AvatarInspector/LeftArm
+AvatarInspector/LeftFingers
+AvatarInspector/RightArm
+AvatarInspector/RightFingers
+AvatarInspector/LeftLeg
+AvatarInspector/RightLeg
+AvatarInspector/HeadZoom
+AvatarInspector/LeftHandZoom
+AvatarInspector/RightHandZoom
+AvatarInspector/DotFill
+AvatarInspector/DotFrame
+AvatarInspector/DotFrameDotted
+AvatarInspector/DotSelection
+SpeedScale
+AvatarPivot
+Avatar Icon
+SpeedScale
+Mirror
+AvatarInspector/BodySIlhouette
+AvatarInspector/BodyPartPicker
+AvatarInspector/MaskEditor_Root
+AvatarInspector/Torso
+AvatarInspector/Head
+AvatarInspector/LeftLeg
+AvatarInspector/RightLeg
+AvatarInspector/LeftArm
+AvatarInspector/RightArm
+AvatarInspector/LeftFingers
+AvatarInspector/RightFingers
+AvatarInspector/LeftFeetIk
+AvatarInspector/RightFeetIk
+AvatarInspector/LeftFingersIk
+AvatarInspector/RightFingersIk
+BuildSettings.SelectedIcon
+Toolbar Minus
+ClothInspector.PaintValue
+EditCollider
+EditCollider
+EditCollider
+EyeDropper.Large
+ColorPicker.CycleColor
+ColorPicker.CycleSlider
+PreTextureMipMapLow
+PreTextureMipMapHigh
+PreTextureAlpha
+PreTextureRGB
+AnimationWrapModeMenu
+Icon Dropdown
+UnityLogo
+Animation.EventMarker
+Profiler.PrevFrame
+Profiler.NextFrame
+GameObject Icon
+Prefab Icon
+PrefabNormal Icon
+PrefabModel Icon
+PrefabNormal Icon
+Icon Dropdown
+renderdoc
+sv_icon_none
+PreMatLight0
+PreMatLight1
+Toolbar Plus
+Toolbar Minus
+Camera Icon
+PreMatSphere
+PreMatCube
+PreMatCylinder
+PreMatTorus
+PreMatQuad
+PreMatLight0
+PreMatLight1
+PlayButton
+PauseButton
+preAudioPlayOff
+preAudioPlayOn
+AS Badge New
+AS Badge Delete
+console.warnicon
+playLoopOff
+HorizontalSplit
+VerticalSplit
+BuildSettings.Web.Small
+Profiler.PrevFrame
+Profiler.NextFrame
+Prefab Icon
+js Script Icon
+cs Script Icon
+boo Script Icon
+Shader Icon
+TextAsset Icon
+AnimatorController Icon
+AudioMixerController Icon
+Sprite Icon
+TreeEditor.Trash
+RectTransformRaw
+RectTransformBlueprint
+EditCollider
+MoveTool
+sv_icon_none
+MeshRenderer Icon
+Terrain Icon
+SceneviewLighting
+SceneviewFx
+SceneviewAudio
+renderdoc
+Toolbar Plus
+Toolbar Minus
+Toolbar Plus
+Toolbar Minus
+PreTextureAlpha
+PreTextureRGB
+PreTextureMipMapLow
+PreTextureMipMapHigh
+Toolbar Plus
+Toolbar Minus
+TreeEditor.Duplicate
+PreMatSphere
+PreMatCube
+PreMatCylinder
+PreMatTorus
+PreMatLight0
+PreMatLight1
+SettingsIcon
+TerrainInspector.TerrainToolRaise
+TerrainInspector.TerrainToolSetHeight
+TerrainInspector.TerrainToolSmoothHeight
+TerrainInspector.TerrainToolSplat
+TerrainInspector.TerrainToolTrees
+TerrainInspector.TerrainToolPlants
+TerrainInspector.TerrainToolSettings
+PreTextureMipMapLow
+PreTextureMipMapHigh
+PreTextureAlpha
+PreTextureRGB
+PlayButton
+PauseButton
+MoveTool
+RotateTool
+ScaleTool
+RectTool
+MoveTool On
+RotateTool On
+ScaleTool On
+RectTool On
+ViewToolOrbit
+ViewToolMove
+ViewToolZoom
+ViewToolOrbit
+ViewToolOrbit On
+ViewToolMove On
+ViewToolZoom On
+ViewToolOrbit On
+PlayButton
+PauseButton
+StepButton
+PlayButtonProfile
+PlayButton On
+PauseButton On
+StepButton On
+PlayButtonProfile On
+PlayButton Anim
+PauseButton Anim
+StepButton Anim
+PlayButtonProfile Anim
+CloudConnect
+preAudioPlayOff
+preAudioPlayOn
+UnityLogo
+WelcomeScreen.MainHeader
+WelcomeScreen.VideoTutLogo
+WelcomeScreen.UnityBasicsLogo
+WelcomeScreen.UnityForumLogo
+WelcomeScreen.UnityAnswersLogo
+WelcomeScreen.AssetStoreLogo
+Profiler.Record
+ProfilerColumn.WarningCount
+Toolbar Plus
+Toolbar Plus More
+Toolbar Minus
+Toolbar Minus

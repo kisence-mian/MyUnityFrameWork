@@ -24,6 +24,8 @@ public class SDKManager
     /// </summary>
     public static void Init()
     {
+        Debug.Log("SDKManager Init");
+
         try
         {
             if (ConfigManager.GetIsExistConfig(c_ConfigName))
@@ -417,34 +419,45 @@ public class SDKManager
         out List<OtherSDKInterface> otherScheme
         )
     {
-        loginScheme = new List<LoginInterface>();
-        for (int i = 0; i < schemeData.LoginScheme.Count; i++)
+        if(schemeData != null)
         {
-            loginScheme.Add((LoginInterface)AnalysisConfig(schemeData.LoginScheme[i]));
-        }
+            loginScheme = new List<LoginInterface>();
+            for (int i = 0; i < schemeData.LoginScheme.Count; i++)
+            {
+                loginScheme.Add((LoginInterface)AnalysisConfig(schemeData.LoginScheme[i]));
+            }
 
-        ADScheme = new List<ADInterface>();
-        for (int i = 0; i < schemeData.ADScheme.Count; i++)
-        {
-            ADScheme.Add((ADInterface)AnalysisConfig(schemeData.ADScheme[i]));
-        }
+            ADScheme = new List<ADInterface>();
+            for (int i = 0; i < schemeData.ADScheme.Count; i++)
+            {
+                ADScheme.Add((ADInterface)AnalysisConfig(schemeData.ADScheme[i]));
+            }
 
-        payScheme = new List<PayInterface>();
-        for (int i = 0; i < schemeData.PayScheme.Count; i++)
-        {
-            payScheme.Add((PayInterface)AnalysisConfig(schemeData.PayScheme[i]));
-        }
+            payScheme = new List<PayInterface>();
+            for (int i = 0; i < schemeData.PayScheme.Count; i++)
+            {
+                payScheme.Add((PayInterface)AnalysisConfig(schemeData.PayScheme[i]));
+            }
 
-        logScheme = new List<LogInterface>();
-        for (int i = 0; i < schemeData.LogScheme.Count; i++)
-        {
-            logScheme.Add((LogInterface)AnalysisConfig(schemeData.LogScheme[i]));
-        }
+            logScheme = new List<LogInterface>();
+            for (int i = 0; i < schemeData.LogScheme.Count; i++)
+            {
+                logScheme.Add((LogInterface)AnalysisConfig(schemeData.LogScheme[i]));
+            }
 
-        otherScheme = new List<OtherSDKInterface>();
-        for (int i = 0; i < schemeData.OtherScheme.Count; i++)
+            otherScheme = new List<OtherSDKInterface>();
+            for (int i = 0; i < schemeData.OtherScheme.Count; i++)
+            {
+                otherScheme.Add((OtherSDKInterface)AnalysisConfig(schemeData.OtherScheme[i]));
+            }
+        }
+        else
         {
-            otherScheme.Add((OtherSDKInterface)AnalysisConfig(schemeData.OtherScheme[i]));
+            loginScheme = new List<LoginInterface>();
+            ADScheme = new List<ADInterface>();
+            payScheme = new List<PayInterface>();
+            logScheme = new List<LogInterface>();
+            otherScheme = new List<OtherSDKInterface>();
         }
     }
 
@@ -485,6 +498,8 @@ public class SDKManager
         InitSDKList(s_payServiceList);
         InitSDKList(s_logServiceList);
         InitSDKList(s_otherServiceList);
+
+        Debug.Log("s_loginServiceList: " + s_loginServiceList.Count);
     }
 
     #endregion
@@ -510,7 +525,8 @@ public class SDKManager
         {
             try
             {
-                list[i].m_SDKName = typeof(T).Name;
+                list[i].m_SDKName = list[i].GetType().Name;
+                Debug.Log("list[i].m_SDKName " + list[i].GetType().Name);
                 list[i].Init();
             }
             catch (Exception e)
