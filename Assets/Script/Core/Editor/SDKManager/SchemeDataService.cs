@@ -68,9 +68,9 @@ public class SchemeDataService
         Dictionary<string, object> editConfig = new Dictionary<string, object>();
         List<string> list = new List<string>();
 
-        for (int i = 0; i < configList.Count; i++)
+        for (int i = 0; i < ConfigList.Count; i++)
         {
-            list.Add(JsonUtility.ToJson(configList[i]));
+            list.Add(JsonUtility.ToJson(ConfigList[i]));
         }
 
         editConfig.Add(SDKEditorWindow.s_schemeKey, list);
@@ -168,13 +168,15 @@ public class SchemeDataService
         SchemeData data = SDKManager.LoadGameSchemeConfig();
         string oldSchemeName = "None";
 
-        if(data != null)
+        if (!IsExitsSchemeName(SchemeName))
+        {
+            Debug.Log("->" + SchemeName + "<- 方案不存在！ ");
+            return;
+        }
+
+        if (data != null)
         {
             oldSchemeName = data.SchemeName;
-        }
-        else
-        {
-            Debug.Log("当前方案不存在！ ");
         }
 
         //方案相同不切换
@@ -204,6 +206,8 @@ public class SchemeDataService
         }
         else
         {
+            //这部分代码实际上不会执行
+
             Debug.Log("不存在的方案名！ " + SchemeName);
             if (oldSchemeName != "None")
             {
@@ -223,9 +227,9 @@ public class SchemeDataService
 
     public static bool IsExitsSchemeName(string name)
     {
-        for (int i = 0; i < configList.Count; i++)
+        for (int i = 0; i < ConfigList.Count; i++)
         {
-            if (configList[i].SchemeName == name)
+            if (ConfigList[i].SchemeName == name)
             {
                 return true;
             }
@@ -236,9 +240,9 @@ public class SchemeDataService
 
     public static int GetSchemeIndex(string name)
     {
-        for (int i = 0; i < configList.Count; i++)
+        for (int i = 0; i < ConfigList.Count; i++)
         {
-            if (configList[i].SchemeName == name)
+            if (ConfigList[i].SchemeName == name)
             {
                 return i;
             }
@@ -252,15 +256,15 @@ public class SchemeDataService
         if (name == "None")
             return null;
 
-        for (int i = 0; i < configList.Count; i++)
+        for (int i = 0; i < ConfigList.Count; i++)
         {
-            if (configList[i].SchemeName == name)
+            if (ConfigList[i].SchemeName == name)
             {
-                return configList[i];
+                return ConfigList[i];
             }
         }
 
-        throw new System.Exception("GetSchemeData Exception not find ->"+ name + "<-");
+        throw new System.Exception("GetSchemeData Error not find ->" + name + "<-");
     }
     #endregion
 
