@@ -25,7 +25,7 @@ public class LanguageComponmentEditor : Editor
             m_lc.m_text = m_lc.GetComponent<Text>();
             if (m_lc.m_text == null)
             {
-                EditorGUILayout.LabelField("没有找到Text组件！", EditorGUIStyleData.s_ErrorMessageLabel);
+                EditorGUILayout.LabelField("没有找到Text组件！", EditorGUIStyleData.ErrorMessageLabel);
             }
         }
 

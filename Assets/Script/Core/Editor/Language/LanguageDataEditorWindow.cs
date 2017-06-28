@@ -161,7 +161,7 @@ public class LanguageDataEditorWindow : EditorWindow
         if (m_currentLanguage == m_defaultLanguage.ToString())
         {
             EditorGUI.indentLevel = 1;
-            EditorGUILayout.LabelField("默认语言", EditorGUIStyleData.s_WarnMessageLabel);
+            EditorGUILayout.LabelField("默认语言", EditorGUIStyleData.WarnMessageLabel);
         }
     }
 
@@ -295,7 +295,7 @@ public class LanguageDataEditorWindow : EditorWindow
             {
                 if (s_languageKeyDict.ContainsKey(m_newModelName))
                 {
-                    EditorGUILayout.LabelField("模块名重复！", EditorGUIStyleData.s_WarnMessageLabel);
+                    EditorGUILayout.LabelField("模块名重复！", EditorGUIStyleData.WarnMessageLabel);
                 }
             }
         }
@@ -345,7 +345,7 @@ public class LanguageDataEditorWindow : EditorWindow
             {
                 if (languageKeyList.Contains(newField))
                 {
-                    EditorGUILayout.LabelField("字段名重复！", EditorGUIStyleData.s_WarnMessageLabel);
+                    EditorGUILayout.LabelField("字段名重复！", EditorGUIStyleData.WarnMessageLabel);
                 }
             }
         }
@@ -453,7 +453,7 @@ public class LanguageDataEditorWindow : EditorWindow
             }
             catch (Exception e)
             {
-                EditorGUILayout.TextArea("Error: " + e.ToString(), EditorGUIStyleData.s_ErrorMessageLabel);
+                EditorGUILayout.TextArea("Error: " + e.ToString(), EditorGUIStyleData.ErrorMessageLabel);
                 EditorGUILayout.Space();
             }
 
@@ -463,7 +463,7 @@ public class LanguageDataEditorWindow : EditorWindow
         {
             EditorGUILayout.BeginHorizontal();
 
-            EditorGUILayout.LabelField("缺少 " + key + " 字段", EditorGUIStyleData.s_WarnMessageLabel);
+            EditorGUILayout.LabelField("缺少 " + key + " 字段", EditorGUIStyleData.WarnMessageLabel);
 
             AddMissLanguageGUI(data, key);
 
@@ -532,7 +532,7 @@ public class LanguageDataEditorWindow : EditorWindow
             }
             else
             {
-                EditorGUILayout.LabelField("已存在该语言",EditorGUIStyleData.s_WarnMessageLabel);
+                EditorGUILayout.LabelField("已存在该语言",EditorGUIStyleData.WarnMessageLabel);
             }
         }
 

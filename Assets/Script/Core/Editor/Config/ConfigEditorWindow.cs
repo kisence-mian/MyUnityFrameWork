@@ -301,7 +301,7 @@ public class ConfigEditorWindow : EditorWindow
                 }
                 catch(Exception e)
                 {
-                    GUILayout.Label(e.ToString(), EditorGUIStyleData.s_ErrorMessageLabel);
+                    GUILayout.Label(e.ToString(), EditorGUIStyleData.ErrorMessageLabel);
                 }
 
             }

@@ -10,32 +10,11 @@ using UnityEngine;
 
 public class GuideSystemEditor
 {
-    [MenuItem("Tools/新手引导/反射")]
+    [MenuItem("Tools/新手引导/增加Guide引导层")]
     public static void ShowAllMethod()
     {
-        Type internalEditorUtilityType = typeof(InternalEditorUtility);
-        MethodInfo[] infos = internalEditorUtilityType.GetMethods( BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public);
-
-        string content = "";
-
-        for (int i = 0; i < infos.Length; i++)
-        {
-            if(infos[i].Name.Contains("SortingLayer"))
-            {
-                content += infos[i].ReturnType +" " + infos[i].Name +"(";
-
-                ParameterInfo[] pinfos = infos[i].GetParameters();
-
-                for (int j = 0; j < pinfos.Length; j++)
-                {
-                    content += pinfos[j].ParameterType + " " + pinfos[j].Name + " ";
-                }
-
-                content += ")\n";
-            }
-        }
-
-        Debug.Log(content);
+        //增加Guide引导层
+        EditorExpand.AddSortLayerIfNotExist("Guide");
     }
 
     [MenuItem("Tools/新手引导/初始化")]
@@ -50,6 +29,8 @@ public class GuideSystemEditor
             CreateGuideWindowScript();
 
             //增加Guide引导层
+
+            EditorExpand.AddSortLayerIfNotExist("Guide");
 
             //添加引导开关
             RecordManager.SaveRecord(GuideSystemBase.c_guideRecordName, GuideSystemBase.c_guideSwitchName, true);

@@ -328,12 +328,12 @@ public class BundleConfigEditorWindow : EditorWindow
     {
         for (int i = 0; i < package.errorMsg.Count; i++)
         {
-            EditorGUILayout.LabelField("ERROR: " + package.errorMsg[i], EditorGUIStyleData.s_ErrorMessageLabel);
+            EditorGUILayout.LabelField("ERROR: " + package.errorMsg[i], EditorGUIStyleData.ErrorMessageLabel);
         }
 
         for (int i = 0; i < package.warnMsg.Count; i++)
         {
-            EditorGUILayout.LabelField("WARN: " + package.warnMsg[i], EditorGUIStyleData.s_WarnMessageLabel);
+            EditorGUILayout.LabelField("WARN: " + package.warnMsg[i], EditorGUIStyleData.WarnMessageLabel);
         }
     }
 
@@ -411,12 +411,12 @@ public class BundleConfigEditorWindow : EditorWindow
         {
             for (int j = 0; j < relyPackages[i].warnMsg.Count; j++)
             {
-                EditorGUILayout.LabelField("WARN: " + relyPackages[i].warnMsg[j], EditorGUIStyleData.s_WarnMessageLabel);
+                EditorGUILayout.LabelField("WARN: " + relyPackages[i].warnMsg[j], EditorGUIStyleData.WarnMessageLabel);
             }
 
             for (int j = 0; j < relyPackages[i].errorMsg.Count; j++)
             {
-                EditorGUILayout.LabelField("ERROR: " + relyPackages[i].errorMsg[j], EditorGUIStyleData.s_ErrorMessageLabel);
+                EditorGUILayout.LabelField("ERROR: " + relyPackages[i].errorMsg[j], EditorGUIStyleData.ErrorMessageLabel);
             }
         }
 
@@ -424,12 +424,12 @@ public class BundleConfigEditorWindow : EditorWindow
         {
             for (int j = 0; j < bundles[i].warnMsg.Count; j++)
             {
-                EditorGUILayout.LabelField("WARN: " + bundles[i].warnMsg[j], EditorGUIStyleData.s_WarnMessageLabel);
+                EditorGUILayout.LabelField("WARN: " + bundles[i].warnMsg[j], EditorGUIStyleData.WarnMessageLabel);
             }
 
             for (int j = 0; j < bundles[i].errorMsg.Count; j++)
             {
-                EditorGUILayout.LabelField("ERROR: " + bundles[i].errorMsg[j], EditorGUIStyleData.s_ErrorMessageLabel);
+                EditorGUILayout.LabelField("ERROR: " + bundles[i].errorMsg[j], EditorGUIStyleData.ErrorMessageLabel);
             }
         }
     }
