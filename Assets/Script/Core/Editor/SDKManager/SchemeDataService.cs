@@ -159,7 +159,8 @@ public class SchemeDataService
     #region 切换方案
 
     /// <summary>
-    /// 切换方案，打包用
+    /// 切换方案
+    /// 由于自动打包会调用这里，所以将切换宏定义的代码也放在此处，注意！
     /// </summary>
     /// <param name="SchemeName"></param>
     public static void ChangeScheme(string SchemeName)
@@ -352,8 +353,29 @@ public class SchemeDataService
     #endregion
     #endregion
 
-    #region 删除方案
+    #region 增删方案
 
+    /// <summary>
+    /// 新增方案
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
+    public static SchemeData AddScheme(string name)
+    {
+        SchemeData data = new SchemeData();
+        data.SchemeName = name;
+
+        ConfigList.Add(data);
+        ConfigNameList.Add(data.SchemeName);
+        SaveEditorSchemeData();
+
+        return data;
+    }
+
+    /// <summary>
+    /// 删除方案
+    /// </summary>
+    /// <param name="data"></param>
     public static void DelectScheme(SchemeData data)
     {
         ConfigList.Remove(data);

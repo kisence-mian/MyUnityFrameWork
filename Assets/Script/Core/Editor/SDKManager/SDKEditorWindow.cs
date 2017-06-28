@@ -106,6 +106,7 @@ public class SDKEditorWindow : EditorWindow
                 if (GUILayout.Button("新增", GUILayout.Width(position.width - 60)))
                 {
                     CreateScheme(configName);
+                    configName = "";
                 }
 
                 EditorGUILayout.Space();
@@ -127,35 +128,39 @@ public class SDKEditorWindow : EditorWindow
     {
         if (GUILayout.Button("保存"))
         {
-            SchemeDataService.SaveEditorSchemeData();
-            SchemeDataService.SaveGameSchemeConfig(
-                SchemeDataService.CreateSchemeData(
-                    m_currentSchemeData.SchemeName,
-                m_LoginScheme,
-                m_ADScheme,
-                m_PayScheme,
-                m_LogScheme,
-                m_otherScheme
-                ));
+            SaveScheme();
         }
+    }
+
+    void SaveScheme()
+    {
+        SchemeDataService.SaveEditorSchemeData();
+        SchemeDataService.SaveGameSchemeConfig(
+            SchemeDataService.CreateSchemeData(
+                m_currentSchemeData.SchemeName,
+            m_LoginScheme,
+            m_ADScheme,
+            m_PayScheme,
+            m_LogScheme,
+            m_otherScheme
+            ));
     }
 
     void CreateScheme(string SchemeName)
     {
-        SchemeData data = new SchemeData();
-        data.SchemeName = SchemeName;
+        SchemeData data = SchemeDataService.AddScheme(SchemeName);
 
-        SchemeDataService.ConfigList.Add(data);
-        SchemeDataService.ConfigNameList.Add(data.SchemeName);
-
-        configName = "";
-        SchemeDataService.SaveEditorSchemeData();
-
+        //如果当前没有方案，则把新建的方案设为当前方案
         if (m_currentSchemeData == null)
         {
             m_currentSchemeData = data;
             m_currentSelectIndex = GetCurrentSelectIndex();
             LoadSchemeData(m_currentSchemeData);
+
+            SaveScheme();
+
+            //设置宏定义
+            EditorExpand.ChangeDefine(new string[] { SchemeName }, new string[] { });
         }
     }
 
@@ -206,11 +211,20 @@ public class SDKEditorWindow : EditorWindow
         {
             if (EditorUtility.DisplayDialog("警告", "删除方案会删除对应的插件文件夹\n要继续吗？", "是", "取消"))
             {
-                SchemeDataService.DelectScheme(m_currentSchemeData);
-                m_currentSchemeData = null;
-                m_currentSelectIndex = GetCurrentSelectIndex();
+                DelectScheme();
             }
         }
+    }
+
+    void DelectScheme()
+    {
+        SchemeDataService.DelectScheme(m_currentSchemeData);
+
+        //移除宏定义
+        EditorExpand.ChangeDefine(new string[] { }, new string[] { m_currentSchemeData.SchemeName });
+
+        m_currentSchemeData = null;
+        m_currentSelectIndex = GetCurrentSelectIndex();
     }
 
     #endregion
