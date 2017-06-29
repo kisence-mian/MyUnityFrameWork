@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEditor;
@@ -36,6 +37,7 @@ public class ReflectionEdtorWindow : EditorWindow
     Assembly m_currentAssembly;
     Type m_currentClass;
     MethodInfo m_method;
+    Stack<Type> m_typeStack = new Stack<Type>();
 
     string m_searchTmp = "";
 
@@ -70,8 +72,9 @@ public class ReflectionEdtorWindow : EditorWindow
                 break;
 
             case WindowStatus.Class:
-                //类
-                AllMethodGUI();
+
+                ClassGUI();
+
                 break;
 
             default:break;
@@ -101,6 +104,7 @@ public class ReflectionEdtorWindow : EditorWindow
             if (m_currentClass == null)
             {
                 m_status = WindowStatus.Assembly;
+                toolbarOption = 0;
                 return;
             }
 
@@ -226,28 +230,35 @@ public class ReflectionEdtorWindow : EditorWindow
 
     #region 类
 
-    Type[] m_types;
+
     Vector2 m_classSpace = Vector2.zero;
+    bool isRoot = true;
 
     void AllClassGUI()
     {
         if (m_currentAssembly != null)
         {
-            if(m_types == null )
-            {
-                m_types = m_currentAssembly.GetTypes();
-            }
+            Type[] types;
+
+            //if (isRoot)
+            //{
+                types = m_currentAssembly.GetTypes();
+            //}
+            //else
+            //{
+            //    types = m_typeStack.Peek().;
+            //}
 
             m_classSpace = GUILayout.BeginScrollView(m_classSpace);
 
-            for (int i = 0; i < m_types.Length; i++)
+            for (int i = 0; i < types.Length; i++)
             {
-                if(m_types[i].IsClass)
+                if(types[i].IsClass)
                 {
                     if (m_searchClassContent == "" ||
-                          (m_searchClassContent != "" && m_types[i].Name.ToLower().Contains(m_searchClassContent.ToLower())))
+                          (m_searchClassContent != "" && types[i].Name.ToLower().Contains(m_searchClassContent.ToLower())))
                     {
-                        ClassButtonGUI(m_types[i]);
+                        ClassButtonGUI(types[i]);
                     }
                 }
             }
@@ -263,7 +274,6 @@ public class ReflectionEdtorWindow : EditorWindow
         {
             m_status = WindowStatus.AppDomain;
             m_currentAssembly = null;
-            m_types = null;
             m_searchTmp = m_searchAssemblyContent;
         }
     }
@@ -286,7 +296,19 @@ public class ReflectionEdtorWindow : EditorWindow
             content2 += "<color=blue>Sealed</color> ";
         }
 
-        content3 += "<color=#11FF11>" + classType.Name + "</color> ";
+        string[] m_nameArrary = classType.FullName.Split('.');
+
+        for (int i = 0; i < m_nameArrary.Length; i++)
+        {
+            if(i != m_nameArrary.Length - 1)
+            {
+                content3 += "<color=grey>" + m_nameArrary[i] + "</color>.";
+            }
+            else
+            {
+                content3 += "<color=#11FF11>" + m_nameArrary[i] + "</color>";
+            }
+        }
 
         GUILayout.Label(content, EditorGUIStyleData.RichText, GUILayout.Width(60));
         GUILayout.Label(content2, EditorGUIStyleData.RichText, GUILayout.Width(60));
@@ -297,9 +319,32 @@ public class ReflectionEdtorWindow : EditorWindow
             m_status = WindowStatus.Class;
             m_currentClass = classType;
             m_searchTmp = "";
+            toolbarOption = 0;
         }
 
         GUILayout.EndHorizontal();
+    }
+
+    int toolbarOption = 0;
+    string[] toolbarTexts = {"方法", "字段" , "属性"};
+    void ClassGUI()
+    {
+        toolbarOption = GUILayout.Toolbar(toolbarOption, toolbarTexts, GUILayout.Width(Screen.width));
+
+        switch(toolbarOption)
+        {
+            case 0:
+                AllMethodGUI();
+                break;
+
+            case 1:
+                AllFieleGUI();
+                break;
+
+            case 2:
+                AllPropertyGUI();
+                break;
+        }
     }
 
     #endregion
@@ -329,7 +374,7 @@ public class ReflectionEdtorWindow : EditorWindow
         }
         else
         {
-            EditorGUILayout.LabelField("没有选中方法");
+            EditorGUILayout.LabelField("没有选中类");
         }
 
         if(m_callContent != "")
@@ -338,6 +383,14 @@ public class ReflectionEdtorWindow : EditorWindow
             if(GUILayout.Button("关闭", "toolbarbutton"))
             {
                 m_callContent = "";
+            }
+
+            if (GUILayout.Button("复制到剪贴板"))
+            {
+                TextEditor tx = new TextEditor();
+                tx.text = m_callContent;
+                tx.OnFocus();
+                tx.Copy();
             }
         }
 
@@ -367,12 +420,32 @@ public class ReflectionEdtorWindow : EditorWindow
             content2 += "<color=yellow>Static</color> ";
         }
 
-        content3 += "<color=#11FF11>" + GetTypeName(method.ReturnType) + "</color> <color=white>" +  method.Name + "</color> <color=grey>(</color>";
+        content3 += "<color=#11FF11>" + GetTypeName(method.ReturnType) + "</color> <color=white>" + method.Name + "</color>";
+
+        if(method.IsGenericMethod)
+        {
+            Type[] types = method.GetGenericArguments();
+
+            content3 += "<color=grey><</color>";
+
+            for (int i = 0; i < types.Length; i++)
+            {
+                content3 += "<color=#11FF11>"+ GetTypeName(types[i]) + "</color>";
+
+                if(i!= types.Length - 1)
+                {
+                    content3 += ",";
+                }
+            }
+            content3 += "<color=grey>></color>";
+        }
+
+        content3 += " <color=grey>(</color>";
 
         ParameterInfo[] infos = method.GetParameters();
         for (int i = 0; i < infos.Length; i++)
         {
-            content3 += GetParmPrdfix(infos[i],true) + "<color=#11FF11>" + GetTypeName(infos[i].ParameterType) + "</color> " + infos[i].Name + GetParmPostfix(infos[i],true);
+            content3 += GetParmPrdfix(infos[i],true) + "<color=#11FF11>" + GetTypeName(infos[i].ParameterType) + "</color> <color=#FF77FF>" + infos[i].Name +"</color>" + GetParmPostfix(infos[i],true);
 
             if(i != infos.Length - 1)
             {
@@ -391,10 +464,13 @@ public class ReflectionEdtorWindow : EditorWindow
         //    m_searchAssemblyContent = "";
         //}
 
-        if (GUILayout.Button("生成调用代码",GUILayout.Width(200)))
+        if(!method.IsPublic)
         {
-            m_callContent = GenerateCallCode(m_currentAssembly,m_currentClass, method);
-            GUI.FocusControl("Search");
+            if (GUILayout.Button("生成调用代码", GUILayout.Width(200)))
+            {
+                m_callContent = GenerateCallCode(m_currentAssembly, m_currentClass, method);
+                GUI.FocusControl("Search");
+            }
         }
 
         GUILayout.EndHorizontal();
@@ -402,32 +478,52 @@ public class ReflectionEdtorWindow : EditorWindow
 
     string GenerateCallCode(Assembly ab,Type type,MethodInfo method)
     {
-        string content = "public ";
+        string content = "public static ";
 
-        if(method.IsStatic)
+        content += GetTypeName(method.ReturnType) + " " + method.Name + "Reflection";
+
+        if (method.IsGenericMethod)
         {
-            content += "static ";
+            Type[] types = method.GetGenericArguments();
+
+            content += "<";
+
+            for (int i = 0; i < types.Length; i++)
+            {
+                content += GetTypeName(types[i]);
+
+                if (i != types.Length - 1)
+                {
+                    content += ",";
+                }
+            }
+            content += ">";
         }
 
-        content += GetTypeName(method.ReturnType) + " " + method.Name + "Reflection(";
+        content += "(";
+        ParameterInfo[] infos = method.GetParameters();
 
         if (!method.IsStatic)
         {
-            content += "this " + type.Name + " instance,";
+            content += "this " + type.Name + " instance";
+
+            if(infos.Length > 0)
+            {
+                content += ",";
+            }
         }
 
-        ParameterInfo[] infos = method.GetParameters();
         for (int i = 0; i < infos.Length; i++)
         {
             content += GetParmPrdfix(infos[i],false) +  GetTypeName(infos[i].ParameterType) + " " + infos[i].Name + GetParmPostfix(infos[i],false);
-            if (i != infos.Length - 1)
+
+            if(i != infos.Length - 1 )
             {
                 content += ",";
             }
         }
 
         content += ")\n";
-
         content += "{\n";
 
         //flags
@@ -437,8 +533,30 @@ public class ReflectionEdtorWindow : EditorWindow
         content += "\tAssembly ab = Assembly.Load(\""+ ab.FullName.Split(',')[0]+"\");\n";
         //获取Type
         content += "\tType type = ab.GetType(\"" + type.FullName + "\");\n";
+
         //获取Method
-        content += "\tMethodInfo mi = type.GetMethod(\""+ method .Name+ "\", flags);\n";
+        content += "\tMethodInfo mi = type.GetMethod(\"" + method.Name + "\", flags);\n";
+
+        if (method.IsGenericMethod)
+        {
+            content += "\tmi = mi.MakeGenericMethod(";
+
+            Type[] types = method.GetGenericArguments();
+
+            for (int i = 0; i < types.Length; i++)
+            {
+                content += "typeof(" + GetTypeName(types[i]) + ")";
+
+                if (i != types.Length - 1)
+                {
+                    content += ",";
+                }
+
+            }
+
+            content += ");\n";
+        }
+
 
         //调用
         if (infos.Length != 0)
@@ -456,10 +574,10 @@ public class ReflectionEdtorWindow : EditorWindow
 
         if (method.ReturnType != typeof(void))
         {
-            content += "return (" + GetTypeName(method.ReturnType)+")";
+            content += "return (" + GetTypeName(method.ReturnType) + ")";
         }
 
-        if(method.IsStatic)
+        if (method.IsStatic)
         {
             content += "mi.Invoke(null,";
         }
@@ -479,7 +597,7 @@ public class ReflectionEdtorWindow : EditorWindow
 
         content += ");\n";
 
-        content += "}\n";
+        content += "}";
 
         return content;
     }
@@ -497,8 +615,7 @@ public class ReflectionEdtorWindow : EditorWindow
         {
             content +=  "out ";
         }
-
-        if(info.Name.EndsWith("&"))
+        else if(info.ParameterType.IsByRef)
         {
             content += "ref ";
         }
@@ -536,27 +653,27 @@ public class ReflectionEdtorWindow : EditorWindow
 
         if (info.ParameterType == typeof(bool))
         {
-            content = ((bool)info.DefaultValue).ToString();
+            content = "bool";
         }
         else if (info.ParameterType == typeof(int))
         {
-            content = ((int)info.DefaultValue).ToString();
+            content = "int";
         }
         else if (info.ParameterType == typeof(long))
         {
-            content = ((long)info.DefaultValue).ToString();
+            content = "long";
         }
         else if (info.ParameterType == typeof(float))
         {
-            content = ((float)info.DefaultValue).ToString() + "f";
+            content = "float";
         }
         else if (info.ParameterType == typeof(double))
         {
-            content = ((double)info.DefaultValue).ToString() + "d";
+            content = "double";
         }
         else if (info.ParameterType == typeof(string))
         {
-            content = "\""+((string)info.DefaultValue).ToString() + "\"";
+            content = "\"string\"";
         }
         else
         {
@@ -569,6 +686,11 @@ public class ReflectionEdtorWindow : EditorWindow
     string GetTypeName(Type info)
     {
         string content = "";
+
+        if(info.IsByRef)
+        {
+            info = info.GetElementType();
+        }
 
         if(info == typeof(bool))
         {
@@ -639,7 +761,27 @@ public class ReflectionEdtorWindow : EditorWindow
         }
         else
         {
-            content = info.Name;
+            if(info.IsGenericType)
+            {
+                Type[] types = info.GetGenericArguments();
+                content = info.Name.Split('`')[0] + "<";
+
+                for (int i = 0; i < types.Length; i++)
+                {
+                    content += GetTypeName(types[i]);
+
+                    if(i != types.Length - 1)
+                    {
+                        content += ",";
+                    }
+                }
+
+                content += ">";
+            }
+            else
+            {
+                content = info.Name;
+            }
         }
 
         return content;
@@ -648,9 +790,272 @@ public class ReflectionEdtorWindow : EditorWindow
 
     #endregion
 
-    #region 搜索
+    #region 字段
+
+    void AllFieleGUI()
+    {
+        if (m_currentClass != null)
+        {
+            m_classSpace = GUILayout.BeginScrollView(m_classSpace);
+
+            FieldInfo[] typesTmp = m_currentClass.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+
+            for (int i = 0; i < typesTmp.Length; i++)
+            {
+                if (m_searchMethodContent == "" ||
+                        (m_searchMethodContent != "" && typesTmp[i].Name.ToLower().Contains(m_searchMethodContent.ToLower())))
+                {
+                    FieldGUI(typesTmp[i]);
+                }
+            }
+
+            GUILayout.EndScrollView();
+        }
+        else
+        {
+            EditorGUILayout.LabelField("没有选中类");
+        }
+
+        if (m_callContent != "")
+        {
+            EditorGUILayout.TextArea(m_callContent);
+            if (GUILayout.Button("关闭", "toolbarbutton"))
+            {
+                m_callContent = "";
+            }
+
+            if (GUILayout.Button("复制到剪贴板"))
+            {
+                TextEditor tx = new TextEditor();
+                tx.text = m_callContent;
+                tx.OnFocus();
+                tx.Copy();
+            }
+        }
+
+        if (GUILayout.Button("返回上一层"))
+        {
+            m_status = WindowStatus.Assembly;
+            m_currentClass = null;
+            m_searchTmp = m_searchClassContent;
+        }
+    }
+
+    void FieldGUI(FieldInfo info)
+    {
+        GUILayout.BeginHorizontal("box");
+
+        string content = "";
+        string content2 = "";
+        string content3 = "";
+
+        if (!info.IsPublic)
+        {
+            content += "<color=red>Private</color> ";
+        }
+
+        if (info.IsLiteral)
+        {
+            content2 += "<color=#9999FF>Const</color> ";
+        }
+        else
+        {
+            if (!info.IsStatic)
+            {
+                content2 += "<color=yellow>Static</color> ";
+            }
+        }
+
+        content3 += "<color=#11FF11>" + GetTypeName(info.FieldType) + "</color> <color=white>" + info.Name + "</color>";
+
+        GUILayout.Label(content, EditorGUIStyleData.RichText, GUILayout.Width(55));
+        GUILayout.Label(content2, EditorGUIStyleData.RichText, GUILayout.Width(50));
+        GUILayout.Label(content3, EditorGUIStyleData.RichText);
+
+        //if (GUILayout.Button("查看详细信息", GUILayout.Width(200)))
+        //{
+        //    m_searchAssemblyContent = "";
+        //}
+
+        if(!info.IsPublic)
+        {
+            if (GUILayout.Button("生成调用代码", GUILayout.Width(200)))
+            {
+                m_callContent = GenerateSetValueCode(m_currentAssembly, m_currentClass, info);
+                GUI.FocusControl("Search");
+            }
+        }
+
+        GUILayout.EndHorizontal();
+    }
+
+    string GenerateSetValueCode(Assembly assembly,Type type,FieldInfo field)
+    {
+        string content = "";
+
+        //常量不能被修改
+        if (!field.IsLiteral)
+        {
+            //生成Set方法
+            content += "public static void Set_" + field.Name + "Reflection(";
+
+            if (field.IsStatic)
+            {
+                content += "this " + GetTypeName(type) + " instance,";
+            }
+
+            content += GetTypeName(field.FieldType) + " " + field.Name + ")\n";
+
+            content += "{\n";
+
+            //flags
+            content += "\tBindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;\n";
+
+            //获取程序集
+            content += "\tAssembly ab = Assembly.Load(\"" + assembly.FullName.Split(',')[0] + "\");\n";
+            //获取Type
+            content += "\tType type = ab.GetType(\"" + type.FullName + "\");\n";
+            //获取FieldInfo
+            content += "\tFieldInfo fi = type.GetField(\"" + field.Name + "\", flags);\n\n";
+            //调用
+            content += "\t";
+
+            if (field.IsStatic)
+            {
+                content += "fi.SetValue(null," + field.Name + ");\n";
+            }
+            else
+            {
+                content += "fi.SetValue(instance," + field.Name + ");";
+            }
+
+            content += "}";
+            content += "\n\n";
+        }
+
+        //生成Get方法
+        content += "public static " + GetTypeName(field.FieldType) + " Get_" + field.Name + "()\n";
+        content += "{\n";
+
+        //flags
+        content += "\tBindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static;\n";
+        //获取程序集
+        content += "\tAssembly ab = Assembly.Load(\"" + assembly.FullName.Split(',')[0] + "\");\n";
+        //获取Type
+        content += "\tType type = ab.GetType(\"" + type.FullName + "\");\n";
+        //获取FieldInfo
+        content += "\tFieldInfo fi = type.GetField(\"" + field.Name + "\", flags);\n\n";
+        //调用
+        content += "\treturn ("+GetTypeName(field.FieldType) +")";
+
+        if (field.IsStatic)
+        {
+            content += "fi.GetValue(null);\n";
+        }
+        else
+        {
+            content += "fi.GetValue(instance);\n";
+        }
+
+        content += "}";
+
+        return content;
+    }
 
     #endregion
+
+    #region  属性
+
+    void AllPropertyGUI()
+    {
+        if (m_currentClass != null)
+        {
+            m_classSpace = GUILayout.BeginScrollView(m_classSpace);
+
+            PropertyInfo[] typesTmp = m_currentClass.GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance);
+
+            for (int i = 0; i < typesTmp.Length; i++)
+            {
+                if (m_searchMethodContent == "" ||
+                        (m_searchMethodContent != "" && typesTmp[i].Name.ToLower().Contains(m_searchMethodContent.ToLower())))
+                {
+                    PropertyGUI(typesTmp[i]);
+                }
+            }
+
+            GUILayout.EndScrollView();
+        }
+        else
+        {
+            EditorGUILayout.LabelField("没有选中类");
+        }
+
+        if (m_callContent != "")
+        {
+            EditorGUILayout.TextArea(m_callContent);
+            if (GUILayout.Button("关闭", "toolbarbutton"))
+            {
+                m_callContent = "";
+            }
+
+            if (GUILayout.Button("复制到剪贴板"))
+            {
+                TextEditor tx = new TextEditor();
+                tx.text = m_callContent;
+                tx.OnFocus();
+                tx.Copy();
+            }
+        }
+
+        if (GUILayout.Button("返回上一层"))
+        {
+            m_status = WindowStatus.Assembly;
+            m_currentClass = null;
+            m_searchTmp = m_searchClassContent;
+        }
+    }
+
+    void PropertyGUI(PropertyInfo info)
+    {
+        GUILayout.BeginHorizontal("box");
+
+        string content = "";
+        string content2 = "";
+        //string content3 = "";
+
+        if(info.CanRead)
+        {
+            if (info.CanWrite)
+            {
+                content = "<color=#88FF88>Read&Write</color>";
+            }
+            else
+            {
+                content = "<color=yellow>ReadOnly</color>";
+            }
+        }
+        else
+        {
+            if (info.CanWrite)
+            {
+                content = "<color=#00FF99>WriteOnly</color>";
+            }
+            else
+            {
+                content = "<color=red>No</color>";
+            }
+        }
+
+        content2 += "<color=#11FF11>" + GetTypeName(info.PropertyType) + "</color> <color=white>" + info.Name + "</color>";
+
+        GUILayout.Label(content, EditorGUIStyleData.RichText, GUILayout.Width(100));
+        GUILayout.Label(content2, EditorGUIStyleData.RichText);
+
+        GUILayout.EndHorizontal();
+    }
+
+
+#endregion
 
     enum WindowStatus
     {

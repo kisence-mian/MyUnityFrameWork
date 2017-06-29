@@ -406,6 +406,14 @@ public class DevelopReplayManager
 
         GUILayout.EndScrollView();
 
+        if (GUILayout.Button("复制到剪贴板"))
+        {
+            TextEditor tx = new TextEditor();
+            tx.text = LogContent;
+            tx.OnFocus();
+            tx.Copy();
+        }
+
         if (GUILayout.Button("返回上层"))
         {
             isShowLog = false;

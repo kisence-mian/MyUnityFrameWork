@@ -157,7 +157,16 @@ public class EditorUtilGUI
     public static object DrawClassData(Type type,string className, object obj, string fieldName = null)
     {
         if (obj == null)
-            obj = Activator.CreateInstance(type);
+        {
+            if(type.GetConstructor(new Type[] { }) != null)
+            {
+                obj = Activator.CreateInstance(type);
+            }
+            else
+            {
+                return obj;
+            }
+        }
         else
         {
             if (type == null)
