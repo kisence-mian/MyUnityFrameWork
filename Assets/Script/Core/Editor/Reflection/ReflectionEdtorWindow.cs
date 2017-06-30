@@ -36,7 +36,7 @@ public class ReflectionEdtorWindow : EditorWindow
     WindowStatus m_status = WindowStatus.AppDomain;
     Assembly m_currentAssembly;
     Type m_currentClass;
-    MethodInfo m_method;
+    MethodInfo m_currentMethod;
     Stack<Type> m_typeStack = new Stack<Type>();
 
     string m_searchTmp = "";
@@ -72,8 +72,11 @@ public class ReflectionEdtorWindow : EditorWindow
                 break;
 
             case WindowStatus.Class:
-
                 ClassGUI();
+                break;
+
+            case WindowStatus.Method:
+                MethodDetailGUI();
 
                 break;
 
@@ -108,7 +111,18 @@ public class ReflectionEdtorWindow : EditorWindow
                 return;
             }
 
-            content += "类视图：" + m_currentClass.FullName;
+            content += "类视图：" +  m_currentClass.FullName;
+        }
+        else if (m_status == WindowStatus.Method)
+        {
+            if (m_currentMethod == null)
+            {
+                m_status = WindowStatus.Class;
+                toolbarOption = 0;
+                return;
+            }
+
+            content += "方法详细视图：" + m_currentClass.FullName + " " + m_currentMethod.Name;
         }
 
         GUILayout.Label(content, "PreLabel");
@@ -402,6 +416,8 @@ public class ReflectionEdtorWindow : EditorWindow
         }
     }
 
+    string m_methodfoldName = "";
+
     void MethodGUI(MethodInfo method)
     {
         GUILayout.BeginHorizontal("box");
@@ -457,12 +473,7 @@ public class ReflectionEdtorWindow : EditorWindow
 
         GUILayout.Label(content, EditorGUIStyleData.RichText,GUILayout.Width(55));
         GUILayout.Label(content2, EditorGUIStyleData.RichText, GUILayout.Width(50));
-        GUILayout.Label(content3, EditorGUIStyleData.RichText);
-
-        //if (GUILayout.Button("查看详细信息", GUILayout.Width(200)))
-        //{
-        //    m_searchAssemblyContent = "";
-        //}
+        GUILayout.Label(content3, EditorGUIStyleData.RichText);  
 
         if(!method.IsPublic)
         {
@@ -473,7 +484,41 @@ public class ReflectionEdtorWindow : EditorWindow
             }
         }
 
+        if (GUILayout.Button("查看详细信息", GUILayout.Width(200)))
+        {
+            m_status = WindowStatus.Method;
+            m_currentMethod = method;
+        }
+
         GUILayout.EndHorizontal();
+    }
+
+    void MethodDetailGUI()
+    {
+        if(m_currentMethod != null)
+        {
+            GUILayout.Label("特性：", "WhiteLargeLabel");
+            object[] objs = m_currentMethod.GetCustomAttributes(false);
+            //特性
+            for (int i = 0; i < objs.Length; i++)
+            {
+                GUILayout.BeginHorizontal("box");
+                string content = "<color=#11FF11>[" + objs[i] + "]</color>";
+                GUILayout.Label(content, EditorGUIStyleData.RichText);
+                GUILayout.EndHorizontal();
+            }
+
+            if (GUILayout.Button("返回上一层"))
+            {
+                m_status = WindowStatus.Method;
+                m_currentMethod = null;
+                m_searchTmp = m_searchMethodContent;
+            }
+        }
+        else
+        {
+            GUILayout.Label("没有选中方法");
+        }
     }
 
     string GenerateCallCode(Assembly ab,Type type,MethodInfo method)
@@ -1063,5 +1108,7 @@ public class ReflectionEdtorWindow : EditorWindow
         Assembly,
         Class,
         Method,
+        Field,
+        Property,
     }
 }

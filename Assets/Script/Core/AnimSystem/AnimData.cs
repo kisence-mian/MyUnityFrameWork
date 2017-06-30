@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine.UI;
 using System;
 
-public class AnimData : IHeapObjectInterface
+public class AnimData
 {
     #region 参数
 
@@ -106,7 +106,6 @@ public class AnimData : IHeapObjectInterface
 
         try
         {
-
             switch (m_animType)
             {
                 case AnimType.UGUI_Color: UguiColor(); break;
@@ -137,7 +136,7 @@ public class AnimData : IHeapObjectInterface
     }
 
     //动画播放完毕执行回调
-    public void executeCallBack()
+    public void ExecuteCallBack()
     {
         try
         {
@@ -152,9 +151,14 @@ public class AnimData : IHeapObjectInterface
         }
     }
 
-    //动画循环逻辑
+    /// <summary>
+    /// 动画循环逻辑
+    /// </summary>
+
     public bool AnimReplayLogic()
     {
+        bool result = false;
+
         switch (m_repeatType)
         {
             case RepeatType.Once:
@@ -176,13 +180,15 @@ public class AnimData : IHeapObjectInterface
 
         if (m_repeatCount == -1)
         {
-            return true;
+            result = true;
         }
         else
         {
             m_repeatCount--;
-            return (m_repeatCount > 0);
+            result = (m_repeatCount > 0);
         }
+
+        return result;
     }
 
     #region 循环逻辑
@@ -240,24 +246,6 @@ public class AnimData : IHeapObjectInterface
     }
 
     public void OnInit() { }
-
-    public void OnPop() { }
-
-    public void OnPush()
-    {
-        m_ignoreTimeScale = false;
-
-        m_delayTime = 0;
-        m_isDone = false;
-        m_currentTime = 0;
-        m_totalTime = 0;
-        m_repeatCount = -1;
-
-        m_pathType = PathType.Line;
-        m_v3Contral = null;
-        m_floatContral = null;
-        //m_toTransform = null;
-    }
 
     #endregion
 
@@ -1174,6 +1162,35 @@ public class AnimData : IHeapObjectInterface
     //outBack,
     //inOutBack,
     //outInBack,
+
+    #endregion
+
+    #region Debug
+
+
+    public void ShowDebug()
+    {
+        AnimData data = new AnimData();
+
+        Type type = data.GetType();
+
+        System.Reflection.FieldInfo[] infos = type.GetFields();
+
+        for (int i = 0; i < infos.Length; i++)
+        {
+            if(
+                (infos[i].GetValue(this) == null && infos[i].GetValue(data) != null)
+                || (infos[i].GetValue(this) != null && infos[i].GetValue(data) == null)
+                || (infos[i].GetValue(this) != null && !infos[i].GetValue(this).Equals(infos[i].GetValue(data)))
+                )
+            {
+                Debug.Log(" " + infos[i].Name + " is not equal ! this value : " + infos[i].GetValue(this) + " data Value :" + infos[i].GetValue(data));
+
+            }
+
+
+        }
+    }
 
     #endregion
 }

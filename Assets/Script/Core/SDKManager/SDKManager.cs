@@ -24,7 +24,7 @@ public class SDKManager
     /// </summary>
     public static void Init()
     {
-        Debug.Log("SDKManager Init");
+        //Debug.Log("SDKManager Init");
 
         try
         {
@@ -277,7 +277,7 @@ public class SDKManager
     {
         try
         {
-            GetADService(0).PlayAD(adType);
+            GetADService(0).PlayAD(adType, tag);
         }
         catch (Exception e)
         {
@@ -292,7 +292,7 @@ public class SDKManager
     {
         try
         {
-            GetADService(SDKName).PlayAD(adType);
+            GetADService(SDKName).PlayAD(adType, tag);
         }
         catch (Exception e)
         {
@@ -307,7 +307,7 @@ public class SDKManager
     {
         try
         {
-            GetADService<T>().PlayAD(adType);
+            GetADService<T>().PlayAD(adType, tag);
         }
         catch (Exception e)
         {
@@ -323,7 +323,7 @@ public class SDKManager
     {
         try
         {
-            GetADService(0).CloseAD(adType);
+            GetADService(0).CloseAD(adType, tag);
         }
         catch (Exception e)
         {
@@ -339,7 +339,7 @@ public class SDKManager
     {
         try
         {
-            GetADService(SDKName).CloseAD(adType);
+            GetADService(SDKName).CloseAD(adType, tag);
         }
         catch (Exception e)
         {
@@ -355,7 +355,7 @@ public class SDKManager
     {
         try
         {
-            GetADService<T>().CloseAD(adType);
+            GetADService<T>().CloseAD(adType, tag);
         }
         catch (Exception e)
         {
@@ -499,7 +499,7 @@ public class SDKManager
         InitSDKList(s_logServiceList);
         InitSDKList(s_otherServiceList);
 
-        Debug.Log("s_loginServiceList: " + s_loginServiceList.Count);
+        //Debug.Log("s_loginServiceList: " + s_loginServiceList.Count);
     }
 
     #endregion
@@ -526,7 +526,7 @@ public class SDKManager
             try
             {
                 list[i].m_SDKName = list[i].GetType().Name;
-                Debug.Log("list[i].m_SDKName " + list[i].GetType().Name);
+                //Debug.Log("list[i].m_SDKName " + list[i].GetType().Name);
                 list[i].Init();
             }
             catch (Exception e)

@@ -5,6 +5,9 @@ using System.Collections.Generic;
 public class Timer 
 {
     public static List<TimerEvent> m_timers = new List<TimerEvent>();
+    public static List<TimerEvent> m_traversalList = new List<TimerEvent>();
+
+    public static List<TimerEvent> m_removeList = new List<TimerEvent>();
 
     public static void Init()
     {
@@ -13,25 +16,45 @@ public class Timer
 
 	static void Update () 
     {
-        for (int i = 0; i < m_timers.Count;i++ )
-        {
-            m_timers[i].Update();
+        m_traversalList.Clear();
+        m_traversalList.AddRange(m_timers);
 
-            if(m_timers[i].m_isDone)
+        for (int i = 0; i < m_traversalList.Count;i++ )
+        {
+            m_traversalList[i].Update();
+
+            if (m_traversalList[i].m_isDone)
             {
-                TimerEvent e = m_timers[i];
+                TimerEvent e = m_traversalList[i];
 
                 e.CompleteTimer();
 
                 if (e.m_repeatCount == 0)
                 {
-                    m_timers.Remove(e);
-                    HeapObjectPool<TimerEvent>.PutObject(e);
-                    i--;
+                    m_removeList.Add(e);
                 }
             }
         }
+
+        for (int i = 0; i < m_removeList.Count; i++)
+        {
+            m_timers.Remove(m_removeList[i]);
+            HeapObjectPool<TimerEvent>.PutObject(m_removeList[i]);
+        }
 	}
+
+    public static bool GetIsExistTimer(string timerName)
+    {
+        for (int i = 0; i < m_timers.Count; i++)
+        {
+            if (m_timers[i].m_timerName == timerName)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public static TimerEvent GetTimer(string timerName)
     {
@@ -43,7 +66,7 @@ public class Timer
             }
         }
 
-        return null;
+        throw new System.Exception("Get Timer  Exception not find ->" + timerName + "<-");
     }
 
     /// <summary>
@@ -164,11 +187,9 @@ public class Timer
     /// <returns></returns>
     public static TimerEvent AddTimer(float spaceTime, bool isIgnoreTimeScale, int callBackCount, string timerName,TimerCallBack callBack, params object[] objs)
     {
-        //TimerEvent te = HeapObjectPool<TimerEvent>.GetObject();
         TimerEvent te = new TimerEvent();
 
         te.m_timerName = timerName ?? te.GetHashCode().ToString();
-        //Debug.Log("AddTimer  ----TIMER "  + " " + te.m_timerName);
         te.m_currentTimer = 0;
         te.m_timerSpace = spaceTime;
 
@@ -185,7 +206,6 @@ public class Timer
 
     public static void DestroyTimer(TimerEvent timer,bool isCallBack = false)
     {
-        //Debug.Log("DestroyTimer1  ----TIMER " + timer.m_timerName);
         if (m_timers.Contains(timer))
         {
             if (isCallBack)
@@ -216,7 +236,6 @@ public class Timer
 
     public static void DestroyAllTimer(bool isCallBack = false)
     {
-        //Debug.Log("DestroyAllTimer  ----TIMER");
         for (int i = 0; i < m_timers.Count; i++)
         {
             if (isCallBack)

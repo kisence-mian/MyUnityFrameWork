@@ -22,23 +22,34 @@ public class HeapObjectPool
     #endregion
 }
 
-#region HeapObject
+    #region HeapObject
 public interface IHeapObjectInterface
 {
     void OnInit();
 
+    /// <summary>
+    /// 取出时调用
+    /// </summary>
     void OnPop();
 
+    /// <summary>
+    /// 放回时调用
+    /// </summary>
     void OnPush();
 }
 
 #endregion
 
-#region HeapObjectPool
+    #region HeapObjectPool
 
 public class HeapObjectPool<T> where T : new()
 {
     static Stack<T> s_pool = new Stack<T>();
+
+    public static int GetCount()
+    {
+        return s_pool.Count;
+    }
 
     public static T GetObject()
     {
@@ -58,7 +69,6 @@ public class HeapObjectPool<T> where T : new()
             {
                 heapObj.OnInit();
             }
-            
         }
 
         if (heapObj != null)

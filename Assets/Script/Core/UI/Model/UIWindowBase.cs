@@ -11,7 +11,6 @@ public class UIWindowBase : UIBase
     public GameObject m_uiRoot;
 
 
-
     #region 重载方法
 
     public virtual void OnOpen()
