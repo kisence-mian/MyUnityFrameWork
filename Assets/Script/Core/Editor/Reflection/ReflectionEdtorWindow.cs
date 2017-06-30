@@ -59,7 +59,7 @@ public class ReflectionEdtorWindow : EditorWindow
         //顶部面板
         TopPanel();
 
-        switch(m_status)
+        switch (m_status)
         {
             case WindowStatus.AppDomain:
                 //程序集
@@ -80,7 +80,7 @@ public class ReflectionEdtorWindow : EditorWindow
 
                 break;
 
-            default:break;
+            default: break;
         }
     }
 
@@ -497,6 +497,8 @@ public class ReflectionEdtorWindow : EditorWindow
     {
         if(m_currentMethod != null)
         {
+            m_classSpace = GUILayout.BeginScrollView(m_classSpace);
+
             GUILayout.Label("特性：", "WhiteLargeLabel");
             object[] objs = m_currentMethod.GetCustomAttributes(false);
             //特性
@@ -508,9 +510,11 @@ public class ReflectionEdtorWindow : EditorWindow
                 GUILayout.EndHorizontal();
             }
 
+            GUILayout.EndScrollView();
+
             if (GUILayout.Button("返回上一层"))
             {
-                m_status = WindowStatus.Method;
+                m_status = WindowStatus.Class;
                 m_currentMethod = null;
                 m_searchTmp = m_searchMethodContent;
             }
