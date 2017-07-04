@@ -4,9 +4,11 @@ using UnityEngine;
 
 public class InputUIOnBeginDragEvent : InputUIEventBase {
 
-	public InputUIOnBeginDragEvent()
+    public Vector2 m_dragPosition;
+    public Vector2 m_delta;
+    public InputUIOnBeginDragEvent()
     {
-        m_type = InputUIEventType.Scroll;
+        m_type = InputUIEventType.BeginDrag;
     }
 
     public InputUIOnBeginDragEvent(string UIName, string ComponentName)

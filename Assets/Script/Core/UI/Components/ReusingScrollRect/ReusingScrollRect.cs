@@ -20,9 +20,9 @@ public class ReusingScrollRect : ScrollRectInput
     RectTransform m_rectTransform;
 
     private Bounds m_viewBounds;
-    GameObject m_itemPrefab;
+    public GameObject m_itemPrefab;
 
-    Vector3 m_itemSize;
+    public Vector3 m_itemSize;
 
     #region 公共方法
 

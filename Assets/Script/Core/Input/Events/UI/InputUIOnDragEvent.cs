@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 public class InputUIOnDragEvent : InputUIEventBase
 {
     public Vector2 m_dragPosition;
+    public Vector2 m_delta;
 
     public InputUIOnDragEvent()
     {

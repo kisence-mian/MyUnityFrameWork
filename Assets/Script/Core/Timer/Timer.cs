@@ -5,7 +5,6 @@ using System.Collections.Generic;
 public class Timer 
 {
     public static List<TimerEvent> m_timers = new List<TimerEvent>();
-    public static List<TimerEvent> m_traversalList = new List<TimerEvent>();
 
     public static List<TimerEvent> m_removeList = new List<TimerEvent>();
 
@@ -16,16 +15,13 @@ public class Timer
 
 	static void Update () 
     {
-        m_traversalList.Clear();
-        m_traversalList.AddRange(m_timers);
-
-        for (int i = 0; i < m_traversalList.Count;i++ )
+        for (int i = 0; i < m_timers.Count;i++ )
         {
-            m_traversalList[i].Update();
+            m_timers[i].Update();
 
-            if (m_traversalList[i].m_isDone)
+            if (m_timers[i].m_isDone)
             {
-                TimerEvent e = m_traversalList[i];
+                TimerEvent e = m_timers[i];
 
                 e.CompleteTimer();
 

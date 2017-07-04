@@ -551,6 +551,14 @@ public class SchemeData
     public List<SDKConfigData> ADScheme    = new List<SDKConfigData>();
     public List<SDKConfigData> PayScheme   = new List<SDKConfigData>();
     public List<SDKConfigData> OtherScheme = new List<SDKConfigData>();
+
+    public string AndroidkeystoreName; //Android 签名路径
+    public string AndroidkeystorePass; //Android 密钥密码
+    public string AndroidkeyaliasName; //Android 密钥别名
+    public string AndroidkeyaliasPass; //Android 别名密码
+
+    //图标
+
 }
 [System.Serializable]
 public class SDKConfigData

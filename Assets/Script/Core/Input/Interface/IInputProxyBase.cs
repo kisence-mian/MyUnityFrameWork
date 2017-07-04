@@ -43,7 +43,7 @@ public class InputEventRegisterInfo<T> : IHeapObjectInterface where T : IInputEv
     {
     }
 
-    public void AddListener()
+    public virtual void AddListener()
     {
         InputManager.AddListener<T>(eventKey, callBack);
     }

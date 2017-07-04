@@ -238,6 +238,16 @@ class ProjectBuildService : Editor
         //设置编译指令
         ApplyScriptDefine();
 
+        //设置签名
+            //签名路径
+            PlayerSettings.Android.keystoreName = "";
+            //密钥密码
+            PlayerSettings.Android.keystorePass = "";
+            //密钥别名
+            PlayerSettings.Android.keyaliasName = "";
+            //别名密码
+            PlayerSettings.Android.keyaliasPass = "";
+
         //打包
         string path = ExportPath + "/" + GetPackageName() + ".apk";
 
