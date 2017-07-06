@@ -128,12 +128,18 @@ public class ReusingScrollRect : ScrollRectInput
         SetItemDisplay();
     }
 
+    protected override void Start()
+    {
+        base.Start();
+        SetItemDisplay();
+    }
+
     public override void Rebuild(CanvasUpdate executing)
     {
         base.Rebuild(executing);
 
         UpdateBound();
-        SetItemDisplay();
+        SetItemDisplay(true);
     }
 
     #endregion
@@ -196,7 +202,7 @@ public class ReusingScrollRect : ScrollRectInput
     List<ReusingData> m_indexList = new List<ReusingData>();
     bool m_clip = false;   //剪枝标志位，性能优化使用
     int m_startPos = 0;
-    void SetItemDisplay()
+    void SetItemDisplay(bool isRebuild = false)
     {
         if(content == null)
         {
@@ -230,8 +236,11 @@ public class ReusingScrollRect : ScrollRectInput
                 m_items.Remove(itemTmp);
                 itemTmp.OnHide();
 
-                //隐藏并移到缓存
-                itemTmp.gameObject.SetActive(false);
+                if (!isRebuild)
+                {
+                    //隐藏并移到缓存
+                    itemTmp.gameObject.SetActive(false);
+                }
                 m_itemCaches.Add(itemTmp);
 
                 m_indexList[itemTmp.m_index].status =  ReusingStatus.Hide;
@@ -255,7 +264,8 @@ public class ReusingScrollRect : ScrollRectInput
             {
                 if (m_viewBounds.Intersects(GetItemBounds(m_indexList[i].index)))
                 {
-                    ShowItem(i, m_datas[i]);
+                    ShowItem(i, isRebuild, m_datas[i]);
+
                     m_indexList[i].status = ReusingStatus.Show;
                     m_clip = true;
                 }
@@ -274,13 +284,16 @@ public class ReusingScrollRect : ScrollRectInput
         }
     }
 
-    void ShowItem(int index,Dictionary<string, object> data)
+    void ShowItem(int index,bool isRebuild,Dictionary<string, object> data)
     {
         ReusingScrollItemBase itemTmp = GetItem();
         itemTmp.transform.SetParent(content);
         itemTmp.transform.localScale = Vector3.one;
 
-        itemTmp.SetContent(index,data);
+        if (!isRebuild)
+        {
+            itemTmp.SetContent(index, data);
+        }
 
         itemTmp.RectTransform.pivot = GetPivot();
         itemTmp.RectTransform.anchorMin = GetMinAchors();

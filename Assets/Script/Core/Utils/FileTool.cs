@@ -111,9 +111,9 @@ public class FileTool
                 {
                     Directory.Delete(pathTmp,false);
                 }
-                catch(Exception e)
+                catch
                 {
-                    Debug.LogError(e.ToString());
+                    //Debug.LogError(e.ToString());
                 }
             }
         }
@@ -130,9 +130,9 @@ public class FileTool
                 {
                     File.Delete(pathTmp);
                 }
-                catch(Exception e)
+                catch/*(Exception e)*/
                 {
-                    Debug.LogError(e.ToString());
+                    //Debug.LogError(e.ToString());
                 }
             }
         }

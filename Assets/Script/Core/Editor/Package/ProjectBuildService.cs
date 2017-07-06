@@ -220,6 +220,8 @@ class ProjectBuildService : Editor
 
     static void BuildForAndroid()
     {
+        SwitchPlatform(BuildTarget.Android);
+
         //输出日志
         PrintDebug();
 
@@ -260,12 +262,14 @@ class ProjectBuildService : Editor
         BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.Android, option);
     }
 
-#endregion
+    #endregion
 
-    #region
+    #region IOS
 
     static void BuildForIOS()
     {
+        SwitchPlatform(BuildTarget.iOS);
+
         //输出日志
         PrintDebug();
 
@@ -301,6 +305,8 @@ class ProjectBuildService : Editor
 
     static void BuildForWEBGL()
     {
+        SwitchPlatform(BuildTarget.WebGL);
+
         //输出日志
         PrintDebug();
 
@@ -431,5 +437,17 @@ class ProjectBuildService : Editor
         PlayerSettings.SetScriptingDefineSymbolsForGroup(targetGroup, define);
     }
 
-#endregion
+    /// <summary>
+    /// 切换平台
+    /// </summary>
+    /// <param name="target"></param>
+    public static void SwitchPlatform(BuildTarget target)
+    {
+        if (EditorUserBuildSettings.activeBuildTarget != target)
+        {
+            EditorUserBuildSettings.SwitchActiveBuildTarget(target);
+        }
+    }
+
+    #endregion
 }

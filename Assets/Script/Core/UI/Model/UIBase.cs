@@ -629,7 +629,17 @@ public class UIBase : MonoBehaviour
             GameObjectManager.DestroyGameObjectByPool(item.gameObject,t);
         }
     }
+    public void CleanItem()
+    {
+        for (int i = 0; i < m_ChildList.Count; i++)
+        {
+            m_ChildList[i].OnUIDestroy();
+            GameObjectManager.DestroyGameObjectByPool(m_ChildList[i].gameObject, true);
+        }
 
+        m_ChildList.Clear();
+        m_childUIIndex = 0;
+    }
 
     public void CleanItem(bool isActive = true)
     {
@@ -841,6 +851,7 @@ public class UIBase : MonoBehaviour
             CancelGuideModel(m_GuideList[i]);
         }
 
+        m_GuideList.Clear();
         m_CreateCanvasDict.Clear();
     }
 

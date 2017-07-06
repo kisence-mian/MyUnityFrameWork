@@ -61,21 +61,22 @@ namespace FrameWork.GuideSystem
         {
             UIBase aimUI = ui.GetItem(itemName);
 
-            ShowGuideUI(GetRectTransform(uiName), aimUI, offset, isFollow);
+            ShowGuideUI(GetRectTransform(uiName), aimUI.gameObject, offset, isFollow);
         }
 
         public void ShowGuideUIByObject(string uiName, UIWindowBase ui, string objName, Vector3 offset, bool isFollow)
         {
-            UIBase aimUI = ui.GetItem(objName);
+            GameObject aimUI = ui.GetGameObject(objName);
 
             ShowGuideUI(GetRectTransform(uiName), aimUI, offset, isFollow);
         }
 
-        public void ShowGuideUI(RectTransform guideUI, UIBase aimUI, Vector3 offset, bool isFollow)
+        public void ShowGuideUI(RectTransform guideUI, GameObject aimUI, Vector3 offset, bool isFollow)
         {
             m_uiList.Add(guideUI);
 
-            guideUI.SetParent(aimUI.RectTransform);
+            guideUI.SetParent(aimUI.transform);
+            guideUI.SetSiblingIndex(0);
             guideUI.anchoredPosition3D = offset;
 
             if (!isFollow)
@@ -86,6 +87,8 @@ namespace FrameWork.GuideSystem
 
         public void HideGuideUI(string uiName)
         {
+            GetRectTransform(uiName).SetParent(m_uiRoot.transform);
+
             SetActive(uiName, false);
         }
 
@@ -93,6 +96,7 @@ namespace FrameWork.GuideSystem
         {
             for (int i = 0; i < m_uiList.Count; i++)
             {
+                m_uiList[i].SetParent(m_uiRoot.transform);
                 m_uiList[i].gameObject.SetActive(false);
             }
 

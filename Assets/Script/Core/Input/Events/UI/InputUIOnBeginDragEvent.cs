@@ -12,12 +12,12 @@ public class InputUIOnBeginDragEvent : InputUIEventBase {
     }
 
     public InputUIOnBeginDragEvent(string UIName, string ComponentName)
-        : base(UIName, ComponentName,InputUIEventType.Scroll)
+        : base(UIName, ComponentName,InputUIEventType.BeginDrag)
     {
     }
 
     public static string GetEventKey(string UIName, string ComponentName, string pram = null)
     {
-        return UIName + "." + ComponentName + "." + pram + "." + InputUIEventType.Scroll.ToString();
+        return UIName + "." + ComponentName + "." + pram + "." + InputUIEventType.BeginDrag.ToString();
     }
 }

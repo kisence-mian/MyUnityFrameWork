@@ -12,13 +12,13 @@ public class InputUIOnEndDragEvent : InputUIEventBase
     }
 
      public InputUIOnEndDragEvent(string UIName, string ComponentName)
-        : base(UIName, ComponentName,InputUIEventType.Scroll)
+        : base(UIName, ComponentName,InputUIEventType.EndDrag)
     {
     }
 
     public static string GetEventKey(string UIName, string ComponentName, string pram = null)
     {
-        return UIName + "." + ComponentName + "." + pram + "." + InputUIEventType.Scroll.ToString();
+        return UIName + "." + ComponentName + "." + pram + "." + InputUIEventType.EndDrag.ToString();
     }
 	
 }
