@@ -63,6 +63,25 @@ public class SchemeDataService
         }
     }
 
+    public static void UpdateSchemeData(SchemeData data)
+    {
+        bool isUpdate = false;
+
+        for (int i = 0; i < ConfigList.Count; i++)
+        {
+            if(ConfigList[i].SchemeName == data.SchemeName)
+            {
+                isUpdate = true;
+                ConfigList[i] = data;
+            }
+        }
+
+        if(!isUpdate)
+        {
+            Debug.LogError("更新失败 没有找到对应的方案 " + data.SchemeName);
+        }
+    }
+
     public static void SaveEditorSchemeData()
     {
         Dictionary<string, object> editConfig = new Dictionary<string, object>();
@@ -83,6 +102,8 @@ public class SchemeDataService
     /// <param name="schemeData"></param>
     public static void SaveGameSchemeConfig(SchemeData schemeData)
     {
+        Debug.Log("SaveGameSchemeConfig " + schemeData.LoginScheme.Count);
+
         if(schemeData != null)
         {
             Dictionary<string, SingleField> config = new Dictionary<string, SingleField>();

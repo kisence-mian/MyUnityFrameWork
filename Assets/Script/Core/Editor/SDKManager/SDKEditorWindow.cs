@@ -134,16 +134,19 @@ public class SDKEditorWindow : EditorWindow
 
     void SaveScheme()
     {
-        SchemeDataService.SaveEditorSchemeData();
-        SchemeDataService.SaveGameSchemeConfig(
-            SchemeDataService.CreateSchemeData(
+        m_currentSchemeData = SchemeDataService.CreateSchemeData(
                 m_currentSchemeData.SchemeName,
             m_LoginScheme,
             m_ADScheme,
             m_PayScheme,
             m_LogScheme,
             m_otherScheme
-            ));
+            );
+
+        SchemeDataService.SaveGameSchemeConfig(m_currentSchemeData);
+
+        SchemeDataService.UpdateSchemeData(m_currentSchemeData);
+        SchemeDataService.SaveEditorSchemeData();
     }
 
     void CreateScheme(string SchemeName)
