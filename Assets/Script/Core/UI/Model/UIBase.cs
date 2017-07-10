@@ -629,19 +629,13 @@ public class UIBase : MonoBehaviour
             GameObjectManager.DestroyGameObjectByPool(item.gameObject,t);
         }
     }
+
     public void CleanItem()
     {
-        for (int i = 0; i < m_ChildList.Count; i++)
-        {
-            m_ChildList[i].OnUIDestroy();
-            GameObjectManager.DestroyGameObjectByPool(m_ChildList[i].gameObject, true);
-        }
-
-        m_ChildList.Clear();
-        m_childUIIndex = 0;
+        CleanItem(true);
     }
 
-    public void CleanItem(bool isActive = true)
+    public void CleanItem(bool isActive)
     {
         for (int i = 0; i < m_ChildList.Count; i++)
         {
@@ -802,9 +796,21 @@ public class UIBase : MonoBehaviour
         status.OldSortingOrder = canvas.sortingOrder;
         status.oldSortingLayerName = canvas.sortingLayerName;
 
+        //如果检测到目标对象
+        bool oldActive = go.activeSelf;
+        if(!oldActive)
+        {
+            go.SetActive(true);
+        }
+
         canvas.overrideSorting = true;
         canvas.sortingOrder = order;
         canvas.sortingLayerName = "Guide";
+
+        if(!oldActive)
+        {
+            go.SetActive(false);
+        }
 
         m_GuideList.Add(go);
         m_CreateCanvasDict.Add(go, status);

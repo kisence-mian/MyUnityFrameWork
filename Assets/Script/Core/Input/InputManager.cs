@@ -153,8 +153,6 @@ public class InputManager
 
     public static void AddAllEventListener<T>(InputEventHandle<T> callback) where T : IInputEventBase
     {
-        string eventName = typeof(T).Name;
-
         InputDispatcher<T> dispatcher = GetDispatcher<T>();
         dispatcher.OnEventDispatch += callback;
     }

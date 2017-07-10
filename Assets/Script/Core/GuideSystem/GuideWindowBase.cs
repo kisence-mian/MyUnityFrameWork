@@ -25,9 +25,9 @@ namespace FrameWork.GuideSystem
 
         public void CreateEffect(string effectName, string windowName, string itemName, bool isFollow)
         {
-            UIWindowBase ui = UIManager.GetUI(windowName);
+            //UIWindowBase ui = UIManager.GetUI(windowName);
 
-            UIBase item = ui.GetItem(itemName);
+            //UIBase item = ui.GetItem(itemName);
         }
 
         public void CreateEffect(string effectName, UIBase ui, Vector3 offset, bool isFollow)

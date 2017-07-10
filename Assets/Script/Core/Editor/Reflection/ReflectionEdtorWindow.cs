@@ -37,7 +37,6 @@ public class ReflectionEdtorWindow : EditorWindow
     Assembly m_currentAssembly;
     Type m_currentClass;
     MethodInfo m_currentMethod;
-    Stack<Type> m_typeStack = new Stack<Type>();
 
     string m_searchTmp = "";
 
@@ -244,9 +243,7 @@ public class ReflectionEdtorWindow : EditorWindow
 
     #region 类
 
-
     Vector2 m_classSpace = Vector2.zero;
-    bool isRoot = true;
 
     void AllClassGUI()
     {
@@ -415,8 +412,6 @@ public class ReflectionEdtorWindow : EditorWindow
             m_searchTmp = m_searchClassContent;
         }
     }
-
-    string m_methodfoldName = "";
 
     void MethodGUI(MethodInfo method)
     {

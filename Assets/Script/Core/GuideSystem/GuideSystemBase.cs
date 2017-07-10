@@ -45,11 +45,11 @@ namespace FrameWork.GuideSystem
         /// <summary>
         /// 新手引导记录表
         /// </summary>
-        Dictionary<string, string> m_guideRecord = new Dictionary<string, string>();
+        //Dictionary<string, string> m_guideRecord = new Dictionary<string, string>();
 
         DataTable m_guideData;
         protected SingleData m_currentGuideData;
-        int m_currentGuideIndex = 0;
+        //int m_currentGuideIndex = 0;
         string m_currentGuideKey = "";
 
         #region 外部调用
@@ -276,7 +276,7 @@ namespace FrameWork.GuideSystem
 
         void ReceviceGuideRecord(Dictionary<string, string> record)
         {
-            m_guideRecord = record;
+            //m_guideRecord = record;
         }
 
         #endregion
@@ -439,13 +439,13 @@ namespace FrameWork.GuideSystem
         {
             if (data != null)
             {
-                m_currentGuideIndex = m_guideData.TableIDs.IndexOf(data.m_SingleDataKey);
+                //m_currentGuideIndex = m_guideData.TableIDs.IndexOf(data.m_SingleDataKey);
                 m_currentGuideData = data;
                 m_currentGuideKey = m_currentGuideData.m_SingleDataKey;
             }
             else
             {
-                m_currentGuideIndex = -1;
+                //m_currentGuideIndex = -1;
                 m_currentGuideData = null;
                 m_currentGuideKey = "";
             }
