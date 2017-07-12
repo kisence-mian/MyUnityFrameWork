@@ -931,7 +931,6 @@ public class AnimSystem : MonoBehaviour
         for (int i = 0; i < GetInstance().removeList.Count; i++)
         {
             GetInstance().animList.Remove(GetInstance().removeList[i]);
-            HeapObjectPool<AnimData>.PutObject(GetInstance().removeList[i]);
         }
     }
 
@@ -948,7 +947,6 @@ public class AnimSystem : MonoBehaviour
         }
 
         GetInstance().animList.Remove(animData);
-        HeapObjectPool<AnimData>.PutObject(animData);
     }
 
     /// <summary>
@@ -962,7 +960,6 @@ public class AnimSystem : MonoBehaviour
         animData.ExecuteCallBack();
 
         GetInstance().animList.Remove(animData);
-        HeapObjectPool<AnimData>.PutObject(animData);
     }
 
     public static void ClearAllAnim(bool isCallBack = false)
@@ -974,7 +971,6 @@ public class AnimSystem : MonoBehaviour
             {
                 animTmp.ExecuteCallBack();
             }
-            HeapObjectPool<AnimData>.PutObject(animTmp);
         }
 
         GetInstance().animList.Clear();
@@ -1013,8 +1009,6 @@ public class AnimSystem : MonoBehaviour
         for (int i = 0; i < removeList.Count; i++)
         {
             animList.Remove(removeList[i]);
-            //释放
-            HeapObjectPool<AnimData>.PutObject(removeList[i]);
         }
 
         removeList.Clear();

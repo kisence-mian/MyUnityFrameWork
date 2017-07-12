@@ -14,19 +14,19 @@ using YLWebSocket;
 
 public class ProtocolService : INetworkInterface 
 {
-    private const int TYPE_string = 1;
-    private const int TYPE_int32 = 2;
-    private const int TYPE_double = 3;
-    private const int TYPE_bool = 4;
-    private const int TYPE_custom = 5;
+    public const int TYPE_string = 1;
+    public const int TYPE_int32 = 2;
+    public const int TYPE_double = 3;
+    public const int TYPE_bool = 4;
+    public const int TYPE_custom = 5;
 
-    private const int TYPE_int8 = 6;
-    private const int TYPE_int16 = 7;
-    private const int RT_repeated = 1;
-    private const int RT_equired = 0;
+    public const int TYPE_int8 = 6;
+    public const int TYPE_int16 = 7;
+    public const int RT_repeated = 1;
+    public const int RT_equired = 0;
 
-    const string m_ProtocolFileName = "ProtocolInfo";
-    const string m_methodNameInfoFileName = "MethodInfo";
+    public const string c_ProtocolFileName = "ProtocolInfo";
+    public const string c_methodNameInfoFileName = "MethodInfo";
 
     Dictionary<string, List<Dictionary<string, object>>> m_protocolInfo;
 
@@ -46,8 +46,11 @@ public class ProtocolService : INetworkInterface
 
     public override void Init()
     {
-        ReadProtocolInfo();
-        ReadMethodNameInfo();
+        m_protocolInfo = ReadProtocolInfo(ResourceManager.ReadTextFile(c_ProtocolFileName));
+        ReadMethodNameInfo(
+            out m_methodNameInfo,
+            out m_methodIndexInfo,
+            ResourceManager.ReadTextFile(c_methodNameInfoFileName));
 
 #if !UNITY_EDITOR && UNITY_WEBGL
         GameObject web = new GameObject("WebSocket");
@@ -237,7 +240,7 @@ public class ProtocolService : INetworkInterface
         Send(msg.Buffer);
     }
 
-#region 缓冲区
+    #region 缓冲区
 
     byte[] m_messageBuffer;
     int m_head = 0;
@@ -352,12 +355,12 @@ public class ProtocolService : INetworkInterface
         }
     }
 
-#region 读取protocol信息
+    #region 读取protocol信息
 
-    void ReadProtocolInfo()
+    public static Dictionary<string, List<Dictionary<string, object>>> ReadProtocolInfo(string content)
     {
-        m_protocolInfo = new Dictionary<string, List<Dictionary<string, object>>>();
-        string content = ResourceManager.ReadTextFile(m_ProtocolFileName);
+        Dictionary<string, List<Dictionary<string, object>>> protocolInfo = new Dictionary<string, List<Dictionary<string, object>>>();
+
         AnalysisProtocolStatus currentStatus = AnalysisProtocolStatus.None;
         List<Dictionary<string, object>> msgInfo = new List<Dictionary<string, object>>();
         Regex rgx = new Regex(@"^message\s(\w+)");
@@ -372,23 +375,19 @@ public class ProtocolService : INetworkInterface
             {
                 if (currentLine.Contains("message"))
                 {
-                    
                     string msgName = rgx.Match(currentLine).Groups[1].Value;
-
-                    //Debug.Log("message :->" + msgName + "<-");
 
                     msgInfo = new List<Dictionary<string, object>>();
 
-                    if (m_protocolInfo.ContainsKey(msgName))
+                    if (protocolInfo.ContainsKey(msgName))
                     {
                         Debug.LogError("protocol 有重复的Key! :" + msgName);
                     }
                     else
                     {
-                        m_protocolInfo.Add(msgName, msgInfo);
+                        protocolInfo.Add(msgName, msgInfo);
                     }
 
-                    
                     currentStatus = AnalysisProtocolStatus.Message;
                 }
             }
@@ -426,11 +425,13 @@ public class ProtocolService : INetworkInterface
                 }
             }
         }
+
+        return protocolInfo;
     }
 
-    Regex m_TypeRgx = new Regex(@"^\s+\w+\s+(\w+)\s+\w+");
+    static Regex m_TypeRgx = new Regex(@"^\s+\w+\s+(\w+)\s+\w+");
 
-    void AddType(string currentLine, Dictionary<string, object> currentFeidInfo)
+    static void AddType(string currentLine, Dictionary<string, object> currentFeidInfo)
     {
         if (currentLine.Contains("int32"))
         {
@@ -463,9 +464,9 @@ public class ProtocolService : INetworkInterface
         }
     }
 
-    Regex m_NameRgx = new Regex(@"^\s+\w+\s+\w+\s+(\w+)");
+    static Regex m_NameRgx = new Regex(@"^\s+\w+\s+\w+\s+(\w+)");
 
-    void AddName(string currentLine, Dictionary<string, object> currentFeidInfo)
+    static void AddName(string currentLine, Dictionary<string, object> currentFeidInfo)
     {
         currentFeidInfo.Add("name", m_NameRgx.Match(currentLine).Groups[1].Value);
     }
@@ -478,14 +479,13 @@ public class ProtocolService : INetworkInterface
 
 #endregion
 
-#region 读取消息号映射
+    #region 读取消息号映射
 
-    void ReadMethodNameInfo()
+    public static void ReadMethodNameInfo(out Dictionary<int, string> methodNameInfo,out Dictionary<string, int> methodIndexInfo,string content)
     {
-        m_methodNameInfo = new Dictionary<int, string>();
-        m_methodIndexInfo = new Dictionary<string, int>();
+        methodNameInfo = new Dictionary<int, string>();
+        methodIndexInfo = new Dictionary<string, int>();
 
-        string content = ResourceManager.ReadTextFile(m_methodNameInfoFileName);
         Regex rgx = new Regex(@"^(\d+),(\w+)");
 
         string[] lines = content.Split('\n');
@@ -499,8 +499,8 @@ public class ProtocolService : INetworkInterface
                 string index = res.Groups[1].Value;
                 string indexName = res.Groups[2].Value;
 
-                m_methodNameInfo.Add(int.Parse(index), indexName);
-                m_methodIndexInfo.Add(indexName, int.Parse(index));
+                methodNameInfo.Add(int.Parse(index), indexName);
+                methodIndexInfo.Add(indexName, int.Parse(index));
             }
         }
     }
@@ -519,7 +519,7 @@ public class ProtocolService : INetworkInterface
 
 #endregion
 
-#region 解包
+    #region 解包
 
     NetWorkMessage  Analysis(ByteArray bytes)
     {
@@ -538,7 +538,7 @@ public class ProtocolService : INetworkInterface
         return msg;
     }
 
-#region 解析数据
+    #region 解析数据
 
     Dictionary<string, object> AnalysisData(string MessageType, byte[] bytes)
     {
@@ -924,7 +924,7 @@ public class ProtocolService : INetworkInterface
 
 #endregion
 
-#region 发包
+    #region 发包
 
     List<byte> GetSendByte(string messageType, Dictionary<string, object> data)
     {
@@ -1188,17 +1188,71 @@ public class ProtocolService : INetworkInterface
     }
 
 #endregion
+}
 
-#region 特性
+#region 特性与基类
 
+namespace Protocol
+{
+    /// <summary>
+    /// 在Protocol以Int16传输的字段
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    public class Int16Attribute : System.Attribute
-    {
-    }
+    public class Int16Attribute : System.Attribute { }
+
+    /// <summary>
+    /// 在Protocol以Int8传输的字段
+    /// </summary>
     [AttributeUsage(AttributeTargets.Field)]
-    public class Int8Attribute : System.Attribute
-    {
+    public class Int8Attribute : System.Attribute { }
+
+    /// <summary>
+    /// 模块名与模块消息编码
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ModuleAttribute : System.Attribute {
+        public int MessageCode;
+        public string ModuleName;
+
+        public ModuleAttribute(int messageCode, string moduleName)
+        {
+            MessageCode = messageCode;
+            ModuleName = moduleName;
+        }
     }
+
+    /// <summary>
+    /// 消息发送模式，如果不加默认为Both
+    /// 生成 protocol 时 ToClient 和 ToServer 类型不会自动加后缀，要保证类名后面有_s 或者 _c后缀
+    /// Both自动添加 _s 和 _c 后缀
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Class)]
+    public class MessageModeAttribute : System.Attribute
+    {
+        public SendMode Mode;
+
+        public MessageModeAttribute(SendMode mode)
+        {
+            Mode = mode;
+        }
+    }
+
+    public enum SendMode
+    {
+        ToClient,
+        ToServer,
+        Both,
+    }
+
+    /// <summary>
+    /// 自动被Protocol解析的基类
+    /// </summary>
+    public interface IProtocolMessageInterface { }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public interface CsharpProtocolInterface : IProtocolMessageInterface { }
+}
 
 #endregion
-}

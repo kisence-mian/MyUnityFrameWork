@@ -23,7 +23,7 @@ class ProjectBuildService : Editor
             }
             return "Android";
 #elif UNITY_IOS
-            return "Ios";
+            return "IOS";
 #else
             return "General";
 #endif

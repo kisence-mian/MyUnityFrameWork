@@ -323,7 +323,7 @@ public class GlobalEvent
     /// <param name="type">事件枚举</param>
     /// <param name="handle">回调</param>
     /// <param name="isUseOnce"></param>
-    public static void AddEvent<T>( EventHandle<T> handle, bool isUseOnce = false)
+    public static void AddTypeEvent<T>( EventHandle<T> handle, bool isUseOnce = false)
     {
         GetEventDispatcher<T>(isUseOnce).m_CallBack += handle;
     }
@@ -333,7 +333,7 @@ public class GlobalEvent
     /// </summary>
     /// <param name="type"></param>
     /// <param name="handle"></param>
-    public static void RemoveEvent<T>(EventHandle<T> handle, bool isUseOnce = false)
+    public static void RemoveTypeEvent<T>(EventHandle<T> handle, bool isUseOnce = false)
     {
         GetEventDispatcher<T>(isUseOnce).m_CallBack -= handle;
     }
@@ -342,7 +342,7 @@ public class GlobalEvent
     /// 移除某类事件
     /// </summary>
     /// <param name="type"></param>
-    public static void RemoveEvent<T>(bool isUseOnce = false)
+    public static void RemoveEventT<T>(bool isUseOnce = false)
     {
         GetEventDispatcher<T>(isUseOnce).m_CallBack = null;
     }
@@ -352,7 +352,7 @@ public class GlobalEvent
     /// </summary>
     /// <param name="type"></param>
     /// <param name="args"></param>
-    public static void DispatchEvent<T>(T e, params object[] args)
+    public static void DispatchTypeEvent<T>(T e, params object[] args)
     {
         GetEventDispatcher<T>(false).Call(e,args);
 

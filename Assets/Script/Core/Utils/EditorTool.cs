@@ -10,6 +10,11 @@ public class EditorTool :MonoBehaviour
         return Type.GetType(typeName);
     }
 
+    public static Type[] GetTypes()
+    {
+        return Assembly.Load("Assembly-CSharp").GetTypes();
+    }
+
     public static string[] GetAllEnumType()
     {
         List<string> listTmp = new List<string>();

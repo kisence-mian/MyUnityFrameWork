@@ -729,6 +729,13 @@ public class UIBase : MonoBehaviour
     {
         GetGameObject(gameObjectID).SetActive(isShow);
     }
+    /// <summary>
+    /// Only Button
+    /// </summary>
+    public void SetEnabeled(string ID,bool enable)
+    {
+        GetButton(ID).enabled = enable;
+    }
 
     public void SetRectWidth(string TextID, float value, float height)
     {
