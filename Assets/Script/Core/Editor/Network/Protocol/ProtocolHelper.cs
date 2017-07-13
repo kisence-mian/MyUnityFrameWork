@@ -413,6 +413,7 @@ namespace FrameWork.Protocol
 
             foreach(var item in data)
             {
+                content += GetAttributeContent(tab + 1, item);
                 content += GetTab(tab + 1) + "public " + GetTypeName(item) + " " + GetFieldName(item) + ";\n";
             }
 
@@ -458,6 +459,25 @@ namespace FrameWork.Protocol
             if(repeat == ProtocolService.RT_repeated)
             {
                 content = "List<" + content + ">";
+            }
+
+            return content;
+        }
+
+        static string GetAttributeContent(int tab,Dictionary<string, object> currentFeidInfo)
+        {
+            string content = "";
+
+            int type = (int)currentFeidInfo["type"];
+            int repeat = (int)currentFeidInfo["spl"];
+
+            if (type == ProtocolService.TYPE_int16)
+            {
+                content = GetTab(tab) + "[Int16]\n";
+            }
+            else if(type == ProtocolService.TYPE_int8)
+            {
+                content = GetTab(tab) + "[Int8]\n";
             }
 
             return content;

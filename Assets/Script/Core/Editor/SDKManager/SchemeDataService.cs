@@ -344,7 +344,7 @@ public class SchemeDataService
         string oldPath = Application.dataPath + "/" + c_SDKCachePath + "/" + schemeName;
         string newPath =  Application.dataPath + "/" + schemeName;
 
-        Debug.Log("SaveSchemeFile ：oldPath: ->" + oldPath + "<- newPath: ->" + newPath + "<-");
+        Debug.Log("LoadSchemeFile ：oldPath: ->" + oldPath + "<- newPath: ->" + newPath + "<-");
 
         MoveFiles(oldPath, newPath);
     }

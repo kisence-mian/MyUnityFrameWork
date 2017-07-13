@@ -296,6 +296,14 @@ public class GameObjectManager :MonoBehaviour
         DestroyPoolObject(CreatePoolObject(gameObjectName));
     }
 
+    /// <summary>
+    /// 预存入对象池
+    /// </summary>
+    /// <param name="name"></param>
+    public static void PutPoolGameOject(string name)
+    {
+        DestroyGameObjectByPool(CreateGameObjectByPool(name));
+    }
 
     public static bool IsExist_New(string objectName)
     {

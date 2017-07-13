@@ -38,5 +38,19 @@ public class UGUITool
             Debug.LogError("set_icon Exception:" + e.ToString());           
         }
     }
-   
+
+    static public void set_SpriteRender(GameObject go , string name)
+    {
+        try {
+            Texture2D tex = ResourceManager.Load<Texture2D>(name);
+            SpriteRenderer sprite = go.GetComponent<SpriteRenderer>();
+            sprite.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.one * 0.5f);
+        }
+        catch (System.Exception e)
+        {
+
+        }
+    }
+
+
 }
