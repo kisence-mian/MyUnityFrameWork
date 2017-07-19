@@ -342,7 +342,7 @@ public class GlobalEvent
     /// 移除某类事件
     /// </summary>
     /// <param name="type"></param>
-    public static void RemoveEventT<T>(bool isUseOnce = false)
+    public static void RemoveTypeEvent<T>(bool isUseOnce = false)
     {
         GetEventDispatcher<T>(isUseOnce).m_CallBack = null;
     }

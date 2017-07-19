@@ -78,7 +78,6 @@ end
 	--第二个参数是延时多久以毫秒为单位
 	--第三个参数是要传入的参数
 function yieldCallBack(function_func,n_time,data)
-
 	local t_yieldCallBackInfo = {};
 	t_yieldCallBackInfo.func = function_func;
 	t_yieldCallBackInfo.data = data;
@@ -104,11 +103,11 @@ end
 
 --用于处理延时消息
 function judge_yieldCallBack(n_timeDelta)
-
 	for k,v in pairs(t_yieldCallBackList) do
-	    if (os.clock() - n_timeTmp) > c_timerMaxTime then
-	    	break;
-	    end
+	    -- if (os.clock() - n_timeTmp) > c_timerMaxTime then
+	    -- 	print(os.clock() .. " " ..n_timeTmp.." "..c_timerMaxTime)
+	    -- 	break;
+	    -- end
 		v.time = v.time - n_timeDelta;
 		if v.time <= 0 then
 			t_yieldCallBackList[k] = nil;

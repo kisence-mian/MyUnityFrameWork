@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class TestStstus : IApplicationStatus 
+public class LuaTestStstus : IApplicationStatus 
 {
 
     public override void OnEnterStatus()

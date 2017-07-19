@@ -46,7 +46,7 @@ public class UGUITool
             SpriteRenderer sprite = go.GetComponent<SpriteRenderer>();
             sprite.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.one * 0.5f);
         }
-        catch (System.Exception e)
+        catch
         {
 
         }

@@ -51,8 +51,11 @@ public class LuaEditorWindow : EditorWindow
 
     bool GetIsInit()
     {
-        string path = Application.dataPath + "/Resources/Lua";
-        return Directory.Exists(path);
+    #if USE_LUA
+        return true;
+    #else
+        return false;
+    #endif
     }
 
     void InitLuaGUI()
@@ -82,9 +85,29 @@ public class LuaEditorWindow : EditorWindow
         //复制lua初始库文件
         FileTool.CopyDirectory(resPath, aimPath);
 
+        //初始Warp
+        ToLuaMenu.GenLuaAll();
+
+        //自动生成Lua配置文件
+        GetLuaFileList();
+        SaveLuaConfig();
+
+        //创建启动文件
+        string luaMainPath = Application.dataPath + "/Resources/Lua/luaMain.txt";
+        string content = "print(\"lua is launch!\");";
+
+        ResourceIOTool.WriteStringByFile(luaMainPath, content);
+
+        //设置宏
         ProjectBuildService.SetScriptDefine("USE_LUA");
 
         AssetDatabase.Refresh();
+
+        string info = "Lua初始化完成，\n";
+        info += "请先生成luaWarp文件 （Window -> Lua设置管理器 -> 重新生成Lua Warp脚本）\n";
+        info += "再重新生成打包设置（Window -> 打包设置管理器 -> 自动添加Resources目录下的资源并保存）\n";
+
+        Debug.Log(info);
     }
 
     void CreateLuaExportFile()
@@ -116,7 +139,7 @@ public class LuaEditorWindow : EditorWindow
         EditorUtil.WriteStringByFile(filePath, sb.ToString());
     }
 
-    #endregion
+#endregion
 
     #region 读取Lua配置
     void LoadLuaConfig()
@@ -151,7 +174,7 @@ public class LuaEditorWindow : EditorWindow
     }
 #endregion
 
-#region Lua信息检视
+    #region Lua信息检视
 
     bool m_isFold = false;
     bool m_isFoldLib = false;
@@ -200,7 +223,7 @@ public class LuaEditorWindow : EditorWindow
 
 #endregion
 
-#region ULua原生功能
+    #region ULua原生功能
 
     void LuaWarpFileGUI()
     {
@@ -247,7 +270,7 @@ public class LuaEditorWindow : EditorWindow
 
 #endregion
 
-#region 自动生成Lua设置
+    #region 自动生成Lua设置
 
     void AutoLuaConfigGUI()
     {

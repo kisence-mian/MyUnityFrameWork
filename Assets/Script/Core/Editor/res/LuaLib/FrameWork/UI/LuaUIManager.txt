@@ -30,6 +30,28 @@ function LuaUIManager.UIOnOpen(UIWindow_window)
 	end
 end
 
+function LuaUIManager.UIOnShow(UIWindow_window)
+
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnShow();
+	else
+		error("UIOnShow Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnHide(UIWindow_window)
+
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnHide();
+	else
+		error("UIOnHide Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
 function LuaUIManager.UIOnEnterAnim(UIWindow_window)
 
 	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
@@ -107,5 +129,12 @@ function LuaUIManager:GetUITable(UIEvent_e)
 
 	if UIEvent_e ~= nil then
 		return LuaUIManager.t_UIs[UIEvent_e.m_name];
+	end
+end
+
+function LuaUIManager:GetUITableByKey(s_UIKey)
+
+	if s_UIKey ~= nil then
+		return LuaUIManager.t_UIs[s_UIKey];
 	end
 end

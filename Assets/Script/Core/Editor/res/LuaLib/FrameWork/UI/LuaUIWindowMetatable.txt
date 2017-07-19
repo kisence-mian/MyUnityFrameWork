@@ -19,6 +19,14 @@ function UIWindowMetaTable:OnOpen()
 	-- print(self.UIWindow_ui.UIEventKey.." OnOpen");
 end
 
+function UIWindowMetaTable:OnShow()
+	-- print(self.UIWindow_ui.UIEventKey.." OnShow");
+end
+
+function UIWindowMetaTable:OnHide()
+	-- print(self.UIWindow_ui.UIEventKey.." OnHide");
+end
+
 function UIWindowMetaTable:EnterAnim()
 	-- print(self.UIWindow_ui.UIEventKey.." EnterAnim");
 	return 0;

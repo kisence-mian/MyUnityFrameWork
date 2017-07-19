@@ -3,3 +3,4 @@ Vector3 = UnityEngine.Vector3
 Vector2 = UnityEngine.Vector2
 
 Color = UnityEngine.Color
+GameObject = UnityEngine.GameObject

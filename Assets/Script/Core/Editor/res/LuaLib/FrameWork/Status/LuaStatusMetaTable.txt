@@ -27,8 +27,12 @@ end
 
 function LuaStatusMetaTable:OpenUIWindow(s_WindowName,func_callBack,parms)
 	
+	print("LuaStatusMetaTable:OpenUIWindow: "..tostring(s_WindowName));
+
 	if LuaStatusMetaTable.t_windowList[s_WindowName] == nil then
 		LuaStatusMetaTable.t_windowList[s_WindowName] = {};
+	else
+		error("LuaStatusMetaTable:OpenUIWindow 覆盖了 "..tostring(s_WindowName).."! 请检查界面是否重复打开");
 	end
 
 	LuaStatusMetaTable.t_windowList[s_WindowName].s_WindowName = s_WindowName;
@@ -36,6 +40,8 @@ function LuaStatusMetaTable:OpenUIWindow(s_WindowName,func_callBack,parms)
 end
 
 function LuaStatusMetaTable:CloseUIWindow(s_WindowName,isPlayAnim,func_callBack,parms)
+	
+	print("LuaStatusMetaTable:CloseUIWindow: "..tostring(s_WindowName));
 	
 	if s_WindowName == nil then
 		error("CloseUIWindow error : s_WindowName is nil");

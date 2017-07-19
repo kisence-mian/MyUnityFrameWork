@@ -117,7 +117,7 @@ end
 function Remove( Self, EventName, Func, Object )
     
     if Func == nil then
-        warn("Remove  Func == nil");
+        error("Remove  Func == nil");
     end
 
     assert( Func )

@@ -482,7 +482,6 @@ namespace FrameWork.Protocol
             string content = "";
 
             int type = (int)currentFeidInfo["type"];
-            int repeat = (int)currentFeidInfo["spl"];
 
             if (type == ProtocolService.TYPE_int16)
             {
