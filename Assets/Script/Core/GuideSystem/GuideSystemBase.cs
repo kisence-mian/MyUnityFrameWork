@@ -306,10 +306,10 @@ namespace FrameWork.GuideSystem
 
             ApplicationManager.s_OnApplicationUpdate += Update;
 
+            OnStart();
+
             SetCurrent(LoadFirstGuide());
             GuideLogic();
-
-            OnStart();
         }
 
         void EndGuide()

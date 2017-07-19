@@ -14,6 +14,7 @@ namespace FrameWork.Protocol
     {
         static List<Type> ModuleList = new List<Type>();
         static List<Type> msgList = new List<Type>();
+        static List<Type> StructList = new List<Type>();
 
         public const string PathName = "ProtocolGenerate";
         const string AnalysisCodeName  = "ProtocolAnalysisService";
@@ -33,6 +34,8 @@ namespace FrameWork.Protocol
 
             string protocolContent = GeneratePrototalContent();
             string protocolList = GeneratePrototalList();
+
+            Debug.Log(protocolContent);
 
             string ProtocolSavePath = Application.dataPath + "/Resources/Network/" + ProtocolService.c_ProtocolFileName + ".txt";
             ResourceIOTool.WriteStringByFile(ProtocolSavePath, protocolContent);
@@ -146,7 +149,7 @@ namespace FrameWork.Protocol
             }
             else if (field.FieldType.Name == typeof(List<>).Name)
             {
-                string content = "repeated";
+                string content = "repeated ";
                 Type type = field.FieldType.GetGenericArguments()[0];
 
                 content += GetTypeName(type) + " " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
@@ -189,7 +192,7 @@ namespace FrameWork.Protocol
             {
                 return "int8";
             }
-            else if (type.IsSubclassOf(typeof(Enum)))
+            else if (type == typeof(string))
             {
                 return "string";
             }
@@ -312,6 +315,9 @@ namespace FrameWork.Protocol
                 else
                 {
                     string className = GetMessageNmae(item.Value);
+
+                    //Debug.Log(className + " -> " + item.Value);
+
                     if (GetAimType(className) == null)
                     {
                         string name = "m_" + item.Value + "_c";
@@ -356,7 +362,14 @@ namespace FrameWork.Protocol
             output += GetTab(1) + "#region Struct\n";
             for (int i = 0; i < s_SubStruct.Count; i++)
             {
-                output += GenerateProtocolClass(2,SendMode.Both,null, s_SubStruct[i], protocolInfo[s_SubStruct[i]],true);
+                try
+                {
+                    output += GenerateProtocolClass(2, SendMode.Both, null, s_SubStruct[i], protocolInfo[s_SubStruct[i]], true);
+                }
+                catch
+                {
+                    throw new Exception("s_SubStruct[i] ->" + s_SubStruct[i]);
+                }
             }
             output += GetTab(1) + "#endregion \n";
 
@@ -401,7 +414,7 @@ namespace FrameWork.Protocol
 
             if(isStruct)
             {
-                content = GetTab(tab) + "public class " + ClassName + " \n";
+                content = GetTab(tab) + "public class " + ClassName + " : IProtocolStructInterface \n";
             }
             else
             {
@@ -567,6 +580,11 @@ namespace FrameWork.Protocol
                 }
             }
 
+            if(result == "")
+            {
+                return name;
+            }
+
             return result;
         }
 
@@ -614,6 +632,16 @@ namespace FrameWork.Protocol
 
             //进行排序
             msgList.Sort(sort);
+
+            StructList.Clear();
+
+            for (int i = 0; i < types.Length; i++)
+            {
+                if (typeof(IProtocolStructInterface).IsAssignableFrom(types[i]))
+                {
+                    StructList.Add(types[i]);
+                }
+            }
         }
 
         static string GenerateCSharpContent()
@@ -806,6 +834,14 @@ namespace FrameWork.Protocol
             {
                 content += GenerateProtocolMessage(msgList[i]);
                 content += "\n";
+            }
+
+            Debug.Log("StructList " + StructList.Count);
+
+            for (int i = 0; i < StructList.Count; i++)
+            {
+                content += "message " + GenerateProtocolName(StructList[i]) + "\n";
+                content += GenerateProtocolMessageNoHead(StructList[i]);
             }
 
             return content;

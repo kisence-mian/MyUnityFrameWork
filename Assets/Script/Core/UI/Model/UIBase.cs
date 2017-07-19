@@ -155,7 +155,14 @@ public class UIBase : MonoBehaviour
 
         if (m_objects.ContainsKey(name))
         {
-            return m_objects[name];
+            GameObject go = m_objects[name];
+
+            if (go == null)
+            {
+                throw new Exception("UIWindowBase GetGameObject error: " + UIName + " m_objects[" + name + "] is null !!");
+            }
+
+            return go;
         }
         else
         {

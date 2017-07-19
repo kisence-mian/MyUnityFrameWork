@@ -116,6 +116,7 @@ public class ApplicationManager : MonoBehaviour
     public static ApplicationBoolCallback s_OnApplicationFocus = null;
     public static ApplicationVoidCallback s_OnApplicationUpdate = null;
     public static ApplicationVoidCallback s_OnApplicationOnGUI = null;
+    public static ApplicationVoidCallback s_OnApplicationOnDrawGizmos = null;
 
     void OnApplicationQuit()
     {
@@ -178,9 +179,15 @@ public class ApplicationManager : MonoBehaviour
             s_OnApplicationOnGUI();
     }
 
-#endregion
+    private void OnDrawGizmos()
+    {
+        if (s_OnApplicationOnDrawGizmos != null)
+            s_OnApplicationOnDrawGizmos();
+    }
 
-#region 程序启动细节
+    #endregion
+
+    #region 程序启动细节
     /// <summary>
     /// 设置资源加载方式
     /// </summary>

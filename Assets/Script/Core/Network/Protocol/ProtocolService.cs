@@ -1250,6 +1250,11 @@ namespace Protocol
     public interface IProtocolMessageInterface { }
 
     /// <summary>
+    /// 自动被Protocol解析的结构
+    /// </summary>
+    public interface IProtocolStructInterface { }
+
+    /// <summary>
     /// 
     /// </summary>
     public interface CsharpProtocolInterface : IProtocolMessageInterface { }
