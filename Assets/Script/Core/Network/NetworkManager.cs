@@ -158,7 +158,6 @@ public class NetworkManager
             s_isConnect = false;
         }
 
-
         InputNetworkEventProxy.DispatchStatusEvent(status);
     }
 

@@ -1712,7 +1712,14 @@ public class BundleConfigEditorWindow : EditorWindow
             pack.Add("relyPackages", new string[0]);
             pack.Add("md5", MD5Tool.GetFileMD5(GetExportPath(relyPackages[i].path, relyPackages[i].name))); //获取bundle包的md5
 
-            gameRelyBundles.Add(relyPackages[i].name, pack);
+            if(gameRelyBundles.ContainsKey(relyPackages[i].name))
+            {
+                Debug.LogError("依赖包重名 ! " + relyPackages[i].name);
+            }
+            else
+            {
+                gameRelyBundles.Add(relyPackages[i].name, pack);
+            }
         }
 
         Dictionary<string, object> gameAssetsBundles = new Dictionary<string, object>();
@@ -1726,7 +1733,14 @@ public class BundleConfigEditorWindow : EditorWindow
             pack.Add("md5", MD5Tool.GetFileMD5(GetExportPath(bundles[i].path, bundles[i].name))); //获取bundle包的md5
             //pack.loadType      = ResLoadType.Streaming;  //默认放在沙盒路径下
 
-            gameAssetsBundles.Add(bundles[i].name, pack);
+            if (gameAssetsBundles.ContainsKey(bundles[i].name))
+            {
+                Debug.LogError("资源包重名 ! " + bundles[i].name);
+            }
+            else
+            {
+                gameAssetsBundles.Add(bundles[i].name, pack);
+            }
         }
 
         data.Add(ResourcesConfigManager.c_relyBundleKey, gameRelyBundles);
