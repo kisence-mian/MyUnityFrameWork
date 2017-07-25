@@ -155,6 +155,11 @@ public class GameObjectManager :MonoBehaviour
             s_objectPool.Add(key, new List<GameObject>());
         }
 
+        if(s_objectPool[key].Contains(obj))
+        {
+            throw new Exception("DestroyGameObjectByPool:-> Repeat Destroy GameObject !" + obj);
+        }
+
         s_objectPool[key].Add(obj);
 
         if(isSetActive)
@@ -367,6 +372,11 @@ public class GameObjectManager :MonoBehaviour
         if (s_objectPool_new.ContainsKey(key) == false)
         {
             s_objectPool_new.Add(key, new List<PoolObject>());
+        }
+
+        if (s_objectPool_new[key].Contains(obj))
+        {
+            throw new Exception("DestroyPoolObject:-> Repeat Destroy GameObject !" + obj);
         }
 
         s_objectPool_new[key].Add(obj);

@@ -24,10 +24,18 @@ public static class ConfigManager
         string dataJson = "";
 
         #if UNITY_EDITOR
-            dataJson = ResourceIOTool.ReadStringByResource(
-                PathTool.GetRelativelyPath(c_directoryName,
-                                            ConfigName,
-                                            c_expandName));
+            if(!Application.isPlaying)
+            {
+                dataJson = ResourceIOTool.ReadStringByResource(
+                    PathTool.GetRelativelyPath(c_directoryName,
+                                ConfigName,
+                                c_expandName));
+            }
+            else
+            {
+                dataJson = ResourceManager.ReadTextFile(ConfigName);
+            }
+
         #else
              dataJson = ResourceManager.ReadTextFile(ConfigName);
         #endif
@@ -51,14 +59,21 @@ public static class ConfigManager
 
         string dataJson = "";
 
-        #if UNITY_EDITOR
-                dataJson = ResourceIOTool.ReadStringByResource( 
-                    PathTool.GetRelativelyPath(c_directoryName,
-                                                ConfigName,
-                                                c_expandName));
-        #else
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            dataJson = ResourceIOTool.ReadStringByResource(
+                PathTool.GetRelativelyPath(c_directoryName,
+                            ConfigName,
+                            c_expandName));
+        }
+        else
+        {
+            dataJson = ResourceManager.ReadTextFile(ConfigName);
+        }
+#else
                 dataJson = ResourceManager.ReadTextFile(ConfigName);
-        #endif
+#endif
 
         if (dataJson == "")
         {

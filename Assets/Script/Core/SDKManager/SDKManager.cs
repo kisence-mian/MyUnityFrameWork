@@ -371,19 +371,25 @@ public class SDKManager
     /// 数据上报
     /// </summary>
     /// <param name="data"></param>
-    public static void Log(string eventID,Dictionary<string,object> data)
+    public static void Log(string eventID, Dictionary<string, object> data)
     {
-        try
+        if(s_logServiceList == null)
         {
-            for (int i = 0; i < s_logServiceList.Count; i++)
+            throw new Exception("logServiceList is null ,please check SDKManager Init");
+        }
+
+        for (int i = 0; i < s_logServiceList.Count; i++)
+        {
+            try
             {
                 s_logServiceList[i].Log(eventID, data);
             }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager Log Exception: " + e.ToString());
+            }
         }
-        catch (Exception e)
-        {
-            Debug.LogError("SDKManager Log Exception: " + e.ToString());
-        }
+
     }
     #endregion
 

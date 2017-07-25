@@ -1,5 +1,4 @@
 ﻿
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -329,7 +328,7 @@ public class HotUpdateManager
 
     static float GetDownLoadFileProgress(int index)
     {
-        if (s_downLoadList.Count ==0)
+        if (s_downLoadList.Count == 0)
         {
             Debug.Log("更新列表为 0");
             return 0.95f;
@@ -383,8 +382,6 @@ public class HotUpdateManager
                     dataJson = text.text;
                     ab.Unload(true);
             }
-
-
         }
 
         return dataJson;
