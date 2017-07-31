@@ -267,43 +267,50 @@ public class EditorUtilGUI
     }
     public static object DrawList(Type type,string name, object obj)
     {
-        Type t = type.GetGenericArguments()[0];
+        try
+        {
+            Type t = type.GetGenericArguments()[0];
 
-        MethodInfo methodInfo = type.GetMethod("get_Item", BindingFlags.Instance | BindingFlags.Public);
-        MethodInfo methodInfo1 = type.GetMethod("set_Item", BindingFlags.Instance | BindingFlags.Public);
-        MethodInfo methodInfo2 = type.GetMethod("RemoveAt", BindingFlags.Instance | BindingFlags.Public);
-        MethodInfo methodInfo3 = type.GetMethod("Add", BindingFlags.Instance | BindingFlags.Public);
-        GUILayout.BeginHorizontal();
-        GUILayout.Label(name);
-        GUILayout.FlexibleSpace();
-        if (GUILayout.Button("+", GUILayout.Width(50)))
-        {
-            object temp = null;
-            if (t.FullName == typeof(string).FullName)
-                temp = "";
-            else
-                temp = Activator.CreateInstance(t);
-            methodInfo3.Invoke(obj, new object[] { temp });
-        }
-        GUILayout.EndHorizontal();
-        PropertyInfo pro = type.GetProperty("Count");
-        int cout = (int)pro.GetValue(obj, null);
-        GUILayout.BeginVertical("box");
-        for (int i = 0; i < cout; i++)
-        {
-            object da = methodInfo.Invoke(obj, new object[] { i });
+            MethodInfo methodInfo = type.GetMethod("get_Item", BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo methodInfo1 = type.GetMethod("set_Item", BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo methodInfo2 = type.GetMethod("RemoveAt", BindingFlags.Instance | BindingFlags.Public);
+            MethodInfo methodInfo3 = type.GetMethod("Add", BindingFlags.Instance | BindingFlags.Public);
             GUILayout.BeginHorizontal();
-            da = DrawObjectDataEditorDefultOneField(type, "", da);
-            methodInfo1.Invoke(obj, new object[] { i, da });
-
-            if (GUILayout.Button("-", GUILayout.Width(50)))
+            GUILayout.Label(name);
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("+", GUILayout.Width(50)))
             {
-                methodInfo2.Invoke(obj, new object[] { i });
-                break;
-            } 
+                object temp = null;
+                if (t.FullName == typeof(string).FullName)
+                    temp = "";
+                else
+                    temp = Activator.CreateInstance(t);
+                methodInfo3.Invoke(obj, new object[] { temp });
+            }
             GUILayout.EndHorizontal();
+            PropertyInfo pro = type.GetProperty("Count");
+            int cout = (int)pro.GetValue(obj, null);
+            GUILayout.BeginVertical("box");
+            for (int i = 0; i < cout; i++)
+            {
+                object da = methodInfo.Invoke(obj, new object[] { i });
+                GUILayout.BeginHorizontal();
+                da = DrawObjectDataEditorDefultOneField(t, "", da);
+                methodInfo1.Invoke(obj, new object[] { i, da });
+
+                if (GUILayout.Button("-", GUILayout.Width(50)))
+                {
+                    methodInfo2.Invoke(obj, new object[] { i });
+                    break;
+                }
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndVertical();
         }
-        GUILayout.EndVertical();
+        catch(Exception e)
+        {
+                Debug.Log(e.ToString());
+        }
         return obj;
     }
 
