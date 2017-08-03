@@ -109,12 +109,13 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-#region 程序生命周期事件派发
+    #region 程序生命周期事件派发
  
     public static ApplicationVoidCallback s_OnApplicationQuit = null;
     public static ApplicationBoolCallback s_OnApplicationPause = null;
     public static ApplicationBoolCallback s_OnApplicationFocus = null;
     public static ApplicationVoidCallback s_OnApplicationUpdate = null;
+    public static ApplicationVoidCallback s_OnApplicationFixedUpdate = null;
     public static ApplicationVoidCallback s_OnApplicationOnGUI = null;
     public static ApplicationVoidCallback s_OnApplicationOnDrawGizmos = null;
 
@@ -171,6 +172,12 @@ public class ApplicationManager : MonoBehaviour
     {
         if (s_OnApplicationUpdate != null)
             s_OnApplicationUpdate();
+    }
+
+    private void FixedUpdate()
+    {
+        if (s_OnApplicationFixedUpdate != null)
+            s_OnApplicationFixedUpdate();
     }
 
     void OnGUI()

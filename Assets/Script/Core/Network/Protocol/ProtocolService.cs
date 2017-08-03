@@ -15,15 +15,15 @@ using YLWebSocket;
 public class ProtocolService : INetworkInterface 
 {
     public const int TYPE_string = 1;
-    public const int TYPE_int32 = 2;
+    public const int TYPE_int32  = 2;
     public const int TYPE_double = 3;
-    public const int TYPE_bool = 4;
+    public const int TYPE_bool   = 4;
     public const int TYPE_custom = 5;
 
-    public const int TYPE_int8 = 6;
-    public const int TYPE_int16 = 7;
+    public const int TYPE_int8   = 6;
+    public const int TYPE_int16  = 7;
     public const int RT_repeated = 1;
-    public const int RT_equired = 0;
+    public const int RT_equired  = 0;
 
     public const string c_ProtocolFileName = "ProtocolInfo";
     public const string c_methodNameInfoFileName = "MethodInfo";
@@ -249,8 +249,9 @@ public class ProtocolService : INetworkInterface
     void SpiltMessage(byte[] bytes,int length)
     {
         WriteBytes(bytes, length);
-
         int i = 0;
+
+        Debug.Log("SpiltMessage " + length);
 
         while (GetBufferLength() != 0 && ReadLength() <= GetBufferLength())
         {
@@ -524,7 +525,8 @@ public class ProtocolService : INetworkInterface
     NetWorkMessage  Analysis(ByteArray bytes)
     {
         NetWorkMessage msg = GetMessageByPool();
-        //Debug.Log("ReceiveDataLoad : " + BitConverter.ToString(bytes));
+        //Debug.Log("ReceiveDataLoad : " + BitConverter.ToString(bytes.Buffer));
+        //Debug.Log("bytes length " + bytes.bytes.Count);
         bytes.ReadUShort(); //消息长度
         bytes.ReadByte();  //模块名
 
@@ -1209,7 +1211,7 @@ namespace Protocol
     /// <summary>
     /// 模块名与模块消息编码
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class| AttributeTargets.Interface)]
     public class ModuleAttribute : System.Attribute {
         public int MessageCode;
         public string ModuleName;
