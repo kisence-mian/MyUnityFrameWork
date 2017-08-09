@@ -153,14 +153,21 @@ namespace FrameWork.Protocol
                 string content = "repeated ";
                 Type type = field.FieldType.GetGenericArguments()[0];
 
-                content += GetTypeName(type) + " " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
+                content += GetTypeName(type).ToLower() + " " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
 
                 return content;
+            }
+            else if (field.FieldType == typeof(string))
+            {
+                return "required string " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
             }
 
             else
             {
-                return "required string " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
+                string content = "required ";
+                content += GetTypeName(field.FieldType).ToLower() + " " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
+
+                return content;
             }
         }
 
@@ -367,9 +374,9 @@ namespace FrameWork.Protocol
                 {
                     output += GenerateProtocolClass(2, SendMode.Both, null, s_SubStruct[i], protocolInfo[s_SubStruct[i]], true);
                 }
-                catch
+                catch(Exception e)
                 {
-                    throw new Exception("s_SubStruct[i] ->" + s_SubStruct[i]);
+                    throw new Exception("s_SubStruct[i] ->" + s_SubStruct[i] + "\n" + e.ToString());
                 }
             }
             output += GetTab(1) + "#endregion \n";
@@ -637,7 +644,8 @@ namespace FrameWork.Protocol
 
             for (int i = 0; i < types.Length; i++)
             {
-                if (typeof(IProtocolStructInterface).IsAssignableFrom(types[i]))
+                if (typeof(IProtocolStructInterface).IsAssignableFrom(types[i])
+                    && types[i] != typeof(IProtocolStructInterface))
                 {
                     StructList.Add(types[i]);
                 }
@@ -800,8 +808,7 @@ namespace FrameWork.Protocol
 
                 for (int j = 0; j < msgList.Count; j++)
                 {
-                    if (msgList[j].IsSubclassOf(ModuleList[i]) ||
-                        ModuleList[i].IsAssignableFrom(msgList[i]))
+                    if (msgList[j].IsSubclassOf(ModuleList[i]))
                     {
                         string nameTmp = GenerateProtocolName(msgList[j]);
                         if(!nameList.Contains(nameTmp))
@@ -990,7 +997,7 @@ namespace FrameWork.Protocol
                 {
                     content += GetTab(tab) + "{\n";
 
-                    content += GetTab(tab + 1) + "List<" + typeTmp + "> list = new List<" + typeTmp + ">();\n";
+                    content += GetTab(tab + 1) + "List<object> list = new List<object>();\n";
                     content += GetTab(tab + 1) + "for(int i = 0;i <" + sourceName + "." + field.Name + ".Count ; i++)\n";
 
                     content += GetTab(tab + 1) + "{\n";
@@ -1004,7 +1011,7 @@ namespace FrameWork.Protocol
                 {
                     content += GetTab(tab) + "{\n";
 
-                    content += GetTab(tab + 1) + "List<Dictionary<string, object>> list" + tab + " = new List<Dictionary<string, object>>();\n";
+                    content += GetTab(tab + 1) + "List<object> list" + tab + " = new List<object>();\n";
                     content += GetTab(tab + 1) + "for(int i" + tab + " = 0;i" + tab + " <" + sourceName + "." + field.Name + ".Count ; i" + tab + "++)\n";
 
                     content += GetTab(tab + 1) + "{\n";
@@ -1117,8 +1124,9 @@ namespace FrameWork.Protocol
                 else
                 {
                     content += GetTab(tab) + "{\n";
-                    content += GenerateAnalysisClassContent(tab + 1 , field.FieldType, "tmp" + tab + "", sourceName);
-                    
+                    content += GetTab(tab + 1) + "Dictionary<string, object> data" + tab + " = (Dictionary<string, object>)" + sourceName + "[\"" + GenerateProtocolFieldName(field) + "\"];\n";
+                    content += GenerateAnalysisClassContent(tab + 1, field.FieldType, "tmp" + tab + "", "data" + tab);
+
                     content += GetTab(tab + 1) + aimName + "." + field.Name + " = " + "tmp" + tab + ";\n";
 
                     content += GetTab(tab) + "}\n";

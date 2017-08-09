@@ -251,8 +251,6 @@ public class ProtocolService : INetworkInterface
         WriteBytes(bytes, length);
         int i = 0;
 
-        Debug.Log("SpiltMessage " + length);
-
         while (GetBufferLength() != 0 && ReadLength() <= GetBufferLength())
         {
             ReceiveDataLoad(ReadByte(ReadLength()));
@@ -803,6 +801,7 @@ public class ProtocolService : INetworkInterface
 
             if (st_len == 0)
             {
+                Debug.Log("return");
                 return tbl;
             }
 
@@ -914,6 +913,8 @@ public class ProtocolService : INetworkInterface
 
         int len1 = ba.ReadUShort();
         ba.ReadUInt();
+
+        //Debug.Log("len1 " + len1 + " " + ba.ReadUInt());
 
         for (int i = 0; i < len1; i++)
         {
@@ -1128,10 +1129,13 @@ public class ProtocolService : INetworkInterface
                 {
                     if (data.ContainsKey(fieldName))
                     {
+                        customType = (string)currentField["vp"];
                         if (repeatType == RT_equired)
                         {
-                            customType = (string)currentField["vp"];
-                            Bytes.bytes.AddRange(GetSendByte(customType, (Dictionary<string, object>)data[fieldName]));
+                            List<byte> byteTmp = GetCustomTypeByte(customType, (Dictionary<string, object>)data[fieldName]);
+
+                            Bytes.WriteInt(byteTmp.Count);
+                            Bytes.bytes.AddRange(byteTmp);
                         }
                         else
                         {
