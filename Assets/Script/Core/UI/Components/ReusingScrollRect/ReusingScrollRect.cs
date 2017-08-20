@@ -111,16 +111,28 @@ public class ReusingScrollRect : ScrollRectInput
         SetItemDisplay();
     }
 
-    #endregion 
+    public void UpdateContent()
+    {
+        Debug.Log("m_items.Count " + m_items.Count);
+
+        for (int j = m_startPos,i = 0; i < m_items.Count; i++,j++)
+        {
+            m_items[i].SetContent(j, m_datas[j]);
+        }
+    }
+
+    #endregion
 
     #region 继承方法
-    //protected override void SetContentAnchoredPosition(Vector2 position)
-    //{
-    //    InputUIEventProxy.DispatchScrollEvent("", "", position);
-
-    //    //base.SetContentAnchoredPosition(position);
-    //    //SetItemDisplay();
-    //}
+    bool m_rebuild = false;
+    public void Update()
+    {
+       if(m_rebuild)
+        {
+            m_rebuild = false;
+            SetItemDisplay();
+        }
+    }
 
     protected override void OnSetContentAnchoredPosition(InputUIOnScrollEvent e)
     {
@@ -139,7 +151,7 @@ public class ReusingScrollRect : ScrollRectInput
         base.Rebuild(executing);
 
         UpdateBound();
-        SetItemDisplay(true);
+        m_rebuild = true;
     }
 
     #endregion
