@@ -20,7 +20,7 @@ public class GuideSystemEditor
     [MenuItem("Tools/新手引导/初始化")]
     public static void InitGuideSystem()
     {
-        if(GetGuideIsInit())
+        if(!GetGuideIsInit())
         {
             //创建数据表
             SaveDataTable();
