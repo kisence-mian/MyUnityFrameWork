@@ -533,6 +533,8 @@ public class UIBase : MonoBehaviour
     #endregion
     }
 
+    #region 添加监听
+
     public void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
         InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(GetButton(buttonName), UIEventKey, buttonName, parm, callback);
@@ -579,6 +581,37 @@ public class UIBase : MonoBehaviour
 
         m_EventListeners.Add(info);
     }
+
+    #endregion
+
+    #region 移除监听
+
+    //TODO 逐步添加所有的移除监听方法
+
+    public InputEventRegisterInfo<InputUIOnClickEvent> GetClickRegisterInfo(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm )
+    {
+        string eventKey = InputUIOnClickEvent.GetEventKey(UIEventKey, buttonName, parm);
+        for (int i = 0; i < m_OnClickEvents.Count; i++)
+        {
+            if(m_OnClickEvents[i].eventKey == eventKey
+                && m_OnClickEvents[i].callBack == callback)
+            {
+                return m_OnClickEvents[i];
+            }
+        }
+
+        throw new Exception("GetClickRegisterInfo Exception not find RegisterInfo by " + buttonName + " parm " + parm);
+    }
+
+    public void RemoveOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
+    {
+        InputEventRegisterInfo<InputUIOnClickEvent>  info = GetClickRegisterInfo(buttonName, callback, parm);
+
+        info.RemoveListener();
+        m_OnClickEvents.Remove(info);
+    }
+
+    #endregion
 
     #endregion
 
@@ -665,6 +698,19 @@ public class UIBase : MonoBehaviour
         }
 
         throw new Exception(UIName + " GetItem Exception Dont find Item: " + itemName);
+    }
+
+    public UIBase GetItemByKey(string uiEvenyKey)
+    {
+        for (int i = 0; i < m_ChildList.Count; i++)
+        {
+            if (m_ChildList[i].UIEventKey == uiEvenyKey)
+            {
+                return m_ChildList[i];
+            }
+        }
+
+        throw new Exception(UIName + " GetItemByKey Exception Dont find Item: " + uiEvenyKey);
     }
 
     public bool GetItemIsExist(string itemName)

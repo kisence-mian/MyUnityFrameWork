@@ -118,6 +118,7 @@ public class ApplicationManager : MonoBehaviour
     public static ApplicationVoidCallback s_OnApplicationFixedUpdate = null;
     public static ApplicationVoidCallback s_OnApplicationOnGUI = null;
     public static ApplicationVoidCallback s_OnApplicationOnDrawGizmos = null;
+    public static ApplicationVoidCallback s_OnApplicationLateUpdate = null;
 
     void OnApplicationQuit()
     {
@@ -172,6 +173,14 @@ public class ApplicationManager : MonoBehaviour
     {
         if (s_OnApplicationUpdate != null)
             s_OnApplicationUpdate();
+    }
+
+    private void LateUpdate()
+    {
+        if(s_OnApplicationLateUpdate != null)
+        {
+            s_OnApplicationLateUpdate();
+        }
     }
 
     private void FixedUpdate()

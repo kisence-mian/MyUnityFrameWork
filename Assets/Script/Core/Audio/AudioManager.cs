@@ -232,7 +232,7 @@ public class AudioManager : MonoBehaviour
     {
         AudioClip clipTmp = null;
 
-        clipTmp = ResourceManager.Load(l_soundName) as AudioClip;
+        clipTmp = ResourceManager.Load<AudioClip>(l_soundName);
 
         if (clipTmp == null)
         {

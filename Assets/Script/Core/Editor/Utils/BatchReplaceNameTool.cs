@@ -6,7 +6,6 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class BatchReplaceNameTool : EditorWindow
 {
-
     [MenuItem("Tools/批量修改名称")]
 
     public static void ShowWindow()
@@ -14,9 +13,11 @@ public class BatchReplaceNameTool : EditorWindow
         GetWindow(typeof(BatchReplaceNameTool));
     }
 
+    bool selectChild = false;
     string m_content = "";
     string m_replace = "";
     Object[] selects;
+    List<GameObject> selectList = new List<GameObject>();
     Vector3 pos = Vector3.zero;
 
     Vector3 pos2 = Vector3.zero;
@@ -27,44 +28,49 @@ public class BatchReplaceNameTool : EditorWindow
 
         pos = GUILayout.BeginScrollView(pos);
 
+        selectChild = EditorGUILayout.Toggle("包括选中子节点", selectChild);
         EditorGUILayout.LabelField("已选列表：");
         EditorGUI.indentLevel++;
 
-        for (int i = 0; i < selects.Length; i++)
+        for (int i = 0; i < selectList.Count; i++)
         {
-            EditorGUILayout.ObjectField(selects[i], typeof(Object));
+            EditorGUILayout.ObjectField(selectList[i], typeof(Object));
         }
 
         EditorGUI.indentLevel--;
         GUILayout.EndScrollView();
         EditorGUILayout.Space();
 
+        EditorGUILayout.LabelField("预览：");
+        EditorGUI.indentLevel++;
+
+        pos2 = GUILayout.BeginScrollView(pos2);
+
+        for (int i = 0; i < selectList.Count; i++)
+        {
+            string tmp = selectList[i].name;
+
+            if (m_content != "")
+            {
+                tmp = tmp.Replace(m_content, m_replace);
+            }
+
+            EditorGUILayout.LabelField(tmp);
+        }
+        GUILayout.EndScrollView();
+        EditorGUI.indentLevel--;
+
+
         m_content = EditorGUILayout.TextField("replace content:", m_content);
         m_replace = EditorGUILayout.TextField("replace to:", m_replace);
 
         EditorGUILayout.Space();
 
-        if(m_content != "")
+        if (GUILayout.Button("Repalce!"))
         {
-            EditorGUILayout.LabelField("预览：");
-            EditorGUI.indentLevel++;
-
-            pos2 = GUILayout.BeginScrollView(pos2);
-
-            for (int i = 0; i < selects.Length; i++)
+            if (m_content != "")
             {
-                string tmp = selects[i].name;
-
-                tmp = tmp.Replace(m_content, m_replace);
-
-                EditorGUILayout.LabelField(tmp);
-            }
-            GUILayout.EndScrollView();
-            EditorGUI.indentLevel--;
-
-            if (GUILayout.Button("Repalce!"))
-            {
-                ChangeName(selects, m_content, m_replace);
+                ChangeName(selectList, m_content, m_replace);
             }
         }
     }
@@ -72,29 +78,46 @@ public class BatchReplaceNameTool : EditorWindow
     private void Update()
     {
         selects = Selection.GetFiltered(typeof(GameObject), SelectionMode.Unfiltered);
-        EnterLogic(selects, m_content);
+
+        selectList.Clear();
+        for (int i = 0; i < selects.Length; i++)
+        {
+            if(selectChild)
+            {
+                GameObject go = (GameObject)selects[i];
+                AddChild(go);
+            }
+            else
+            {
+                selectList.Add((GameObject)selects[i]);
+            }
+        }
 
         Repaint();
     }
 
-    void EnterLogic(Object[] objs, string newName)
+    void AddChild(GameObject go)
     {
-        if (Input.GetKeyDown(KeyCode.A))
+        if(!selectList.Contains(go))
         {
-            Debug.Log("Enter");
-            ChangeName(objs, newName, m_replace);
+            selectList.Add(go);
+
+            foreach (Transform tf in go.transform)
+            {
+                AddChild(tf.gameObject);
+            }
         }
     }
 
-    void ChangeName(Object[] objs, string newName,string replaceTo)
+    void ChangeName(List<GameObject> list, string newName,string replaceTo)
     {
-        Undo.RecordObjects(objs, "ReplaceName->" + newName);
-        for (int i = 0; i < objs.Length; i++)
+        Undo.RecordObjects(list.ToArray(), "ReplaceName->" + newName);
+        for (int i = 0; i < list.Count; i++)
         {
-            string tmp = objs[i].name;
+            string tmp = list[i].name;
 
             tmp = tmp.Replace(newName, replaceTo);
-            objs[i].name = tmp;
+            list[i].name = tmp;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Text.RegularExpressions;
 
 [RequireComponent(typeof(UILayerManager))]
 [RequireComponent(typeof(UIAnimManager))]
@@ -399,6 +400,55 @@ public class UIManager : MonoBehaviour
                 return s_UIs[UIname][s_UIs[UIname].Count - 1];
             }
         }
+    }
+
+    public static UIBase GetUIBaseByEventKey(string eventKey)
+    {
+        string UIkey = eventKey.Split('.')[0];
+        string[] keyArray = UIkey.Split('_');
+
+        string uiEventKey = "";
+
+        UIBase uiTmp = null;
+        for (int i = 0; i < keyArray.Length; i++)
+        {
+            if(i == 0)
+            {
+                uiEventKey = keyArray[0];
+                uiTmp = GetUIWindowByEventKey(uiEventKey);
+            }
+            else
+            {
+                uiEventKey += "_" + keyArray[i];
+                uiTmp = uiTmp.GetItemByKey(uiEventKey);
+            }
+
+            Debug.Log("uiEventKey " + uiEventKey);
+        }
+
+        return uiTmp;
+    }
+
+    static Regex uiKey = new Regex(@"(\S+)\d+");
+    static UIWindowBase GetUIWindowByEventKey(string eventKey)
+    {
+        string UIname = uiKey.Match(eventKey).Groups[1].Value;
+
+        if (!s_UIs.ContainsKey(UIname))
+        {
+            throw new Exception("UIManager: GetUIWindowByEventKey error dont find UI name: ->" + eventKey + "<-  " + UIname);
+        }
+
+        List<UIWindowBase> list = s_UIs[UIname];
+        for (int i = 0; i < list.Count; i++)
+        {
+            if(list[i].UIEventKey == eventKey)
+            {
+                return list[i];
+            }
+        }
+
+        throw new Exception("UIManager: GetUIWindowByEventKey error dont find UI name: ->" + eventKey + "<-  " + UIname);
     }
 
     static bool GetIsExits(UIWindowBase UI)

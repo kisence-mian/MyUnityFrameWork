@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using FrameWork;
 
 public abstract class IInputEventBase 
 {
@@ -27,7 +28,7 @@ public abstract class IInputEventBase
         Reset();
     }
 
-    public void Reset()
+    public virtual void Reset()
     {
         m_eventKey = null;
         m_t = DevelopReplayManager.CurrentTime;
@@ -48,7 +49,7 @@ public abstract class IInputEventBase
     /// <returns></returns>
     public virtual string Serialize()
     {
-        return JsonUtility.ToJson(this);
+        return Serializer.Serialize(this);
     }
 
     /// <summary>

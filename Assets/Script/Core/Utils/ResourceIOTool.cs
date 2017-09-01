@@ -195,11 +195,44 @@ public class ResourceIOTool :MonoBehaviour
 #endif
     }
 
+    /// <summary>
+    /// 异步加载WWW
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="callback"></param>
+    public static void WWWLoadAsync(string url, WWWLoadCallBack callback)
+    {
+        GetInstance().MonoLoadWWWethod(url, callback);
+    }
+
+    public void MonoLoadWWWethod(string url, WWWLoadCallBack callback)
+    {
+        StartCoroutine(MonoLoadByWWWAsync(url, callback));
+    }
+
+    public IEnumerator MonoLoadByWWWAsync(string url, WWWLoadCallBack callback)
+    {
+        WWW www = new WWW(url);
+        LoadState loadState = new LoadState();
+
+        while (!www.isDone)
+        {
+                     
+            loadState.UpdateProgress(www);
+            callback(loadState, www);
+
+            yield return 0;
+        }
+
+        loadState.UpdateProgress(www);
+        callback(loadState, www);
+    }
+
     #endregion
 
     #region 写操作
 #if !UNITY_WEBGL || UNITY_EDITOR
-   //web Player 不支持写操作
+    //web Player 不支持写操作
     public static void WriteStringByFile(string path, string content)
     {
         byte[] dataByte = Encoding.GetEncoding("UTF-8").GetBytes(content);
@@ -241,6 +274,7 @@ public class ResourceIOTool :MonoBehaviour
 
 #region 回调声明
 public delegate void AssetBundleLoadCallBack(LoadState state, AssetBundle bundlle);
+public delegate void WWWLoadCallBack(LoadState loadState, WWW www);
 public delegate void LoadCallBack(LoadState loadState, object resObject);
 public class LoadState
 {

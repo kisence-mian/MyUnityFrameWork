@@ -61,6 +61,22 @@ public static class ExpandMethod
 
         return sb.ToString();
     }
+    public static string ToSaveString(this string[] list)
+    {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < list.Length; i++)
+        {
+            sb.Append(list[i]);
+
+            if (i != list.Length - 1)
+            {
+                sb.Append("|");
+            }
+        }
+
+        return sb.ToString();
+    }
 
     //逆时针旋转
     public static Vector3 Vector3RotateInXZ(this Vector3 dir,float angle)

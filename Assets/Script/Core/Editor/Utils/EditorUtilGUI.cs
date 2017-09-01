@@ -33,8 +33,16 @@ public class EditorUtilGUI
 
     public static string FieldGUI_Type(FieldType type,string enumType,string content, string labelContent = "字段内容")
     {
-        SingleField data = new SingleField(type, content, enumType);
-        return EditorUtilGUI.FieldGUI_Type(data, labelContent);
+        try
+        {
+            SingleField data = new SingleField(type, content, enumType);
+            return EditorUtilGUI.FieldGUI_Type(data, labelContent);
+        }
+        catch(Exception e)
+        {
+            EditorGUILayout.LabelField("解析错误：", e.ToString(), "ErrorLabel");
+            return content;
+        }
     }
 
     public static string FieldGUI_Type(SingleField data, string labelContent = "字段内容")

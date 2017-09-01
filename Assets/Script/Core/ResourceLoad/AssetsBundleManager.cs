@@ -204,14 +204,14 @@ public static class AssetsBundleManager
     {
         if (s_bundles.ContainsKey(name))
         {
-            return (T)s_bundles[name].mainAsset;
+            return s_bundles[name].Load<T>();
         }
         else
         {
 #if !UNITY_WEBGL
             if (MemoryManager.s_allowDynamicLoad)
             {
-                return (T)LoadBundle(name).mainAsset;
+                return (T)LoadBundle(name).Load<T>();
             }
             else
             {
@@ -294,7 +294,8 @@ public static class AssetsBundleManager
                 UnLoadRelyBundle(configTmp.relyPackages[i]);
             }
 
-            s_bundles[bundleName].bundle.Unload(true);
+            //这里不能执行Unload(true);
+            UnloadBundle(s_bundles[bundleName]);
 
             s_bundles.Remove(bundleName);
         }
@@ -304,12 +305,43 @@ public static class AssetsBundleManager
         }
     }
 
+    static void UnloadBundle(Bundle bundle)
+    {
+        UnloadObject(bundle.mainAsset);
+
+        for (int i = 0; i < bundle.allAsset.Length; i++)
+        {
+            UnloadObject(bundle.allAsset[i]);
+        }
+    }
+
+    static void UnloadObject(UnityEngine.Object obj)
+    {
+        if (!(obj is GameObject)
+            && !(obj is Component)
+            && !(obj is AssetBundle)
+            )
+        {
+            Resources.UnloadAsset(obj);
+        }
+        else if ((obj is GameObject)
+            && !(obj is Component))
+        {
+            UnityEngine.Object.DestroyImmediate(obj, true);
+        }
+    }
+
     /// <summary>
     /// 卸载依赖包
     /// </summary>
     /// <param name="relyBundleName"></param>
     public static void UnLoadRelyBundle(string relyBundleName)
     {
+        if(relyBundleName == "")
+        {
+            return;
+        }
+
         if (s_relyBundle.ContainsKey(relyBundleName))
         {
             s_relyBundle[relyBundleName].relyCount --;
@@ -349,7 +381,10 @@ public static class AssetsBundleManager
             bundleTmp.bundle = asset;
             bundleTmp.bundle.name = bundleName;
             bundleTmp.mainAsset = bundleTmp.bundle.mainAsset;
+            bundleTmp.allAsset = bundleTmp.bundle.LoadAllAssets();
             bundleTmp.bundle.Unload(false);
+
+            Debug.Log("Unload false");
 
             //如果有缓存起来的回调这里一起回调
             if( LoadAsyncDict.ContainsKey(bundleName))
@@ -428,9 +463,28 @@ public delegate void BundleLoadCallBack(LoadState state, Bundle bundlle);
 public delegate void RelyBundleLoadCallBack(LoadState state, RelyBundle bundlle);
 public class Bundle
 {
-    public object mainAsset;
+    public UnityEngine.Object mainAsset;
+    public UnityEngine.Object[] allAsset;
     public AssetBundle bundle;
     public ResourcesConfig bundleConfig;
+
+    public T Load<T>() where T : UnityEngine.Object
+    {
+        if (mainAsset.GetType() == typeof(T))
+        {
+            return (T)mainAsset;
+        }
+
+        for (int i = 0; i < allAsset.Length; i++)
+        {
+            if(allAsset[i].GetType() == typeof(T))
+            {
+                return (T)allAsset[i];
+            }
+        }
+
+        throw new Exception("Bundle Load Exception : not find by " + typeof(T).Name  + " ");
+    }
 }
 
 public class RelyBundle

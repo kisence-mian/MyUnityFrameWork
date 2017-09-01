@@ -24,7 +24,7 @@ public class InputNetworkMessageEvent : IInputEventBase
             {
                 if (m_content != null && m_content != "")
                 {
-                    m_data = Json.Deserialize(m_content) as Dictionary<string, object>;
+                    m_data = DevelopReplayManager.Deserializer.Deserialize<Dictionary<string, object>>(m_content);
                 }
                 else
                 {
@@ -41,6 +41,12 @@ public class InputNetworkMessageEvent : IInputEventBase
         }
     }
 
+    public override void Reset()
+    {
+        base.Reset();
+        m_content = null;
+    }
+
     protected override string GetEventKey()
     {
         return m_MessgaeType;
@@ -50,7 +56,7 @@ public class InputNetworkMessageEvent : IInputEventBase
     {
         if (m_content == null || m_content == "")
         {
-            m_content = Json.Serialize(Data);
+            m_content = Serializer.Serialize(Data);
         }
 
         return base.Serialize();

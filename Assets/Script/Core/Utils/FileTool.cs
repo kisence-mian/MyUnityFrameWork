@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using System;
 using System.Text;
+using System.Collections.Generic;
 
 public class FileTool  
 {
@@ -188,6 +189,11 @@ public class FileTool
         }
     }
 
+    public static string GetExpandName(string name)
+    {
+        return name.Substring(name.LastIndexOf(".") + 1, (name.Length - name.LastIndexOf(".") - 1));
+    }
+
     //取出一个路径下的文件名
     public static string GetFileNameByPath(string path)
     {
@@ -353,6 +359,62 @@ public class FileTool
     }
     #endregion
 
+    #region 获取一个路径下的所有文件
+
+    public static List<string> GetAllFileNamesByPath(string path,string[] expandNames = null)
+    {
+        List<string> list = new List<string>();
+
+        RecursionFind(list,path,expandNames);
+
+        return list;
+    }
+
+    static void RecursionFind(List<string> list,string path , string[] expandNames)
+    {
+        string[] allUIPrefabName = Directory.GetFiles(path);
+        foreach (var item in allUIPrefabName)
+        {
+            if (ExpandFilter(item, expandNames))
+            {
+                list.Add(item);
+            }
+        }
+
+        string[] dires = Directory.GetDirectories(path);
+        for (int i = 0; i < dires.Length; i++)
+        {
+            RecursionFind(list, dires[i], expandNames);
+        }
+    }
+
+    static bool ExpandFilter(string name,string[] expandNames)
+    {
+        if(expandNames == null)
+        {
+            return true;
+        }
+
+        else if (expandNames.Length == 0)
+        {
+            return !name.Contains(".");
+        }
+
+        else
+        {
+            for (int i = 0; i < expandNames.Length; i++)
+            {
+                if(name.EndsWith("." + expandNames[i]))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+    }
+
+    #endregion
 }
 
 public delegate void FileExecuteHandle(string filePath);

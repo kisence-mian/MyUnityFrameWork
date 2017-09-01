@@ -290,6 +290,7 @@ public class HotUpdateManager
         }
 
         string downLoadPath = downLoadServicePath + "/" + platform + "/" + Application.version + "/";
+        Debug.Log("=====>"+downLoadPath);
 
         s_versionFileDownLoadPath   = downLoadPath + HotUpdateManager.c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
         s_Md5FileDownLoadPath       = downLoadPath + ResourcesConfigManager.c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName;

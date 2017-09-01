@@ -72,6 +72,11 @@ public abstract class IApplicationStatus
 
     }
 
+    public virtual void OnGUI()
+    {
+
+    }
+
     public virtual IEnumerator InChangeScene(ChangSceneFinish handle)
     {
         if (handle != null)

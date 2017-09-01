@@ -129,7 +129,7 @@ public class DevelopReplayManager
         tmp.Add(c_serializeInfoKey, inputEvent.Serialize());
         try
         {
-            WriteInputEvent(Json.Serialize(tmp));
+            WriteInputEvent(Serializer.Serialize(tmp));
         }
         catch(Exception e)
         {
@@ -199,6 +199,8 @@ public class DevelopReplayManager
 
     static void WriteInputEvent(string EventSerializeContent)
     {
+        //Debug.Log("EventSerializeContent: " + EventSerializeContent);
+
         if (m_EventWriter != null)
         {
             m_EventWriter.WriteLine(EventSerializeContent);
@@ -228,7 +230,7 @@ public class DevelopReplayManager
         LoadEventStream(eventContent.Split('\n'));
         LoadRandomList(randomContent.Split('\n'));
     }
-
+    public static Deserializer Deserializer = new Deserializer();
     static void LoadEventStream(string[] content)
     {
         s_eventStream = new List<IInputEventBase>();
@@ -236,8 +238,8 @@ public class DevelopReplayManager
         {
             if (content[i] != "")
             {
-                Dictionary<string, object> info = (Dictionary<string, object>)(Json.Deserialize(content[i]));
-                IInputEventBase eTmp = (IInputEventBase)JsonUtility.FromJson(info[c_serializeInfoKey].ToString(), Type.GetType(info[c_eventNameKey].ToString()));
+                Dictionary<string, object> info = (Deserializer.Deserialize<Dictionary<string, object>> (content[i]));
+                IInputEventBase eTmp = (IInputEventBase)Deserializer.Deserialize(Type.GetType(info[c_eventNameKey].ToString()),info[c_serializeInfoKey].ToString());
                 s_eventStream.Add(eTmp);
             }
         }

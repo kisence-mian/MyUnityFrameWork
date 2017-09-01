@@ -49,13 +49,26 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
             GlobalEvent.AddEvent(MemoryEvent.FreeHeapMemory, CleanCache);
         }
 
-        string dataName = typeof(T).Name.Replace("Generate","");
-
-        DataTable data = DataManager.GetData(dataName);
+       
+        DataTable data= GetDataTable();
         for (int i = 0; i < data.TableIDs.Count; i++)
         {
             GetData(data.TableIDs[i]);
         }
+    }
+
+    public static Dictionary<string, T> GetAllData()
+    {
+        CleanCache();
+        PreLoad();
+        return s_dict;
+    }
+    public static DataTable GetDataTable()
+    {
+        string dataName = typeof(T).Name.Replace("Generate", "");
+
+        return DataManager.GetData(dataName);
+
     }
 
     public static void CleanCache(params object[] objs)

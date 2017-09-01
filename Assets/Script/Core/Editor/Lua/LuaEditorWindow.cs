@@ -227,25 +227,23 @@ public class LuaEditorWindow : EditorWindow
 
     void LuaWarpFileGUI()
     {
-        if (Directory.Exists(CustomSettings.saveDir))
+        if (!File.Exists(CustomSettings.saveDir + "/LuaBinderCatch.cs"))
         {
-            if (!File.Exists(CustomSettings.saveDir + "/LuaBinderCatch.cs"))
+            if (GUILayout.Button("清除Lua Warp脚本"))
             {
-                if (GUILayout.Button("清除Lua Warp脚本"))
-                {
-                    FileTool.DeleteDirectory(CustomSettings.saveDir);
-                    CreateLuaBinder();
-                    AssetDatabase.Refresh();
-                }
-            }
-
-            if (GUILayout.Button("重新生成Lua Warp脚本"))
-            {
+                FileTool.CreatFilePath(CustomSettings.saveDir);
                 FileTool.DeleteDirectory(CustomSettings.saveDir);
-                ToLuaMenu.GenLuaAll();
+                CreateLuaBinder();
+                AssetDatabase.Refresh();
             }
         }
 
+        if (GUILayout.Button("重新生成Lua Warp脚本"))
+        {
+            FileTool.CreatPath(CustomSettings.saveDir);
+            FileTool.DeleteDirectory(CustomSettings.saveDir);
+            ToLuaMenu.GenLuaAll();
+        }
     }
 
     /// <summary>

@@ -344,6 +344,7 @@ namespace FrameWork.Protocol
                     {
                         log += ("跳过了 " + className + " 类\n");
 
+                        //检查类的子结构，放入Struct列表中
                         string name = "m_" + item.Value + "_c";
                         if (protocolInfo.ContainsKey(name))
                         {
@@ -370,14 +371,24 @@ namespace FrameWork.Protocol
             output += GetTab(1) + "#region Struct\n";
             for (int i = 0; i < s_SubStruct.Count; i++)
             {
-                try
+                if(GetAimStructType(s_SubStruct[i]) == null)
                 {
-                    output += GenerateProtocolClass(2, SendMode.Both, null, s_SubStruct[i], protocolInfo[s_SubStruct[i]], true);
+                    try
+                    {
+                        output += GenerateProtocolClass(2, SendMode.Both, null, s_SubStruct[i], protocolInfo[s_SubStruct[i]], true);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception("s_SubStruct[i] ->" + s_SubStruct[i] + "\n" + e.ToString());
+                    }
                 }
-                catch(Exception e)
+                else
                 {
-                    throw new Exception("s_SubStruct[i] ->" + s_SubStruct[i] + "\n" + e.ToString());
+                    log += ("跳过了 " + s_SubStruct[i] + " 结构\n");
+                    //检查结构的子结构，放入Struct列表中
+                    GenerateProtocolClass(2, SendMode.Both, null, s_SubStruct[i], protocolInfo[s_SubStruct[i]], true);
                 }
+
             }
             output += GetTab(1) + "#endregion \n";
 
@@ -514,7 +525,24 @@ namespace FrameWork.Protocol
 
             for (int i = 0; i < types.Length; i++)
             {
-                if (typeof(CsharpProtocolInterface).IsAssignableFrom(types[i])
+                if ((typeof(CsharpProtocolInterface).IsAssignableFrom(types[i])|| typeof(IProtocolStructInterface).IsAssignableFrom(types[i]))
+                    && types[i].Name.ToLower() == name.ToLower()
+                    )
+                {
+                    return types[i];
+                }
+            }
+
+            return null;
+        }
+
+        static Type GetAimStructType(string name)
+        {
+            Type[] types = EditorTool.GetTypes();
+
+            for (int i = 0; i < types.Length; i++)
+            {
+                if (typeof(IProtocolStructInterface).IsAssignableFrom(types[i])
                     && types[i].Name.ToLower() == name.ToLower()
                     )
                 {
@@ -872,7 +900,14 @@ namespace FrameWork.Protocol
                 vy = ((ModuleAttribute)objy[0]).MessageCode;
             }
 
-            return vx.CompareTo(vy);
+            if (vx == vy)
+            {
+                return x.Name.CompareTo(y.Name);
+            }
+            else
+            {
+                return vx.CompareTo(vy);
+            }
         }
 
         static bool GetIsModule(Type type)

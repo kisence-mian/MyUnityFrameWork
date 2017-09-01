@@ -16,6 +16,13 @@ public class ApplicationStatusManager
     public static void Init()
     {
         ApplicationManager.s_OnApplicationUpdate += AppUpdate;
+        ApplicationManager.s_OnApplicationOnGUI += AppOnGUI;
+    }
+
+    private static void AppOnGUI()
+    {
+        if (s_currentAppStatus != null)
+            s_currentAppStatus.OnGUI();
     }
 
     /// <summary>

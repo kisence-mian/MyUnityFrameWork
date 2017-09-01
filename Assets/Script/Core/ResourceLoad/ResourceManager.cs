@@ -27,7 +27,7 @@ public static class ResourceManager
     //读取一个文本
     public static string ReadTextFile(string textName)
     {
-        TextAsset text = (TextAsset)Load(textName);
+        TextAsset text = Load<TextAsset>(textName);
 
         if (text == null)
         {
