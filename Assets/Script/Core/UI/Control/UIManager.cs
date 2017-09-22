@@ -145,6 +145,7 @@ public class UIManager : MonoBehaviour
     {
         RemoveUI(UI);        //移除UI引用
         UI.RemoveAllListener();
+        s_UILayerManager.RemoveUI(UI);
 
         if (isPlayAnim)
         {
@@ -518,6 +519,11 @@ public class UIManager : MonoBehaviour
 
             return id;
         }
+    }
+
+    public static int GetNormalUICount()
+    {
+        return s_UILayerManager.normalUIList.Count;
     }
 
 #endregion

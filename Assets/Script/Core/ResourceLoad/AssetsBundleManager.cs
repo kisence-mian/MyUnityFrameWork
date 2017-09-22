@@ -325,9 +325,14 @@ public static class AssetsBundleManager
             Resources.UnloadAsset(obj);
         }
         else if ((obj is GameObject)
-            && !(obj is Component))
+            ||  (obj is Component))
         {
             UnityEngine.Object.DestroyImmediate(obj, true);
+        }
+        else
+        {
+            AssetBundle ab = (AssetBundle)obj;
+            ab.Unload(true);
         }
     }
 

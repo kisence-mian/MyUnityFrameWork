@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class UILayerManager : MonoBehaviour 
 {
@@ -8,6 +9,8 @@ public class UILayerManager : MonoBehaviour
     public Transform m_NormalLayerParent;
     public Transform m_TopbarLayerParent;
     public Transform m_PopUpLayerParent;
+
+    public List<UIWindowBase> normalUIList = new List<UIWindowBase>();
 
     public void Awake()
     {
@@ -44,7 +47,10 @@ public class UILayerManager : MonoBehaviour
         {
             case UIType.GameUI: ui.transform.SetParent(m_GameUILayerParent); break;
             case UIType.Fixed: ui.transform.SetParent(m_FixedLayerParent); break;
-            case UIType.Normal: ui.transform.SetParent(m_NormalLayerParent); break;
+            case UIType.Normal:
+                ui.transform.SetParent(m_NormalLayerParent);
+                normalUIList.Add(ui);
+                break;
             case UIType.TopBar: ui.transform.SetParent(m_TopbarLayerParent); break;
             case UIType.PopUp: ui.transform.SetParent(m_PopUpLayerParent); break;
         }
@@ -60,6 +66,20 @@ public class UILayerManager : MonoBehaviour
             rt.sizeDelta = Vector2.zero;
             rt.anchoredPosition = Vector3.zero;
             rt.SetAsLastSibling();
+        }
+    }
+
+    public void RemoveUI(UIWindowBase ui)
+    {
+        switch (ui.m_UIType)
+        {
+            case UIType.GameUI: break;
+            case UIType.Fixed: break;
+            case UIType.Normal:
+                normalUIList.Remove(ui);
+                break;
+            case UIType.TopBar: break;
+            case UIType.PopUp:  break;
         }
     }
 }

@@ -929,13 +929,14 @@ namespace FrameWork.Protocol
 
             content += GetTab(1) + "public static void SendCommand (IProtocolMessageInterface cmd)\n";
             content += GetTab(1) + "{\n";
-
+            int index = 0;
             for (int i = 0; i < msgList.Count; i++)
             {
                 if (GetSendMode(msgList[i]) == SendMode.ToServer
                     || GetSendMode(msgList[i]) == SendMode.Both)
                 {
-                    content += GenerateSendIfContent(msgList[i], i != 0);
+                    content += GenerateSendIfContent(msgList[i], index != 0);
+                    index++;
                 }
             }
 

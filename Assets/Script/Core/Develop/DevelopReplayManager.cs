@@ -97,7 +97,7 @@ public class DevelopReplayManager
             Log.Init(true); //日志记录启动
 
             ApplicationManager.s_OnApplicationUpdate += OnRecordUpdate;
-            InputManager.OnEveryEventDispatch += OnEveryEventCallBack;
+            //InputManager.OnEveryEventDispatch += OnEveryEventCallBack;
             GUIConsole.onGUICallback += RecordModeGUI;
             GUIConsole.onGUICloseCallback += ProfileGUI;
 
@@ -127,6 +127,7 @@ public class DevelopReplayManager
 
         tmp.Add(c_eventNameKey, inputEvent.GetType().Name);
         tmp.Add(c_serializeInfoKey, inputEvent.Serialize());
+
         try
         {
             WriteInputEvent(Serializer.Serialize(tmp));
@@ -135,7 +136,6 @@ public class DevelopReplayManager
         {
             Debug.LogError("Write Dev Log Error! : " + e.ToString());
         }
-        
     }
 
     public static void OnGetRandomCallBack(int random)

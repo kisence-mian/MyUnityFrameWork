@@ -700,6 +700,25 @@ public class UIBase : MonoBehaviour
         throw new Exception(UIName + " GetItem Exception Dont find Item: " + itemName);
     }
 
+    public UIBase GetItemByIndex(string itemName,int index)
+    {
+        for (int i = 0; i < m_ChildList.Count; i++)
+        {
+            if (m_ChildList[i].name == itemName)
+            {
+                //Debug.Log("GetItemByIndex " + index, m_ChildList[i]);
+
+                index--;
+                if(index == 0)
+                {
+                    return m_ChildList[i];
+                }
+            }
+        }
+
+        throw new Exception(UIName + " GetItem Exception Dont find Item: " + itemName);
+    }
+
     public UIBase GetItemByKey(string uiEvenyKey)
     {
         for (int i = 0; i < m_ChildList.Count; i++)
@@ -734,7 +753,7 @@ public class UIBase : MonoBehaviour
 
     public void SetText(string TextID, string content)
     {
-        GetText(TextID).text = content;
+        GetText(TextID).text = content.Replace("//n", "/n");
     }
 
     public void SetImageColor(string ImageID, Color color)
@@ -795,6 +814,11 @@ public class UIBase : MonoBehaviour
         GetRectTransform(TextID).sizeDelta = Vector2.right * -value * 2 + Vector2.up * height;
     }
 
+    public void SetWidth(string TextID, float width, float height)
+    {
+        GetRectTransform(TextID).sizeDelta = Vector2.right * width + Vector2.up * height;
+    }
+
     public void SetPosition(string TextID, float x, float y, float z, bool islocal)
     {
         if (islocal)
@@ -811,7 +835,7 @@ public class UIBase : MonoBehaviour
 
     #endregion
 
-    #region 新手引导使用
+     #region 新手引导使用
 
     protected List<GameObject> m_GuideList = new List<GameObject>();
     protected Dictionary<GameObject, GuideChangeData> m_CreateCanvasDict = new Dictionary<GameObject, GuideChangeData>(); //保存Canvas的创建状态
@@ -824,6 +848,11 @@ public class UIBase : MonoBehaviour
     public void SetItemGuideMode(string itemName, int order = 1)
     {
         SetGuideMode(GetItem(itemName).gameObject, order);
+    }
+
+    public void SetItemGuideModeByIndex(string itemName, int index ,int order = 1)
+    {
+        SetGuideMode(GetItemByIndex(itemName, index).gameObject, order);
     }
 
     public void SetSelfGuideMode(int order = 1)
@@ -858,7 +887,7 @@ public class UIBase : MonoBehaviour
 
         //如果检测到目标对象
         bool oldActive = go.activeSelf;
-        if(!oldActive)
+        if (!oldActive)
         {
             go.SetActive(true);
         }
@@ -867,36 +896,59 @@ public class UIBase : MonoBehaviour
         canvas.sortingOrder = order;
         canvas.sortingLayerName = "Guide";
 
-        if(!oldActive)
+        if (!oldActive)
         {
             go.SetActive(false);
         }
 
-        m_GuideList.Add(go);
-        m_CreateCanvasDict.Add(go, status);
+        if(!m_CreateCanvasDict.ContainsKey(go))
+        {
+            m_CreateCanvasDict.Add(go, status);
+            m_GuideList.Add(go);
+        }
+        else
+        {
+            Debug.LogError("m_CreateCanvasDict " + go);
+        }
     }
 
     public void CancelGuideModel(GameObject go)
     {
+        if (go == null)
+        {
+            Debug.LogError("go is null");
+            return;
+        }
+
         Canvas canvas = go.GetComponent<Canvas>();
         GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
 
-        GuideChangeData status = m_CreateCanvasDict[go];
-
-        if (graphic != null && status.isCreateGraphic)
+        if (m_CreateCanvasDict.ContainsKey(go))
         {
-             Destroy(graphic);
-        }
+            GuideChangeData status = m_CreateCanvasDict[go];
 
-        if (canvas != null && status.isCreateCanvas)
-        {
-            Destroy(canvas);
+            if (graphic != null && status.isCreateGraphic)
+            {
+                DestroyImmediate(graphic);
+            }
+
+            if (canvas != null && status.isCreateCanvas)
+            {
+                DestroyImmediate(canvas);
+            }
+            else
+            {
+                if (canvas != null)
+                {
+                    canvas.overrideSorting = status.OldOverrideSorting;
+                    canvas.sortingOrder = status.OldSortingOrder;
+                    canvas.sortingLayerName = status.oldSortingLayerName;
+                }
+            }
         }
         else
         {
-            canvas.overrideSorting = status.OldOverrideSorting;
-            canvas.sortingOrder = status.OldSortingOrder;
-            canvas.sortingLayerName = status.oldSortingLayerName;
+            Debug.LogError("m_CreateCanvasDict.ContainsKey(go) is error");
         }
     }
 
@@ -915,6 +967,11 @@ public class UIBase : MonoBehaviour
         for (int i = 0; i < m_GuideList.Count; i++)
         {
             CancelGuideModel(m_GuideList[i]);
+        }
+
+        for (int i = 0; i < m_ChildList.Count; i++)
+        {
+            m_ChildList[i].ClearGuideModel();
         }
 
         m_GuideList.Clear();

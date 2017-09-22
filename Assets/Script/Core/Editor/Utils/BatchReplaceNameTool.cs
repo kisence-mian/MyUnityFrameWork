@@ -34,7 +34,7 @@ public class BatchReplaceNameTool : EditorWindow
 
         for (int i = 0; i < selectList.Count; i++)
         {
-            EditorGUILayout.ObjectField(selectList[i], typeof(Object));
+            EditorGUILayout.ObjectField(selectList[i], typeof(Object),true);
         }
 
         EditorGUI.indentLevel--;

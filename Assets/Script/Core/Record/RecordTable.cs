@@ -27,7 +27,7 @@ public class RecordTable : Dictionary<string, SingleField>
 
     public static string Serialize(RecordTable table)
     {
-        return JsonTool.Dictionary2Json<SingleField>(table); ;
+        return JsonTool.Dictionary2Json<SingleField>(table);
     }
 
     #endregion
