@@ -8,7 +8,7 @@ using System.Text;
 using System.Collections.Generic;
 using FrameWork;
 
-public class TCPService : INetworkInterface 
+public class JsonNetworkService : INetworkInterface 
 {
     /// <summary>
     /// 消息结尾符
@@ -76,7 +76,14 @@ public class TCPService : INetworkInterface
         {
             m_ConnectStatusCallback(NetworkState.Connecting);
 
-            m_Socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            SocketType socketType = SocketType.Stream;
+
+            if (m_protocolType == ProtocolType.Udp)
+            {
+                socketType = SocketType.Dgram;
+            }
+
+            m_Socket = new Socket(AddressFamily.InterNetwork, socketType, m_protocolType);
             IPAddress ip = IPAddress.Parse(m_IPaddress);
             IPEndPoint ipe = new IPEndPoint(ip, m_port);
             //mSocket.

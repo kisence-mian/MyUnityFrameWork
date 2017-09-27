@@ -10,12 +10,12 @@ public class ScrollRectInput : ScrollRect
     public virtual void Init(string UIEventKey)
     {
         m_UIEventKey = UIEventKey;
-        m_register = InputUIEventProxy.AddOnScrollListener(m_UIEventKey, name, OnSetContentAnchoredPosition);
+        m_register = InputUIEventProxy.GetOnScrollListener(m_UIEventKey, name, OnSetContentAnchoredPosition);
     }
 
     public virtual void Dispose()
     {
-        m_register.RemoveListener();
+        m_register.RemoveListener(true);
     }
 
     protected override void SetContentAnchoredPosition(Vector2 position)

@@ -1,4 +1,4 @@
-﻿#if UNITY_5_5
+﻿#if UNITY_5_5_OR_NEWER
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;

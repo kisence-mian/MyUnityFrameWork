@@ -67,7 +67,7 @@ public class UIBase : MonoBehaviour
     {
         m_UIID = id;
         m_canvas = GetComponent<Canvas>();
-
+        m_UIName = null;
         CreateObjectTable();
         OnInit();
     }
@@ -133,6 +133,7 @@ public class UIBase : MonoBehaviour
     Dictionary<string, InputField> m_inputFields = new Dictionary<string, InputField>();
     Dictionary<string, Slider> m_Sliders = new Dictionary<string, Slider>();
     Dictionary<string, Canvas> m_Canvas = new Dictionary<string, Canvas>();
+    Dictionary<string, Toggle> m_Toggle = new Dictionary<string, Toggle>();
 
     Dictionary<string, UGUIJoyStick> m_joySticks = new Dictionary<string, UGUIJoyStick>();
     Dictionary<string, UGUIJoyStickBase> m_joySticks_ro = new Dictionary<string, UGUIJoyStickBase>();
@@ -240,6 +241,23 @@ public class UIBase : MonoBehaviour
         }
 
         m_texts.Add(name, tmp);
+        return tmp;
+    }
+    public Toggle GetToggle(string name)
+    {
+        if (m_Toggle .ContainsKey(name))
+        {
+            return m_Toggle[name];
+        }
+
+        Toggle tmp = GetGameObject(name).GetComponent<Toggle>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetText ->" + name + "<- is Null !");
+        }
+
+        m_Toggle.Add(name, tmp);
         return tmp;
     }
 
@@ -486,11 +504,11 @@ public class UIBase : MonoBehaviour
     protected List<Enum> m_EventNames = new List<Enum>();
     protected List<EventHandRegisterInfo> m_EventListeners = new List<EventHandRegisterInfo>();
 
-    protected List<InputEventRegisterInfo<InputUIOnClickEvent>> m_OnClickEvents = new List<InputEventRegisterInfo<InputUIOnClickEvent>>();
-    protected List<InputEventRegisterInfo<InputUILongPressEvent>> m_LongPressEvents = new List<InputEventRegisterInfo<InputUILongPressEvent>>();
-    protected List<InputEventRegisterInfo<InputUIOnDragEvent>> m_DragEvents = new List<InputEventRegisterInfo<InputUIOnDragEvent>>();
-    protected List<InputEventRegisterInfo<InputUIOnBeginDragEvent>> m_BeginDragEvents = new List<InputEventRegisterInfo<InputUIOnBeginDragEvent>>();
-    protected List<InputEventRegisterInfo<InputUIOnEndDragEvent>> m_EndDragEvents = new List<InputEventRegisterInfo<InputUIOnEndDragEvent>>();
+    protected List<InputEventRegisterInfo> m_OnClickEvents = new List<InputEventRegisterInfo>();
+    protected List<InputEventRegisterInfo> m_LongPressEvents = new List<InputEventRegisterInfo>();
+    protected List<InputEventRegisterInfo> m_DragEvents = new List<InputEventRegisterInfo>();
+    protected List<InputEventRegisterInfo> m_BeginDragEvents = new List<InputEventRegisterInfo>();
+    protected List<InputEventRegisterInfo> m_EndDragEvents = new List<InputEventRegisterInfo>();
 
     public virtual void RemoveAllListener()
     {
@@ -502,32 +520,32 @@ public class UIBase : MonoBehaviour
 
         for (int i = 0; i < m_OnClickEvents.Count; i++)
         {
-            m_OnClickEvents[i].RemoveListener();
+            m_OnClickEvents[i].RemoveListener(true);
         }
         m_OnClickEvents.Clear();
 
         for (int i = 0; i < m_LongPressEvents.Count; i++)
         {
-            m_LongPressEvents[i].RemoveListener();
+            m_LongPressEvents[i].RemoveListener(true);
         }
         m_LongPressEvents.Clear();
 
         #region 拖动事件
         for (int i = 0; i < m_DragEvents.Count; i++)
         {
-            m_DragEvents[i].RemoveListener();
+            m_DragEvents[i].RemoveListener(true);
         }
         m_DragEvents.Clear();
 
         for (int i = 0; i < m_BeginDragEvents.Count; i++)
         {
-            m_BeginDragEvents[i].RemoveListener();
+            m_BeginDragEvents[i].RemoveListener(true);
         }
         m_BeginDragEvents.Clear();
 
         for (int i = 0; i < m_EndDragEvents.Count; i++)
         {
-            m_EndDragEvents[i].RemoveListener();
+            m_EndDragEvents[i].RemoveListener(true);
         }
         m_EndDragEvents.Clear();
     #endregion
@@ -535,39 +553,60 @@ public class UIBase : MonoBehaviour
 
     #region 添加监听
 
+    bool GetRegister(List<InputEventRegisterInfo> list, string eventKey)
+    {
+        int registerCount = 0;
+        for (int i = 0; i < list.Count; i++)
+        {
+            if (list[i].eventKey == eventKey)
+            {
+                registerCount++;
+            }
+        }
+
+        return registerCount == 0;
+    }
+
     public void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
-        InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(GetButton(buttonName), UIEventKey, buttonName, parm, callback);
+        InputButtonClickRegisterInfo info = InputUIEventProxy.GetOnClickListener(GetButton(buttonName), UIEventKey, buttonName, parm, callback);
+        info.AddListener(GetRegister(m_OnClickEvents, info.eventKey));
         m_OnClickEvents.Add(info);
     }
 
     public void AddOnClickListenerByCreate(Button button, string compName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
-        InputEventRegisterInfo<InputUIOnClickEvent> info = InputUIEventProxy.AddOnClickListener(button, UIEventKey, compName, parm, callback);
+        InputButtonClickRegisterInfo info = InputUIEventProxy.GetOnClickListener(button, UIEventKey, compName, parm, callback);
+        info.AddListener(GetRegister(m_OnClickEvents, info.eventKey));
         m_OnClickEvents.Add(info);
     }
 
     public void AddLongPressListener(string compName, InputEventHandle<InputUILongPressEvent> callback, string parm = null)
     {
-        InputEventRegisterInfo<InputUILongPressEvent> info = InputUIEventProxy.AddLongPressListener(GetLongPressComp(compName), UIEventKey, compName, parm, callback);
+        InputEventRegisterInfo<InputUILongPressEvent> info = InputUIEventProxy.GetLongPressListener(GetLongPressComp(compName), UIEventKey, compName, parm, callback);
+        info.AddListener(GetRegister(m_LongPressEvents, info.eventKey));
         m_LongPressEvents.Add(info);
+
     }
 
     public void AddDragListener(string compName, InputEventHandle<InputUIOnDragEvent> callback, string parm = null)
     {
-        InputEventRegisterInfo<InputUIOnDragEvent> info = InputUIEventProxy.AddOnDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
+        InputEventRegisterInfo<InputUIOnDragEvent> info = InputUIEventProxy.GetOnDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
+        info.AddListener(GetRegister(m_DragEvents, info.eventKey));
         m_DragEvents.Add(info);
     }
 
     public void AddBeginDragListener(string compName, InputEventHandle<InputUIOnBeginDragEvent> callback, string parm = null)
     {
-        InputEventRegisterInfo<InputUIOnBeginDragEvent> info = InputUIEventProxy.AddOnBeginDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
+        InputEventRegisterInfo<InputUIOnBeginDragEvent> info = InputUIEventProxy.GetOnBeginDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
+        info.AddListener(GetRegister(m_BeginDragEvents, info.eventKey));
         m_BeginDragEvents.Add(info);
     }
 
     public void AddEndDragListener(string compName, InputEventHandle<InputUIOnEndDragEvent> callback, string parm = null)
     {
-        InputEventRegisterInfo<InputUIOnEndDragEvent> info = InputUIEventProxy.AddOnEndDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
+        InputEventRegisterInfo<InputUIOnEndDragEvent> info = InputUIEventProxy.GetOnEndDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
+        info.AddListener(GetRegister(m_EndDragEvents, info.eventKey));
         m_EndDragEvents.Add(info);
     }
 
@@ -588,15 +627,16 @@ public class UIBase : MonoBehaviour
 
     //TODO 逐步添加所有的移除监听方法
 
-    public InputEventRegisterInfo<InputUIOnClickEvent> GetClickRegisterInfo(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm )
+    public InputButtonClickRegisterInfo GetClickRegisterInfo(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm )
     {
         string eventKey = InputUIOnClickEvent.GetEventKey(UIEventKey, buttonName, parm);
         for (int i = 0; i < m_OnClickEvents.Count; i++)
         {
-            if(m_OnClickEvents[i].eventKey == eventKey
-                && m_OnClickEvents[i].callBack == callback)
+            InputButtonClickRegisterInfo info = (InputButtonClickRegisterInfo)m_OnClickEvents[i];
+            if (info.eventKey == eventKey
+                && info.callBack == callback)
             {
-                return m_OnClickEvents[i];
+                return info;
             }
         }
 
@@ -605,10 +645,9 @@ public class UIBase : MonoBehaviour
 
     public void RemoveOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
-        InputEventRegisterInfo<InputUIOnClickEvent>  info = GetClickRegisterInfo(buttonName, callback, parm);
-
-        info.RemoveListener();
+        InputButtonClickRegisterInfo info = GetClickRegisterInfo(buttonName, callback, parm);
         m_OnClickEvents.Remove(info);
+        info.RemoveListener(GetRegister(m_OnClickEvents, info.eventKey));
     }
 
     #endregion
@@ -679,6 +718,7 @@ public class UIBase : MonoBehaviour
     {
         for (int i = 0; i < m_ChildList.Count; i++)
         {
+            m_ChildList[i].RemoveAllListener();
             m_ChildList[i].OnUIDestroy();
             GameObjectManager.DestroyGameObjectByPool(m_ChildList[i].gameObject, isActive);
         }

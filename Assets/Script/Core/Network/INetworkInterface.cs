@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Net.Sockets;
 
 public class INetworkInterface 
 {
@@ -14,6 +15,8 @@ public class INetworkInterface
 
     public ConnectStatusCallBack m_ConnectStatusCallback;
     public MessageCallBack m_messageCallBack;
+
+    public ProtocolType m_protocolType;
 
     public virtual void Init()
     {

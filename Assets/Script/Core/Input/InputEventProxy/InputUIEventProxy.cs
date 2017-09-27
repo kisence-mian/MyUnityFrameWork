@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 public class InputUIEventProxy : IInputProxyBase
 {
     #region 添加监听
-    public static InputEventRegisterInfo<InputUIOnClickEvent> AddOnClickListener(Button button, string UIName, string ComponentName, string parm, InputEventHandle<InputUIOnClickEvent> callback)
+    public static InputButtonClickRegisterInfo GetOnClickListener(Button button, string UIName, string ComponentName, string parm, InputEventHandle<InputUIOnClickEvent> callback)
     {
         InputButtonClickRegisterInfo info = HeapObjectPool<InputButtonClickRegisterInfo>.GetObject();
 
@@ -19,14 +19,10 @@ public class InputUIEventProxy : IInputProxyBase
             DispatchOnClickEvent(UIName, ComponentName, parm);
         };
 
-        info.AddListener();
-
-        button.onClick.AddListener(info.m_OnClick);
-
         return info;
     }
 
-    public static InputEventRegisterInfo<InputUILongPressEvent> AddLongPressListener(LongPressAcceptor acceptor, string UIName, string ComponentName, string parm, InputEventHandle<InputUILongPressEvent> callback)
+    public static InputEventRegisterInfo<InputUILongPressEvent> GetLongPressListener(LongPressAcceptor acceptor, string UIName, string ComponentName, string parm, InputEventHandle<InputUILongPressEvent> callback)
     {
         InputlongPressRegisterInfo info = HeapObjectPool<InputlongPressRegisterInfo>.GetObject();
 
@@ -38,13 +34,10 @@ public class InputUIEventProxy : IInputProxyBase
             DispatchLongPressEvent(UIName, ComponentName, parm, type);
         };
 
-        info.AddListener();
-        acceptor.OnLongPress += info.m_OnLongPress;
-
         return info;
     }
 
-    public static InputEventRegisterInfo<InputUIOnScrollEvent> AddOnScrollListener(string UIName, string ComponentName, InputEventHandle<InputUIOnScrollEvent> callback)
+    public static InputEventRegisterInfo<InputUIOnScrollEvent> GetOnScrollListener(string UIName, string ComponentName, InputEventHandle<InputUIOnScrollEvent> callback)
     {
         InputEventRegisterInfo<InputUIOnScrollEvent> info = HeapObjectPool<InputEventRegisterInfo<InputUIOnScrollEvent>>.GetObject();
 
@@ -57,7 +50,7 @@ public class InputUIEventProxy : IInputProxyBase
         return info;
     }
 
-    public static InputEventRegisterInfo<InputUIOnDragEvent> AddOnDragListener(DragAcceptor acceptor, string UIName, string ComponentName, string parm, InputEventHandle<InputUIOnDragEvent> callback)
+    public static InputEventRegisterInfo<InputUIOnDragEvent> GetOnDragListener(DragAcceptor acceptor, string UIName, string ComponentName, string parm, InputEventHandle<InputUIOnDragEvent> callback)
     {
         InputDragRegisterInfo info = HeapObjectPool<InputDragRegisterInfo>.GetObject();
 
@@ -69,15 +62,10 @@ public class InputUIEventProxy : IInputProxyBase
                 DispatchDragEvent(UIName, ComponentName, parm, data);
             };
 
-        info.AddListener();
-
-        InputManager.AddListener(
-            InputUIOnDragEvent.GetEventKey(UIName, ComponentName, parm), callback);
-
         return info;
     }
 
-    public static InputBeginDragRegisterInfo AddOnBeginDragListener(DragAcceptor acceptor, string UIName, string ComponentName, string parm, InputEventHandle<InputUIOnBeginDragEvent> callback)
+    public static InputBeginDragRegisterInfo GetOnBeginDragListener(DragAcceptor acceptor, string UIName, string ComponentName, string parm, InputEventHandle<InputUIOnBeginDragEvent> callback)
     {
         InputBeginDragRegisterInfo info = HeapObjectPool<InputBeginDragRegisterInfo>.GetObject();
 
@@ -89,15 +77,10 @@ public class InputUIEventProxy : IInputProxyBase
             DispatchBeginDragEvent(UIName, ComponentName, parm, data);
         };
 
-        info.AddListener();
-
-        InputManager.AddListener(
-            InputUIOnBeginDragEvent.GetEventKey(UIName, ComponentName, parm), callback);
-
         return info;
     }
 
-    public static InputEndDragRegisterInfo AddOnEndDragListener(DragAcceptor acceptor, string UIName, string ComponentName, string parm, InputEventHandle<InputUIOnEndDragEvent> callback)
+    public static InputEndDragRegisterInfo GetOnEndDragListener(DragAcceptor acceptor, string UIName, string ComponentName, string parm, InputEventHandle<InputUIOnEndDragEvent> callback)
     {
         InputEndDragRegisterInfo info = HeapObjectPool<InputEndDragRegisterInfo>.GetObject();
 
@@ -108,11 +91,6 @@ public class InputUIEventProxy : IInputProxyBase
         {
             DispatchEndDragEvent(UIName, ComponentName, parm, data);
         };
-
-        info.AddListener();
-
-        InputManager.AddListener(
-            InputUIOnDragEvent.GetEventKey(UIName, ComponentName, parm), callback);
 
         return info;
     }
@@ -234,10 +212,23 @@ public class InputButtonClickRegisterInfo : InputEventRegisterInfo<InputUIOnClic
     public Button m_button;
     public UnityAction m_OnClick;
 
-    public override void RemoveListener()
+    public override void RemoveListener(bool isSole)
     {
-        base.RemoveListener();
-        m_button.onClick.RemoveListener(m_OnClick);
+        base.RemoveListener(isSole);
+        if (isSole)
+        {
+            m_button.onClick.RemoveListener(m_OnClick);
+        }
+    }
+
+    public override void AddListener(bool isSole)
+    {
+        base.AddListener(isSole);
+
+        if(isSole)
+        {
+            m_button.onClick.AddListener(m_OnClick);
+        }
     }
 }
 
@@ -246,10 +237,22 @@ public class InputlongPressRegisterInfo : InputEventRegisterInfo<InputUILongPres
     public LongPressAcceptor m_acceptor;
     public InputUIEventLongPressCallBack m_OnLongPress;
 
-    public override void RemoveListener()
+    public override void RemoveListener(bool isSole)
     {
-        base.RemoveListener();
-        m_acceptor.OnLongPress -= m_OnLongPress;
+        base.RemoveListener(isSole);
+        if (isSole)
+        {
+            m_acceptor.OnLongPress -= m_OnLongPress;
+        }
+    }
+
+    public override void AddListener(bool isSole)
+    {
+        base.AddListener(isSole);
+        if (isSole)
+        {
+            m_acceptor.OnLongPress += m_OnLongPress;
+        }
     }
 }
 
@@ -258,17 +261,22 @@ public class InputDragRegisterInfo : InputEventRegisterInfo<InputUIOnDragEvent>
     public DragAcceptor m_acceptor;
     public InputUIEventDragCallBack m_OnDrag;
 
-    public override void AddListener()
+    public override void AddListener(bool isSole)
     {
-        base.AddListener();
-        m_acceptor.m_OnDrag += m_OnDrag;
+        base.AddListener(isSole);
+        if (isSole)
+        {
+            m_acceptor.m_OnDrag += m_OnDrag;
+        }
     }
 
-
-    public override void RemoveListener()
+    public override void RemoveListener(bool isSole)
     {
-        base.RemoveListener();
-        m_acceptor.m_OnDrag -= m_OnDrag;
+        base.RemoveListener(isSole);
+        if (isSole)
+        {
+            m_acceptor.m_OnDrag -= m_OnDrag;
+        }
     }
 }
 
@@ -277,16 +285,22 @@ public class InputBeginDragRegisterInfo : InputEventRegisterInfo<InputUIOnBeginD
     public DragAcceptor m_acceptor;
     public InputUIEventDragCallBack m_OnBeginDrag;
 
-    public override void AddListener()
+    public override void AddListener(bool isSole)
     {
-        base.AddListener();
-        m_acceptor.m_OnBeginDrag += m_OnBeginDrag;
+        base.AddListener(isSole);
+        if (isSole)
+        {
+            m_acceptor.m_OnBeginDrag += m_OnBeginDrag;
+        }
     }
 
-    public override void RemoveListener()
+    public override void RemoveListener(bool isSole)
     {
-        base.RemoveListener();
-        m_acceptor.m_OnBeginDrag -= m_OnBeginDrag;
+        base.RemoveListener(isSole);
+        if (isSole)
+        {
+            m_acceptor.m_OnBeginDrag -= m_OnBeginDrag;
+        }
     }
 }
 
@@ -295,15 +309,20 @@ public class InputEndDragRegisterInfo : InputEventRegisterInfo<InputUIOnEndDragE
     public DragAcceptor m_acceptor;
     public InputUIEventDragCallBack m_OnEndDrag;
 
-    public override void AddListener()
+    public override void AddListener(bool isSole)
     {
-        base.AddListener();
-        m_acceptor.m_OnEndDrag += m_OnEndDrag;
+        base.AddListener(isSole);
+        if (isSole)
+        {
+            m_acceptor.m_OnEndDrag += m_OnEndDrag;
+        }
     }
-    public override void RemoveListener()
+    public override void RemoveListener(bool isSole)
     {
-        base.RemoveListener();
-        m_acceptor.m_OnEndDrag -= m_OnEndDrag;
-
+        base.RemoveListener(isSole);
+        if (isSole)
+        {
+            m_acceptor.m_OnEndDrag -= m_OnEndDrag;
+        }
     }
 }

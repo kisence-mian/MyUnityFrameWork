@@ -34,28 +34,40 @@ public abstract class IInputProxyBase
     #endregion
 }
 
-public class InputEventRegisterInfo<T> : IHeapObjectInterface where T : IInputEventBase
+public class InputEventRegisterInfo : IHeapObjectInterface
 {
     public string eventKey;
+    public void OnInit(){}
+    public void OnPop(){}
+    public void OnPush(){}
+    public virtual void AddListener(bool isSole) {}
+    public virtual void RemoveListener(bool isSole) {}
+}
+
+public class InputEventRegisterInfo<T> : InputEventRegisterInfo where T : IInputEventBase
+{
     public InputEventHandle<T> callBack;
 
     public InputEventRegisterInfo()
     {
     }
 
-    public virtual void AddListener()
+    /// <summary>
+    /// 添加监听和派发
+    /// </summary>
+    /// <param name="isRegister">这个eventKey是否已经注册过了，如果是则不在派发对象上重复派发</param>
+    public override void AddListener(bool isSole)
     {
         InputManager.AddListener<T>(eventKey, callBack);
     }
 
-    public virtual void RemoveListener()
+    /// <summary>
+    /// 移除监听和派发
+    /// </summary>
+    /// <param name="isRegister">这是不是这个eventKey最后一个监听事件，如果是则移除派发</param>
+    public override void RemoveListener(bool isSole)
     {
         InputManager.RemoveListener<T>(eventKey, callBack);
         HeapObjectPool<InputEventRegisterInfo<T>>.PutObject(this);
     }
-    public void OnInit() { }
-
-    public void OnPop() { }
-
-    public void OnPush() { }
 }

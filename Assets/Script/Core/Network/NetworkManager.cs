@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using FrameWork;
+using System.Net.Sockets;
 
 public class NetworkManager 
 {
@@ -16,13 +17,14 @@ public class NetworkManager
         set { NetworkManager.s_isConnect = value; }
     }
 
-    public static void Init<T>() where T : INetworkInterface,new ()
+    public static void Init<T>(ProtocolType protocolType = ProtocolType.Tcp) where T : INetworkInterface,new ()
     {
         //提前加载网络事件派发器，避免异步冲突
         InputManager.LoadDispatcher<InputNetworkConnectStatusEvent>();
         InputManager.LoadDispatcher<InputNetworkMessageEvent>();
 
         s_network = new T();
+        s_network.m_protocolType = protocolType;
         s_network.Init();
         s_network.m_messageCallBack = ReceviceMeaasge;
         s_network.m_ConnectStatusCallback = ConnectStatusChange;

@@ -21,7 +21,12 @@ public class GUIUtil
 
             s_fontSize = (int)(Screen.dpi * 0.13f);
 
-            //#if UNITY_ANDROID || UNITY_IOS
+            #if UNITY_EDITOR
+            s_fontSize *= 3;
+
+            #endif
+
+
             GUI.skin.label.fontSize = s_fontSize;
             //GUI.skin.button.fixedHeight = 0;
             GUI.skin.button.fontSize = s_fontSize;
