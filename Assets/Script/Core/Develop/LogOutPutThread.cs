@@ -23,8 +23,19 @@ public class LogOutPutThread
         {
             ApplicationManager.s_OnApplicationQuit += Close;
 
+            string prefix = Application.productName;
+
+#if UNITY_EDITOR
+            prefix += "_Editor_" + SystemInfo.deviceName;
+#else
+    #if UNITY_ANDROID
+            prefix += "_Android_" + SystemInfo.deviceName;
+    #else
+            prefix += "_Ios_" + SystemInfo.deviceName;
+    #endif
+#endif
             DateTime now = DateTime.Now;
-            string logName = string.Format("Log{0}{1}{2}#{3}_{4}_{5}",
+            string logName = string.Format(prefix + "_{0}{1}{2}#{3}_{4}_{5}",
                 now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
             string logPath = PathTool.GetAbsolutePath(ResLoadLocation.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
@@ -47,7 +58,7 @@ public class LogOutPutThread
             Debug.LogError("LogOutPutThread Init Exception:" + e.ToString());
         }
 #endif
-    }
+        }
 
     public void Log(LogInfo log)
     {
@@ -146,7 +157,7 @@ public class LogOutPutThread
         return ResourceIOTool.ReadStringByFile(GetPath(logName));
     }
 
-    static string GetPath(string logName)
+    public static string GetPath(string logName)
     {
         return PathTool.GetAbsolutePath(ResLoadLocation.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));
     }

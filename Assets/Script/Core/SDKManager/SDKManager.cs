@@ -391,6 +391,15 @@ public class SDKManager
         }
 
     }
+
+    public static void LogString(string eventID, string eventInfo)
+    {
+        Dictionary<string, object> send_info = new Dictionary<string, object>();
+        send_info["name"] = eventID;
+        send_info["info"] = eventInfo;
+        //Debug.Log("<color=blue>SendDataEvent ====</color>" + name);
+        Log(eventID, send_info);
+    }
     #endregion
 
     #endregion

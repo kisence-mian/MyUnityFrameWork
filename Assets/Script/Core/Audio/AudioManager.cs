@@ -136,13 +136,26 @@ public class AudioManager : MonoBehaviour
     /// <param name="l_soundName">音效名</param>
     public static AudioSource PlaySound2D(string l_soundName)
     {
-        AudioSource audioTmp = GetAudioSource2D(SoundType.Sound);
-        audioTmp.clip = GetAudioClip(l_soundName);
-        audioTmp.loop = false;
-        audioTmp.volume = s_SoundVolume;
-        audioTmp.PlayOneShot(audioTmp.clip);
+        AudioSource audioTmp = PlaySound2D(l_soundName,1,false);
+
         return audioTmp;
     }
+
+    /// <summary>
+    /// 播放一个2D音效, 可变音调
+    /// </summary>
+    /// <param name="l_soundName">音效名</param>
+    public static AudioSource PlaySound2D(string l_soundName, float l_pitch, bool l_isLoop = false )
+    {
+        AudioSource audioTmp = GetAudioSource2D(SoundType.Sound);
+        audioTmp.clip = GetAudioClip(l_soundName);
+        audioTmp.loop = l_isLoop;
+        audioTmp.volume = s_SoundVolume;
+        audioTmp.PlayOneShot(audioTmp.clip);
+        audioTmp.pitch = l_pitch;
+        return audioTmp;
+    }
+
 
     /// <summary>
     /// 延时播放一个2D音效

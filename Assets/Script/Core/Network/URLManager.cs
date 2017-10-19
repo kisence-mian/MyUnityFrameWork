@@ -1,45 +1,40 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class URLManager 
 {
     const string s_configName = "URLConfig";
 
-    static DataTable s_URLTable;
+    static Dictionary<string,SingleField> s_URLTable;
 
     public static string GetURL(string urlKey)
     {
         Init();
 
-        if (s_URLTable.ContainsKey(urlKey))
+        if (s_URLTable != null)
         {
-            return s_URLTable[urlKey].GetString("URL");
+            if (s_URLTable.ContainsKey(urlKey))
+            {
+                return s_URLTable[urlKey].GetString();
+            }
+            else
+            {
+                return null;
+            }
         }
-        else
-        {
-            return null;
-        }
-    }
 
-    public static string GetPort(string urlKey)
-    {
-        Init();
-
-        if (s_URLTable.ContainsKey(urlKey))
-        {
-            return s_URLTable[urlKey].GetString("Port");
-        }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     public static void Init()
     {
         if (s_URLTable == null)
         {
-            s_URLTable = DataManager.GetData(s_configName);
+            if(ConfigManager.GetIsExistConfig(s_configName))
+            {
+                s_URLTable = ConfigManager.GetData(s_configName);
+            }
         }
     }
 }

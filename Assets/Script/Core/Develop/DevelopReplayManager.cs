@@ -367,6 +367,7 @@ public class DevelopReplayManager
     }
 
     static string LogContent = "";
+    static string LogPath = "";
 
     static void ShowLogList()
     {
@@ -379,6 +380,7 @@ public class DevelopReplayManager
                 isShowLog = true;
                 scrollPos = Vector2.zero;
                 LogContent = LogOutPutThread.LoadLogContent(FileNameList[i]);
+                LogPath = LogOutPutThread.GetPath(FileNameList[i]);
             }
         }
 
@@ -404,9 +406,28 @@ public class DevelopReplayManager
     {
         scrollPos = GUILayout.BeginScrollView(scrollPos);
 
-        GUILayout.TextArea(LogContent);
-
+        try
+        {
+            GUIUtil.SafeTextArea(LogContent);
+        }
+        catch(Exception e)
+        {
+            GUILayout.TextArea(e.ToString());
+        }
+        
         GUILayout.EndScrollView();
+
+        if(URLManager.GetURL("LogUpLoadURL") != null)
+        {
+            if (GUILayout.Button("上传日志"))
+            {
+                HTTPTool.Upload_Request_Thread(URLManager.GetURL("LogUpLoadURL"), LogPath);
+            }
+        }
+        else
+        {
+            GUILayout.Label("上传日志需要在 URLConfig -> LogUpLoadURL 配置上传目录");
+        }
 
         if (GUILayout.Button("复制到剪贴板"))
         {

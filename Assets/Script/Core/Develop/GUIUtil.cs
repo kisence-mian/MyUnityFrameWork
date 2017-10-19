@@ -47,6 +47,19 @@ public class GUIUtil
             GUI.skin.textField.fontSize = s_fontSize;
             GUI.skin.textField.wordWrap = true;
         }
+    }
 
+    const int maxContent = 15000;
+    public static void SafeTextArea(string content)
+    {
+        if(content.Length > maxContent)
+        {
+            GUILayout.TextArea(content.Substring(0, maxContent));
+            SafeTextArea(content.Substring(maxContent+ 1,content.Length - maxContent - 1));
+        }
+        else
+        {
+            GUILayout.TextArea(content);
+        }
     }
 }
