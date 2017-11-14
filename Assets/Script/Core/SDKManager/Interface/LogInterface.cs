@@ -14,6 +14,10 @@ public class LogInterface : SDKInterfaceBase
     {
 
     }
+    public virtual void Log(string eventID, Dictionary<string, string> data)
+    {
+
+    }
 
     public virtual void LoginLog(string accountID, Dictionary<string, object> data)
     {

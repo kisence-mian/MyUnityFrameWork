@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FrameWork;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
@@ -392,11 +393,42 @@ public class SDKManager
 
     }
 
-    public static void LogString(string eventID, string eventInfo)
+    public static void Log(string eventID, Dictionary<string, string> data)
     {
-        Dictionary<string, object> send_info = new Dictionary<string, object>();
-        send_info["name"] = eventID;
-        send_info["info"] = eventInfo;
+        if (s_logServiceList == null)
+        {
+            throw new Exception("logServiceList is null ,please check SDKManager Init");
+        }
+
+        for (int i = 0; i < s_logServiceList.Count; i++)
+        {
+            try
+            {
+                s_logServiceList[i].Log(eventID, data);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager Log Exception: " + e.ToString());
+            }
+        }
+
+    }
+
+    public static void LogString(string eventID, string ev_json)
+    {
+        //Dictionary<string, string> send_info = new Dictionary<string, string>();
+        //send_info["name"] = eventID;
+        //send_info["info"] = eventInfo;
+
+        Dictionary<string, object> en_dic = (Dictionary<string, object>)Json.Deserialize(ev_json);
+
+        Dictionary<string, string> send_info = new Dictionary<string, string>();
+
+        foreach (string item in en_dic.Keys)
+        {
+            send_info[item] = en_dic[item].ToString();
+        }
+
         //Debug.Log("<color=blue>SendDataEvent ====</color>" + name);
         Log(eventID, send_info);
     }

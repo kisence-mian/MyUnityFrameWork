@@ -117,7 +117,15 @@ public class NetworkManager
 
     static void ReceviceMeaasge(NetWorkMessage message)
     {
-        s_messageList.Add(message);
+        if(message != null)
+        {
+            s_messageList.Add(message);
+        }
+        else
+        {
+            Debug.LogError("Message Error: Message is null");
+        }
+
     }
 
     static void Dispatch(NetWorkMessage msg)
@@ -128,19 +136,12 @@ public class NetworkManager
         }
         catch (Exception e)
         {
-            if (msg!= null )
+            string messageContent = "";
+            if (msg.m_data != null)
             {
-                string messageContent = "";
-                if(msg.m_data != null)
-                {
-                    messageContent = Json.Serialize(msg.m_data);
-                }
-                Debug.LogError("Message Error: MessageType is ->" + msg.m_MessageType + "<- MessageContent is ->" + messageContent + "<-\n" + e.ToString());
+                messageContent = Json.Serialize(msg.m_data);
             }
-            else
-            {
-                Debug.LogError("Message Error: Message is null" );
-            }
+            Debug.LogError("Message Error: MessageType is ->" + msg.m_MessageType + "<- MessageContent is ->" + messageContent + "<-\n" + e.ToString());
         }
     }
 

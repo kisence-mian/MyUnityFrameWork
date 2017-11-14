@@ -530,14 +530,23 @@ public class ProtocolService : INetworkInterface
     NetWorkMessage  Analysis(ByteArray bytes)
     {
         NetWorkMessage msg = GetMessageByPool();
-        //Debug.Log("ReceiveDataLoad : " + BitConverter.ToString(bytes.Buffer));
-        //Debug.Log("bytes length " + bytes.bytes.Count);
         bytes.ReadUShort(); //消息长度
         bytes.ReadByte();  //模块名
 
         int methodIndex = bytes.ReadUShort(); //方法名
 
-        msg.m_MessageType = m_methodNameInfo[methodIndex];
+        //Debug.Log("methodIndex " + methodIndex);
+        //Debug.Log("ReceiveDataLoad : " + BitConverter.ToString(bytes.Buffer));
+        try
+        {
+            msg.m_MessageType = m_methodNameInfo[methodIndex];
+        }
+        catch
+        {
+            Debug.LogError("没有找到消息号！ " + methodIndex);
+            return null;
+        }
+
         int re_len = bytes.Length - 5;
         msg.m_data = AnalysisData(msg.m_MessageType, bytes.ReadBytes(re_len));
 

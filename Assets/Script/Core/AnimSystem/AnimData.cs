@@ -430,7 +430,10 @@ public class AnimData
         {
             newColor = m_oldColor[index];
             newColor.a = a;
-            m_animObjectList_Image[i].color = newColor;
+            if (m_animObjectList_Image[i] != null)
+            {
+                m_animObjectList_Image[i].color = newColor;
+            }
 
             index++;
         }
@@ -439,7 +442,10 @@ public class AnimData
         {
             newColor = m_oldColor[index];
             newColor.a = a;
-            m_animObjectList_Text[i].color = newColor;
+            if (m_animObjectList_Text[i] != null)
+            {
+                m_animObjectList_Text[i].color = newColor;
+            }
 
             index++;
         }

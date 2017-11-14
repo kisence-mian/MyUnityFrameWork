@@ -12,7 +12,7 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHand
 
     public UGUIJoyStickHandle onJoyStick;
 
-    protected bool canMove = true;
+    public bool canMove = true;
     void Start()
     {
         //计算摇杆块的半径
@@ -40,6 +40,7 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHand
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        canMove = false;
         content.anchoredPosition3D = Vector3.zero;
         //onJoyStick(Vector3.zero);
     }
@@ -75,6 +76,7 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHand
     public void ReHomePos()
     {
         canMove = false;
+        
         content.anchoredPosition3D = Vector3.zero;
         onJoyStick(Vector3.zero);
     }
