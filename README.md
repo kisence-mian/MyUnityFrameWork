@@ -11,7 +11,7 @@
 　　4.提供Jenkins自动化打包接口ProjectBuildService ([打包教程](http://www.kisence.com/2017/06/01/shi-yong-jenkinsjin-xing-zi-dong-da-bao/) ) 
 　
 ## 游戏流程管理  
-　　1.游戏逻辑入口从某一个游戏流程开始（创建一个流程继承IGameStatus,然后在ApplicationManager中选择它作为第一个流程）  
+　　1.游戏逻辑入口从某一个游戏流程开始（创建一个流程继承IGameStatus,然后在ApplicationManager中选择它作为第一个流程）  
 　　2.提供测试接口，可传入测试数据，直接测试某一个流程不需要把游戏从头运行一次  
 　　3.游戏启动时允许呼出开发者控制台，在真机上定位问题更快捷（查看以往日志数据、复盘Bug操作等）  
 
