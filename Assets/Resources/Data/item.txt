@@ -1,6 +1,9 @@
-﻿id	asdasd	tt
-type	Color	Vector2|AnimParamType
-note	颜色	枚举测试
-default	1|1|1|1	8.881112|0
-asdasdads		
-111	0.7279412|0.4496107|0.4496107|1	0.1111|0
+id	ItemName	Cost
+type	String	Int
+note		
+default	NaNa	0
+2	Knife	50
+1	Sword	100
+3	Shield	200
+4	Armour	300
+5	Shoe	200

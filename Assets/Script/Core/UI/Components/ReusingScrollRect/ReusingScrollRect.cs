@@ -111,16 +111,6 @@ public class ReusingScrollRect : ScrollRectInput
         SetItemDisplay();
     }
 
-    public void UpdateContent()
-    {
-        Debug.Log("m_items.Count " + m_items.Count);
-
-        for (int j = m_startPos,i = 0; i < m_items.Count; i++,j++)
-        {
-            m_items[i].SetContent(j, m_datas[j]);
-        }
-    }
-
     #endregion
 
     #region 继承方法
@@ -175,19 +165,21 @@ public class ReusingScrollRect : ScrollRectInput
     {
         Vector3 size = m_itemSize;
 
-        if(horizontal)
+        if (horizontal)
         {
             size.x *= count;
-            size.y = m_rectTransform.sizeDelta.y;
+            size.y = 0;
         }
 
         if(vertical)
         {
             size.y *= count;
-            size.x = m_rectTransform.sizeDelta.x;
+            size.x = 0;
         }
 
         content.sizeDelta = size;
+
+        Debug.Log(m_itemSize + "" + size + " m_rectTransform.sizeDelta " + m_rectTransform.sizeDelta, m_rectTransform );
     }
 
     void UpdateIndexList(int count)
@@ -220,7 +212,6 @@ public class ReusingScrollRect : ScrollRectInput
         {
             throw new Exception("SetItemDisplay Exception: content is null !");
         }
-
 
         m_clip = false;
         //计算已显示的哪些需要隐藏
@@ -491,12 +482,12 @@ public class ReusingScrollRect : ScrollRectInput
 
         if (horizontal)
         {
-            size.y = m_rectTransform.sizeDelta.y;
+            size.y = 0;
         }
 
         if (vertical)
         {
-            size.x = m_rectTransform.sizeDelta.x;
+            size.x = 0;
         }
         return size;
     }
