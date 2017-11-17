@@ -89,7 +89,7 @@ public class LogOutPutThread
         ExitLogic();
     }
 
-    Dictionary<string, object> m_logData;
+    //Dictionary<string, object> m_logData;
 
     //string ConfigName = "LogInfo";
     //string isCrashKey = "isCrash";

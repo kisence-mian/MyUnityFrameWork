@@ -184,7 +184,7 @@ public class JsonNetworkService : INetworkInterface
         {
             if(s != null && s != "")
             {
-                NetWorkMessage msg = GetMessageByPool();
+                NetWorkMessage msg = new NetWorkMessage();
 
                 s = WWW.UnEscapeURL(s);
                 s = s.Replace(c_endCharReplaceString, c_endChar.ToString());

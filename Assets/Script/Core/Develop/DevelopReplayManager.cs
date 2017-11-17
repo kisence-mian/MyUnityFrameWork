@@ -33,7 +33,7 @@ public class DevelopReplayManager
 
     public static bool s_isProfile = true;
 
-    static List<Dictionary<string, string>> s_eventStreamSerialize;
+    //static List<Dictionary<string, string>> s_eventStreamSerialize;
     static List<IInputEventBase> s_eventStream;
 
     static List<int> s_randomList;

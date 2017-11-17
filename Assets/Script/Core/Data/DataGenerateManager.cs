@@ -5,7 +5,7 @@ using System;
 
 public class DataGenerateManager<T> where T : DataGenerateBase, new()
 {
-    static T s_dataCatch;
+    //static T s_dataCatch;
     static Dictionary<string, T> s_dict = new Dictionary<string, T>();
 
     static bool s_isInit = false;

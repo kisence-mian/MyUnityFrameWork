@@ -130,7 +130,7 @@ public class GUIConsole
     {
         if (scrollToBottom)
         {
-            GUILayout.BeginScrollView(Vector2.up * entries.Count * 100.0f);
+            GUILayout.BeginScrollView(Vector2.up * entries.Count * 1000.0f);
         } 
         else
         {

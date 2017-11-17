@@ -34,7 +34,7 @@ using System.Collections;
 		void Update()
 		{
 			++this.frameCount;
-			this.rateDuration += Time.deltaTime;
+			this.rateDuration += Time.unscaledDeltaTime;
 			if (this.rateDuration > calcRate)
 			{
 				// 计算帧率
@@ -46,6 +46,6 @@ using System.Collections;
 
         void OnGUI()
         {
-            GUILayout.TextField("FPS：" + fps.ToString());
+            GUILayout.Label("FPS：" + fps.ToString());
         }
 	}

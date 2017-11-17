@@ -9,12 +9,16 @@ public class NetworkManager
 {
     static INetworkInterface s_network;
 
-    private static bool s_isConnect;
-
     public static bool IsConnect
     {
-        get { return NetworkManager.s_isConnect; }
-        set { NetworkManager.s_isConnect = value; }
+        get {
+            if(s_network == null)
+            {
+                return false;
+            }
+
+            return s_network.isConnect;
+        }
     }
 
     public static void Init<T>(ProtocolType protocolType = ProtocolType.Tcp) where T : INetworkInterface,new ()
@@ -117,15 +121,14 @@ public class NetworkManager
 
     static void ReceviceMeaasge(NetWorkMessage message)
     {
-        if(message != null)
+        if(message.m_MessageType != null)
         {
             s_messageList.Add(message);
         }
         else
         {
-            Debug.LogError("Message Error: Message is null");
+            Debug.LogError("ReceviceMeaasge m_MessageType is null !");
         }
-
     }
 
     static void Dispatch(NetWorkMessage msg)
@@ -152,15 +155,6 @@ public class NetworkManager
 
     static void Dispatch(NetworkState status)
     {
-        if (status == NetworkState.Connected)
-        {
-            s_isConnect = true;
-        }
-        else
-        {
-            s_isConnect = false;
-        }
-
         InputNetworkEventProxy.DispatchStatusEvent(status);
     }
 
@@ -168,17 +162,27 @@ public class NetworkManager
 
     static List<NetworkState> s_statusList = new List<NetworkState>();
     static List<NetWorkMessage> s_messageList = new List<NetWorkMessage>();
+    const int MaxDealCount = 10;
 
     //将消息的处理并入主线程
     static void Update()
     {
-        if (s_messageList.Count >0)
+        if (s_messageList.Count > 0)
         {
+            int dealCount = 0;
             for (int i = 0; i < s_messageList.Count; i++)
             {
+                dealCount++;
                 Dispatch(s_messageList[i]);
+
+                s_messageList.RemoveAt(i);
+                i--;
+
+                if (dealCount >= MaxDealCount)
+                {
+                    break;
+                }
             }
-            s_messageList.Clear();
         }
 
         if (s_statusList.Count > 0)
@@ -205,7 +209,7 @@ public enum NetworkState
     FaildToConnect,
 }
 
-public class NetWorkMessage
+public struct NetWorkMessage
 {
    public string m_MessageType;
 

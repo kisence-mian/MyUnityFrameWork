@@ -20,7 +20,7 @@ using UnityEngine.Profiling;
 		private Rect allocMemoryRect;
 		private Rect reservedMemoryRect;
 		private Rect unusedReservedMemoryRect;
-        private Rect RuntimeMemorySizeRect;
+        //private Rect RuntimeMemorySizeRect;
 		private Rect monoHeapRect;
 		private Rect monoUsedRect;
 
