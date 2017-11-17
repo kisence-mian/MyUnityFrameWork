@@ -1,7 +1,8 @@
 # MyUnityFrameWork  
 　　Unity框架，组件可插拔，可视化编辑，代码自动生成。  
 　　包含资源加载，配置加载，数据加载，UI管理，音频管理,日志管理，动画系统，特效系统等，以及对应编辑器工具  
-　　支持Android、Ios、PC、WEBGL
+　　支持Android、Ios、PC、WEBGL  
+　　项目中的Script/Core目录就是完整框架
 
 ## 应用  
 　　1.快速配置开发模式和发布模式（开发模式资源直接从Resources文件夹加载，不需要重新打包）  
@@ -10,7 +11,7 @@
 　　4.提供Jenkins自动化打包接口ProjectBuildService ([打包教程](http://www.kisence.com/2017/06/01/shi-yong-jenkinsjin-xing-zi-dong-da-bao/) ) 
 　
 ## 游戏流程管理  
-　　1.游戏逻辑入口从某一个游戏流程开始（创建一个流程继承IGameStatus,然后再ApplicationManager中选择它作为第一个流程）  
+　　1.游戏逻辑入口从某一个游戏流程开始（创建一个流程继承IGameStatus,然后在ApplicationManager中选择它作为第一个流程）  
 　　2.提供测试接口，可传入测试数据，直接测试某一个流程不需要把游戏从头运行一次  
 　　3.游戏启动时允许呼出开发者控制台，在真机上定位问题更快捷（查看以往日志数据、复盘Bug操作等）  
 
@@ -76,6 +77,7 @@
 　　　　·重用Item的scrollRect，不会一下子加载太多item，节约性能。  
 　　　　·内置摇杆。  
 　　10.对新手引导做了内置支持  
+　　11.3D模型投射到UI上的工具  
 
 ## 新手引导系统  
 　　1.内置了新手引导系统，并提供了接口支持拓展功能  
@@ -133,9 +135,12 @@
 　　1.提供各种预设特效，开发简单快捷  
 　　　　·震屏特效。  
 　　　　·屏幕淡入淡出特效。  
+　　2.内置特效LOD管理工具  
 
 ## 其他功能  
 　　1.Timer  
 　　2.EventDispatch  
 　　3.HeapObjectPool  
+　　4.自动导入FBX到AnimatorControl  
+　　5.自动生成Protocol文件工具  
 
