@@ -552,7 +552,7 @@ public class AnimSystem : MonoBehaviour
 
         l_tmp.m_animType = AnimType.Custom_Vector3;
         l_tmp.m_fromV3 = from;
-        l_tmp.m_toV2 = to;
+        l_tmp.m_toV3 = to;
         l_tmp.m_customMethodV3 = method;
 
         l_tmp.m_delayTime = delayTime;

@@ -1121,7 +1121,7 @@ namespace FrameWork.Protocol
                 }
                 else if (field.FieldType.IsSubclassOf(typeof(Enum)))
                 {
-                    content += GetTab(tab) + aimName + "." + field.Name + " = " + "(" + field.FieldType.Name + ")" + sourceName + "[\"" + GenerateProtocolFieldName(field) + "\"];\n";
+                    content += GetTab(tab) + aimName + "." + field.Name + " = " + "(" + field.FieldType.FullName.Replace('+','.') + ")" + sourceName + "[\"" + GenerateProtocolFieldName(field) + "\"];\n";
                 }
 
                 else if (field.FieldType == typeof(string))
