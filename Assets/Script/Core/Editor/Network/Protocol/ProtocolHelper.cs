@@ -105,7 +105,10 @@ namespace FrameWork.Protocol
 
             for (int i = 0; i < fields.Length; i++)
             {
-                content += GetTab(1) + GenerateProtocolMessageField(fields[i], ref index);
+                if(!fields[i].IsStatic)
+                {
+                    content += GetTab(1) + GenerateProtocolMessageField(fields[i], ref index);
+                }
             }
 
             content += "}\n";
@@ -743,7 +746,7 @@ namespace FrameWork.Protocol
 
             for (int i = 0; i < msgList.Count; i++)
             {
-                if(GetSendMode(msgList[i]) == SendMode.ToClient
+                if (GetSendMode(msgList[i]) == SendMode.ToClient
                     || GetSendMode(msgList[i]) == SendMode.Both)
                 {
                     csharpContent += GenerateReceviceCommandContent(msgList[i]);
@@ -999,7 +1002,10 @@ namespace FrameWork.Protocol
 
             for (int i = 0; i < fields.Length; i++)
             {
-                content += GenerateSerializeFieldContent(tab, fields[i],aimName,sourceName);
+                if(!fields[i].IsStatic)
+                {
+                    content += GenerateSerializeFieldContent(tab, fields[i], aimName, sourceName);
+                }
             }
 
             return content;
@@ -1189,7 +1195,10 @@ namespace FrameWork.Protocol
 
             for (int i = 0; i < fields.Length; i++)
             {
-                content += GenerateAnalysisContent(tab, fields[i], aimName, sourceName);
+                if(!fields[i].IsStatic)
+                {
+                    content += GenerateAnalysisContent(tab, fields[i], aimName, sourceName);
+                }
             }
 
             return content;
