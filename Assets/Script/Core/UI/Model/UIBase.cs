@@ -9,7 +9,6 @@ public class UIBase : MonoBehaviour
     public Canvas m_canvas;
 
     #region 重载方法
-
     //当UI第一次打开时调用OnInit方法，调用时机在OnOpen之前
     public virtual void OnInit()
     {
@@ -87,7 +86,9 @@ public class UIBase : MonoBehaviour
         m_objects.Clear();
 
         m_images.Clear();
+        m_Sprites.Clear();
         m_texts.Clear();
+        m_textmeshs.Clear();
         m_buttons.Clear();
         m_scrollRects.Clear();
         m_reusingScrollRects.Clear();
@@ -104,6 +105,7 @@ public class UIBase : MonoBehaviour
         {
             if (m_objectList[i] != null)
             {
+                //Debug.Log("===>"+m_objectList[i].name);
                 if (m_objects.ContainsKey(m_objectList[i].name))
                 {
                     Debug.LogError("CreateObjectTable ContainsKey ->" + m_objectList[i].name + "<-");
@@ -124,7 +126,9 @@ public class UIBase : MonoBehaviour
 
     Dictionary<string, GameObject> m_objects = new Dictionary<string, GameObject>();
     Dictionary<string, Image> m_images = new Dictionary<string, Image>();
+    Dictionary<string, Sprite> m_Sprites = new Dictionary<string, Sprite>();
     Dictionary<string, Text> m_texts = new Dictionary<string, Text>();
+    Dictionary<string, TextMesh> m_textmeshs = new Dictionary<string, TextMesh>();
     Dictionary<string, Button> m_buttons = new Dictionary<string, Button>();
     Dictionary<string, ScrollRect> m_scrollRects = new Dictionary<string, ScrollRect>();
     Dictionary<string, ReusingScrollRect> m_reusingScrollRects = new Dictionary<string, ReusingScrollRect>();
@@ -207,7 +211,23 @@ public class UIBase : MonoBehaviour
         m_uiBases.Add(name, tmp);
         return tmp;
     }
+    public Sprite GetSprite(string name)
+    {
+        if (m_Sprites.ContainsKey(name))
+        {
+            return m_Sprites[name];
+        }
 
+        Sprite tmp = GetGameObject(name).GetComponent<Sprite>();
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetImage ->" + name + "<- is Null !");
+        }
+
+        m_Sprites.Add(name, tmp);
+        return tmp;
+    }
     public Image GetImage(string name)
     {
         if (m_images.ContainsKey(name))
@@ -225,7 +245,25 @@ public class UIBase : MonoBehaviour
         m_images.Add(name, tmp);
         return tmp;
     }
+    public TextMesh GetTextMesh(string name)
+    {
+        if (m_textmeshs.ContainsKey(name))
+        {
+            return m_textmeshs[name];
+        }
 
+        TextMesh tmp = GetGameObject(name).GetComponent<TextMesh>();
+
+
+
+        if (tmp == null)
+        {
+            throw new Exception(m_EventNames + " GetText ->" + name + "<- is Null !");
+        }
+
+        m_textmeshs.Add(name, tmp);
+        return tmp;
+    }
     public Text GetText(string name)
     {
         if (m_texts.ContainsKey(name))
@@ -873,9 +911,14 @@ public class UIBase : MonoBehaviour
         GetGameObject(TextID).transform.localScale = Vector3.right * x + Vector3.up * y + Vector3.forward * z;
     }
 
+    public void SetMeshText(string TextID, string txt)
+    {
+        GetTextMesh(TextID).text = txt;
+    }
+
     #endregion
 
-     #region 新手引导使用
+    #region 新手引导使用
 
     protected List<GameObject> m_GuideList = new List<GameObject>();
     protected Dictionary<GameObject, GuideChangeData> m_CreateCanvasDict = new Dictionary<GameObject, GuideChangeData>(); //保存Canvas的创建状态
@@ -1020,6 +1063,8 @@ public class UIBase : MonoBehaviour
 
     #endregion
 
+    #region 工具方法
+
     [ContextMenu("ObjectList 去重")]
     public void ClearObject()
     {
@@ -1041,4 +1086,5 @@ public class UIBase : MonoBehaviour
         m_objectList = ls;
     }
 
+    #endregion
 }
