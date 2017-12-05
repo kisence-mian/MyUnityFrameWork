@@ -662,7 +662,6 @@ public class SingleData : Dictionary<string, string>
             {
                 return data.m_defaultValue[key];
             }
-
         }
         catch (Exception e)
         {
@@ -670,6 +669,23 @@ public class SingleData : Dictionary<string, string>
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-");// throw  
+    }
+
+    string StringFilter(string content)
+    {
+        if(content == "Null"
+            || content == "null"
+            || content == "NULL"
+            || content == "nu11"
+            || content == "none"
+            || content == "nil" )
+        {
+            return null;
+        }
+        else
+        {
+            return content;
+        }
     }
 
     public Vector2 GetVector2(string key)

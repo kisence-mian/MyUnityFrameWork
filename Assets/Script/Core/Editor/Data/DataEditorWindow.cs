@@ -851,7 +851,8 @@ public class DataEditorWindow : EditorWindow
                 //默认字符类型
                 else
                 {
-                    content += "m_" + key + " = data." + OutPutFieldFunction(data.m_tableTypes[key], enumType) + "(\"" + key + "\")";
+                    content += "m_" + key + " = data." + OutPutFieldFunction(FieldType.String, enumType) + "(\"" + key + "\")";
+                    Debug.LogWarning("字段 " + key + "没有配置类型！");
                 }
 
                 content += ";\n";
