@@ -24,6 +24,8 @@ public class FirstStatus : IApplicationStatus
 
         AnimSystem.Move(go, null, Vector3.one, callBack: (object[] obj) => { }
             , parameter: new object[] { });
+
+        
     }
 
     //public void CallBackTest(InputNetworkEvent e)

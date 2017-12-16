@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.Text.RegularExpressions;
 
+[RequireComponent(typeof(UIStackManager))]
 [RequireComponent(typeof(UILayerManager))]
 [RequireComponent(typeof(UIAnimManager))]
 public class UIManager : MonoBehaviour
@@ -11,6 +12,7 @@ public class UIManager : MonoBehaviour
     public static GameObject s_UIManagerGo;
     public static UILayerManager s_UILayerManager; //UI层级管理器
     public static UIAnimManager s_UIAnimManager;   //UI动画管理器
+    public static UIStackManager s_UIStackManager; //UI栈管理器
     public static Camera s_UIcamera;               //UICamera
 
     static public Dictionary<string, List<UIWindowBase>> s_UIs     = new Dictionary<string, List<UIWindowBase>>(); //打开的UI
@@ -31,6 +33,7 @@ public class UIManager : MonoBehaviour
 
         s_UILayerManager = instance.GetComponent<UILayerManager>();
         s_UIAnimManager  = instance.GetComponent<UIAnimManager>();
+        s_UIStackManager = instance.GetComponent<UIStackManager>();
         s_UIcamera       = instance.GetComponentInChildren<Camera>();
 
         DontDestroyOnLoad(instance);
@@ -66,7 +69,7 @@ public class UIManager : MonoBehaviour
 
 #endregion
 
-#region UI的打开与关闭方法
+    #region UI的打开与关闭方法
 
     /// <summary>
     /// 创建UI,如果不打开则存放在Hide列表中
@@ -125,6 +128,7 @@ public class UIManager : MonoBehaviour
             Debug.LogError(UIName + " OnOpen Exception: " + e.ToString());
         }
 
+        s_UIStackManager.OnUIOpen(UIbase);
         s_UILayerManager.SetLayer(UIbase);      //设置层级
         s_UIAnimManager.StartEnterAnim(UIbase, callback, objs); //播放动画
         return UIbase;
@@ -178,6 +182,7 @@ public class UIManager : MonoBehaviour
             Debug.LogError(UI.UIName + " OnClose Exception: " + e.ToString());
         }
 
+        s_UIStackManager.OnUIClose(UI);
         AddHideUI(UI);
     }
     public static void CloseUIWindow(string UIname, bool isPlayAnim = true, UICallBack callback = null, params object[] objs)
@@ -292,9 +297,14 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public static void CloseLastUI(UIType uiType = UIType.Normal)
+    {
+        s_UIStackManager.CloseLastUIWindow(uiType);
+    }
+
 #endregion
 
-#region UI的打开与关闭 异步方法
+    #region UI的打开与关闭 异步方法
 
     public static void OpenUIAsync<T>( UICallBack callback, params object[] objs) where T : UIWindowBase
     {
@@ -315,7 +325,7 @@ public class UIManager : MonoBehaviour
 
 #endregion
 
-#region UI内存管理
+    #region UI内存管理
 
     public static void DestroyUI(UIWindowBase UI)
     {
@@ -350,7 +360,7 @@ public class UIManager : MonoBehaviour
 
 #endregion
 
-#region 打开UI列表的管理
+    #region 打开UI列表的管理
 
     /// <summary>
     /// 删除所有打开的UI
@@ -528,7 +538,7 @@ public class UIManager : MonoBehaviour
 
 #endregion
 
-#region 隐藏UI列表的管理
+    #region 隐藏UI列表的管理
 
     /// <summary>
     /// 删除所有隐藏的UI
@@ -630,7 +640,7 @@ public class UIManager : MonoBehaviour
 
 #endregion
 }
-#region UI事件 代理 枚举
+    #region UI事件 代理 枚举
 
     /// <summary>
     /// UI回调

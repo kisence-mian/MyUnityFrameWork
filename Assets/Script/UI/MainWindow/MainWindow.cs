@@ -52,6 +52,6 @@ public class MainWindow : UIWindowBase
 
     public void OnClickSetting(InputUIOnClickEvent e)
     {
-
+        UIManager.CloseLastUI();
     }
 }
