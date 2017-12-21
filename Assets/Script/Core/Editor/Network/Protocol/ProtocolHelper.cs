@@ -27,7 +27,6 @@ namespace FrameWork.Protocol
         #region c# -> protocol
 
         [MenuItem("Tools/Protocol/c# -> protocol")]
-
         static void StartGenerate()
         {
             GenerateList();
@@ -133,6 +132,27 @@ namespace FrameWork.Protocol
                     return "required int32 " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
                 }
             }
+
+            else if (field.FieldType == typeof(long))
+            {
+                if (field.GetCustomAttributes(typeof(Int8Attribute), true).Length > 0)
+                {
+                    return "required int8 " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
+                }
+                else if (field.GetCustomAttributes(typeof(Int16Attribute), true).Length > 0)
+                {
+                    return "required int16 " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
+                }
+                else if (field.GetCustomAttributes(typeof(Int32Attribute), true).Length > 0)
+                {
+                    return "required int32 " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
+                }
+                else
+                {
+                    return "required int64 " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
+                }
+            }
+
             else if (field.FieldType == typeof(bool))
             {
                 return "required bool " + GenerateProtocolFieldName(field) + " = " + count++ + ";\n";
@@ -189,6 +209,26 @@ namespace FrameWork.Protocol
                 else
                 {
                     return "int32";
+                }
+            }
+
+            else if (type == typeof(long))
+            {
+                if (type.GetCustomAttributes(typeof(Int8Attribute), true).Length > 0)
+                {
+                    return "int8";
+                }
+                else if (type.GetCustomAttributes(typeof(Int16Attribute), true).Length > 0)
+                {
+                    return "int16";
+                }
+                else if (type.GetCustomAttributes(typeof(Int32Attribute), true).Length > 0)
+                {
+                    return "int32";
+                }
+                else
+                {
+                    return "int64";
                 }
             }
             else if (type == typeof(bool))
@@ -1117,10 +1157,17 @@ namespace FrameWork.Protocol
                 {
                     content += GetTab(tab) + aimName +"." + field.Name + " = " + "(int)"+ sourceName + "[\"" + GenerateProtocolFieldName(field) + "\"];\n";
                 }
+                //目前不支持Long类型
+                else if (field.FieldType == typeof(long))
+                {
+                    content += GetTab(tab) + aimName + "." + field.Name + " = " + "(int)" + sourceName + "[\"" + GenerateProtocolFieldName(field) + "\"];\n";
+                }
+
                 else if (field.FieldType == typeof(bool))
                 {
                     content += GetTab(tab) + aimName + "." + field.Name + " = " + "(bool)" + sourceName + "[\"" + GenerateProtocolFieldName(field) + "\"];\n";
                 }
+
                 else if (field.FieldType == typeof(float))
                 {
                     content += GetTab(tab) + aimName + "." + field.Name + " = " + "(float)(double)" + sourceName + "[\"" + GenerateProtocolFieldName(field) + "\"];\n";
@@ -1210,6 +1257,12 @@ namespace FrameWork.Protocol
             {
                 return true;
             }
+
+            else if (type == typeof(long))
+            {
+                return true;
+            }
+
             else if (type == typeof(bool))
             {
                 return true;

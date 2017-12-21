@@ -294,7 +294,7 @@ public class FileTool
                     {
                         charByteCounter++;
                     }
-                    //标记位首位若为非0 则至少以2个1开始 如:110XXXXX...........1111110X　 
+                    //标记位首位若为非0 则至少以2个1开始 如:110XXXXX......1111110X　 
                     if (charByteCounter == 1 || charByteCounter > 6)
                     {
                         return false;

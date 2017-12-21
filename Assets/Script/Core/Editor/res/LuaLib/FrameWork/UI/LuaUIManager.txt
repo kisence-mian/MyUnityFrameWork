@@ -15,7 +15,7 @@ function LuaUIManager.UIOnInit(UIWindow_window)
 		t_UIWindow:OnInit();
 
 	else
-		error("没有找到 ->"..UIWindow_window.UIName.."<- 对应的Lua脚本!");
+		error("没有找到 ->".UIWindow_window.UIName."<- 对应的Lua脚本!");
 	end
 end
 
@@ -26,7 +26,7 @@ function LuaUIManager.UIOnOpen(UIWindow_window)
 	if t_UI ~= nil then
 		t_UI:OnOpen();
 	else
-		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnOpen Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 
@@ -37,7 +37,7 @@ function LuaUIManager.UIOnShow(UIWindow_window)
 	if t_UI ~= nil then
 		t_UI:OnShow();
 	else
-		error("UIOnShow Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnShow Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 
@@ -48,7 +48,7 @@ function LuaUIManager.UIOnHide(UIWindow_window)
 	if t_UI ~= nil then
 		t_UI:OnHide();
 	else
-		error("UIOnHide Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnHide Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 
@@ -59,7 +59,7 @@ function LuaUIManager.UIOnEnterAnim(UIWindow_window)
 	if t_UI ~= nil then
 		return t_UI:EnterAnim();
 	else
-		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnOpen Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 
@@ -69,7 +69,7 @@ function LuaUIManager.UIOnCompleteEnterAnim(UIWindow_window)
 	if t_UI ~= nil then
 		t_UI:OnCompleteEnterAnim();
 	else
-		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnOpen Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 
@@ -79,7 +79,7 @@ function LuaUIManager.UIOnRefresh(UIWindow_window)
 	if t_UI ~= nil then
 		t_UI:OnRefresh();
 	else
-		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnOpen Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 
@@ -89,7 +89,7 @@ function LuaUIManager.UIOnClose(UIWindow_window)
 	if t_UI ~= nil then
 		t_UI:OnClose();
 	else
-		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnOpen Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 
@@ -99,7 +99,7 @@ function LuaUIManager.UIOnExitAnim(UIWindow_window)
 	if t_UI ~= nil then
 		return t_UI:ExitAnim();
 	else
-		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnOpen Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 
@@ -109,7 +109,7 @@ function LuaUIManager.UIOnCompleteExitAnim(UIWindow_window)
 	if t_UI ~= nil then
 		t_UI:OnCompleteExitAnim();
 	else
-		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnOpen Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 
@@ -121,7 +121,7 @@ function LuaUIManager.UIOnDestroy(UIWindow_window)
 		t_UI:OnDestroy();
 		LuaUIManager.t_UIs[UIWindow_window.UIEventKey] = nil;
 	else
-		error("UIOnDestroy Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+		error("UIOnDestroy Error Not Find ->".UIWindow_window.UIEventKey."<- ");
 	end
 end
 

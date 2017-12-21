@@ -62,7 +62,7 @@ public class Deserializer {
         ///     int type = src["type"];
         ///     if (type == 0) { return new Apple; }
         ///     if (type == 1) { return new Raspberry; }
-        ///     ..
+        ///     .
         /// </code>
         /// If the parent has info on the type you can do this
         /// <code>
@@ -77,7 +77,7 @@ public class Deserializer {
         ///     int typeInBasket = parentSrc['typeInBasket'];
         ///     if (type == 0) { return new Apple; }
         ///     if (type == 1) { return new Raspberry; }
-        ///     ..
+        ///     .
         /// </code>
         /// </example>
         /// <returns>The created object</returns>
@@ -122,7 +122,7 @@ public class Deserializer {
     ///         public int hp;
     ///         public Foo someFoo;
     ///     };
-    /// ...
+    /// ..
     ///     Deserializer deserializer = new Deserializer();
     ///
     ///     string json = "{\"hp\":123,\"someFoo\":{\"num\":456,\"name\":\"gman\",\"weight\":156.4}}";
@@ -158,7 +158,7 @@ public class Deserializer {
     ///         public int hp;
     ///         public Foo someFoo;
     ///     };
-    /// ...
+    /// ..
     ///     Deserializer deserializer = new Deserializer();
     ///
     ///     Dictionary<string, object> d = new Dictionary<string, object>

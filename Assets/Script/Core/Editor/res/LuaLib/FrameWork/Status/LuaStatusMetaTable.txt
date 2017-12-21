@@ -27,12 +27,12 @@ end
 
 function LuaStatusMetaTable:OpenUIWindow(s_WindowName,func_callBack,parms)
 	
-	print("LuaStatusMetaTable:OpenUIWindow: "..tostring(s_WindowName));
+	print("LuaStatusMetaTable:OpenUIWindow: ".tostring(s_WindowName));
 
 	if LuaStatusMetaTable.t_windowList[s_WindowName] == nil then
 		LuaStatusMetaTable.t_windowList[s_WindowName] = {};
 	else
-		error("LuaStatusMetaTable:OpenUIWindow 覆盖了 "..tostring(s_WindowName).."! 请检查界面是否重复打开");
+		error("LuaStatusMetaTable:OpenUIWindow 覆盖了 ".tostring(s_WindowName)."! 请检查界面是否重复打开");
 	end
 
 	LuaStatusMetaTable.t_windowList[s_WindowName].s_WindowName = s_WindowName;
@@ -41,7 +41,7 @@ end
 
 function LuaStatusMetaTable:CloseUIWindow(s_WindowName,isPlayAnim,func_callBack,parms)
 	
-	print("LuaStatusMetaTable:CloseUIWindow: "..tostring(s_WindowName));
+	print("LuaStatusMetaTable:CloseUIWindow: ".tostring(s_WindowName));
 	
 	if s_WindowName == nil then
 		error("CloseUIWindow error : s_WindowName is nil");
@@ -49,7 +49,7 @@ function LuaStatusMetaTable:CloseUIWindow(s_WindowName,isPlayAnim,func_callBack,
 	end
 
 	if LuaStatusMetaTable.t_windowList[s_WindowName] == nil then
-		error("Not Exits ->"..tostring(s_WindowName).."<- Window !");
+		error("Not Exits ->".tostring(s_WindowName)."<- Window !");
 		return;
 	end
 
@@ -65,7 +65,7 @@ end
 function LuaStatusMetaTable:CloseALLUIWindow()
 	
 	for k,v in pairs(LuaStatusMetaTable.t_windowList) do
-		-- print("Close: "..v.s_WindowName);
+		-- print("Close: ".v.s_WindowName);
 		self:CloseUIWindow(v.s_WindowName);
 	end
 

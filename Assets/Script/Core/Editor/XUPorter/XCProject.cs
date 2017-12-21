@@ -706,7 +706,7 @@ namespace UnityEditor.XCodeEditor
 		{	
 			PBXGroup modGroup = this.GetGroup( mod.group );
 			
-			Debug.Log( "Adding libraries..." );
+			Debug.Log( "Adding libraries.." );
 			
 			foreach( XCModFile libRef in mod.libs ) {
 				string completeLibPath = System.IO.Path.Combine( "usr/lib", libRef.filePath );
@@ -714,7 +714,7 @@ namespace UnityEditor.XCodeEditor
 				this.AddFile( completeLibPath, modGroup, "SDKROOT", true, libRef.isWeak );
 			}
 			
-			Debug.Log( "Adding frameworks..." );
+			Debug.Log( "Adding frameworks.." );
 			PBXGroup frameworkGroup = this.GetGroup( "Frameworks" );
 			foreach( string framework in mod.frameworks ) {
 				string[] filename = framework.Split( ':' );
@@ -723,13 +723,13 @@ namespace UnityEditor.XCodeEditor
 				this.AddFile( completePath, frameworkGroup, "SDKROOT", true, isWeak );
 			}
 
-			Debug.Log( "Adding files..." );
+			Debug.Log( "Adding files.." );
 			foreach( string filePath in mod.files ) {
 				string absoluteFilePath = System.IO.Path.Combine( mod.path, filePath );
 				this.AddFile( absoluteFilePath, modGroup );
 			}
 
-			Debug.Log( "Adding embed binaries..." );
+			Debug.Log( "Adding embed binaries.." );
 			if (mod.embed_binaries != null)
 			{
 				//1. Add LD_RUNPATH_SEARCH_PATHS for embed framework
@@ -742,14 +742,14 @@ namespace UnityEditor.XCodeEditor
 				}
 			}
 			
-			Debug.Log( "Adding folders..." );
+			Debug.Log( "Adding folders.." );
 			foreach( string folderPath in mod.folders ) {
 				string absoluteFolderPath = System.IO.Path.Combine( Application.dataPath, folderPath );
 				Debug.Log ("Adding folder " + absoluteFolderPath);
 				this.AddFolder( absoluteFolderPath, modGroup, (string[])mod.excludes.ToArray( typeof(string) ) );
 			}
 			
-			Debug.Log( "Adding headerpaths..." );
+			Debug.Log( "Adding headerpaths.." );
 			foreach( string headerpath in mod.headerpaths ) {
 				if (headerpath.Contains("$(inherited)")) {
 					Debug.Log ("not prepending a path to " + headerpath);
@@ -760,17 +760,17 @@ namespace UnityEditor.XCodeEditor
 				}
 			}
 
-			Debug.Log( "Adding compiler flags..." );
+			Debug.Log( "Adding compiler flags.." );
 			foreach( string flag in mod.compiler_flags ) {
 				this.AddOtherCFlags( flag );
 			}
 
-			Debug.Log( "Adding linker flags..." );
+			Debug.Log( "Adding linker flags.." );
 			foreach( string flag in mod.linker_flags ) {
 				this.AddOtherLinkerFlags( flag );
 			}
 
-			Debug.Log ("Adding plist items...");
+			Debug.Log ("Adding plist items..");
 			string plistPath = this.projectRootPath + "/Info.plist";
 			XCPlist plist = new XCPlist (plistPath);
 			plist.Process(mod.plist);

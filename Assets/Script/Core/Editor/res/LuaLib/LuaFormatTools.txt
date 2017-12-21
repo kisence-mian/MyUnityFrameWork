@@ -9,19 +9,19 @@ end
 function sec2string(sec)
 	local d,h,m,s = sec2time(sec)
 	local str = ""
-	if d>0 then	str = d..":" end
+	if d>0 then	str = d.":" end
 	if h>0 then
-		h = h<=9 and "0"..h or h
-		str = str=="" and h or str..":"..h
+		h = h<=9 and "0".h or h
+		str = str=="" and h or str.":".h
 	end
 	
 	if tonumber(d)>0 or tonumber(h)>0 or tonumber(m)>0 then
-		m = m<=9 and "0"..m or m
-		str = str=="" and m or str..":"..m
+		m = m<=9 and "0".m or m
+		str = str=="" and m or str.":".m
 	end
 
-	s = s<=9 and "0"..s or s
-	str = str=="" and s or str..":"..s
+	s = s<=9 and "0".s or s
+	str = str=="" and s or str.":".s
 
 	return str
 end
@@ -54,17 +54,17 @@ end
 function string.replace (allstr,str,nstr)
 	return (string.gsub(allstr,str,nstr))--没有括号会返回替换次数
 end
---替换所有$[num]... 为 {...}中的个数值
-function string.replace_tbl (...)
+--替换所有$[num].. 为 {..}中的个数值
+function string.replace_tbl (..)
 	local allstr = "replace tbl no succ!"
-	local tmp = {...}
+	local tmp = {..}
 	if tmp == nil then return allstr end
 	for i,v in ipairs(tmp) do
 		if i == 1 then
 			allstr = v
 		end
 		if allstr~=nil and i>1 then
-			allstr = (string.replace(allstr,tostring("$"..(i-1)),v))
+			allstr = (string.replace(allstr,tostring("$".(i-1)),v))
 		end
 	end
 	return allstr

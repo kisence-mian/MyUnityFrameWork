@@ -20,7 +20,7 @@ function LuaStatusManager:EnterStatus(s_StatusName)
 			--调用Init方法
 			t_status:OnStatusInit();
 		else
-			error("EnterStatus 没有找到 ->"..tostring(s_StatusName).."<- Status");
+			error("EnterStatus 没有找到 ->".tostring(s_StatusName)."<- Status");
 		end
 	end
 
@@ -39,7 +39,7 @@ function LuaStatusManager:ExitStatus(s_StatusName)
 		t_status:CloseALLUIWindow();
 		t_status:OnExitStatus();
 	else
-		error("ExitStatus 没有找到 ->"..tostring(s_StatusName).."<- Status");
+		error("ExitStatus 没有找到 ->".tostring(s_StatusName)."<- Status");
 	end
 
 end
@@ -58,7 +58,7 @@ function LuaStatusManager:DestroyStatus(s_StatusName)
 		t_status:OnStatusDestroy();
 		self.t_statusDict[s_StatusName] = nil;
 	else
-		error("DestroyStatus 没有找到 ->"..tostring(s_StatusName).."<- Status");
+		error("DestroyStatus 没有找到 ->".tostring(s_StatusName)."<- Status");
 	end
 
 end
@@ -71,7 +71,7 @@ function LuaStatusManager:GetStatus(s_StatusName)
 
 		return t_status;
 	else
-		error("GetStatus 没有找到 ->"..tostring(s_StatusName).."<- Status");
+		error("GetStatus 没有找到 ->".tostring(s_StatusName)."<- Status");
 	end
 
 end

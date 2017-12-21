@@ -1233,6 +1233,12 @@ namespace Protocol
     public class Int8Attribute : System.Attribute { }
 
     /// <summary>
+    /// 在Protocol以Int32传输的字段
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field)]
+    public class Int32Attribute : System.Attribute { }
+
+    /// <summary>
     /// 模块名与模块消息编码
     /// </summary>
     [AttributeUsage(AttributeTargets.Class| AttributeTargets.Interface)]

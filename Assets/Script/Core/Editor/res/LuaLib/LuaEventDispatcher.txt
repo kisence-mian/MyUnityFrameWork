@@ -9,11 +9,11 @@ local ipairs = _G.ipairs
 module ("EventDispatcher", package.seeall)
 
 -- 默认调用函数
-local function PreInvoke( EventName, Func, Object, UserData, ... )
+local function PreInvoke( EventName, Func, Object, UserData, .. )
     if Object then
-        Func( Object, EventName, ... )
+        Func( Object, EventName, .. )
     else
-        Func( EventName, ... )
+        Func( EventName, .. )
     end
  
 end
@@ -62,7 +62,7 @@ end
  
 -- 派发
 local te_time = 0;
-function Dispatch( Self, EventName, ... )
+function Dispatch( Self, EventName, .. )
     assert( EventName )
     --print("Dispatch")
     local Event = Self.mEventTable[ EventName ]
@@ -76,13 +76,13 @@ function Dispatch( Self, EventName, ... )
         if Object == "_StaticFunc" then
                 
             for Func, UserData in pairs( ObjectFunc ) do
-                Self.mPreInvokeFunc( EventName, Func, nil, UserData, ... );
+                Self.mPreInvokeFunc( EventName, Func, nil, UserData, .. );
             end
             
         else
         
             for Func, UserData in pairs( ObjectFunc ) do
-                Self.mPreInvokeFunc( EventName, Func, Object, UserData, ... );
+                Self.mPreInvokeFunc( EventName, Func, Object, UserData, .. );
             end
         end
     end

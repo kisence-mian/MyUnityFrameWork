@@ -105,7 +105,7 @@ end
 function judge_yieldCallBack(n_timeDelta)
 	for k,v in pairs(t_yieldCallBackList) do
 	    -- if (os.clock() - n_timeTmp) > c_timerMaxTime then
-	    -- 	print(os.clock() .. " " ..n_timeTmp.." "..c_timerMaxTime)
+	    -- 	print(os.clock() . " " .n_timeTmp." ".c_timerMaxTime)
 	    -- 	break;
 	    -- end
 		v.time = v.time - n_timeDelta;
@@ -113,7 +113,7 @@ function judge_yieldCallBack(n_timeDelta)
 			t_yieldCallBackList[k] = nil;
 			local r, msg = pcall(v.func,v.data)
 		    if not r then
-		        error("judge_yieldCallBack error !:"..tostring(msg));
+		        error("judge_yieldCallBack error !:".tostring(msg));
 		    end
 		end
 	end
@@ -128,7 +128,7 @@ function judge_yieldCallBack(n_timeDelta)
 
 			local r, msg = pcall(v.func,v.data)
 		    if not r then
-		        error("judge_nextFrame error !:"..tostring(msg));
+		        error("judge_nextFrame error !:".tostring(msg));
 		    end
 		end
 	end
@@ -142,5 +142,5 @@ end
 
 function TimerSwitch()
 	b_isStop = not b_isStop;
-	warn("b_isStop: "..tostring(b_isStop));
+	warn("b_isStop: ".tostring(b_isStop));
 end

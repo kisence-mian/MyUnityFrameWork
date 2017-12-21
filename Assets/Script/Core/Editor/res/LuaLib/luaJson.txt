@@ -34,7 +34,7 @@
 
      -- Handle strings
      if vtype=='string' then    
-       return '"' .. json_private.encodeString(v) .. '"'     -- Need to handle encoding in string
+       return '"' . json_private.encodeString(v) . '"'     -- Need to handle encoding in string
      end
      
      -- Handle booleans
@@ -54,14 +54,14 @@
        else -- An object, not an array
          for i,j in pairs(v) do
            if isEncodable(i) and isEncodable(j) then
-             table.insert(rval, '"' .. json_private.encodeString(i) .. '":' .. json.encode(j))
+             table.insert(rval, '"' . json_private.encodeString(i) . '":' . json.encode(j))
            end
          end
        end
        if bArray then
-         return '[' .. table.concat(rval,',') ..']'
+         return '[' . table.concat(rval,',') .']'
        else
-         return '{' .. table.concat(rval,',') .. '}'
+         return '{' . table.concat(rval,',') . '}'
        end
      end
      
@@ -70,13 +70,13 @@
        return 'null'
      end
      
-     assert(false,'encode attempt to encode unsupported type ' .. vtype .. ':' .. tostring(v))
+     assert(false,'encode attempt to encode unsupported type ' . vtype . ':' . tostring(v))
    end
 
    function json.decode(s, startPos)
      startPos = startPos and startPos or 1
      startPos = decode_scanWhitespace(s,startPos)
-     assert(startPos<=string.len(s), 'Unterminated JSON encoded object found at position in [' .. s .. ']')
+     assert(startPos<=string.len(s), 'Unterminated JSON encoded object found at position in [' . s . ']')
      local curChar = string.sub(s,startPos,startPos)
      -- Object
      if curChar=='{' then
@@ -108,7 +108,7 @@
    function decode_scanArray(s,startPos)
      local array = {}   -- The return value
      local stringLen = string.len(s)
-     assert(string.sub(s,startPos,startPos)=='[','decode_scanArray called but array does not start at position ' .. startPos .. ' in string:\n'..s )
+     assert(string.sub(s,startPos,startPos)=='[','decode_scanArray called but array does not start at position ' . startPos . ' in string:\n'.s )
      startPos = startPos + 1
      -- Infinite loop for array elements
      repeat
@@ -129,9 +129,9 @@
 
 
    function decode_scanComment(s, startPos)
-     assert( string.sub(s,startPos,startPos+1)=='/*', "decode_scanComment called but comment does not start at position " .. startPos)
+     assert( string.sub(s,startPos,startPos+1)=='/*', "decode_scanComment called but comment does not start at position " . startPos)
      local endPos = string.find(s,'*/',startPos+2)
-     assert(endPos~=nil, "Unterminated comment in string at " .. startPos)
+     assert(endPos~=nil, "Unterminated comment in string at " . startPos)
      return endPos+2  
    end
 
@@ -144,7 +144,7 @@
          return consts[k], startPos + string.len(k)
        end
      end
-     assert(nil, 'Failed to scan constant from string ' .. s .. ' at starting position ' .. startPos)
+     assert(nil, 'Failed to scan constant from string ' . s . ' at starting position ' . startPos)
    end
 
    function decode_scanNumber(s,startPos)
@@ -156,9 +156,9 @@
       ) do
        endPos = endPos + 1
      end
-     local stringValue = 'return ' .. string.sub(s,startPos, endPos-1)
+     local stringValue = 'return ' . string.sub(s,startPos, endPos-1)
      local stringEval = loadstring(stringValue)
-     assert(stringEval, 'Failed to scan number [ ' .. stringValue .. '] in JSON string at position ' .. startPos .. ' : ' .. endPos)
+     assert(stringEval, 'Failed to scan number [ ' . stringValue . '] in JSON string at position ' . startPos . ' : ' . endPos)
      return stringEval(), endPos
    end
 
@@ -166,7 +166,7 @@
      local object = {}
      local stringLen = string.len(s)
      local key, value
-     assert(string.sub(s,startPos,startPos)=='{','decode_scanObject called but object does not start at position ' .. startPos .. ' in string:\n' .. s)
+     assert(string.sub(s,startPos,startPos)=='{','decode_scanObject called but object does not start at position ' . startPos . ' in string:\n' . s)
      startPos = startPos + 1
      repeat
        startPos = decode_scanWhitespace(s,startPos)
@@ -181,12 +181,12 @@
        assert(startPos<=stringLen, 'JSON string ended unexpectedly scanning object.')
        -- Scan the key
        key, startPos = json.decode(s,startPos)
-       assert(startPos<=stringLen, 'JSON string ended unexpectedly searching for value of key ' .. key)
+       assert(startPos<=stringLen, 'JSON string ended unexpectedly searching for value of key ' . key)
        startPos = decode_scanWhitespace(s,startPos)
-       assert(startPos<=stringLen, 'JSON string ended unexpectedly searching for value of key ' .. key)
-       assert(string.sub(s,startPos,startPos)==':','JSON object key-value assignment mal-formed at ' .. startPos)
+       assert(startPos<=stringLen, 'JSON string ended unexpectedly searching for value of key ' . key)
+       assert(string.sub(s,startPos,startPos)==':','JSON object key-value assignment mal-formed at ' . startPos)
        startPos = decode_scanWhitespace(s,startPos+1)
-       assert(startPos<=stringLen, 'JSON string ended unexpectedly searching for value of key ' .. key)
+       assert(startPos<=stringLen, 'JSON string ended unexpectedly searching for value of key ' . key)
        value, startPos = json.decode(s,startPos)
        object[key]=value
      until false  -- infinite loop while key-value pairs are found
@@ -205,12 +205,12 @@
    end})
 
    function decode_scanString(s,startPos)
-     assert(startPos, 'decode_scanString(..) called without start position')
+     assert(startPos, 'decode_scanString(.) called without start position')
      local startChar = string.sub(s,startPos,startPos)
      -- START SoniEx2
      -- PS: I don't think single quotes are valid JSON
      assert(startChar == [["]] or startChar == [[']],'decode_scanString called for a non-string')
-     --assert(startPos, "String decoding failed: missing closing " .. startChar .. " for string at position " .. oldStart)
+     --assert(startPos, "String decoding failed: missing closing " . startChar . " for string at position " . oldStart)
      local t = {}
      local i,j = startPos,startPos
      while string.find(s, startChar, j+1) ~= j+1 do
@@ -225,7 +225,7 @@
          local a = string.sub(s,j+1,j+4)
          j = j + 4
          local n = tonumber(a, 16)
-         assert(n, "String decoding failed: bad Unicode escape " .. a .. " at position " .. i .. " : " .. j)
+         assert(n, "String decoding failed: bad Unicode escape " . a . " at position " . i . " : " . j)
          -- math.floor(x/2^y) == lazy right shift
          -- a % 2^b == bitwise_and(a, (2^b)-1)
          -- 64 = 2^6
@@ -246,7 +246,7 @@
        end
      end
      table.insert(t,string.sub(j, j+1))
-     assert(string.find(s, startChar, j+1), "String decoding failed: missing closing " .. startChar .. " at position " .. j .. "(for string at position " .. startPos .. ")")
+     assert(string.find(s, startChar, j+1), "String decoding failed: missing closing " . startChar . " at position " . j . "(for string at position " . startPos . ")")
      return table.concat(t,""), j+2
      -- END SoniEx2
    end
