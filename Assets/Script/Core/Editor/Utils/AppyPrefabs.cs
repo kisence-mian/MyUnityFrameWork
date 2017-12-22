@@ -7,7 +7,7 @@ public class AppyPrefabs : Editor
     static void BatchExportPrefab()
     {
         GameObject[] objs = Selection.gameObjects;
-        int len = objs.Length;
+        //int len = objs.Length;
         foreach (GameObject item in objs)
         {
             //if (PrefabUtility.GetPrefabType(item) == PrefabType.PrefabInstance){}
@@ -22,7 +22,7 @@ public class AppyPrefabs : Editor
     static void BatchRestPrefab()
     {
         GameObject[] objs = Selection.gameObjects;
-        int len = objs.Length;
+        //int len = objs.Length;
         foreach (GameObject item in objs)
         {
             //if (PrefabUtility.GetPrefabType(item) == PrefabType.PrefabInstance){}
