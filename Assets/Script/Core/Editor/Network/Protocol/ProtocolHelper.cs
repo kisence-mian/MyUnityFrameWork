@@ -37,10 +37,10 @@ namespace FrameWork.Protocol
             Debug.Log(protocolContent);
             Debug.Log(protocolList);
 
-            string ProtocolSavePath = Application.dataPath + "/Resources/Network/" + ProtocolService.c_ProtocolFileName + ".txt";
+            string ProtocolSavePath = Application.dataPath + "/Resources/Network/" + ProtocolNetworkService.c_ProtocolFileName + ".txt";
             ResourceIOTool.WriteStringByFile(ProtocolSavePath, protocolContent);
 
-            string MethodSavePath = Application.dataPath + "/Resources/Network/" + ProtocolService.c_methodNameInfoFileName + ".txt";
+            string MethodSavePath = Application.dataPath + "/Resources/Network/" + ProtocolNetworkService.c_methodNameInfoFileName + ".txt";
             ResourceIOTool.WriteStringByFile(MethodSavePath, protocolList);
 
             AssetDatabase.Refresh();
@@ -302,18 +302,18 @@ namespace FrameWork.Protocol
             string log = "自动生成 c# 类：->\n";
 
             s_SubStruct = new List<string>();
-            string path = Application.dataPath + "/Resources/Network/"+ ProtocolService .c_ProtocolFileName+ ".txt";
+            string path = Application.dataPath + "/Resources/Network/"+ ProtocolNetworkService .c_ProtocolFileName+ ".txt";
             string content = ResourceIOTool.ReadStringByFile(path);
 
-            Dictionary<string, List<Dictionary<string, object>>> protocolInfo = ProtocolService.ReadProtocolInfo(content);
+            Dictionary<string, List<Dictionary<string, object>>> protocolInfo = ProtocolNetworkService.ReadProtocolInfo(content);
 
-            path = Application.dataPath + "/Resources/Network/" + ProtocolService.c_methodNameInfoFileName + ".txt";
+            path = Application.dataPath + "/Resources/Network/" + ProtocolNetworkService.c_methodNameInfoFileName + ".txt";
             content = ResourceIOTool.ReadStringByFile(path);
 
             Dictionary<int, string> methodNameInfo;
             Dictionary<string, int> methodIndexInfo;
 
-            ProtocolService.ReadMethodNameInfo(out methodNameInfo,out methodIndexInfo, content);
+            ProtocolNetworkService.ReadMethodNameInfo(out methodNameInfo,out methodIndexInfo, content);
 
             string output = "using System.Collections.Generic;\n";
             output += "namespace Protocol\n{\n";
@@ -502,22 +502,22 @@ namespace FrameWork.Protocol
             int repeat = (int)currentFeidInfo["spl"];
             string content = "";
 
-            if (type == ProtocolService.TYPE_int32
-                || type == ProtocolService.TYPE_int16
-                || type == ProtocolService.TYPE_int8
+            if (type == ProtocolNetworkService.TYPE_int32
+                || type == ProtocolNetworkService.TYPE_int16
+                || type == ProtocolNetworkService.TYPE_int8
                 )
             {
                 content = "int";
             }
-            else if (type == ProtocolService.TYPE_string)
+            else if (type == ProtocolNetworkService.TYPE_string)
             {
                 content = "string";
             }
-            else if (type == ProtocolService.TYPE_double)
+            else if (type == ProtocolNetworkService.TYPE_double)
             {
                 content = "float";
             }
-            else if (type == ProtocolService.TYPE_bool)
+            else if (type == ProtocolNetworkService.TYPE_bool)
             {
                 content = "bool";
             }
@@ -531,7 +531,7 @@ namespace FrameWork.Protocol
                 }
             }
 
-            if(repeat == ProtocolService.RT_repeated)
+            if(repeat == ProtocolNetworkService.RT_repeated)
             {
                 content = "List<" + content + ">";
             }
@@ -545,11 +545,11 @@ namespace FrameWork.Protocol
 
             int type = (int)currentFeidInfo["type"];
 
-            if (type == ProtocolService.TYPE_int16)
+            if (type == ProtocolNetworkService.TYPE_int16)
             {
                 content = GetTab(tab) + "[Int16]\n";
             }
-            else if(type == ProtocolService.TYPE_int8)
+            else if(type == ProtocolNetworkService.TYPE_int8)
             {
                 content = GetTab(tab) + "[Int8]\n";
             }

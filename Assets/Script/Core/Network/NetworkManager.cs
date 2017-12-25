@@ -17,27 +17,54 @@ public class NetworkManager
                 return false;
             }
 
-            return s_network.isConnect;
+            return s_network.m_socketService.isConnect;
         }
     }
 
-    public static void Init<T>(ProtocolType protocolType = ProtocolType.Tcp) where T : INetworkInterface,new ()
+    /// <summary>
+    /// 对旧代码的兼容
+    /// </summary>
+    /// <typeparam name="T">协议处理类</typeparam>
+    /// <param name="protocolType"></param>
+    [Obsolete("New method is Init<TProtocol,TSocket>")]
+    public static void Init<T>(ProtocolType protocolType = ProtocolType.Tcp) where T : INetworkInterface, new()
+    {
+        Init<T, SocketService>();
+    }
+
+    [Obsolete("New method is Init(string networkInterfaceName,string socketName)")]
+    public static void Init(string networkInterfaceName)
+    {
+        Init(networkInterfaceName, "SocketService");
+    }
+
+    /// <summary>
+    /// 网络初始化
+    /// </summary>
+    /// <typeparam name="TProtocol">协议处理类</typeparam>
+    /// <typeparam name="TSocket">Socket类</typeparam>
+    /// <param name="protocolType">通讯协议</param>
+    public static void Init<TProtocol,TSocket>(ProtocolType protocolType = ProtocolType.Tcp) where TProtocol : INetworkInterface,new () where TSocket : SocketBase,new()
     {
         //提前加载网络事件派发器，避免异步冲突
         InputManager.LoadDispatcher<InputNetworkConnectStatusEvent>();
         InputManager.LoadDispatcher<InputNetworkMessageEvent>();
 
-        s_network = new T();
-        s_network.m_protocolType = protocolType;
+        s_network = new TProtocol();
+        s_network.m_socketService = new TSocket();
+        s_network.m_socketService.m_byteCallBack = s_network.SpiltMessage;
+        s_network.m_socketService.m_connectStatusCallback = ConnectStatusChange;
+        s_network.m_socketService.m_protocolType = protocolType;
+        s_network.m_socketService.Init();
+
         s_network.Init();
         s_network.m_messageCallBack = ReceviceMeaasge;
-        s_network.m_ConnectStatusCallback = ConnectStatusChange;
 
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationQuit += DisConnect;
     }
 
-    public static void Init(string networkInterfaceName)
+    public static void Init(string networkInterfaceName,string socketName)
     {
         //提前加载网络事件派发器，避免异步冲突
         InputManager.LoadDispatcher<InputNetworkConnectStatusEvent>();
@@ -46,9 +73,16 @@ public class NetworkManager
         Type type = Type.GetType(networkInterfaceName);
 
         s_network = Activator.CreateInstance(type) as INetworkInterface;
+
+        Type socketType = Type.GetType(networkInterfaceName);
+
+        s_network.m_socketService = Activator.CreateInstance(socketType) as SocketBase;
+        s_network.m_socketService.m_byteCallBack = s_network.SpiltMessage;
+        s_network.m_socketService.m_connectStatusCallback = ConnectStatusChange;
+        s_network.m_socketService.Init();
+
         s_network.Init();
         s_network.m_messageCallBack = ReceviceMeaasge;
-        s_network.m_ConnectStatusCallback = ConnectStatusChange;
 
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationQuit += DisConnect;
@@ -60,7 +94,6 @@ public class NetworkManager
         InputManager.UnLoadDispatcher<InputNetworkMessageEvent>();
 
         s_network.m_messageCallBack = null;
-        s_network.m_ConnectStatusCallback = null;
         s_network = null;
 
         ApplicationManager.s_OnApplicationUpdate -= Update;
@@ -198,6 +231,7 @@ public class NetworkManager
     #endregion
 }
 
+public delegate void ByteCallBack(byte[] data, ref int offset, int length);
 public delegate void MessageCallBack(NetWorkMessage receStr);
 public delegate void ConnectStatusCallBack(NetworkState connectStstus);
 
