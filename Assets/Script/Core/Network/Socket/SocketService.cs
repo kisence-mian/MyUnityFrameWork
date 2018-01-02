@@ -8,7 +8,7 @@ using UnityEngine;
 
 public class SocketService : SocketBase
 {
-    private Socket m_Socket;
+    protected Socket m_Socket;
     private Thread m_connThread;
 
     protected int m_offset = 0;
@@ -19,6 +19,7 @@ public class SocketService : SocketBase
     {
         m_acb = new AsyncCallback(EndReceive);
     }
+
 
     public override void Close()
     {

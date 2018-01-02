@@ -25,10 +25,7 @@ public abstract class SocketBase
 
     }
 
-    /// <summary>
-    /// 传入时间
-    /// </summary>
-    public virtual void Update()
+    public virtual void Dispose()
     {
 
     }
