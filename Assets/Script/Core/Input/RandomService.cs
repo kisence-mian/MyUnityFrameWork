@@ -92,9 +92,6 @@ public class RandomService
             throw new Exception("RandomService Exception no RandomList!");
         }
     }
-
-
-
 }
 
 public delegate void RandomHandel(int random);

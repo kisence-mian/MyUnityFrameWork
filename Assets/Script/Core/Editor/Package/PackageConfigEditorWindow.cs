@@ -745,9 +745,14 @@ public class BundleConfigEditorWindow : EditorWindow
 
     void UpdateRelyPackageNames()
     {
-        RelyPackageNames = new string[relyPackages.Count];
+        RelyPackageNames = new string[1];
+
+        if (relyPackages.Count > 0)
+            RelyPackageNames = new string[relyPackages.Count];
+
         for (int i = 0; i < relyPackages.Count; i++)
         {
+
             RelyPackageNames[i] = relyPackages[i].name;
         }
     }
