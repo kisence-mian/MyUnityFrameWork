@@ -32,7 +32,10 @@ public abstract class INetworkInterface
     {
         m_socketService.Close();
     }
-
+    public virtual void Update()
+    {
+        m_socketService.Update();
+    }
     public virtual void SendMessage(string MessageType, Dictionary<string, object> data)
     {
 

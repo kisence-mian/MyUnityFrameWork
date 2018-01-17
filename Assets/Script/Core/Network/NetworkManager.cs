@@ -62,6 +62,8 @@ public class NetworkManager
 
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationQuit += DisConnect;
+
+        ApplicationManager.s_OnApplicationOnGUI += GUI;
     }
 
     public static void Init(string networkInterfaceName,string socketName)
@@ -152,11 +154,14 @@ public class NetworkManager
         }
     }
 
+    static int msgCount = 0;
+
     static void ReceviceMeaasge(NetWorkMessage message)
     {
         if(message.m_MessageType != null)
         {
             s_messageList.Add(message);
+            msgCount++;
         }
         else
         {
@@ -195,7 +200,7 @@ public class NetworkManager
 
     static List<NetworkState> s_statusList = new List<NetworkState>();
     static List<NetWorkMessage> s_messageList = new List<NetWorkMessage>();
-    const int MaxDealCount = 10;
+    const int MaxDealCount = 20;
 
     //将消息的处理并入主线程
     static void Update()
@@ -211,12 +216,15 @@ public class NetworkManager
                 s_messageList.RemoveAt(i);
                 i--;
 
-                if (dealCount >= MaxDealCount)
-                {
-                    break;
-                }
+                //if (dealCount >= MaxDealCount)
+                //{
+                //    Debug.Log("s_messageList.Count " + s_messageList.Count);
+
+                //    break;
+                //}
             }
         }
+
 
         if (s_statusList.Count > 0)
         {
@@ -226,6 +234,26 @@ public class NetworkManager
             }
             s_statusList.Clear();
         }
+       if(s_network != null)
+        {
+            s_network.Update();
+        }
+       
+    }
+    static float msgCountTimer = 0;
+    static int count = 0;
+    static void GUI()
+    {
+        msgCountTimer += Time.deltaTime;
+        GUILayout.Label("MPS " + count);
+
+        if (msgCountTimer > 1)
+        {
+            count = msgCount;
+            msgCountTimer = 0;
+            msgCount = 0;
+        }
+
     }
 
     #endregion

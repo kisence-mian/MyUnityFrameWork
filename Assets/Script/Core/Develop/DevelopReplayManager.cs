@@ -97,14 +97,17 @@ public class DevelopReplayManager
             Log.Init(true); //日志记录启动
 
             ApplicationManager.s_OnApplicationUpdate += OnRecordUpdate;
-            //InputManager.OnEveryEventDispatch += OnEveryEventCallBack;
+
             GUIConsole.onGUICallback += RecordModeGUI;
             GUIConsole.onGUICloseCallback += ProfileGUI;
 
-            //记录随机数列
-            RandomService.OnRandomCreat += OnGetRandomCallBack;
-
-            OpenWriteFileStream(GetLogFileName());
+            if (ApplicationManager.Instance.m_recordInput)
+            {
+                //记录随机数列
+                RandomService.OnRandomCreat += OnGetRandomCallBack;
+                InputManager.OnEveryEventDispatch += OnEveryEventCallBack; //记录输入
+                OpenWriteFileStream(GetLogFileName()); //开启文件流
+            }
         }
 
         ApplicationManager.s_OnApplicationOnGUI -= ReplayMenuGUI;
@@ -150,6 +153,7 @@ public class DevelopReplayManager
 
         try
         {
+
             string path = PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
                                          PathTool.GetRelativelyPath(
                                                         c_directoryName,
@@ -305,6 +309,12 @@ public class DevelopReplayManager
                 MenuStatus = DevMenuEnum.Log;
                 FileNameList = LogOutPutThread.GetLogFileNameList();
             }
+
+            if (GUILayout.Button("查看持久文件", GUILayout.ExpandHeight(true)))
+            {
+                MenuStatus = DevMenuEnum.PersistentFile;
+                FileNameList = PersistentFileManager.GetFileList();
+            }
         }
         else if (MenuStatus  == DevMenuEnum.Replay)
         {
@@ -313,6 +323,10 @@ public class DevelopReplayManager
         else if (MenuStatus == DevMenuEnum.Log)
         {
             LogGUI();
+        }
+        else if (MenuStatus == DevMenuEnum.PersistentFile)
+        {
+            PersistentFileGUI();
         }
     }
 
@@ -366,7 +380,7 @@ public class DevelopReplayManager
         }
     }
 
-    static string LogContent = "";
+    static string showContent = "";
     static string LogPath = "";
 
     static void ShowLogList()
@@ -379,7 +393,7 @@ public class DevelopReplayManager
             {
                 isShowLog = true;
                 scrollPos = Vector2.zero;
-                LogContent = LogOutPutThread.LoadLogContent(FileNameList[i]);
+                showContent = LogOutPutThread.LoadLogContent(FileNameList[i]);
                 LogPath = LogOutPutThread.GetPath(FileNameList[i]);
             }
         }
@@ -408,7 +422,7 @@ public class DevelopReplayManager
 
         try
         {
-            GUIUtil.SafeTextArea(LogContent);
+            GUIUtil.SafeTextArea(showContent);
         }
         catch(Exception e)
         {
@@ -432,7 +446,7 @@ public class DevelopReplayManager
         if (GUILayout.Button("复制到剪贴板"))
         {
             TextEditor tx = new TextEditor();
-            tx.text = LogContent;
+            tx.text = showContent;
             tx.OnFocus();
             tx.Copy();
         }
@@ -440,6 +454,113 @@ public class DevelopReplayManager
         if (GUILayout.Button("返回上层"))
         {
             isShowLog = false;
+        }
+    }
+
+    #endregion
+
+    #region PersistentFileGUI
+
+    static bool isShowPersistentFile = false;
+    static void PersistentFileGUI()
+    {
+        if (isShowPersistentFile)
+        {
+            ShowPersistentFile();
+        }
+        else
+        {
+            ShowPersistentFileList();
+        }
+    }
+
+    static void ShowPersistentFile()
+    {
+        scrollPos = GUILayout.BeginScrollView(scrollPos);
+
+        try
+        {
+            GUIUtil.SafeTextArea(showContent);
+        }
+        catch (Exception e)
+        {
+            GUILayout.TextArea(e.ToString());
+        }
+
+        GUILayout.EndScrollView();
+
+        if (URLManager.GetURL("PersistentFileUpLoadURL") != null)
+        {
+            if (GUILayout.Button("上传持久数据"))
+            {
+                HTTPTool.Upload_Request_Thread(URLManager.GetURL("PersistentFileUpLoadURL"), LogPath);
+            }
+        }
+        else
+        {
+            GUILayout.Label("上传持久数据需要在 URLConfig -> PersistentFileUpLoadURL 配置上传目录");
+        }
+
+        if (GUILayout.Button("复制到剪贴板"))
+        {
+            TextEditor tx = new TextEditor();
+            tx.text = showContent;
+            tx.OnFocus();
+            tx.Copy();
+        }
+
+        if (GUILayout.Button("返回上层"))
+        {
+            isShowPersistentFile = false;
+        }
+    }
+
+    static void ShowPersistentFileList()
+    {
+        scrollPos = GUILayout.BeginScrollView(scrollPos);
+
+        for (int i = 0; i < FileNameList.Length; i++)
+        {
+            if (GUILayout.Button(FileNameList[i]))
+            {
+                isShowPersistentFile = true;
+                scrollPos = Vector2.zero;
+                showContent = PersistentFileManager.GetData(FileNameList[i]);
+                LogPath = PersistentFileManager.GetPath(FileNameList[i]);
+            }
+        }
+
+        GUILayout.EndScrollView();
+
+        if (URLManager.GetURL("PersistentFileUpLoadURL") != null)
+        {
+            if (GUILayout.Button("上传所有持久数据文件"))
+            {
+                for (int i = 0; i < FileNameList.Length; i++)
+                {
+                    string path = PersistentFileManager.GetPath(FileNameList[i]);
+                    HTTPTool.Upload_Request_Thread(URLManager.GetURL("PersistentFileUpLoadURL"), path);
+                }
+            }
+        }
+        else
+        {
+            GUILayout.Label("上传持久数据文件需要在 URLConfig -> PersistentFileUpLoadURL 配置上传目录");
+        }
+
+        if (GUILayout.Button("清除持久数据文件"))
+        {
+            OpenWarnWindow("确定要删除所有持久数据文件吗？", () =>
+            {
+                Debug.Log("已删除所有持久数据文件");
+                FileTool.SafeDeleteDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, PersistentFileManager.c_directoryName));
+                FileNameList = new string[0];
+            });
+        }
+
+        if (GUILayout.Button("返回上层"))
+        {
+            MenuStatus = DevMenuEnum.MainMenu;
         }
     }
 
@@ -746,6 +867,7 @@ public class DevelopReplayManager
     {
         MainMenu,
         Replay,
-        Log
+        Log,
+        PersistentFile
     }
 }

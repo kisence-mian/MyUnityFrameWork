@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using UnityEngine;
 #pragma warning disable
 
 public class KCP
@@ -240,6 +241,7 @@ public class KCP
     // check the size of next message in the recv queue
     public int PeekSize()
     {
+        //Debug.Log("rcv_queue.Length :" + rcv_queue.Length);
         if (0 == rcv_queue.Length) return -1;
 
         var seq = rcv_queue[0];
@@ -512,7 +514,7 @@ public class KCP
             if (data.Length - offset < IKCP_OVERHEAD) break;
 
             offset += ikcp_decode32u(data, offset, ref conv_);
-
+            //Debug.Log("conv : " + conv + "  conv_ :" + conv_);
             if (conv != conv_) return -1;
 
             offset += ikcp_decode8u(data, offset, ref cmd);

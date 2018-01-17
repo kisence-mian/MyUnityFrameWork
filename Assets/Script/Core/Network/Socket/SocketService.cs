@@ -78,7 +78,9 @@ public class SocketService : SocketBase
 
             IPEndPoint ipe = new IPEndPoint(ip, m_port);
             //mSocket.
+            //m_Socket.NoDelay = false;
             m_Socket.Connect(ipe);
+
             isConnect = true;
             StartReceive();
 
@@ -115,5 +117,10 @@ public class SocketService : SocketBase
         {
             m_byteCallBack(m_readData, ref m_offset, length);
         }
+    }
+
+    public override void Update()
+    {
+       
     }
 }

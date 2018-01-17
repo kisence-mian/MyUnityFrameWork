@@ -42,7 +42,7 @@ public interface IHeapObjectInterface
 
     #region HeapObjectPool
 
-public class HeapObjectPool<T> where T : new()
+public static class HeapObjectPool<T> where T : new()
 {
     static Stack<T> s_pool = new Stack<T>();
 

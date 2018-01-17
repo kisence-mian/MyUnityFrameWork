@@ -56,4 +56,6 @@ public abstract class SocketBase
     ///关闭连接
     /// </summary>
     public abstract void Close();
+
+    public abstract void Update();
 }

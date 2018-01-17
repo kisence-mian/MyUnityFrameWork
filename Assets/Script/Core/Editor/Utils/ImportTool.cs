@@ -57,7 +57,7 @@ public class ImportTool : AssetPostprocessor
                 model.SaveAndReimport();
             }
         }
-        Debug.Log("OnPostprocessModel : " + g.name);
+        //Debug.Log("OnPostprocessModel : " + g.name);
     }
     bool isLoopAnimation(string objectName)
     {

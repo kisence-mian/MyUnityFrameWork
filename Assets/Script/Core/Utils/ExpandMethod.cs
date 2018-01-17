@@ -138,4 +138,20 @@ public static class ExpandMethod
 
         return angle;
     }
+
+    /// <summary>
+    /// 递归改变子节点的Scale
+    /// </summary>
+    public static void SetScale(this Transform tr, Vector3 scale,bool recursion = true)
+    {
+        tr.localScale = scale;
+        if(recursion)
+        {
+            foreach (Transform item in tr)
+            {
+                SetScale(item, scale);
+            }
+        }
+
+    }
 }

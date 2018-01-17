@@ -25,6 +25,10 @@ public class AnimData
     public int m_repeatCount = -1;
 
     //V3
+    public Vector4 m_fromV4;
+    public Vector4 m_toV4;
+
+    //V3
     public Vector3 m_fromV3;
     public Vector3 m_toV3;
 
@@ -61,6 +65,7 @@ public class AnimData
     public float[] m_floatContral = null;
 
     //自定义函数
+    public AnimCustomMethodVector4 m_customMethodV4;
     public AnimCustomMethodVector3 m_customMethodV3;
     public AnimCustomMethodVector2 m_customMethodV2;
     public AnimCustomMethodFloat m_customMethodFloat;
@@ -121,7 +126,8 @@ public class AnimData
 
                 case AnimType.Color: UpdateColor(); break;
                 case AnimType.Alpha: UpdateAlpha(); break;
-
+                    
+                case AnimType.Custom_Vector4: CustomMethodVector4(); break;
                 case AnimType.Custom_Vector3: CustomMethodVector3(); break;
                 case AnimType.Custom_Vector2: CustomMethodVector2(); break;
                 case AnimType.Custom_Float: CustomMethodFloat(); break;
@@ -280,6 +286,18 @@ public class AnimData
         try
         {
             m_customMethodV3(GetInterpolationV3(m_fromV3, m_toV3));
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
+    }
+
+    public void CustomMethodVector4()
+    {
+        try
+        {
+            m_customMethodV4(GetInterpolationV4(m_fromV4, m_toV4));
         }
         catch (Exception e)
         {
@@ -745,6 +763,28 @@ public class AnimData
         }
 
         return 0;
+    }
+
+    Vector3 GetInterpolationV4(Vector4 oldValue, Vector4 aimValue)
+    {
+        Vector3 result = Vector3.zero;
+
+        //暂不支持贝塞尔曲线
+        //if (m_pathType == PathType.Line)
+        //{
+            result = new Vector4(
+                GetInterpolation(oldValue.x, aimValue.x),
+                GetInterpolation(oldValue.y, aimValue.y),
+                GetInterpolation(oldValue.z, aimValue.z),
+                GetInterpolation(oldValue.w, aimValue.w)
+            );
+        //}
+        //else
+        //{
+        //    result = GetBezierInterpolationV3(oldValue, aimValue);
+        //}
+
+        return result;
     }
 
     Vector3 GetInterpolationV3(Vector3 oldValue, Vector3 aimValue)

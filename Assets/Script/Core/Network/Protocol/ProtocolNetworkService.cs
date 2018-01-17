@@ -34,7 +34,7 @@ public class ProtocolNetworkService : INetworkInterface
             out m_methodIndexInfo,
             ResourceManager.ReadTextFile(c_methodNameInfoFileName));
 
-        m_messageBuffer = new byte[204800];
+        m_messageBuffer = new byte[1024 * 1024 * 8];
 
         m_head = 0;
         m_total = 0;
@@ -76,6 +76,8 @@ public class ProtocolNetworkService : INetworkInterface
         WriteBytes(data, length);
         int i = 0;
 
+        //Debug.Log("GetBufferLength() " + GetBufferLength() + " ReadLength() " + ReadLength());
+
         while (GetBufferLength() != 0 && ReadLength() <= GetBufferLength())
         {
             ReceiveDataLoad(ReadByte(ReadLength()));
@@ -116,7 +118,6 @@ public class ProtocolNetworkService : INetworkInterface
         int result = (int)m_messageBuffer[m_head] << 8;
 
         int nextPos = m_head + 1;
-
         if (nextPos >= m_messageBuffer.Length)
         {
             nextPos = 0;

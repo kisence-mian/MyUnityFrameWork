@@ -45,6 +45,9 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
+    [Tooltip("是否记录输入到本地")]
+    public bool m_recordInput = true;
+
     //快速启动
     public bool m_quickLunch = true;
 

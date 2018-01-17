@@ -26,8 +26,8 @@ public class KCPService : SocketBase
     private bool mNeedUpdateFlag;
     private UInt32 mNextUpdateTime;
 
-    private bool mInConnectStage;
-    private bool mConnectSucceed;
+    //private bool mInConnectStage;
+    //private bool mConnectSucceed;
     private UInt32 mConnectStartTime;
     private UInt32 mLastSendConnectTime;
 
@@ -35,17 +35,30 @@ public class KCPService : SocketBase
 
     public override void Connect()
     {
+        Debug.Log("Connect " + m_IPaddress + " : " + m_port);
+
         mSvrEndPoint = new IPEndPoint(IPAddress.Parse(m_IPaddress), m_port);
         mUdpClient = new UdpClient(m_IPaddress, m_port);
-        mUdpClient.Connect(mSvrEndPoint);
+        m_connectStatusCallback(NetworkState.Connecting);
+        try
+        {
+            mUdpClient.Connect(mSvrEndPoint);
+            m_connectStatusCallback(NetworkState.Connected);
+            isConnect = true;
+        }
+        catch(Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
+
 
         reset_state();
-
-        mInConnectStage = true;
+        init_kcp(1);
+        //mInConnectStage = true;
         mConnectStartTime = iclock();
 
         mUdpClient.BeginReceive(ReceiveCallback, this);
-        m_connectStatusCallback(NetworkState.Connecting);
+       
     }
 
     void ReceiveCallback(IAsyncResult ar)
@@ -66,6 +79,7 @@ public class KCPService : SocketBase
 
     void OnData(byte[] buf)
     {
+        //Debug.Log("收到消息");
         mRecvQueue.Push(buf);
     }
 
@@ -74,8 +88,8 @@ public class KCPService : SocketBase
         mNeedUpdateFlag = false;
         mNextUpdateTime = 0;
 
-        mInConnectStage = false;
-        mConnectSucceed = false;
+        //mInConnectStage = false;
+        //mConnectSucceed = false;
         mConnectStartTime = 0;
         mLastSendConnectTime = 0;
         mRecvQueue.Clear();
@@ -97,10 +111,17 @@ public class KCPService : SocketBase
     {
         mKcp = new KCP(conv, (byte[] buf, int size) =>
         {
-            mUdpClient.Send(buf, size);
+            try
+            {
+                mUdpClient.Send(buf, size);
+            }catch(Exception e)
+            {
+                Debug.LogError(e);
+            }
         });
 
         mKcp.NoDelay(1, 10, 2, 1);
+        mKcp.WndSize(128, 128);
     }
 
     public override void Send(byte[] buf)
@@ -109,7 +130,7 @@ public class KCPService : SocketBase
         mNeedUpdateFlag = true;
     }
 
-    public void Update()
+    public override void Update()
     {
         update(iclock());
     }
@@ -121,47 +142,50 @@ public class KCPService : SocketBase
         m_connectStatusCallback(NetworkState.ConnectBreak);
     }
 
-    void process_connect_packet()
-    {
-        mRecvQueue.Switch();
+    //void process_connect_packet()
+    //{
+    //    mRecvQueue.Switch();
 
-        if (!mRecvQueue.Empty())
-        {
-            var buf = mRecvQueue.Pop();
+    //    if (!mRecvQueue.Empty())
+    //    {
+    //        var buf = mRecvQueue.Pop();
 
-            UInt32 conv = 0;
-            KCP.ikcp_decode32u(buf, 0, ref conv);
+    //        //UInt32 conv = 1;
+    //        //KCP.ikcp_decode32u(buf, 0, ref conv);
 
-            if (conv <= 0)
-                throw new Exception("inlvaid connect back packet");
+    //        //if (conv <= 0)
+    //        //    throw new Exception("inlvaid connect back packet");
 
-            init_kcp(conv);
+    //        //init_kcp(conv);
 
-            mInConnectStage = false;
-            mConnectSucceed = true;
+    //        //mInConnectStage = false;
+    //        //mConnectSucceed = true;
 
-            m_connectStatusCallback(NetworkState.Connected);
-            //evHandler(cliEvent.Connected, null, null);
-        }
-    }
+    //        //m_connectStatusCallback(NetworkState.Connected);
+    //        //evHandler(cliEvent.Connected, null, null);
+    //    }
+    //}
 
-    void process_recv_queue()
+    void process_recv_queue(UInt32 current)
     {
         mRecvQueue.Switch();
 
         while (!mRecvQueue.Empty())
         {
+           
             var buf = mRecvQueue.Pop();
-
-            mKcp.Input(buf);
+          
+           int input= mKcp.Input(buf);
             mNeedUpdateFlag = true;
-
+            //mKcp.Update(current);
+            //Debug.Log("process_recv_queue :" + buf.Length + "  input:"+ input+" PeekSize:" + mKcp.PeekSize());
             for (var size = mKcp.PeekSize(); size > 0; size = mKcp.PeekSize())
             {
                 var buffer = new byte[size];
                 if (mKcp.Recv(buffer) > 0)
                 {
                     int offset = 0;
+                    //Debug.Log("m_byteCallBack ---------");
                     m_byteCallBack(buffer, ref offset, buffer.Length);
                 }
             }
@@ -180,40 +204,50 @@ public class KCPService : SocketBase
 
     void update(UInt32 current)
     {
-        if (mInConnectStage)
+        //if (mInConnectStage)
+        //{
+        //    if (connect_timeout(current))
+        //    {
+        //        m_connectStatusCallback(NetworkState.ConnectBreak);
+        //        isConnect = false;
+        //        mInConnectStage = false;
+        //        return;
+        //    }
+
+        //    if (need_send_connect_packet(current))
+        //    {
+        //        mLastSendConnectTime = current;
+        //        mUdpClient.Send(new byte[4] { 0, 0, 0, 0 }, 4);
+        //    }
+
+        //    process_connect_packet();
+
+        //    return;
+        //}
+
+        if (isConnect)
         {
-            if (connect_timeout(current))
-            {
-                m_connectStatusCallback(NetworkState.ConnectBreak);
-                mInConnectStage = false;
-                return;
-            }
-
-            if (need_send_connect_packet(current))
-            {
-                mLastSendConnectTime = current;
-                mUdpClient.Send(new byte[4] { 0, 0, 0, 0 }, 4);
-            }
-
-            process_connect_packet();
-
-            return;
-        }
-
-        if (mConnectSucceed)
-        {
-            process_recv_queue();
+            process_recv_queue(current);
 
             if (mNeedUpdateFlag || current >= mNextUpdateTime)
             {
                 mKcp.Update(current);
                 mNextUpdateTime = mKcp.Check(current);
+                //Debug.Log("mNextUpdateTime :" + (current));
                 mNeedUpdateFlag = false;
             }
         }
+        //SendHeartPackage(current);
     }
-
-
-
-
+    private const uint SEND_HEART_PACK_TIME = 2000;
+    private uint tempTime;
+    //private void SendHeartPackage(UInt32 current)
+    //{
+    //    if(tempTime < current)
+    //    {
+    //        tempTime = current + SEND_HEART_PACK_TIME;
+    //        Send(new byte[4] { 0, 0, 0, 0 });
+    //        Debug.Log("SendHeartPackage");
+    //    }
+    //}
 }
