@@ -200,7 +200,7 @@ public class NetworkManager
 
     static List<NetworkState> s_statusList = new List<NetworkState>();
     static List<NetWorkMessage> s_messageList = new List<NetWorkMessage>();
-    const int MaxDealCount = 20;
+    const int MaxDealCount = 2000;
 
     //将消息的处理并入主线程
     static void Update()

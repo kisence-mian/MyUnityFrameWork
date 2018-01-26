@@ -10,7 +10,7 @@ public class GlobalEvent
 {
     #region 以Enum为Key的事件派发
 
-    private static Dictionary<Enum, List<EventHandle>> mEventDic = new Dictionary<Enum, List<EventHandle>>();
+    private static Dictionary<Enum, EventHandle> mEventDic = new Dictionary<Enum, EventHandle>();
     private static Dictionary<Enum, List<EventHandle>> mUseOnceEventDic = new Dictionary<Enum, List<EventHandle>>();
 
     /// <summary>
@@ -41,16 +41,11 @@ public class GlobalEvent
         {
             if (mEventDic.ContainsKey(type))
             {
-                if (!mEventDic[type].Contains(handle))
-                    mEventDic[type].Add(handle);
-                else
-                    Debug.LogWarning("already existing EventType: " + type + " handle: " + handle);
+                mEventDic[type]+= handle;
             }
             else
             {
-                List<EventHandle> temp = new List<EventHandle>();
-                temp.Add(handle);
-                mEventDic.Add(type, temp);
+                mEventDic.Add(type, handle);
             }
         }
     }
@@ -76,14 +71,7 @@ public class GlobalEvent
 
         if (mEventDic.ContainsKey(type))
         {
-            if (mEventDic[type].Contains(handle))
-            {
-                mEventDic[type].Remove(handle);
-                if (mEventDic[type].Count == 0)
-                {
-                    mEventDic.Remove(type);
-                }
-            }
+            mEventDic[type]-= handle;
         }
     }
 
@@ -95,13 +83,11 @@ public class GlobalEvent
     {
         if (mUseOnceEventDic.ContainsKey(type))
         {
-
             mUseOnceEventDic.Remove(type);
         }
 
         if (mEventDic.ContainsKey(type))
         {
-
             mEventDic.Remove(type);
         }
     }
@@ -115,20 +101,17 @@ public class GlobalEvent
     {
         if (mEventDic.ContainsKey(type))
         {
-            for (int i = 0; i < mEventDic[type].Count; i++)
+            try
             {
-                //遍历委托链表
-                foreach (EventHandle callBack in mEventDic[type][i].GetInvocationList())
+                if (mEventDic[type] != null)
                 {
-                    try
-                    {
-                        callBack(args);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError(e.ToString());
-                    }
+                    mEventDic[type](args);
                 }
+
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e.ToString());
             }
         }
 

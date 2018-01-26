@@ -177,7 +177,8 @@ public class GameObjectManager :MonoBehaviour
     {
         Timer.DelayCallBack(time, (object[] obj) =>
         {
-            DestroyGameObjectByPool(go);
+            if (go != null)//应对调用过CleanPool()
+                DestroyGameObjectByPool(go);
         });
     }
 

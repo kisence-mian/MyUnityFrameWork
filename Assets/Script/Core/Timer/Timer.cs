@@ -6,7 +6,7 @@ public class Timer
 {
     public static List<TimerEvent> m_timers = new List<TimerEvent>();
 
-    public static List<TimerEvent> m_removeList = new List<TimerEvent>();
+    //public static List<TimerEvent> m_removeList = new List<TimerEvent>();
 
     public static void Init()
     {
@@ -27,15 +27,10 @@ public class Timer
 
                 if (e.m_repeatCount == 0)
                 {
-                    m_removeList.Add(e);
+                    m_timers.RemoveAt(i);
+                    i--;
                 }
             }
-        }
-
-        for (int i = 0; i < m_removeList.Count; i++)
-        {
-            m_timers.Remove(m_removeList[i]);
-            //HeapObjectPool<TimerEvent>.PutObject(m_removeList[i]);
         }
 	}
 

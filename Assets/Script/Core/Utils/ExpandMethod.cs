@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public static class ExpandMethod
 {
+    #region ToSaveString
     public static string ToSaveString(this Vector3 v3)
     {
         StringBuilder sb = new StringBuilder();
@@ -79,6 +80,10 @@ public static class ExpandMethod
         return sb.ToString();
     }
 
+    #endregion
+
+    #region 向量
+
     //向量逆时针旋转
     public static Vector3 Vector3RotateInXZ(this Vector3 dir, float angle)
     {
@@ -139,6 +144,9 @@ public static class ExpandMethod
         return angle;
     }
 
+    #endregion
+
+    #region GameObject
     /// <summary>
     /// 递归改变子节点的Scale
     /// </summary>
@@ -152,6 +160,38 @@ public static class ExpandMethod
                 SetScale(item, scale);
             }
         }
+    }
+
+    /// <summary>
+    /// 优化的设置SetActive方法，可以节约重复设置Active的开销
+    /// </summary>
+    public static void SetActiveOptimize(this GameObject go, bool isActive)
+    {
+        if (go.activeSelf != isActive)
+        {
+            go.SetActive(isActive);
+        }
+    }
+
+    #endregion
+
+    #region Animator
+
+    /// <summary>
+    /// 可以重复调用的过渡动画
+    /// </summary>
+    /// <param name="anim"></param>
+    /// <param name="animName"></param>
+    public static void CustomCrossFade(this Animator anim, string animName,int layer = 0,float time = 0.5f)
+    {
+        if(!anim.GetCurrentAnimatorStateInfo(layer).IsName(animName)
+            && !anim.GetNextAnimatorStateInfo(layer).IsName(animName)
+            )
+        {
+            anim.CrossFade(animName, time, layer);
+        }
 
     }
+
+    #endregion
 }

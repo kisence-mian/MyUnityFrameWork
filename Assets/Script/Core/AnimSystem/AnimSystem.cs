@@ -734,36 +734,6 @@ public class AnimSystem : MonoBehaviour
         GetInstance().animList.Add(l_tmp);
 
         return l_tmp;
-
-
-        //AnimType animType;
-        //if (isLocal)
-        //{
-        //    animType = AnimType.LocalPosition;
-        //}
-        //else
-        //{
-        //    animType = AnimType.Position;
-        //}
-
-
-        //AnimParamHash animParnHash = HashTemp.SetData(
-        //    AnimParamType.GameObj, animObject,
-        //    AnimParamType.AnimType, animType,
-        //    AnimParamType.FromV3, from,
-        //    AnimParamType.ToV3, to,
-        //    AnimParamType.Time, time,
-        //    AnimParamType.InteType, interp,
-        //    AnimParamType.IsLocal, isLocal,
-        //    AnimParamType.PathType, bezierMoveType,
-        //    AnimParamType.floatControl, t_Bezier_contralRadius,
-        //    AnimParamType.RepeatType, repeatType,
-        //    AnimParamType.CallBack, callBack,
-        //    AnimParamType.CallBackParams, parameter
-        //    );
-
-        //return ValueTo(animParnHash);
-
     }
 
     public static AnimData BezierMove(GameObject animObject, Vector3 from, Vector3 to, float time,
