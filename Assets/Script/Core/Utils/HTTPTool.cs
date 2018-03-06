@@ -10,7 +10,7 @@ using System.Threading;
 public class HTTPTool
 {
     private static readonly Encoding DEFAULTENCODE = Encoding.UTF8;
-    public static void Upload_Request_Thread(string url, string file)
+    public static void Upload_Request_Thread(string url, string file,CallBack<string> callBack = null)
     {
         NameValueCollection data = new NameValueCollection();
 
@@ -19,6 +19,7 @@ public class HTTPTool
         ut.files = new string[] { file };
         ut.data = data;
         ut.encoding = DEFAULTENCODE;
+        ut.callBack = callBack;
 
         Thread th = new Thread(ut.Upload_Request);
         th.Start();
@@ -30,6 +31,7 @@ public class HTTPTool
         public string[] files;
         public NameValueCollection data;
         public Encoding encoding;
+        public CallBack<string> callBack;
         public void Upload_Request()
         {
             Debug.Log("Upload_Request " + url);
@@ -93,11 +95,19 @@ public class HTTPTool
                     string result = stream.ReadToEnd();
                     if (result == "ok")
                     {
-                        Debug.Log("上传完成 " + result);
+                        Debug.Log(files[0] + " 上传完成 " + result);
+                        if(callBack != null)
+                        {
+                            callBack(files[0] + "上传完成 " + result);
+                        }
                     }
                     else
                     {
-                        Debug.Log("上传结束 " + result);
+                        Debug.Log(files[0] + "上传失败 " + result);
+                        if (callBack != null)
+                        {
+                            callBack(files[0] + "上传失败 " + result);
+                        }
                     }
 
                     return;
@@ -106,7 +116,11 @@ public class HTTPTool
             }
             catch (Exception e)
             {
-                Debug.Log("上传失败 " + e.ToString());
+                Debug.Log(files[0] + "上传失败 " + e.ToString());
+                if (callBack != null)
+                {
+                    callBack(files[0] + "上传完成 " + e.ToString());
+                }
             }
         }
     }

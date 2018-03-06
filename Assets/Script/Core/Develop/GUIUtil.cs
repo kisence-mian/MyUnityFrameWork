@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class GUIUtil 
 {
@@ -62,4 +63,69 @@ public class GUIUtil
             GUILayout.TextArea(content);
         }
     }
+
+    #region Tips
+
+    static List<string> tiplist = new List<string>();
+
+    public static void ShowTips(string content)
+    {
+        if(tiplist.Count == 0)
+        {
+            ApplicationManager.s_OnApplicationOnGUI += TipsGUI;
+        }
+
+        tiplist.Add(content);
+    }
+
+    const int tipWindowStartID = 1000;
+
+    const float tipWidth = 600;
+    const float tipHeight = 500;
+    static void TipsGUI()
+    {
+        int lastID = 0;
+        for (int i = 0; i < tiplist.Count; i++)
+        {
+            lastID = tipWindowStartID + i;
+
+            Rect rect = new Rect(GetTipPos(i) ,new Vector2(tipWidth, tipHeight));
+            GUILayout.Window(lastID, rect, TipsWindow, "TipsWindow");
+        }
+
+        GUI.BringWindowToFront(lastID);
+    }
+
+    static Vector2 GetTipPos(int i)
+    {
+        Vector3 pos = new Vector2(Screen.width / 2 - tipWidth / 2, Screen.height / 2 - tipHeight / 2) + new Vector2(50, 50) * i;
+
+        while(pos.x + tipWidth > Screen.width)
+        {
+            pos.x -= Screen.width/2;
+        }
+
+        while (pos.y + tipHeight > Screen.height)
+        {
+            pos.y -= Screen.height/2;
+        }
+
+        return pos;
+    }
+
+    static void TipsWindow(int windowID)
+    {
+        GUILayout.Label(tiplist[windowID - tipWindowStartID], GUILayout.ExpandHeight(true));
+
+        if( GUILayout.Button("OK"))
+        {
+            tiplist.RemoveAt(windowID - tipWindowStartID);
+            if(tiplist.Count == 0)
+            {
+                ApplicationManager.s_OnApplicationOnGUI -= TipsGUI;
+            }
+        }
+    }
+
+    #endregion
 }

@@ -24,6 +24,8 @@ public class ParticleLODService : PoolObject
     {
         ResetLOD(RenderManager.LOD);
         GlobalEvent.AddEvent(RenderEventEnum.UpdateLOD, ReceviceUpdateLOD);
+
+        //Debug.Log("OnCreate " + (RenderManager.LOD));
     }
 
     public override void OnObjectDestroy()

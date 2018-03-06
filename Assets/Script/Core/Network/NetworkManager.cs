@@ -63,7 +63,7 @@ public class NetworkManager
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationQuit += DisConnect;
 
-        ApplicationManager.s_OnApplicationOnGUI += GUI;
+        //ApplicationManager.s_OnApplicationOnGUI += GUI;
     }
 
     public static void Init(string networkInterfaceName,string socketName)
@@ -240,21 +240,21 @@ public class NetworkManager
         }
        
     }
-    static float msgCountTimer = 0;
-    static int count = 0;
-    static void GUI()
-    {
-        msgCountTimer += Time.deltaTime;
-        GUILayout.Label("MPS " + count);
+    //static float msgCountTimer = 0;
+    //static int count = 0;
+    //static void GUI()
+    //{
+    //    msgCountTimer += Time.deltaTime;
+    //    GUILayout.Label("MPS " + count);
 
-        if (msgCountTimer > 1)
-        {
-            count = msgCount;
-            msgCountTimer = 0;
-            msgCount = 0;
-        }
+    //    if (msgCountTimer > 1)
+    //    {
+    //        count = msgCount;
+    //        msgCountTimer = 0;
+    //        msgCount = 0;
+    //    }
 
-    }
+    //}
 
     #endregion
 }

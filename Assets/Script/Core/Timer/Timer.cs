@@ -24,14 +24,11 @@ public class Timer
                 TimerEvent e = m_timers[i];
 
                 e.CompleteTimer();
-
-                if (e.m_repeatCount == 0)
-                {
-                    m_timers.RemoveAt(i);
-                    i--;
-                }
             }
         }
+
+        //移除所有完结的Timer
+        m_timers.RemoveAll(item => item.m_repeatCount == 0);
 	}
 
     public static bool GetIsExistTimer(string timerName)
