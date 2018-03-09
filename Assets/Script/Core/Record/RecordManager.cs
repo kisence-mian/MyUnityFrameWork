@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.IO;
+using FrameWork;
 
 public class RecordManager 
 {
@@ -89,7 +90,7 @@ public class RecordManager
         s_RecordCache.Clear();
     }
 
-#region 保存封装
+    #region 保存封装
 
     public static void SaveRecord(string RecordName, string key, string value)
     {
@@ -138,6 +139,14 @@ public class RecordManager
         RecordTable table = GetData(RecordName);
         table.SetRecord(key, value);
         SaveData(RecordName, table);
+    }
+
+
+
+    public static void SaveRecord<T>(string RecordName, string key, T value)
+    {
+        string content = Serializer.Serialize(value);
+        SaveRecord(RecordName, key, content);
     }
 
 
@@ -192,6 +201,22 @@ public class RecordManager
         RecordTable table = GetData(RecordName);
 
         return table.GetRecord(key, defaultValue);
+    }
+
+    static Deserializer des = new Deserializer();
+
+    public static T GetTRecord<T>(string RecordName, string key, T defaultValue)
+    {
+        string content = GetStringRecord(RecordName, key, null);
+
+        if(content == null)
+        {
+            return defaultValue;
+        }
+        else
+        {
+            return des.Deserialize<T>(content);
+        }
     }
 
     #endregion

@@ -4,6 +4,8 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 
+#pragma warning disable
+
 class ProjectBuildService : Editor
 {
     #region 参数解析

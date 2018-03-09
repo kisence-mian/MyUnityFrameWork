@@ -26,6 +26,11 @@ public static class ResourcesConfigManager
         }
     }
 
+    public static void ClearConfig()
+    {
+        s_isInit = false;
+    }
+
     public static bool GetIsExitRes(string resName)
     {
         if (m_bundleConfigs == null)
