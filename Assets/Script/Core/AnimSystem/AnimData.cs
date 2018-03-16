@@ -605,6 +605,7 @@ public class AnimData
     #region Color
 
     List<SpriteRenderer> m_animObjectList_Sprite = new List<SpriteRenderer>();
+    List<TextMesh> m_animObjectList_TextMeshList = new List<TextMesh>();
 
     #region ALPHA
 
@@ -620,6 +621,13 @@ public class AnimData
                 m_animObjectList_Sprite.Add(images[i]);
                 m_oldColor.Add(images[i].color);
             }
+
+            TextMesh[] meshs = m_animGameObejct.GetComponentsInChildren<TextMesh>();
+            for (int i = 0; i < meshs.Length; i++)
+            {
+                m_animObjectList_TextMeshList.Add(meshs[i]);
+                m_oldColor.Add(meshs[i].color);
+            }
         }
         else
         {
@@ -628,6 +636,13 @@ public class AnimData
             {
                 m_animObjectList_Sprite.Add(image);
                 m_oldColor.Add(image.color);
+            }
+
+            TextMesh mesh = m_animGameObejct.GetComponent<TextMesh>();
+            if (mesh != null)
+            {
+                m_animObjectList_TextMeshList.Add(mesh);
+                m_oldColor.Add(mesh.color);
             }
         }
 
@@ -649,6 +664,15 @@ public class AnimData
             newColor = m_oldColor[index];
             newColor.a = a;
             m_animObjectList_Sprite[i].color = newColor;
+
+            index++;
+        }
+
+        for (int i = 0; i < m_animObjectList_TextMeshList.Count; i++)
+        {
+            newColor = m_oldColor[index];
+            newColor.a = a;
+            m_animObjectList_TextMeshList[i].color = newColor;
 
             index++;
         }

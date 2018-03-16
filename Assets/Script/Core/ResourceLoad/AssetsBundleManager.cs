@@ -389,8 +389,6 @@ public static class AssetsBundleManager
             bundleTmp.allAsset = bundleTmp.bundle.LoadAllAssets();
             bundleTmp.bundle.Unload(false);
 
-            Debug.Log("Unload false");
-
             //如果有缓存起来的回调这里一起回调
             if( LoadAsyncDict.ContainsKey(bundleName))
             {

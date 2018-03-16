@@ -93,9 +93,17 @@ public class MemoryManager
 
     public static void LoadRes(List<string> resList,LoadProgressCallBack callBack)
     {
+        //Resource 模式直接返回完成
+        if (ResourceManager.m_gameLoadType != ResLoadLocation.Resource)
+        {
             s_loadCallBack += callBack;
             s_LoadList.AddRange(resList);
             s_loadCount += resList.Count;
+        }
+        else
+        {
+            callBack(LoadState.CompleteState);
+        }
     }
 
     public static void UnLoadRes(List<string> resList)

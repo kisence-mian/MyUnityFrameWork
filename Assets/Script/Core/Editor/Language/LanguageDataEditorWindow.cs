@@ -181,9 +181,15 @@ public class LanguageDataEditorWindow : EditorWindow
     {
         string[] mask = s_languageList.ToArray();
         m_currentSelectIndex = EditorGUILayout.Popup("当前语言：", m_currentSelectIndex, mask);
-        if (mask.Length != 0)
+        if (mask.Length != 0 
+            && m_currentSelectIndex >= 0
+            && m_currentSelectIndex < mask.Length)
         {
             LoadLanguage(mask[m_currentSelectIndex]);
+        }
+        else
+        {
+            Debug.Log("m_currentSelectIndex " + m_currentSelectIndex + " mask.Length " + mask.Length);
         }
     }
 
