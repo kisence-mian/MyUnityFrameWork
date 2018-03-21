@@ -62,6 +62,7 @@ public class LanguageDataEditorWindow : EditorWindow
             EditorLanguageGUI();
             SaveDataGUI();
             AddLanguageGUI();
+            GenerateLanuageClassGUI();
         }
         else
         {
@@ -280,14 +281,6 @@ public class LanguageDataEditorWindow : EditorWindow
             EditorGUI.indentLevel++;
             m_newModelName = EditorGUILayout.TextField("模块名", m_newModelName);
 
-            if (!s_languageKeyDict.ContainsKey(LanguageManager.c_defaultModuleKey.ToString()))
-            {
-                if (GUILayout.Button("新增默认模块"))
-                {
-                    s_languageKeyDict.Add(LanguageManager.c_defaultModuleKey, new List<string>());
-                }
-            }
-
             if (m_newModelName != "" && !s_languageKeyDict.ContainsKey(m_newModelName))
             {
                 if (GUILayout.Button("新增模块"))
@@ -304,6 +297,15 @@ public class LanguageDataEditorWindow : EditorWindow
                     EditorGUILayout.LabelField("模块名重复！", EditorGUIStyleData.WarnMessageLabel);
                 }
             }
+
+            //不再支持新增默认模块
+            //if (!s_languageKeyDict.ContainsKey(LanguageManager.c_defaultModuleKey.ToString()))
+            //{
+            //    if (GUILayout.Button("新增默认模块"))
+            //    {
+            //        s_languageKeyDict.Add(LanguageManager.c_defaultModuleKey, new List<string>());
+            //    }
+            //}
         }
     }
 
@@ -543,6 +545,47 @@ public class LanguageDataEditorWindow : EditorWindow
         }
 
         EditorGUILayout.Space();
+    }
+
+    #endregion
+
+    #region 生成模块类
+
+    void GenerateLanuageClassGUI()
+    {
+        if(GUILayout.Button( "生成语言模块声明类"))
+        {
+            GenerateLanuageClass();
+        }
+    }
+
+    void GenerateLanuageClass()
+    {
+        string content = "";
+        string SavePath = Application.dataPath + "/Script/Generate/LanguageModelDefine.cs";
+
+
+        content += "public class LanguageModelDefine\n";
+        content += "{\n";
+
+        //只创建模块名
+        foreach (var item in s_languageKeyDict)
+        {
+            content += "\tpublic const string c_" + item.Key + " = \"" + item.Key + "\";\n";
+
+            List<string> list = item.Value;
+            for (int i = 0; i < list.Count; i++)
+            {
+                content += "\tpublic const string c_" + item.Key + "_"+list[i] + " = \"" + list[i] + "\";\n";
+            }
+
+            content += "\n";
+        }
+
+        content += "}\n";
+
+        EditorUtil.WriteStringByFile(SavePath, content);
+        AssetDatabase.Refresh();
     }
 
     #endregion

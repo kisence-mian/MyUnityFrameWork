@@ -120,6 +120,8 @@ public class LanguageManager
 
     public static string GetContent(string moduleName, string contentID, params object[] contentParams)
     {
+        Init();
+
         string content = null;
 
         if (!s_languageDataDict.ContainsKey(moduleName))
