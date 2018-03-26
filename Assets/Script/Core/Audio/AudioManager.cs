@@ -68,7 +68,6 @@ public class AudioManager : MonoBehaviour
 
             Init2DpPlayer(10);
         }
-
     }
 
     static void Init2DpPlayer(int count)

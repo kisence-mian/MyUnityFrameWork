@@ -58,13 +58,24 @@ public class ShopWindow : UIWindowBase
 
         for (int i = 0; i < itemData.TableIDs.Count; i++)
         {
+            SingleData singleData = itemData.GetLineFromKey(itemData.TableIDs[i]);
+
+            string itemName = singleData.GetString("Name");
+            int cost = singleData.GetInt("Cost");
+
             Dictionary<string, object> tmp = new Dictionary<string, object>();
 
-            tmp.Add("Name",DataGenerateManager<itemGenerate>.GetData(itemData.TableIDs[i]).m_ItemName);
+            tmp.Add("Name", DataGenerateManager<itemGenerate>.GetData(itemData.TableIDs[i]).m_ItemName);
             tmp.Add("Cost", DataGenerateManager<itemGenerate>.GetData(itemData.TableIDs[i]).m_key);
 
             data.Add(tmp);
         }
+
+
+        //itemGenerate data = DataGenerateManager<itemGenerate>.GetData("1");
+        //string itemName = data.m_ItemName;
+        //int cost = data.m_Cost;
+
 
         return data;
     }

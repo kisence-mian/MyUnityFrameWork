@@ -1,0 +1,4 @@
+GuideID	StartPoint	EndPoint	Premise	NextGuide	CallToNext	ClickToNext	GuideWindowName	GuideObjectName	GuideItemName	TipContent	TipContentPos	MaskAlpha
+type	Bool	Bool	String	String	Bool	Bool	String	StringArray	StringArray	String	Vector3	Float
+note	引导开始点	引导结束点	前提条件	下一步引导,如果为空,则为下一条记录	是否接收调用去下一步引导	是否接收点击去下一步引导	引导的界面名字	高亮显示的对象名字	高亮的Item名字	提示文本内容	提示文本位置	遮罩Alpha
+default	False	False	Null	Null	False	False	Null	Null	Null	Null	0|0|0	0.75
