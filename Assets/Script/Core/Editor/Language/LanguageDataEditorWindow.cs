@@ -562,10 +562,10 @@ public class LanguageDataEditorWindow : EditorWindow
     void GenerateLanuageClass()
     {
         string content = "";
-        string SavePath = Application.dataPath + "/Script/Generate/LanguageModelDefine.cs";
+        string SavePath = Application.dataPath + "/Script/Generate/LanguageDef.cs";
 
 
-        content += "public class LanguageModelDefine\n";
+        content += "public class LanguageDef\n";
         content += "{\n";
 
         //只创建模块名
