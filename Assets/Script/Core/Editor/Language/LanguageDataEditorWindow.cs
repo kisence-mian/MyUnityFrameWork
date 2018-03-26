@@ -571,12 +571,12 @@ public class LanguageDataEditorWindow : EditorWindow
         //只创建模块名
         foreach (var item in s_languageKeyDict)
         {
-            content += "\tpublic const string c_" + item.Key + " = \"" + item.Key + "\";\n";
+            content += "\tpublic const string c_" + StringFilter(item.Key) + " = \"" + item.Key + "\";\n";
 
             List<string> list = item.Value;
             for (int i = 0; i < list.Count; i++)
             {
-                content += "\tpublic const string c_" + item.Key + "_"+list[i] + " = \"" + list[i] + "\";\n";
+                content += "\tpublic const string c_" + StringFilter(item.Key) + "_" + StringFilter(list[i]) + " = \"" + list[i] + "\";\n";
             }
 
             content += "\n";
@@ -586,6 +586,16 @@ public class LanguageDataEditorWindow : EditorWindow
 
         EditorUtil.WriteStringByFile(SavePath, content);
         AssetDatabase.Refresh();
+    }
+
+    /// <summary>
+    /// 去掉所有不合法的字符
+    /// </summary>
+    /// <param name="content"></param>
+    /// <returns></returns>
+    string StringFilter(string content)
+    {
+        return content.Replace("-","");
     }
 
     #endregion
