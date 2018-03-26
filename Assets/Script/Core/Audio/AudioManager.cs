@@ -106,17 +106,17 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// 播放一个2D音乐
     /// </summary>
-    /// <param name="l_musicName">音乐名</param>
-    /// <param name="l_isLoop">是否循环</param>
-    public static AudioSource PlayMusic2D(string l_musicName, bool l_isLoop)
+    /// <param name="musicName">音乐名</param>
+    /// <param name="isLoop">是否循环</param>
+    public static AudioSource PlayMusic2D(string musicName, bool isLoop)
     {
         s_MusicIsPlaying = true;
 
         AudioSource audioTmp = GetAudioSource2D(SoundType.Music);
-        audioTmp.clip = GetAudioClip(l_musicName);
-        audioTmp.loop = l_isLoop;
+        audioTmp.clip = GetAudioClip(musicName);
+        audioTmp.loop = isLoop;
         audioTmp.volume = s_MusicVolume;
-        if (l_isLoop)
+        if (isLoop)
         {
             audioTmp.Play();
         }
@@ -129,13 +129,25 @@ public class AudioManager : MonoBehaviour
         return audioTmp;
     }
 
+    public static AudioSource StopMusic2D()
+    {
+        s_MusicIsPlaying = true;
+
+        AudioSource audioTmp = GetAudioSource2D(SoundType.Music);
+        audioTmp.volume = s_MusicVolume;
+
+        audioTmp.Stop();
+
+        return audioTmp;
+    }
+
     /// <summary>
     /// 播放一个2D音效
     /// </summary>
-    /// <param name="l_soundName">音效名</param>
-    public static AudioSource PlaySound2D(string l_soundName)
+    /// <param name="soundName">音效名</param>
+    public static AudioSource PlaySound2D(string soundName)
     {
-        AudioSource audioTmp = PlaySound2D(l_soundName,1,false);
+        AudioSource audioTmp = PlaySound2D(soundName,1,false);
 
         return audioTmp;
     }
@@ -143,15 +155,15 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// 播放一个2D音效, 可变音调
     /// </summary>
-    /// <param name="l_soundName">音效名</param>
-    public static AudioSource PlaySound2D(string l_soundName, float l_pitch, bool l_isLoop = false )
+    /// <param name="soundName">音效名</param>
+    public static AudioSource PlaySound2D(string soundName, float pitch, bool isLoop = false )
     {
         AudioSource audioTmp = GetAudioSource2D(SoundType.Sound);
-        audioTmp.clip = GetAudioClip(l_soundName);
-        audioTmp.loop = l_isLoop;
+        audioTmp.clip = GetAudioClip(soundName);
+        audioTmp.loop = isLoop;
         audioTmp.volume = s_SoundVolume;
         audioTmp.PlayOneShot(audioTmp.clip);
-        audioTmp.pitch = l_pitch;
+        audioTmp.pitch = pitch;
         return audioTmp;
     }
 
@@ -159,23 +171,23 @@ public class AudioManager : MonoBehaviour
     /// <summary>
     /// 延时播放一个2D音效
     /// </summary>
-    /// <param name="l_soundName">音效名</param>
-    public static void PlaySound2D(string l_soundName,float l_delay )
+    /// <param name="soundName">音效名</param>
+    public static void PlaySound2D(string soundName,float delay )
     {
-        if (l_delay == 0)
+        if (delay == 0)
         {
-            PlaySound2D(l_soundName);
+            PlaySound2D(soundName);
         }
         else
         {
-            ApplicationManager.Instance.StartCoroutine(DelayPlay(l_soundName, l_delay));
+            ApplicationManager.Instance.StartCoroutine(DelayPlay(soundName, delay));
         }
     }
 
-    static IEnumerator DelayPlay(string l_soundName, float l_delay)
+    static IEnumerator DelayPlay(string soundName, float delay)
     {
-        yield return new WaitForSeconds(l_delay);
-        PlaySound2D(l_soundName);
+        yield return new WaitForSeconds(delay);
+        PlaySound2D(soundName);
     }
 
     /// <summary>
@@ -192,9 +204,9 @@ public class AudioManager : MonoBehaviour
         return audioTmp;
     }
 
-    public static AudioSource GetAudioSource2D(SoundType l_SoundType)
+    public static AudioSource GetAudioSource2D(SoundType SoundType)
     {
-        if (l_SoundType == SoundType.Music)
+        if (SoundType == SoundType.Music)
         {
             if(s_2Dmusic == null)
             {
@@ -223,9 +235,9 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    public static AudioSource GetAudioSource3D(GameObject l_obj)
+    public static AudioSource GetAudioSource3D(GameObject obj)
     {
-        AudioSource[] l_players = l_obj.GetComponents<AudioSource>();
+        AudioSource[] l_players = obj.GetComponents<AudioSource>();
 
         for (int i = 0; i < l_players.Length; i++)
         {
@@ -235,20 +247,20 @@ public class AudioManager : MonoBehaviour
             }
         }
 
-        AudioSource l_newAudioPlayer = l_obj.AddComponent<AudioSource>();
+        AudioSource l_newAudioPlayer = obj.AddComponent<AudioSource>();
 
         return l_newAudioPlayer;
     }
 
-    public static AudioClip GetAudioClip(string l_soundName)
+    public static AudioClip GetAudioClip(string soundName)
     {
         AudioClip clipTmp = null;
 
-        clipTmp = ResourceManager.Load<AudioClip>(l_soundName);
+        clipTmp = ResourceManager.Load<AudioClip>(soundName);
 
         if (clipTmp == null)
         {
-            Debug.LogError("AudioManager GetAudioClip error: " + l_soundName + "is not AudioClip ! ");
+            Debug.LogError("AudioManager GetAudioClip error: " + soundName + "is not AudioClip ! ");
         }
 
         return clipTmp;

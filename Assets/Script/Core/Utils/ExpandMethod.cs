@@ -193,5 +193,50 @@ public static class ExpandMethod
 
     }
 
+    //获取切换进度
+    public static float GetCrossFadeProgress(this Animator anim, int layer = 0)
+    {
+        if(anim.GetNextAnimatorStateInfo(layer).shortNameHash == 0)
+        {
+            return 1;
+        }
+
+        return anim.GetCurrentAnimatorStateInfo(layer).normalizedTime % 1;
+    }
+
+    #endregion
+
+    #region ParticleSystem
+
+    public static void RecursionPlay(this GameObject ps)
+    {
+        ParticleSystem[] list = ps.GetComponentsInChildren<ParticleSystem>();
+
+        for (int i = 0; i < list.Length; i++)
+        {
+            list[i].Play();
+        }
+    }
+
+    public static void RecursionStop(this GameObject ps)
+    {
+        ParticleSystem[] list = ps.GetComponentsInChildren<ParticleSystem>();
+
+        for (int i = 0; i < list.Length; i++)
+        {
+            list[i].Stop();
+        }
+    }
+
+    public static void RecursionPause(this GameObject ps)
+    {
+        ParticleSystem[] list = ps.GetComponentsInChildren<ParticleSystem>();
+
+        for (int i = 0; i < list.Length; i++)
+        {
+            list[i].Pause();
+        }
+    }
+
     #endregion
 }

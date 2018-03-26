@@ -435,7 +435,7 @@ public class DevelopReplayManager
         {
             if (GUILayout.Button("上传日志"))
             {
-                HTTPTool.Upload_Request_Thread(URLManager.GetURL("LogUpLoadURL"), LogPath);
+                HTTPTool.Upload_Request_Thread(URLManager.GetURL("LogUpLoadURL"), LogPath, UploadCallBack);
             }
         }
         else
@@ -493,7 +493,7 @@ public class DevelopReplayManager
         {
             if (GUILayout.Button("上传持久数据"))
             {
-                HTTPTool.Upload_Request_Thread(URLManager.GetURL("PersistentFileUpLoadURL"), LogPath);
+                HTTPTool.Upload_Request_Thread(URLManager.GetURL("PersistentFileUpLoadURL"), LogPath, UploadCallBack);
             }
         }
         else
@@ -523,10 +523,13 @@ public class DevelopReplayManager
         {
             if (GUILayout.Button(FileNameList[i]))
             {
-                isShowPersistentFile = true;
-                scrollPos = Vector2.zero;
-                showContent = PersistentFileManager.GetData(FileNameList[i]);
-                LogPath = PersistentFileManager.GetPath(FileNameList[i]);
+                //isShowPersistentFile = true;
+                //scrollPos = Vector2.zero;
+                //showContent = PersistentFileManager.GetData(FileNameList[i]);
+                //LogPath = PersistentFileManager.GetPath(FileNameList[i]);
+
+                string path = PersistentFileManager.GetPath(FileNameList[i]);
+                HTTPTool.Upload_Request_Thread(URLManager.GetURL("PersistentFileUpLoadURL"), path, UploadCallBack);
             }
         }
 
@@ -539,7 +542,7 @@ public class DevelopReplayManager
                 for (int i = 0; i < FileNameList.Length; i++)
                 {
                     string path = PersistentFileManager.GetPath(FileNameList[i]);
-                    HTTPTool.Upload_Request_Thread(URLManager.GetURL("PersistentFileUpLoadURL"), path);
+                    HTTPTool.Upload_Request_Thread(URLManager.GetURL("PersistentFileUpLoadURL"), path, UploadCallBack);
                 }
             }
         }
@@ -668,6 +671,8 @@ public class DevelopReplayManager
 
         if (Input.GetKeyDown(KeyCode.F5))
         {
+            Debug.Log("Time.timeScale " + Time.timeScale);
+
             if (Time.timeScale == 0)
             {
                 Time.timeScale = 1;
@@ -861,6 +866,11 @@ public class DevelopReplayManager
             now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
         return logName;
+    }
+
+    static void UploadCallBack(string result)
+    {
+        GUIUtil.ShowTips(result);
     }
 
     enum DevMenuEnum

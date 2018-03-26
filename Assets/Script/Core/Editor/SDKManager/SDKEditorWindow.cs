@@ -42,6 +42,11 @@ public class SDKEditorWindow : EditorWindow
     void OnProjectChange()
     {
         SchemeDataService.ReloadEditorSchemeData();
+        m_currentSchemeData = SDKManager.LoadGameSchemeConfig();
+        m_currentSelectIndex = GetCurrentSelectIndex();
+        LoadSchemeData(m_currentSchemeData);
+
+        CreateReadMe();
     }
 
     #region GUI

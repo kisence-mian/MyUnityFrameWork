@@ -24,9 +24,20 @@ public class UGUITool
     
     static public void set_icon(Image img,string name,bool is_nativesize = true)
     {
+        if(name == null)
+        {
+            Debug.LogError("set_icon Image name 不能为 null !" );
+            return;
+        }
+
+        if (img == null)
+        {
+            Debug.LogError("set_icon Image 不能为 null !");
+            return;
+        }
+
         try
         {
-            //Texture2D tex = ResourceManager.Load<Texture2D>(name);
             Sprite sp = ResourceManager.Load<Sprite>(name);
             img.overrideSprite = sp;// Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);
             img.sprite = img.overrideSprite;
@@ -45,11 +56,16 @@ public class UGUITool
         try {
             Texture2D tex = ResourceManager.Load<Texture2D>(name);
             SpriteRenderer sprite = go.GetComponent<SpriteRenderer>();
-            sprite.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.one * 0.5f);
+            sprite.sprite = CreateSprite(tex);
         }
         catch
         {
 
         }
+    }
+
+    static public Sprite CreateSprite(Texture2D texture)
+    {
+        return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector3.one * 0.5f);
     }
 }

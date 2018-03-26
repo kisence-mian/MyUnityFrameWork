@@ -12,12 +12,23 @@ public static class ResourcesConfigManager
     public static Dictionary<string, ResourcesConfig> m_relyBundleConfigs;
     public static Dictionary<string, ResourcesConfig> m_bundleConfigs ;
 
+    static bool s_isInit = false;
+
     public static void Initialize()
     {
-        ResourcesConfigStruct result = GetResourcesConfig();
+        if (!s_isInit)
+        {
+            s_isInit = true;
+            ResourcesConfigStruct result = GetResourcesConfig();
 
-        m_relyBundleConfigs = result.relyList;
-        m_bundleConfigs = result.bundleList;
+            m_relyBundleConfigs = result.relyList;
+            m_bundleConfigs = result.bundleList;
+        }
+    }
+
+    public static void ClearConfig()
+    {
+        s_isInit = false;
     }
 
     public static bool GetIsExitRes(string resName)

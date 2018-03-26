@@ -732,6 +732,7 @@ public class UIBase : MonoBehaviour
         if (m_ChildList.Contains(item))
         {
             m_ChildList.Remove(item);
+            item.RemoveAllListener();
             item.OnUIDestroy();
             GameObjectManager.DestroyGameObjectByPool(item.gameObject, isActive);
         }
@@ -742,6 +743,7 @@ public class UIBase : MonoBehaviour
         if (m_ChildList.Contains(item))
         {
             m_ChildList.Remove(item);
+            item.RemoveAllListener();
             item.OnUIDestroy();
             GameObjectManager.DestroyGameObjectByPool(item.gameObject,t);
         }
@@ -885,6 +887,13 @@ public class UIBase : MonoBehaviour
     public void SetEnabeled(string ID,bool enable)
     {
         GetButton(ID).enabled = enable;
+    }
+    /// <summary>
+    /// Only Button
+    /// </summary>
+    public void SetButtonInteractable(string ID,bool enable)
+    {
+        GetButton(ID).interactable = enable;
     }
 
     public void SetRectWidth(string TextID, float value, float height)

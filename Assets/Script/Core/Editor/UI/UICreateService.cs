@@ -7,9 +7,15 @@ using FrameWork.GuideSystem;
 
 public class UICreateService 
 {
-
     public static void CreatUIManager(Vector2 referenceResolution, CanvasScaler.ScreenMatchMode MatchMode, bool isOnlyUICamera, bool isVertical)
     {
+        //新增五个层级
+        EditorExpand.AddSortLayerIfNotExist("GameUI");
+        EditorExpand.AddSortLayerIfNotExist("Fixed");
+        EditorExpand.AddSortLayerIfNotExist("Normal");
+        EditorExpand.AddSortLayerIfNotExist("TopBar");
+        EditorExpand.AddSortLayerIfNotExist("PopUp");
+
         //UIManager
         GameObject UIManagerGo = new GameObject("UIManager");
         UIManagerGo.layer = LayerMask.NameToLayer("UI");
@@ -138,7 +144,14 @@ public class UICreateService
 
         uiBaseTmp.m_UIType = UIType;
 
-        uiGo.AddComponent<Canvas>();
+        Canvas canvas =  uiGo.AddComponent<Canvas>();
+
+        if(EditorExpand.isExistShortLayer(UIType.ToString()))
+        {
+            canvas.overrideSorting = true;
+            canvas.sortingLayerName = UIType.ToString();
+        }
+
         uiGo.AddComponent<GraphicRaycaster>();
 
         RectTransform ui = uiGo.GetComponent<RectTransform>();

@@ -372,6 +372,8 @@ public class BundleConfigEditorWindow : EditorWindow
 
             CreatePackageFile();                 //保存编辑器文件
             CheckAndCreatBundelPackageConfig(); //生成资源路径文件
+
+            ResourcesConfigManager.ClearConfig();
         }
 
         if (GUILayout.Button("增加选中资源"))

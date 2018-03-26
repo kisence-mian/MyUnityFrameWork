@@ -212,6 +212,42 @@ public class UIEditorWindow : EditorWindow
 
     #endregion
 
+    #region UITool
+
+    bool isFoldUITool = false;
+
+    void UIToolGUI()
+    {
+        EditorGUI.indentLevel = 0;
+        isFoldUITool = EditorGUILayout.Foldout(isFoldUImanager, "UITool:");
+        if (isFoldUITool)
+        {
+            EditorGUI.indentLevel = 1;
+
+            if (GUILayout.Button("重设UI sortLayer"))
+            {
+                ResetUISortLayer();
+            }
+
+            if (GUILayout.Button("清除UI sortLayer"))
+            {
+                CleanUISortLayer();
+            }
+        }
+    }
+
+    void CleanUISortLayer()
+    {
+
+    }
+
+    void ResetUISortLayer()
+    {
+
+    }
+
+    #endregion
+
     #region UI
 
     //所有UI预设

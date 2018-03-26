@@ -65,6 +65,16 @@ public class ReusingScrollRect : ScrollRectInput
         m_itemCaches.Clear();
     }
 
+    public void Refresh()
+    {
+        for (int i = 0; i < m_items.Count; i++)
+        {
+            m_items[i].SetContent(m_items[i].m_index, m_datas[m_items[i].m_index]);
+        }
+
+        SetItemDisplay();
+    }
+
 
     public void SetData(List<Dictionary<string, object>> data)
     {
