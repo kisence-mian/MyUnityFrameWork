@@ -91,6 +91,11 @@ public class GuideSystemEditor
         data.SetNote(GuideSystemBase.c_guideEndPoint, "引导结束点");
         data.SetFieldType(GuideSystemBase.c_guideEndPoint, FieldType.Bool, null);
 
+        data.TableKeys.Add(GuideSystemBase.c_guideClosePoint);
+        data.SetDefault(GuideSystemBase.c_guideEndPoint, "False");
+        data.SetNote(GuideSystemBase.c_guideEndPoint, "引导关闭点");
+        data.SetFieldType(GuideSystemBase.c_guideClosePoint, FieldType.Bool, null);
+
         data.TableKeys.Add(GuideSystemBase.c_PremiseKey);
         data.SetDefault(GuideSystemBase.c_PremiseKey, "Null");
         data.SetNote(GuideSystemBase.c_PremiseKey, "前提条件");

@@ -14,6 +14,7 @@ namespace FrameWork.GuideSystem
 
         public const string c_guideStartPoint = "StartPoint";  //引导开始点
         public const string c_guideEndPoint   = "EndPoint";    //引导结束点
+        public const string c_guideClosePoint = "ClosePoint";  //引导关闭点
 
         public const string c_PremiseKey = "Premise";          //前提条件
         public const string c_NextGuideNameKey = "NextGuide";  //下一步引导,如果为空,则为下一条记录
@@ -152,6 +153,11 @@ namespace FrameWork.GuideSystem
         protected virtual bool GuideEndCondition()
         {
             return GetGuideEndPoint(m_currentGuideData);
+        }
+
+        protected virtual bool GuideCloseCondition()
+        {
+            return GetGuideClosePoint(m_currentGuideData);
         }
 
         /// <summary>
@@ -343,13 +349,15 @@ namespace FrameWork.GuideSystem
                 //清除上一步的操作
                 ClearGuideLogic();
 
-                //保存这一步
-                SaveGuideRecord(m_currentGuideData);
+                //如果是结束点则保存这一步
+                if(GuideEndCondition())
+                    SaveGuideRecord(m_currentGuideData);
 
                 SingleData nextGuideData = GetNextGuideData(m_currentGuideData);
 
                 //退出判断
                 if (!GuideEndCondition() 
+                    && !GuideCloseCondition()
                     && nextGuideData != null)
                 {
                     //读取下一步引导
@@ -375,10 +383,7 @@ namespace FrameWork.GuideSystem
 
                 string uiName = GetGuideWindowName(m_currentGuideData);
 
-                if(uiName != null 
-                    && uiName != ""
-                    && uiName != "Null"
-                    && uiName != "null")
+                if(uiName != null)
                 {
                     //获取UI进行表现
                     UIWindowBase ui = UIManager.GetUI(uiName);
@@ -427,10 +432,7 @@ namespace FrameWork.GuideSystem
 
             //如果新手引导启动时没有为m_currentGuideKey赋值
             //则认为从第一条记录开始
-            if (m_currentGuideKey == "" 
-                || m_currentGuideKey == null
-                || m_currentGuideKey == "Null"
-                || m_currentGuideKey == "null")
+            if (m_currentGuideKey == "")
             {
                 guideData = m_guideData[m_guideData.TableIDs[0]];
             }
@@ -488,6 +490,11 @@ namespace FrameWork.GuideSystem
             return data.GetBool(c_guideEndPoint);
         }
 
+        protected bool GetGuideClosePoint(SingleData data)
+        {
+            return data.GetBool(c_guideClosePoint);
+        }
+
         protected bool GetCallToNext(SingleData data)
         {
             return data.GetBool(c_CallToNextKey);
@@ -532,10 +539,7 @@ namespace FrameWork.GuideSystem
         {
             string next = GetNextGuideNeme(data);
 
-            if (next == null
-                || next == "null"
-                || next == "Null"
-                || next == "")
+            if (next == null)
             {
                 int newIndex = m_guideData.TableIDs.IndexOf(data.m_SingleDataKey) + 1;
                 return GetGuideDataByIndex(newIndex);

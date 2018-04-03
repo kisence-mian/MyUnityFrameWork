@@ -109,7 +109,7 @@ namespace FrameWork.GuideSystem
 
         public virtual void ShowTips(string content, Vector3 pos)
         {
-            if (content != null && content != "" && content != "Null")
+            if (content != null)
             {
                 m_TipTransfrom.gameObject.SetActive(true);
 
