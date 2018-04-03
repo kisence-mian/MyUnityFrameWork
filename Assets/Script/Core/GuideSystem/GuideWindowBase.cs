@@ -59,9 +59,9 @@ namespace FrameWork.GuideSystem
 
         public void ShowGuideUIByItem(string uiName, UIWindowBase ui, string itemName, Vector3 offset, bool isFollow)
         {
-            UIBase aimUI = ui.GetItem(itemName);
+            GameObject aimUI = ui.GetItem(itemName);
 
-            ShowGuideUI(GetRectTransform(uiName), aimUI.gameObject, offset, isFollow);
+            ShowGuideUI(GetRectTransform(uiName), aimUI, offset, isFollow);
         }
 
         public void ShowGuideUIByObject(string uiName, UIWindowBase ui, string objName, Vector3 offset, bool isFollow)

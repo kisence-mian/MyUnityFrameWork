@@ -52,6 +52,14 @@ namespace FrameWork.GuideSystem
         //int m_currentGuideIndex = 0;
         string m_currentGuideKey = "";
 
+        public bool IsStart
+        {
+            get
+            {
+                return m_isStart;
+            }
+        }
+
         #region 外部调用
 
         /// <summary>
@@ -88,7 +96,7 @@ namespace FrameWork.GuideSystem
         {
             SingleData guideData = LoadFirstGuide();
 
-            if (!m_isStart 
+            if (!IsStart 
                 && guideData != null
                 && GuideStartCondition(guideData)
                 && GetGuideSwitch())

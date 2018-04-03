@@ -189,7 +189,7 @@ public class ReusingScrollRect : ScrollRectInput
 
         content.sizeDelta = size;
 
-        Debug.Log(m_itemSize + "" + size + " m_rectTransform.sizeDelta " + m_rectTransform.sizeDelta, m_rectTransform );
+        //Debug.Log(m_itemSize + "" + size + " m_rectTransform.sizeDelta " + m_rectTransform.sizeDelta, m_rectTransform );
     }
 
     void UpdateIndexList(int count)

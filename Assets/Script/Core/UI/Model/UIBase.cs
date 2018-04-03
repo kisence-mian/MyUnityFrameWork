@@ -283,7 +283,7 @@ public class UIBase : MonoBehaviour
     }
     public Toggle GetToggle(string name)
     {
-        if (m_Toggle .ContainsKey(name))
+        if (m_Toggle.ContainsKey(name))
         {
             return m_Toggle[name];
         }
@@ -436,9 +436,9 @@ public class UIBase : MonoBehaviour
         set { m_rectTransform = value; }
     }
 
-    public void SetSizeDelta(float w,float h)
+    public void SetSizeDelta(float w, float h)
     {
-        RectTransform.sizeDelta = new Vector2(w,h);
+        RectTransform.sizeDelta = new Vector2(w, h);
     }
 
     #region 自定义组件
@@ -586,7 +586,7 @@ public class UIBase : MonoBehaviour
             m_EndDragEvents[i].RemoveListener(true);
         }
         m_EndDragEvents.Clear();
-    #endregion
+        #endregion
     }
 
     #region 添加监听
@@ -665,7 +665,7 @@ public class UIBase : MonoBehaviour
 
     //TODO 逐步添加所有的移除监听方法
 
-    public InputButtonClickRegisterInfo GetClickRegisterInfo(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm )
+    public InputButtonClickRegisterInfo GetClickRegisterInfo(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm)
     {
         string eventKey = InputUIOnClickEvent.GetEventKey(UIEventKey, buttonName, parm);
         for (int i = 0; i < m_OnClickEvents.Count; i++)
@@ -696,7 +696,7 @@ public class UIBase : MonoBehaviour
 
     List<UIBase> m_ChildList = new List<UIBase>();
     int m_childUIIndex = 0;
-    public UIBase CreateItem(string itemName, string prantName,bool isActive)
+    public UIBase CreateItem(string itemName, string prantName, bool isActive)
     {
         GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, GetGameObject(prantName), isActive);
 
@@ -738,14 +738,14 @@ public class UIBase : MonoBehaviour
         }
     }
 
-    public void DestroyItem(UIBase item,float t)
+    public void DestroyItem(UIBase item, float t)
     {
         if (m_ChildList.Contains(item))
         {
             m_ChildList.Remove(item);
             item.RemoveAllListener();
             item.OnUIDestroy();
-            GameObjectManager.DestroyGameObjectByPool(item.gameObject,t);
+            GameObjectManager.DestroyGameObjectByPool(item.gameObject, t);
         }
     }
 
@@ -767,20 +767,124 @@ public class UIBase : MonoBehaviour
         m_childUIIndex = 0;
     }
 
-    public UIBase GetItem(string itemName)
+    public GameObject GetItem(string itemName)
     {
-        for (int i = 0; i < m_ChildList.Count; i++)
+        //Debug.Log("GetItem  v0 " + m_ChildList.Count);
+        if (!itemName.Contains("."))
         {
-            if(m_ChildList[i].name == itemName)
+            //Debug.Log("GetItem  v1 " + m_ChildList.Count);
+            int index = 0;
+            if (itemName.Contains("["))
             {
-                return m_ChildList[i];
+                index = int.Parse(itemName.Substring(itemName.IndexOf("[") + 1, 1));
+            }
+            int rd_index = 0;
+            for (int i = 0; i < m_ChildList.Count; i++)
+            {
+                if (m_ChildList[i].name == itemName)
+                {
+                    if (index == rd_index)
+                    {
+                        return m_ChildList[i].gameObject;
+                    }
+                    else
+                    {
+                        rd_index = rd_index + 1;
+                    }
+
+                }
+            }
+        }
+        else
+        {
+            //Debug.Log("GetItem  v2 ");
+            string[] itemNames = itemName.Split('.');
+            //Debug.Log("itemNames.Length " + itemNames.Length);
+
+            List<Transform> Comp_list = new List<Transform>();
+
+            //for (int i = 0; i < m_ChildList.Count; i++)
+            //{
+            //    Comp_list.Add(m_ChildList[i].transform);
+            //}
+
+            for (int j = 0; j < itemNames.Length; j++)
+            {
+
+                int index = 0;
+                string t_itemName = itemNames[j];
+
+                if (t_itemName.Contains("["))
+                {
+                    index = int.Parse(t_itemName.Substring(t_itemName.IndexOf("[") + 1, 1));
+                }
+                t_itemName = t_itemName.Substring(0, t_itemName.Length - 3);
+                if (j == 0)
+                {
+                    //Debug.Log("===tsss=>"+ t_itemName);
+                    //Transform tss = GetGameObject(t_itemName).transform;
+
+                    //Debug.Log("===t=>"+ tss.name,tss);
+                    //Debug.Log("==child" + tss.GetChild(0), tss.GetChild(0));
+
+
+                    //int len = tss.childCount;
+                    //Debug.Log(len);
+                    //for (int i = 0; i < len; i++)
+                    //{
+                    //    Transform itemts = tss.GetChild(i);
+                    //    Debug.Log("===item>" + itemts.name);
+                    //}
+
+                    Transform[] aa = GetGameObject(t_itemName).GetComponentsInChildren<Transform>();
+                    //for (int i = 0; i < aa.Length; i++)
+                    //{
+                    //    Debug.Log("bbbbb " + aa[i].name);
+                    //}
+                    //Debug.Log("aaaaaaaa " + t_itemName + " " + aa.Length);
+                    Comp_list = new List<Transform>(aa);
+                }
+                else
+                {
+
+
+                    //Debug.Log("t_itemNameA " + t_itemName + " " + index + " " + Comp_list.Count);
+                    int rd_index = 0;
+                    for (int i = 0; i < Comp_list.Count; i++)
+                    {
+                        //Debug.Log("Comp_list[i].name " + Comp_list[i].name);
+                        if (Comp_list[i].name == t_itemName)
+                        {
+                            if (index == rd_index)
+                            {
+                                if (j == itemNames.Length - 1)
+                                {
+                                    //Debug.Log("GetItem  v4 ");
+                                    return Comp_list[i].gameObject;
+                                }
+                                else
+                                {
+                                    //Debug.Log("GetItem  v3 ");
+                                    Transform[] aa = Comp_list[i].GetComponentsInChildren<Transform>();
+                                    Comp_list = new List<Transform>(aa);
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                rd_index = rd_index + 1;
+                            }
+
+                        }
+                    }
+                }
             }
         }
 
         throw new Exception(UIName + " GetItem Exception Dont find Item: " + itemName);
     }
 
-    public UIBase GetItemByIndex(string itemName,int index)
+    public UIBase GetItemByIndex(string itemName, int index)
     {
         for (int i = 0; i < m_ChildList.Count; i++)
         {
@@ -789,7 +893,7 @@ public class UIBase : MonoBehaviour
                 //Debug.Log("GetItemByIndex " + index, m_ChildList[i]);
 
                 index--;
-                if(index == 0)
+                if (index == 0)
                 {
                     return m_ChildList[i];
                 }
@@ -841,7 +945,7 @@ public class UIBase : MonoBehaviour
         GetImage(ImageID).color = color;
     }
 
-    public void SetTextColor(string TextID,Color color)
+    public void SetTextColor(string TextID, Color color)
     {
         GetText(TextID).color = color;
     }
@@ -884,14 +988,14 @@ public class UIBase : MonoBehaviour
     /// <summary>
     /// Only Button
     /// </summary>
-    public void SetEnabeled(string ID,bool enable)
+    public void SetEnabeled(string ID, bool enable)
     {
         GetButton(ID).enabled = enable;
     }
     /// <summary>
     /// Only Button
     /// </summary>
-    public void SetButtonInteractable(string ID,bool enable)
+    public void SetButtonInteractable(string ID, bool enable)
     {
         GetButton(ID).interactable = enable;
     }
@@ -939,34 +1043,34 @@ public class UIBase : MonoBehaviour
 
     public void SetItemGuideMode(string itemName, int order = 1)
     {
-        SetGuideMode(GetItem(itemName).gameObject, order);
+        SetGuideMode(GetItem(itemName), order);
     }
 
-    public void SetItemGuideModeByIndex(string itemName, int index ,int order = 1)
+    public void SetItemGuideModeByIndex(string itemName, int index, int order = 1)
     {
         SetGuideMode(GetItemByIndex(itemName, index).gameObject, order);
     }
 
     public void SetSelfGuideMode(int order = 1)
     {
-        SetGuideMode(gameObject,order);
+        SetGuideMode(gameObject, order);
     }
 
-    public void SetGuideMode(GameObject go,int order = 1)
+    public void SetGuideMode(GameObject go, int order = 1)
     {
         Canvas canvas = go.GetComponent<Canvas>();
         GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
 
         GuideChangeData status = new GuideChangeData();
 
-        if(canvas == null)
+        if (canvas == null)
         {
             canvas = go.AddComponent<Canvas>();
 
             status.isCreateCanvas = true;
         }
 
-        if(graphic == null)
+        if (graphic == null)
         {
             graphic = go.AddComponent<GraphicRaycaster>();
 
@@ -993,7 +1097,7 @@ public class UIBase : MonoBehaviour
             go.SetActive(false);
         }
 
-        if(!m_CreateCanvasDict.ContainsKey(go))
+        if (!m_CreateCanvasDict.ContainsKey(go))
         {
             m_CreateCanvasDict.Add(go, status);
             m_GuideList.Add(go);
@@ -1088,7 +1192,8 @@ public class UIBase : MonoBehaviour
             }
         }
 
-        ls.Sort((a,b) => {
+        ls.Sort((a, b) =>
+        {
             return a.name.CompareTo(b.name);
         });
 

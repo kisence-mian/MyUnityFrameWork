@@ -61,6 +61,11 @@ public class TimerEvent
 
     public void CallBackTimer()
     {
+        if(this == Timer.test)
+        {
+            Debug.Log("CallBackTimer " + (m_callBack == null));
+        }
+
         if (m_callBack != null)
         {
             try
