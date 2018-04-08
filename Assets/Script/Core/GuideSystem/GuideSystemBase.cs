@@ -14,12 +14,14 @@ namespace FrameWork.GuideSystem
 
         public const string c_guideStartPoint = "StartPoint";  //引导开始点
         public const string c_guideEndPoint   = "EndPoint";    //引导结束点
+        public const string c_guideClosePoint = "ClosePoint";  //引导关闭点
 
         public const string c_PremiseKey = "Premise";          //前提条件
         public const string c_NextGuideNameKey = "NextGuide";  //下一步引导,如果为空,则为下一条记录
 
         public const string c_CallToNextKey = "CallToNext";    //是否调用去下一步引导
         public const string c_ClickToNextKey = "ClickToNext";  //是否点击去下一步引导
+        public const string c_ConditionToNextKey = "ConditionToNextKey";    //是否自动判断条件去下一步引导
 
         public const string c_GuideWindowNameKey = "GuideWindowName";  //引导的界面名字
         public const string c_GuideObjectNameKey = "GuideObjectName";  //高亮显示的对象名字
@@ -51,6 +53,14 @@ namespace FrameWork.GuideSystem
         protected SingleData m_currentGuideData;
         //int m_currentGuideIndex = 0;
         string m_currentGuideKey = "";
+
+        public bool IsStart
+        {
+            get
+            {
+                return m_isStart;
+            }
+        }
 
         #region 外部调用
 
@@ -88,7 +98,7 @@ namespace FrameWork.GuideSystem
         {
             SingleData guideData = LoadFirstGuide();
 
-            if (!m_isStart 
+            if (!IsStart 
                 && guideData != null
                 && GuideStartCondition(guideData)
                 && GetGuideSwitch())
@@ -144,6 +154,11 @@ namespace FrameWork.GuideSystem
         protected virtual bool GuideEndCondition()
         {
             return GetGuideEndPoint(m_currentGuideData);
+        }
+
+        protected virtual bool GuideCloseCondition()
+        {
+            return GetGuideClosePoint(m_currentGuideData);
         }
 
         /// <summary>
@@ -315,6 +330,7 @@ namespace FrameWork.GuideSystem
         void EndGuide()
         {
             m_isStart = false;
+            m_isOperationUI = false;
 
             UIManager.CloseUIWindow(m_guideWindowBase);
             m_guideWindowBase = null;
@@ -329,31 +345,29 @@ namespace FrameWork.GuideSystem
 
         void NextGuide()
         {
-            //判断是否满足进行下一步的条件
-            if (GuideNextCondition())
-            {
-                //清除上一步的操作
-                ClearGuideLogic();
+            //清除上一步的操作
+            ClearGuideLogic();
 
-                //保存这一步
+            //如果是结束点则保存这一步
+            if (GuideEndCondition())
                 SaveGuideRecord(m_currentGuideData);
 
-                SingleData nextGuideData = GetNextGuideData(m_currentGuideData);
+            SingleData nextGuideData = GetNextGuideData(m_currentGuideData);
 
-                //退出判断
-                if (!GuideEndCondition() 
-                    && nextGuideData != null)
-                {
-                    //读取下一步引导
-                    SetCurrent(nextGuideData);
+            //退出判断
+            if (!GuideEndCondition()
+                && !GuideCloseCondition()
+                && nextGuideData != null)
+            {
+                //读取下一步引导
+                SetCurrent(nextGuideData);
 
-                    //引导逻辑
-                    GuideLogic();
-                }
-                else
-                {
-                    EndGuide();
-                }
+                //引导逻辑
+                GuideLogic();
+            }
+            else
+            {
+                EndGuide();
             }
         }
 
@@ -367,10 +381,7 @@ namespace FrameWork.GuideSystem
 
                 string uiName = GetGuideWindowName(m_currentGuideData);
 
-                if(uiName != null 
-                    && uiName != ""
-                    && uiName != "Null"
-                    && uiName != "null")
+                if(uiName != null)
                 {
                     //获取UI进行表现
                     UIWindowBase ui = UIManager.GetUI(uiName);
@@ -419,10 +430,7 @@ namespace FrameWork.GuideSystem
 
             //如果新手引导启动时没有为m_currentGuideKey赋值
             //则认为从第一条记录开始
-            if (m_currentGuideKey == "" 
-                || m_currentGuideKey == null
-                || m_currentGuideKey == "Null"
-                || m_currentGuideKey == "null")
+            if (m_currentGuideKey == "")
             {
                 guideData = m_guideData[m_guideData.TableIDs[0]];
             }
@@ -480,6 +488,19 @@ namespace FrameWork.GuideSystem
             return data.GetBool(c_guideEndPoint);
         }
 
+        protected bool GetGuideClosePoint(SingleData data)
+        {
+            //对旧项目做兼容
+            if (!data.ContainsKey(c_guideClosePoint)
+                && !data.data.m_defaultValue.ContainsKey(c_guideClosePoint))
+            {
+                return false;
+            }
+
+
+            return data.GetBool(c_guideClosePoint);
+        }
+
         protected bool GetCallToNext(SingleData data)
         {
             return data.GetBool(c_CallToNextKey);
@@ -488,6 +509,18 @@ namespace FrameWork.GuideSystem
         protected bool GetClickToNext(SingleData data)
         {
             return data.GetBool(c_ClickToNextKey);
+        }
+
+        protected bool GetConditionToNext(SingleData data)
+        {
+            //对旧项目做兼容
+            if (!data.ContainsKey(c_ConditionToNextKey)
+                && !data.data.m_defaultValue.ContainsKey(c_ConditionToNextKey))
+            {
+                return false;
+            }
+
+            return data.GetBool(c_ConditionToNextKey);
         }
 
         protected string GetGuideWindowName(SingleData data)
@@ -524,10 +557,7 @@ namespace FrameWork.GuideSystem
         {
             string next = GetNextGuideNeme(data);
 
-            if (next == null
-                || next == "null"
-                || next == "Null"
-                || next == "")
+            if (next == null)
             {
                 int newIndex = m_guideData.TableIDs.IndexOf(data.m_SingleDataKey) + 1;
                 return GetGuideDataByIndex(newIndex);
@@ -567,12 +597,24 @@ namespace FrameWork.GuideSystem
 
         void Update()
         {
-            if(!DevelopReplayManager.IsReplay 
-                && ApplicationManager.AppMode == AppMode.Developing)
+            if (IsStart)
             {
-                if(Input.GetKeyDown(KeyCode.F3))
+                if (!DevelopReplayManager.IsReplay
+                    && ApplicationManager.AppMode == AppMode.Developing)
                 {
-                    Dispose();
+                    if (Input.GetKeyDown(KeyCode.F3))
+                    {
+                        Dispose();
+                    }
+                }
+
+                if (GetConditionToNext(m_currentGuideData))
+                {
+                    //判断是否满足进行下一步的条件
+                    if (GuideNextCondition())
+                    {
+                        NextGuide();
+                    }
                 }
             }
         }

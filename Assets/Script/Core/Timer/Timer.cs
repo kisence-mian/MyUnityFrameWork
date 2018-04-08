@@ -6,6 +6,8 @@ public class Timer
 {
     public static List<TimerEvent> m_timers = new List<TimerEvent>();
 
+    public static TimerEvent test;
+
     //public static List<TimerEvent> m_removeList = new List<TimerEvent>();
 
     public static void Init()
@@ -17,28 +19,32 @@ public class Timer
     {
         for (int i = 0; i < m_timers.Count;i++ )
         {
-            m_timers[i].Update();
+            TimerEvent e = m_timers[i];
+            e.Update();
 
-            if (m_timers[i].m_isDone)
+            if (e.m_isDone)
             {
-                TimerEvent e = m_timers[i];
-
                 e.CompleteTimer();
 
                 if (e.m_repeatCount == 0)
                 {
-                    m_timers.RemoveAt(i);
-                    i--;
+                    m_timers.Remove(e);
                 }
             }
         }
-	}
+
+        if(test != null)
+        {
+            Debug.Log("Test " + test.m_timerName + " " + test.m_currentTimer + " " + m_timers.Contains(test) + " isDone " + test.m_isDone); 
+        }
+    }
 
     public static bool GetIsExistTimer(string timerName)
     {
         for (int i = 0; i < m_timers.Count; i++)
         {
-            if (m_timers[i].m_timerName == timerName)
+            var e = m_timers[i];
+            if (e.m_timerName == timerName)
             {
                 return true;
             }
@@ -51,9 +57,10 @@ public class Timer
     {
         for (int i = 0; i < m_timers.Count; i++)
         {
-            if (m_timers[i].m_timerName == timerName)
+            var e = m_timers[i];
+            if (e.m_timerName == timerName)
             {
-                return m_timers[i];
+                return e;
             }
         }
 
@@ -197,6 +204,8 @@ public class Timer
 
     public static void DestroyTimer(TimerEvent timer,bool isCallBack = false)
     {
+        //Debug.Log("DestroyTimer " + timer.m_timerName + " isTest " + (timer == test));
+
         if (m_timers.Contains(timer))
         {
             if (isCallBack)
@@ -217,9 +226,10 @@ public class Timer
         //Debug.Log("DestroyTimer2  ----TIMER " + timerName);
         for (int i = 0; i < m_timers.Count;i++ )
         {
-            if (m_timers[i].m_timerName.Equals(timerName))
+            TimerEvent te = m_timers[i];
+            if (te.m_timerName.Equals(timerName))
             {
-                DestroyTimer(m_timers[i], isCallBack);
+                DestroyTimer(te, isCallBack);
             }
         }
     }
@@ -253,9 +263,11 @@ public class Timer
     {
         for (int i = 0; i < m_timers.Count; i++)
         {
-            if (m_timers[i].m_timerName.Equals(timerName))
+            var e = m_timers[i];
+
+            if (e.m_timerName.Equals(timerName))
             {
-                ResetTimer(m_timers[i]);
+                ResetTimer(e);
             }
         }
     }

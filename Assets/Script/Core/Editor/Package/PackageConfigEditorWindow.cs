@@ -247,6 +247,8 @@ public class BundleConfigEditorWindow : EditorWindow
                 relyPackages[i].path = c_relyAssetsBundlePath + "/" + relyPackages[i].name;
                 EditorGUILayout.LabelField("Path: ", relyPackages[i].path);
 
+                relyPackages[i].isCollectDependencies = EditorGUILayout.Toggle("收集依赖", relyPackages[i].isCollectDependencies);
+
                 //子资源视图
                 relyPackages[i].isFold_objects = EditorGUILayout.Foldout(relyPackages[i].isFold_objects, "Objects");
                 EditorGUI.indentLevel = 5;
@@ -317,9 +319,19 @@ public class BundleConfigEditorWindow : EditorWindow
                 }
             }
         }
-        //if (GUILayout.Button("资源去重"))
-        //{
-        //}
+
+        if (GUILayout.Button("打印所有依赖资源"))
+        {
+            for (int i = 0; i < pack.objects.Count; i++)
+            {
+                Object[] objs = GetCorrelationResource(pack.objects[i].obj);
+                for (int j = 0; j < objs.Length; j++)
+                {
+                    Debug.Log(pack.objects[i].obj + " -> " + objs[j]);
+                }
+            }
+        }
+
         EditorGUILayout.EndHorizontal();
     }
 
@@ -1799,6 +1811,9 @@ public class EditPackageConfig
 
     public List<EditorObject> objects = new List<EditorObject>();  //所有子资源
     public bool isFold_objects = false; //子资源是否折叠
+
+    //依赖包独有
+    public bool isCollectDependencies = true; //收集依赖
 
     //bundle独有
     public EditorObject mainObject;     //主资源

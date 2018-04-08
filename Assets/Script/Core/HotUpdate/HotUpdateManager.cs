@@ -107,7 +107,7 @@ public class HotUpdateManager
         if (www.error != null && www.error != "")
         {
             //下载失败
-            Debug.LogError("Version File DownLoad Error URL:" + s_versionFileDownLoadPath + " error:" + www.error);
+            //Debug.LogError("Version File DownLoad Error URL:" + s_versionFileDownLoadPath + " error:" + www.error);
 
             UpdateDateCallBack(HotUpdateStatusEnum.VersionFileDownLoadFail, 0);
             yield break;
