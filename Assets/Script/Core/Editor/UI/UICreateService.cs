@@ -326,8 +326,8 @@ public class UICreateService
         maskrt.anchorMax = Vector2.one;
 
         GameObject tips = new GameObject("Tips");
-        mask.layer = LayerMask.NameToLayer("UI");
-        RectTransform tipsrt = mask.AddComponent<RectTransform>();
+        tips.layer = LayerMask.NameToLayer("UI");
+        RectTransform tipsrt = tips.AddComponent<RectTransform>();
         tipsrt.SetParent(root);
 
         guideBaseTmp.m_objectList.Add(tips);

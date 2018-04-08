@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
-
+#pragma warning disable
 public class PackageService
 {
-    static BuildAssetBundleOptions relyBuildOption; //依赖包打包设置
-    static BuildAssetBundleOptions bundleBuildOption; //Bundle包打包设置
+    static BuildAssetBundleOptions relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle    //每次二进制一致  //依赖包打包设置      
+                                                    | BuildAssetBundleOptions.CollectDependencies;         //完整资源     
+                                                                                                       // | BuildAssetBundleOptions.ChunkBasedCompression;   //块压缩 
+
+    static BuildAssetBundleOptions bundleBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle  //每次二进制一致  //Bundle打包设置
+                                                       | BuildAssetBundleOptions.CollectDependencies     //收集依赖
+                                                       | BuildAssetBundleOptions.CompleteAssets;         //完整资源
+                                                       //| BuildAssetBundleOptions.ChunkBasedCompression; //块压缩
     static BuildTarget GetTargetPlatform
     {
         get
@@ -26,21 +32,8 @@ public class PackageService
         }
     }
 
-#pragma warning disable
-
     public static IEnumerator Package(List<EditPackageConfig> relyPackages, List<EditPackageConfig> bundles, PackageCallBack callBack)
     {
-        relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
-               //| BuildAssetBundleOptions.CollectDependencies   //收集依赖
-               | BuildAssetBundleOptions.CompleteAssets          //完整资源
-               | BuildAssetBundleOptions.ChunkBasedCompression;  //块压缩
-
-        bundleBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
-               | BuildAssetBundleOptions.CollectDependencies   //收集依赖
-               | BuildAssetBundleOptions.CompleteAssets      //完整资源
-               | BuildAssetBundleOptions.ChunkBasedCompression;  //块压缩
-
-
         BuildPipeline.PushAssetDependencies();
 
         float sumCount = relyPackages.Count + bundles.Count;
@@ -87,11 +80,6 @@ public class PackageService
 
     public static void Package(List<EditPackageConfig> relyPackages, List<EditPackageConfig> bundles)
     {
-        relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
-               | BuildAssetBundleOptions.CollectDependencies   //收集依赖
-               | BuildAssetBundleOptions.CompleteAssets;      //完整资源
-                                                              //| BuildAssetBundleOptions.UncompressedAssetBundle //不压缩
-
         BuildPipeline.PushAssetDependencies();
 
 
@@ -145,7 +133,16 @@ public class PackageService
 
         FileTool.CreatFilePath(path);
 
-        BuildPipeline.BuildAssetBundle(null, res, path, relyBuildOption, GetTargetPlatform);
+        if(package.isCollectDependencies)
+        {
+            BuildPipeline.BuildAssetBundle(null, res, path, relyBuildOption, GetTargetPlatform);
+        }
+        else
+        {
+            BuildAssetBundleOptions bbo = BuildAssetBundleOptions.DeterministicAssetBundle;
+
+            BuildPipeline.BuildAssetBundle(null, res, path, bbo, GetTargetPlatform);
+        }
     }
 
     static void PackageBundle(EditPackageConfig package)
