@@ -333,8 +333,8 @@ public class UICreateService
         guideBaseTmp.m_objectList.Add(tips);
 
         GameObject Text_tips = new GameObject("Text_tip");
-        mask.layer = LayerMask.NameToLayer("UI");
-        RectTransform txt_tipsrt = mask.AddComponent<RectTransform>();
+        Text_tips.layer = LayerMask.NameToLayer("UI");
+        RectTransform txt_tipsrt = Text_tips.AddComponent<RectTransform>();
         Text txt = Text_tips.AddComponent<Text>();
         txt_tipsrt.SetParent(tipsrt);
 
