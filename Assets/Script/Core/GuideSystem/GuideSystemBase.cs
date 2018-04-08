@@ -258,7 +258,7 @@ namespace FrameWork.GuideSystem
 
         void ReceviceClickEvent(InputUIOnClickEvent e)
         {
-            if (GetClickToNext(m_currentGuideData) && GuideClickFilter(e))
+            if (IsStart && GetClickToNext(m_currentGuideData) && GuideClickFilter(e))
             {
                 NextGuide();
             }
@@ -266,7 +266,7 @@ namespace FrameWork.GuideSystem
 
         void ReceviceUIOpenEvent(UIWindowBase UI, params object[] objs)
         {
-            if (!m_isOperationUI && UI.UIName.Equals(GetGuideWindowName(m_currentGuideData)))
+            if (IsStart && !m_isOperationUI && UI.UIName.Equals(GetGuideWindowName(m_currentGuideData)))
             {
                 m_isOperationUI = true;
                 m_currentOperationWindow = UI;
@@ -276,7 +276,7 @@ namespace FrameWork.GuideSystem
 
         void ReceviceUIShowEvent(UIWindowBase UI, params object[] objs)
         {
-            if (!m_isOperationUI && UI.UIName.Equals(GetGuideWindowName(m_currentGuideData)))
+            if (IsStart && !m_isOperationUI && UI.UIName.Equals(GetGuideWindowName(m_currentGuideData)))
             {
                 m_isOperationUI = true;
                 m_currentOperationWindow = UI;
@@ -305,26 +305,14 @@ namespace FrameWork.GuideSystem
                 m_isInit = true;
                 LoadGuideData();
                 GetGuideRecord();
+
+                InputManager.AddAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
+                UISystemEvent.RegisterAllUIEvent(UIEvent.OnOpen, ReceviceUIOpenEvent);
+                UISystemEvent.RegisterAllUIEvent(UIEvent.OnShow, ReceviceUIShowEvent);
+                UISystemEvent.RegisterAllUIEvent(UIEvent.OnClose, ReceviceUICloseEvent);
+
+                ApplicationManager.s_OnApplicationUpdate += Update;
             }
-        }
-
-        void StartGuide()
-        {
-            m_isStart = true;
-
-            m_guideWindowBase = (GuideWindowBase)UIManager.OpenUIWindow(c_guideWindowName);
-
-            InputManager.AddAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
-            UISystemEvent.RegisterAllUIEvent(UIEvent.OnOpen, ReceviceUIOpenEvent);
-            UISystemEvent.RegisterAllUIEvent(UIEvent.OnShow, ReceviceUIShowEvent);
-            UISystemEvent.RegisterAllUIEvent(UIEvent.OnClose, ReceviceUICloseEvent);
-
-            ApplicationManager.s_OnApplicationUpdate += Update;
-
-            OnStart();
-
-            SetCurrent(LoadFirstGuide());
-            GuideLogic();
         }
 
         void EndGuide()
@@ -332,7 +320,9 @@ namespace FrameWork.GuideSystem
             m_isStart = false;
             m_isOperationUI = false;
 
-            UIManager.CloseUIWindow(m_guideWindowBase);
+            if(m_guideWindowBase != null)
+                UIManager.CloseUIWindow(m_guideWindowBase);
+
             m_guideWindowBase = null;
 
             InputManager.RemoveAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
@@ -341,6 +331,19 @@ namespace FrameWork.GuideSystem
             UISystemEvent.RemoveAllUIEvent(UIEvent.OnClose, ReceviceUICloseEvent);
 
             ApplicationManager.s_OnApplicationUpdate -= Update;
+        }
+
+        void StartGuide()
+        {
+            m_isStart = true;
+
+            SetCurrent(LoadFirstGuide());
+
+            m_guideWindowBase = (GuideWindowBase)UIManager.OpenUIWindow(c_guideWindowName);
+
+            OnStart();
+
+            GuideLogic();
         }
 
         void NextGuide()
@@ -423,7 +426,8 @@ namespace FrameWork.GuideSystem
             if(m_guideData.TableIDs.Count == 0)
             {
                 Dispose();
-                throw new System.Exception("LoadFirstGuide :新手引导无记录！");
+                Debug.LogError("LoadFirstGuide :新手引导无记录！");
+                return null;
             }
 
             SingleData guideData = null;

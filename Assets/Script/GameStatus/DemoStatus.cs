@@ -6,6 +6,7 @@ public class DemoStatus : IApplicationStatus
 {
     public override void OnEnterStatus()
     {
+        GuideSyetem.Instance.Start();
         OpenUI<MainWindow>();
     }
 }

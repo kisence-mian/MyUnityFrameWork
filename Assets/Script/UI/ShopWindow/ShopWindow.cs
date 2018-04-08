@@ -60,7 +60,7 @@ public class ShopWindow : UIWindowBase
         {
             SingleData singleData = itemData.GetLineFromKey(itemData.TableIDs[i]);
 
-            string itemName = singleData.GetString("Name");
+            string itemName = singleData.GetString("ItemName");
             int cost = singleData.GetInt("Cost");
 
             Dictionary<string, object> tmp = new Dictionary<string, object>();
