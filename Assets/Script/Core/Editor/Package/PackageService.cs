@@ -7,6 +7,7 @@ using UnityEngine;
 public class PackageService
 {
     static BuildAssetBundleOptions relyBuildOption; //依赖包打包设置
+    static BuildAssetBundleOptions bundleBuildOption; //Bundle包打包设置
     static BuildTarget GetTargetPlatform
     {
         get
@@ -30,9 +31,15 @@ public class PackageService
     public static IEnumerator Package(List<EditPackageConfig> relyPackages, List<EditPackageConfig> bundles, PackageCallBack callBack)
     {
         relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
+               //| BuildAssetBundleOptions.CollectDependencies   //收集依赖
+               | BuildAssetBundleOptions.CompleteAssets          //完整资源
+               | BuildAssetBundleOptions.ChunkBasedCompression;  //块压缩
+
+        bundleBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
                | BuildAssetBundleOptions.CollectDependencies   //收集依赖
-               | BuildAssetBundleOptions.CompleteAssets;      //完整资源
-                                                              //| BuildAssetBundleOptions.UncompressedAssetBundle //不压缩
+               | BuildAssetBundleOptions.CompleteAssets      //完整资源
+               | BuildAssetBundleOptions.ChunkBasedCompression;  //块压缩
+
 
         BuildPipeline.PushAssetDependencies();
 
@@ -72,10 +79,6 @@ public class PackageService
             yield return 0;
         }
 
-        //for (int i = 0; i < m_NoPackagekFile.Count; i++)
-        //{
-        //    CopyFile(m_NoPackagekFile[i]);
-        //}
 
         BuildPipeline.PopAssetDependencies();
 
@@ -162,7 +165,7 @@ public class PackageService
 
         FileTool.CreatFilePath(path);
 
-        BuildPipeline.BuildAssetBundle(package.mainObject.obj, res, path, relyBuildOption, GetTargetPlatform);
+        BuildPipeline.BuildAssetBundle(package.mainObject.obj, res, path, bundleBuildOption, GetTargetPlatform);
 
         BuildPipeline.PopAssetDependencies();
     }

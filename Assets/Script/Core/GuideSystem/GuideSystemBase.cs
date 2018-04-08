@@ -21,6 +21,7 @@ namespace FrameWork.GuideSystem
 
         public const string c_CallToNextKey = "CallToNext";    //是否调用去下一步引导
         public const string c_ClickToNextKey = "ClickToNext";  //是否点击去下一步引导
+        public const string c_ConditionToNextKey = "ConditionToNextKey";    //是否自动判断条件去下一步引导
 
         public const string c_GuideWindowNameKey = "GuideWindowName";  //引导的界面名字
         public const string c_GuideObjectNameKey = "GuideObjectName";  //高亮显示的对象名字
@@ -329,6 +330,7 @@ namespace FrameWork.GuideSystem
         void EndGuide()
         {
             m_isStart = false;
+            m_isOperationUI = false;
 
             UIManager.CloseUIWindow(m_guideWindowBase);
             m_guideWindowBase = null;
@@ -343,33 +345,29 @@ namespace FrameWork.GuideSystem
 
         void NextGuide()
         {
-            //判断是否满足进行下一步的条件
-            if (GuideNextCondition())
+            //清除上一步的操作
+            ClearGuideLogic();
+
+            //如果是结束点则保存这一步
+            if (GuideEndCondition())
+                SaveGuideRecord(m_currentGuideData);
+
+            SingleData nextGuideData = GetNextGuideData(m_currentGuideData);
+
+            //退出判断
+            if (!GuideEndCondition()
+                && !GuideCloseCondition()
+                && nextGuideData != null)
             {
-                //清除上一步的操作
-                ClearGuideLogic();
+                //读取下一步引导
+                SetCurrent(nextGuideData);
 
-                //如果是结束点则保存这一步
-                if(GuideEndCondition())
-                    SaveGuideRecord(m_currentGuideData);
-
-                SingleData nextGuideData = GetNextGuideData(m_currentGuideData);
-
-                //退出判断
-                if (!GuideEndCondition() 
-                    && !GuideCloseCondition()
-                    && nextGuideData != null)
-                {
-                    //读取下一步引导
-                    SetCurrent(nextGuideData);
-
-                    //引导逻辑
-                    GuideLogic();
-                }
-                else
-                {
-                    EndGuide();
-                }
+                //引导逻辑
+                GuideLogic();
+            }
+            else
+            {
+                EndGuide();
             }
         }
 
@@ -492,6 +490,14 @@ namespace FrameWork.GuideSystem
 
         protected bool GetGuideClosePoint(SingleData data)
         {
+            //对旧项目做兼容
+            if (!data.ContainsKey(c_guideClosePoint)
+                && !data.data.m_defaultValue.ContainsKey(c_guideClosePoint))
+            {
+                return false;
+            }
+
+
             return data.GetBool(c_guideClosePoint);
         }
 
@@ -503,6 +509,18 @@ namespace FrameWork.GuideSystem
         protected bool GetClickToNext(SingleData data)
         {
             return data.GetBool(c_ClickToNextKey);
+        }
+
+        protected bool GetConditionToNext(SingleData data)
+        {
+            //对旧项目做兼容
+            if (!data.ContainsKey(c_ConditionToNextKey)
+                && !data.data.m_defaultValue.ContainsKey(c_ConditionToNextKey))
+            {
+                return false;
+            }
+
+            return data.GetBool(c_ConditionToNextKey);
         }
 
         protected string GetGuideWindowName(SingleData data)
@@ -579,12 +597,24 @@ namespace FrameWork.GuideSystem
 
         void Update()
         {
-            if(!DevelopReplayManager.IsReplay 
-                && ApplicationManager.AppMode == AppMode.Developing)
+            if (IsStart)
             {
-                if(Input.GetKeyDown(KeyCode.F3))
+                if (!DevelopReplayManager.IsReplay
+                    && ApplicationManager.AppMode == AppMode.Developing)
                 {
-                    Dispose();
+                    if (Input.GetKeyDown(KeyCode.F3))
+                    {
+                        Dispose();
+                    }
+                }
+
+                if (GetConditionToNext(m_currentGuideData))
+                {
+                    //判断是否满足进行下一步的条件
+                    if (GuideNextCondition())
+                    {
+                        NextGuide();
+                    }
                 }
             }
         }

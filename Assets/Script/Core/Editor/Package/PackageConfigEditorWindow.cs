@@ -317,9 +317,19 @@ public class BundleConfigEditorWindow : EditorWindow
                 }
             }
         }
-        //if (GUILayout.Button("资源去重"))
-        //{
-        //}
+
+        if (GUILayout.Button("打印所有依赖资源"))
+        {
+            for (int i = 0; i < pack.objects.Count; i++)
+            {
+                Object[] objs = GetCorrelationResource(pack.objects[i].obj);
+                for (int j = 0; j < objs.Length; j++)
+                {
+                    Debug.Log(pack.objects[i].obj + " -> " + objs[j]);
+                }
+            }
+        }
+
         EditorGUILayout.EndHorizontal();
     }
 

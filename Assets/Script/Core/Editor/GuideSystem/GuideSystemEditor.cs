@@ -106,15 +106,20 @@ public class GuideSystemEditor
         data.SetNote(GuideSystemBase.c_NextGuideNameKey, "下一步引导,如果为空,则为下一条记录");
         data.SetFieldType(GuideSystemBase.c_NextGuideNameKey, FieldType.String, null);
 
+        data.TableKeys.Add(GuideSystemBase.c_ClickToNextKey);
+        data.SetDefault(GuideSystemBase.c_ClickToNextKey, "False");
+        data.SetNote(GuideSystemBase.c_ClickToNextKey, "是否接收点击去下一步引导");
+        data.SetFieldType(GuideSystemBase.c_ClickToNextKey, FieldType.Bool, null);
+
         data.TableKeys.Add(GuideSystemBase.c_CallToNextKey);
         data.SetDefault(GuideSystemBase.c_CallToNextKey, "False");
         data.SetNote(GuideSystemBase.c_CallToNextKey, "是否接收调用去下一步引导");
         data.SetFieldType(GuideSystemBase.c_CallToNextKey, FieldType.Bool, null);
 
-        data.TableKeys.Add(GuideSystemBase.c_ClickToNextKey);
-        data.SetDefault(GuideSystemBase.c_ClickToNextKey, "False");
-        data.SetNote(GuideSystemBase.c_ClickToNextKey, "是否接收点击去下一步引导");
-        data.SetFieldType(GuideSystemBase.c_ClickToNextKey, FieldType.Bool, null);
+        data.TableKeys.Add(GuideSystemBase.c_ConditionToNextKey);
+        data.SetDefault(GuideSystemBase.c_ConditionToNextKey, "False");
+        data.SetNote(GuideSystemBase.c_ConditionToNextKey, "是否自动判断条件去下一步引导");
+        data.SetFieldType(GuideSystemBase.c_ConditionToNextKey, FieldType.Bool, null);
 
         data.TableKeys.Add(GuideSystemBase.c_GuideWindowNameKey);
         data.SetDefault(GuideSystemBase.c_GuideWindowNameKey, "Null");
