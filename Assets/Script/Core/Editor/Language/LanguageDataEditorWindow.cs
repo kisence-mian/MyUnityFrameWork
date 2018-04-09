@@ -25,7 +25,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
     SystemLanguage m_defaultLanguage = SystemLanguage.ChineseSimplified;
 
-    [MenuItem("Window/多语言编辑器", priority = 600)]
+    [MenuItem("Window/多语言编辑器 &5", priority = 600)]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(LanguageDataEditorWindow));
