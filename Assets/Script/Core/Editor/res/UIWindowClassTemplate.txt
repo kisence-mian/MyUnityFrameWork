@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections;
 
 public class {0} : UIWindowBase 
@@ -16,23 +16,23 @@ public class {0} : UIWindowBase
 
     }
 
-    //UI的进入动画
-    public override IEnumerator EnterAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
+    //UI的进入动画 调用 base.EnterAnim 表示进入动画播放完成
+    public override IEnumerator EnterAnim(UIAnimCallBack animComplete, UICallBack callBack, params object[] objs)
     {
         AnimSystem.UguiAlpha(gameObject, 0, 1, callBack:(object[] obj)=>
         {
-            StartCoroutine(base.EnterAnim(l_animComplete, l_callBack, objs));
+            StartCoroutine(base.EnterAnim(animComplete, callBack, objs));
         });
 
         yield return new WaitForEndOfFrame();
     }
 
-    //UI的退出动画
-    public override IEnumerator ExitAnim(UIAnimCallBack l_animComplete, UICallBack l_callBack, params object[] objs)
+    //UI的退出动画 调用 base.ExitAnim 表示退出动画播放完成
+    public override IEnumerator ExitAnim(UIAnimCallBack animComplete, UICallBack callBack, params object[] objs)
     {
         AnimSystem.UguiAlpha(gameObject , null, 0, callBack:(object[] obj) =>
         {
-            StartCoroutine(base.ExitAnim(l_animComplete, l_callBack, objs));
+            StartCoroutine(base.ExitAnim(animComplete, callBack, objs));
         });
 
         yield return new WaitForEndOfFrame();
