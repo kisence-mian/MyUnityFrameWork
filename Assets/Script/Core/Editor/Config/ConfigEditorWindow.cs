@@ -12,7 +12,7 @@ public class ConfigEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
 
-    [MenuItem("Window/配置编辑器", priority = 500)]
+    [MenuItem("Window/配置编辑器 &4", priority = 502)]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(ConfigEditorWindow));

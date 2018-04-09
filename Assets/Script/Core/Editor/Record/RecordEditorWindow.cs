@@ -10,7 +10,7 @@ public class RecordEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
 
-    [MenuItem("Window/持久数据编辑器", priority = 500)]
+    [MenuItem("Window/持久数据编辑器 &3", priority = 501)]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(RecordEditorWindow));
