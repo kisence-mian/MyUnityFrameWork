@@ -38,6 +38,7 @@ namespace FrameWork.GuideSystem
 
         bool m_isInit = false;
         bool m_isStart = false;
+        bool m_isRegister = false;
 
         bool m_isOperationUI = false;  //是否已经操作了UI
         protected GuideWindowBase m_guideWindowBase; //当前引导界面
@@ -305,32 +306,7 @@ namespace FrameWork.GuideSystem
                 m_isInit = true;
                 LoadGuideData();
                 GetGuideRecord();
-
-                InputManager.AddAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
-                UISystemEvent.RegisterAllUIEvent(UIEvent.OnOpen, ReceviceUIOpenEvent);
-                UISystemEvent.RegisterAllUIEvent(UIEvent.OnShow, ReceviceUIShowEvent);
-                UISystemEvent.RegisterAllUIEvent(UIEvent.OnClose, ReceviceUICloseEvent);
-
-                ApplicationManager.s_OnApplicationUpdate += Update;
             }
-        }
-
-        void EndGuide()
-        {
-            m_isStart = false;
-            m_isOperationUI = false;
-
-            if(m_guideWindowBase != null)
-                UIManager.CloseUIWindow(m_guideWindowBase);
-
-            m_guideWindowBase = null;
-
-            InputManager.RemoveAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
-            UISystemEvent.RemoveAllUIEvent(UIEvent.OnOpen, ReceviceUIOpenEvent);
-            UISystemEvent.RemoveAllUIEvent(UIEvent.OnShow, ReceviceUIShowEvent);
-            UISystemEvent.RemoveAllUIEvent(UIEvent.OnClose, ReceviceUICloseEvent);
-
-            ApplicationManager.s_OnApplicationUpdate -= Update;
         }
 
         void StartGuide()
@@ -344,6 +320,40 @@ namespace FrameWork.GuideSystem
             OnStart();
 
             GuideLogic();
+
+            if(!m_isRegister)
+            {
+                m_isRegister = true;
+                InputManager.AddAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
+                UISystemEvent.RegisterAllUIEvent(UIEvent.OnOpen, ReceviceUIOpenEvent);
+                UISystemEvent.RegisterAllUIEvent(UIEvent.OnShow, ReceviceUIShowEvent);
+                UISystemEvent.RegisterAllUIEvent(UIEvent.OnClose, ReceviceUICloseEvent);
+
+                ApplicationManager.s_OnApplicationUpdate += Update;
+            }
+
+        }
+
+        void EndGuide()
+        {
+            m_isStart = false;
+            m_isOperationUI = false;
+
+            if (m_guideWindowBase != null)
+                UIManager.CloseUIWindow(m_guideWindowBase);
+
+            m_guideWindowBase = null;
+
+            if (m_isRegister)
+            {
+                m_isRegister = false;
+                InputManager.RemoveAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
+                UISystemEvent.RemoveAllUIEvent(UIEvent.OnOpen, ReceviceUIOpenEvent);
+                UISystemEvent.RemoveAllUIEvent(UIEvent.OnShow, ReceviceUIShowEvent);
+                UISystemEvent.RemoveAllUIEvent(UIEvent.OnClose, ReceviceUICloseEvent);
+
+                ApplicationManager.s_OnApplicationUpdate -= Update;
+            }
         }
 
         void NextGuide()
