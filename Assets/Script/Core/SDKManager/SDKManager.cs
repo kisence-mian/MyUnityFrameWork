@@ -586,6 +586,8 @@ public class SDKManager
     #endregion
 }
 
+#region 声明
+
 public delegate void LoginCallBack(string ID, Dictionary<string,object> data);
 public delegate void PayCallBack(string goodsID, Dictionary<string, object> data);
 
@@ -613,3 +615,5 @@ public class SDKConfigData
     public string SDKName;
     public string SDKContent;
 }
+
+#endregion

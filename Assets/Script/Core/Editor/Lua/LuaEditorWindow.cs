@@ -82,8 +82,14 @@ public class LuaEditorWindow : EditorWindow
         string resPath = Application.dataPath + "/Script/Core/Editor/res/LuaLib";
         string aimPath = Application.dataPath + "/Resources/LuaLib";
 
+        string pluginsResPath = Application.dataPath + "/Script/Core/Lua/ToLua/PluginsRes";
+        string pluginsPath = Application.dataPath + "/Lua/Plugins";
+
         //复制lua初始库文件
         FileTool.CopyDirectory(resPath, aimPath);
+
+        //拷贝LuaPlugins文件
+        FileTool.CopyDirectory(pluginsResPath, pluginsPath);
 
         //初始Warp
         ToLuaMenu.GenLuaAll();

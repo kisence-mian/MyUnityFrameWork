@@ -1092,6 +1092,7 @@ public class UIBase : MonoBehaviour
         canvas.sortingOrder = order;
         canvas.sortingLayerName = "Guide";
 
+
         if (!oldActive)
         {
             go.SetActive(false);

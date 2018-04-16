@@ -86,7 +86,7 @@ namespace FrameWork.GuideSystem
         /// </summary>
         public void Next()
         {
-            if (GetCallToNext(m_currentGuideData) && GuideCallFilter())
+            if ( IsStart && GetCallToNext(m_currentGuideData) && GuideCallFilter())
             {
                 NextGuide();
             }
@@ -116,6 +116,16 @@ namespace FrameWork.GuideSystem
         /// 新手引导启动时调用
         /// </summary>
         protected virtual void OnStart()
+        {
+
+        }
+
+        protected virtual void OnCloseGuide()
+        {
+
+        }
+
+        protected virtual void OnEndGuide()
         {
 
         }
@@ -242,7 +252,74 @@ namespace FrameWork.GuideSystem
         /// </summary>
         protected virtual bool GuideClickFilter(InputUIOnClickEvent e)
         {
+            //if(GetGuideWindowName(m_currentGuideData) != null)
+            //{
+            //    if(!e.EventKey.Contains(GetGuideWindowName(m_currentGuideData)))
+            //    {
+            //        return false;
+            //    }
+            //}
+
+            if (GetGuideObjectNames(m_currentGuideData).Length != 0)
+            {
+                string[] objnames = GetGuideObjectNames(m_currentGuideData);
+                bool isExist = false;
+                for (int i = 0; i < objnames.Length; i++)
+                {
+                    string objName = GetObjName(objnames[i]);
+
+                    if (e.EventKey.Contains(objName))
+                    {
+                        isExist = true;
+                    }
+                }
+
+                if(!isExist)
+                {
+                    return false;
+                }
+            }
+
+            if (GetGuideItemNames(m_currentGuideData).Length != 0)
+            {
+                string[] objnames = GetGuideItemNames(m_currentGuideData);
+                bool isExist = false;
+                for (int i = 0; i < objnames.Length; i++)
+                {
+                    string itemName = GetObjName(objnames[i]);
+
+                    if (e.EventKey.Contains(objnames[i]))
+                    {
+                        isExist = true;
+                    }
+                }
+
+                if (!isExist)
+                {
+                    return false;
+                }
+            }
+
             return true;
+        }
+
+        string GetObjName(string objName)
+        {
+            if(objName.Contains("."))
+            {
+                string[] temp = objName.Split('.');
+
+                objName = temp[temp.Length - 1];
+            }
+
+            if(objName.Contains("["))
+            {
+                string[] temp = objName.Split('[');
+
+                objName = temp[0];
+            }
+
+            return objName;
         }
 
         /// <summary>
@@ -336,6 +413,8 @@ namespace FrameWork.GuideSystem
 
         void EndGuide()
         {
+            OnCloseGuide();
+
             m_isStart = false;
             m_isOperationUI = false;
 
@@ -358,6 +437,9 @@ namespace FrameWork.GuideSystem
 
         void NextGuide()
         {
+            //
+            OnEndGuide();
+
             //清除上一步的操作
             ClearGuideLogic();
 
@@ -368,8 +450,7 @@ namespace FrameWork.GuideSystem
             SingleData nextGuideData = GetNextGuideData(m_currentGuideData);
 
             //退出判断
-            if (!GuideEndCondition()
-                && !GuideCloseCondition()
+            if (!GuideCloseCondition()
                 && nextGuideData != null)
             {
                 //读取下一步引导
