@@ -9,7 +9,7 @@ public class SystemInfoTool
         name = name.ToLower();
         if (name == "all") isall = true;
         string str = "";
-#if UNITY_5_6
+#if UNITY_5_6_OR_NEWER
         if (isall || name == "bundleidentifier") str = isall ? str + Application.identifier+"\n" : Application.identifier;
 #endif
 #if UNITY_5_5

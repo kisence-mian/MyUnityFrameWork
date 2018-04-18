@@ -60,7 +60,11 @@ namespace FrameWork.SDKInterface
         /// </summary>
         public static void Login()
         {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Login);
+            data.Add(SDKInterfaceDefine.Login_ParameterName_Device, Application.identifier);
 
+            Call(data);
         }
 
         /// <summary>
@@ -140,17 +144,52 @@ namespace FrameWork.SDKInterface
 
         #region 数据上报
 
-        /// <summary>
-        /// 数据上报
-        /// </summary>
-        /// <param name="data"></param>
-        public static void Log(string eventID, Dictionary<string, object> data)
+        public static void Log_Login(string AccountId, Dictionary<string, string> data = null)
         {
+            if(data == null)
+            {
+                data = new Dictionary<string, string>();
+            }
 
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Log_FunctionName_Login);
+            data.Add(SDKInterfaceDefine.Log_ParameterName_AccountId, AccountId);
+
+            Call(data);
         }
 
-        public static void Log(string eventID, Dictionary<string, string> data)
+        public static void Log_Loginout(string AccountId = null, Dictionary<string, string> data = null)
         {
+            if (data == null)
+            {
+                data = new Dictionary<string, string>();
+            }
+
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Log_FunctionName_LoginOut);
+            data.Add(SDKInterfaceDefine.Log_ParameterName_AccountId, AccountId);
+
+            Call(data);
+        }
+
+        public static void Log(string eventID, Dictionary<string, string> data = null)
+        {
+            Log(eventID, null, data);
+        }
+
+        public static void Log(string eventID, string label ,Dictionary<string, string> data = null)
+        {
+            if (data == null)
+            {
+                data = new Dictionary<string, string>();
+            }
+
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Log_FunctionName_Event);
+            data.Add(SDKInterfaceDefine.Log_ParameterName_EventID, eventID);
+            data.Add(SDKInterfaceDefine.Log_ParameterName_EventLabel, label);
+
+            Call(data);
         }
 
         #endregion
