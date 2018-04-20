@@ -288,9 +288,18 @@ namespace FrameWork.SDKInterface
 
         #region Login
 
+        public static CallBack<OnLoginInfo> OnLoginCallBack;
+
         static void OnLogin(Dictionary<string, string> data)
         {
+            bool isSuccess = bool.Parse(data[SDKInterfaceDefine.ParameterName_IsSuccess]);
+            string accountId = data[SDKInterfaceDefine.Login_ParameterName_AccountId];
 
+            OnLoginInfo info = new OnLoginInfo();
+            info.isSuccess = isSuccess;
+            info.accountId = accountId;
+
+            OnLoginCallBack(info);
         }
 
         #endregion
@@ -364,6 +373,12 @@ namespace FrameWork.SDKInterface
         public bool isSuccess;
         public string goodsId;
         public GoodsType goodsType;
+    }
+
+    public struct OnLoginInfo
+    {
+        public bool isSuccess;
+        public string accountId;
     }
 
     public enum GoodsType

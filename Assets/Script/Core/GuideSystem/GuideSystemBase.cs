@@ -237,6 +237,9 @@ namespace FrameWork.GuideSystem
             
             //清除手指
             m_guideWindowBase.HideAllGuideUI();
+
+            //清除文本
+            m_guideWindowBase.ClearTips();
         }
 
         /// <summary>

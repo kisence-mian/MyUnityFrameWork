@@ -40,6 +40,7 @@ namespace FrameWork.SDKInterface
         public const string FunctionName_Logout = "Logout";
 
         public const string Login_ParameterName_Device = "Device";
+        public const string Login_ParameterName_AccountId = "AccountId";
 
         //Pay相关参数
         public const string Pay_ParameterName_GoodsID     = "GoodsID";

@@ -122,6 +122,11 @@ namespace FrameWork.GuideSystem
             }
         }
 
+        public virtual void ClearTips()
+        {
+            m_TipTransfrom.gameObject.SetActive(false);
+        }
+
         public virtual void SetMaskAlpha(float alpha)
         {
             if(alpha != 0)
