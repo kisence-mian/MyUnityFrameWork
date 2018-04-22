@@ -13,7 +13,11 @@ public class Log
 
 	public static void Init(bool isOpenLog = true)
     {
+#if UNITY_2017
+        Debug.unityLogger.logEnabled = isOpenLog;
+#else
         Debug.logger.logEnabled = isOpenLog;
+#endif
 
         if (isOpenLog)
         {

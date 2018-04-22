@@ -17,7 +17,7 @@ public class ReusingScrollRect : ScrollRectInput
     public List<ReusingScrollItemBase> m_items = new List<ReusingScrollItemBase>();
     public List<ReusingScrollItemBase> m_itemCaches = new List<ReusingScrollItemBase>();
 
-    RectTransform m_rectTransform;
+    //RectTransform m_rectTransform;
 
     private Bounds m_viewBounds;
     public GameObject m_itemPrefab;
@@ -37,7 +37,7 @@ public class ReusingScrollRect : ScrollRectInput
         base.Init(UIEventKey);
 
         m_ItemName = itemName;
-        m_rectTransform = GetComponent<RectTransform>();
+        //m_rectTransform = GetComponent<RectTransform>();
 
         Rebuild(CanvasUpdate.Layout);
 

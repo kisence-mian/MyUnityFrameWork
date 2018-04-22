@@ -291,7 +291,7 @@ namespace FrameWork.GuideSystem
                 {
                     string itemName = GetObjName(objnames[i]);
 
-                    if (e.EventKey.Contains(objnames[i]))
+                    if (e.EventKey.Contains(itemName))
                     {
                         isExist = true;
                     }
