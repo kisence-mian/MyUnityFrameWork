@@ -43,7 +43,7 @@ class ProjectBuildService : Editor
             {
                 if (arg.StartsWith("ExportPath"))
                 {
-                    path =  arg.Split("-"[0])[1];
+                    path = arg.Split("-"[0])[1];
                 }
             }
 
@@ -216,7 +216,7 @@ class ProjectBuildService : Editor
         FileTool.SafeDeleteDirectory(Application.dataPath + "/Resources");
     }
 
-#endregion
+    #endregion
 
     #region Android
 
@@ -243,25 +243,37 @@ class ProjectBuildService : Editor
         ApplyScriptDefine();
 
         //设置签名
-            //签名路径
-            PlayerSettings.Android.keystoreName = "";
-            //密钥密码
-            PlayerSettings.Android.keystorePass = "";
-            //密钥别名
-            PlayerSettings.Android.keyaliasName = "";
-            //别名密码
-            PlayerSettings.Android.keyaliasPass = "";
+        //签名路径
+        PlayerSettings.Android.keystoreName = "";
+        //密钥密码
+        PlayerSettings.Android.keystorePass = "";
+        //密钥别名
+        PlayerSettings.Android.keyaliasName = "";
+        //别名密码
+        PlayerSettings.Android.keyaliasPass = "";
 
         //打包
         string path = ExportPath + "/" + GetPackageName() + ".apk";
 
+
+#if UNITY_2017_OR_NEWER
+		BuildPlayerOptions bo = new BuildPlayerOptions();
+		bo.scenes = GetBuildScenes();
+		bo.target = BuildTarget.Android;
+		bo.options = BuildOptions.None;
+        bo.locationPathName = path;
+		
+		BuildPipeline.BuildPlayer(bo);
+#else
         BuildOptions option = BuildOptions.None;
         if (ApplicationMode == AppMode.Release)
         {
             option = BuildOptions.Il2CPP;
         }
-
         BuildPipeline.BuildPlayer(GetBuildScenes(), path, BuildTarget.Android, option);
+#endif
+
+
     }
 
     #endregion
@@ -292,18 +304,27 @@ class ProjectBuildService : Editor
 
         //打包
 
+#if UNITY_2017_OR_NEWER
+        BuildPlayerOptions bo = new BuildPlayerOptions();
+        bo.scenes = GetBuildScenes();
+        bo.target = BuildTarget.iOS;
+        bo.options = BuildOptions.None;
+        bo.locationPathName = ExportPath;
+        
+        BuildPipeline.BuildPlayer(bo);
+#else
         BuildOptions option = BuildOptions.None;
         if (ApplicationMode == AppMode.Release)
         {
             option = BuildOptions.Il2CPP;
         }
-
         BuildPipeline.BuildPlayer(GetBuildScenes(), ExportPath, BuildTarget.iOS, option);
+#endif
     }
 
 #endregion
 
-    #region WEBGL
+#region WEBGL
 
     static void BuildForWEBGL()
     {
@@ -341,9 +362,9 @@ class ProjectBuildService : Editor
 
 #endregion
 
-    #endregion
+#endregion
 
-    #region 功能函数
+#region 功能函数
 
     //在这里找出你当前工程所有的场景文件，假设你只想把部分的scene文件打包 那么这里可以写你的条件判断 总之返回一个字符串数组。
     static string[] GetBuildScenes()
@@ -451,5 +472,5 @@ class ProjectBuildService : Editor
         }
     }
 
-    #endregion
+#endregion
 }
