@@ -1,8 +1,32 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 public class SystemInfoTool
 {
-
+    public enum SystemInfoNames
+    {
+        /// <summary>设备ID</summary>
+        bundleidentifier,
+        /// <summary>版本号</summary>
+        version,
+        devicemodel,
+        devicename,
+        deviceuniqueidentifier,
+        graphicsdevicename,
+        graphicsmemorysize,
+        graphicsmultithreaded,
+        operatingsystem,
+        processorcount,
+        processortype,
+        systemmemorysize,
+        developerbuild,
+        rsmodel,
+        all
+    }
+    
+    public static string GetSysInfo(SystemInfoNames name)
+    {
+        return GetSysInfo(name.ToString());
+    }
     public static string GetSysInfo(string name)
     {
         bool isall = false;
@@ -10,7 +34,7 @@ public class SystemInfoTool
         if (name == "all") isall = true;
         string str = "";
 #if UNITY_5_6_OR_NEWER
-        if (isall || name == "bundleidentifier") str = isall ? str + Application.identifier+"\n" : Application.identifier;
+        if (isall || name == "bundleidentifier") str = isall ? str + Application.identifier + "\n" : Application.identifier;
 #endif
 #if UNITY_5_5
         if (isall || name == "bundleidentifier") str = isall ? str + Application.bundleIdentifier + "\n" : Application.bundleIdentifier;
