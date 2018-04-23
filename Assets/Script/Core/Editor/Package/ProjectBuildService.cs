@@ -256,7 +256,7 @@ class ProjectBuildService : Editor
         string path = ExportPath + "/" + GetPackageName() + ".apk";
 
 
-#if UNITY_2017_OR_NEWER
+#if UNITY_2017_1_OR_NEWER
 		BuildPlayerOptions bo = new BuildPlayerOptions();
 		bo.scenes = GetBuildScenes();
 		bo.target = BuildTarget.Android;
@@ -304,7 +304,7 @@ class ProjectBuildService : Editor
 
         //打包
 
-#if UNITY_2017_OR_NEWER
+#if UNITY_2017_1_OR_NEWER
         BuildPlayerOptions bo = new BuildPlayerOptions();
         bo.scenes = GetBuildScenes();
         bo.target = BuildTarget.iOS;
