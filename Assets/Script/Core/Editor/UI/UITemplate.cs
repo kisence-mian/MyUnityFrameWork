@@ -773,23 +773,18 @@ public class UITemplate
 
     public void FindTemplateName(string path)
     {
-        FileTool.CreatPath(path);
-
-        string[] allUIPrefabName = Directory.GetFiles(path);
-        foreach (var item in allUIPrefabName)
+        if(Directory.Exists(path))
         {
-            if (item.EndsWith(".prefab"))
+            string[] allUIPrefabName = Directory.GetFiles(path);
+            foreach (var item in allUIPrefabName)
             {
-                string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
-                m_allTemplateName.Add(configName);
+                if (item.EndsWith(".prefab"))
+                {
+                    string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
+                    m_allTemplateName.Add(configName);
+                }
             }
         }
-
-        //string[] dires = Directory.GetDirectories(path);
-        //for (int i = 0; i < dires.Length; i++)
-        //{
-        //    FindConfigName(dires[i]);
-        //}
     }
 
 
