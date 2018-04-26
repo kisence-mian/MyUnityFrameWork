@@ -511,6 +511,10 @@ public class DataEditorWindow : EditorWindow
                         //弹出警告并重置数据
                         if (EditorUtility.DisplayDialog("警告", "改变字段类型会重置该字段的所有数据和默认值\n是否继续？", "是", "取消"))
                         {
+                            if (m_editorNewEnumIndex == -1)
+                            {
+                                m_editorNewEnumIndex = 0;
+                            }
                             m_currentData.SetFieldType(key, m_editorNewType, EditorTool.GetAllEnumType()[m_editorNewEnumIndex]);
                             ResetDataField(m_currentData, key, m_editorNewType, EditorTool.GetAllEnumType()[m_editorNewEnumIndex]);
 
