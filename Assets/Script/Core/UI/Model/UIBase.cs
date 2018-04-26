@@ -1019,6 +1019,11 @@ public class UIBase : MonoBehaviour
 
     }
 
+    public void SetAnchoredPosition(string ID,float x, float y)
+    {
+        GetRectTransform(ID).anchoredPosition = Vector2.right * x + Vector2.up * y;
+    }
+
     public void SetScale(string TextID, float x, float y, float z)
     {
         GetGameObject(TextID).transform.localScale = Vector3.right * x + Vector3.up * y + Vector3.forward * z;
