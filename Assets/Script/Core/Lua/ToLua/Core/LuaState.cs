@@ -312,13 +312,21 @@ namespace LuaInterface
 
         void BindTypeRef(int reference, Type t)
         {
-            metaMap.Add(t, reference);
-            typeMap.Add(reference, t);
-
-            if (t.IsGenericTypeDefinition)
+            try
             {
-                genericSet.Add(t);
+                metaMap.Add(t, reference);
+                typeMap.Add(reference, t);
+
+                if (t.IsGenericTypeDefinition)
+                {
+                    genericSet.Add(t);
+                }
             }
+            catch(Exception e)
+            {
+                Debug.LogError(reference + " " + t.FullName + " " + e.ToString());
+            }
+
         }
 
         public Type GetClassType(int reference)
@@ -409,9 +417,17 @@ namespace LuaInterface
                 throw new LuaException("must call BeginModule first");
             }
 
-            int reference = LuaDLL.tolua_beginenum(L, t.Name);
+            int reference = 0;
+
+            reference = LuaDLL.tolua_beginenum(L, t.Name);
             RegFunction("__gc", Collect);
-            BindTypeRef(reference, t);
+
+            if (!metaMap.ContainsKey(t))
+            { 
+                BindTypeRef(reference, t);
+            }
+
+
             return reference;
         }
 

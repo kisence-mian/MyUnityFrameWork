@@ -1,6 +1,6 @@
 fileFormatVersion: 2
-guid: b1ead8f44f44f03489dbaace838ac272
-timeCreated: 1524378268
+guid: 1c90bfe64d2c72946bd78a0747883a48
+timeCreated: 1456833383
 licenseType: Pro
 PluginImporter:
   externalObjects: {}
@@ -11,25 +11,23 @@ PluginImporter:
   isOverridable: 0
   platformData:
   - first:
-      '': Any
+      '': OSXIntel
     second:
       enabled: 0
       settings:
-        Exclude Android: 1
-        Exclude Editor: 1
-        Exclude Linux: 1
-        Exclude Linux64: 1
-        Exclude LinuxUniversal: 1
-        Exclude OSXUniversal: 1
-        Exclude Win: 1
-        Exclude Win64: 1
-        Exclude iOS: 1
+        CPU: AnyCPU
+  - first:
+      '': OSXIntel64
+    second:
+      enabled: 0
+      settings:
+        CPU: AnyCPU
   - first:
       Android: Android
     second:
       enabled: 0
       settings:
-        CPU: ARMv7
+        CPU: AnyCPU
   - first:
       Any: 
     second:
@@ -68,18 +66,6 @@ PluginImporter:
       settings:
         CPU: x86_64
   - first:
-      Standalone: LinuxUniversal
-    second:
-      enabled: 0
-      settings:
-        CPU: None
-  - first:
-      Standalone: OSXUniversal
-    second:
-      enabled: 0
-      settings:
-        CPU: AnyCPU
-  - first:
       Standalone: Win
     second:
       enabled: 0
@@ -94,7 +80,7 @@ PluginImporter:
   - first:
       iPhone: iOS
     second:
-      enabled: 0
+      enabled: 1
       settings:
         CompileFlags: 
         FrameworkDependencies: 

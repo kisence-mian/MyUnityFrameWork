@@ -14,7 +14,7 @@ public class LuaEditorWindow : EditorWindow
     List<string> m_LuaLibFileList;
     Dictionary<string, SingleField> m_luaConfig;
 
-    [MenuItem("Window/Lua设置编辑器")]
+    [MenuItem("Window/Lua设置编辑器 &7")]
     public static void ShowWindow()
     {
         EditorWindow.GetWindow(typeof(LuaEditorWindow));
@@ -90,6 +90,10 @@ public class LuaEditorWindow : EditorWindow
 
         //拷贝LuaPlugins文件
         FileTool.CopyDirectory(pluginsResPath, pluginsPath);
+
+        //修改文件名 dllx -> dll
+        FileTool.ChangeFileName(pluginsPath + "/x86/tolua.dllx", pluginsPath + "/x86/tolua.dll");
+        FileTool.ChangeFileName(pluginsPath + "/x86_64/tolua.dllx", pluginsPath + "/x86_64/tolua.dll");
 
         //初始Warp
         ToLuaMenu.GenLuaAll();

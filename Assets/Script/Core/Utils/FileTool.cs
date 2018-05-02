@@ -208,6 +208,15 @@ public class FileTool
         return paths[paths.Length - 1];
     }
 
+    //修改文件名
+    public static void ChangeFileName(string path,string newName)
+    {
+        if (System.IO.File.Exists(path))
+        {
+            System.IO.File.Move(path, newName);
+        }
+    }
+
     #endregion
 
     #region 文件编码
