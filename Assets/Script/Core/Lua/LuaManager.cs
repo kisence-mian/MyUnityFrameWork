@@ -88,6 +88,20 @@ public class LuaManager
         }
     }
 
+    public static object[] CallFunction(string functionName,params object[] objs)
+    {
+        var function = LuaState.GetFunction(functionName);
+
+        if(function != null)
+        {
+            return function.Call(objs);
+        }
+        else
+        {
+            throw new Exception("找不到Lua函数 ->" + functionName + "<-");
+        }
+    }
+
     static LuaFunction s_updateFunction;
 
     static void Update()

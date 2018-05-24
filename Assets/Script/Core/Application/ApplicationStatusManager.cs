@@ -36,6 +36,8 @@ public class ApplicationStatusManager
 
     public static void EnterStatus(string statusName)
     {
+        ApplicationManager.Instance.currentStatus = statusName;
+
         if (s_currentAppStatus != null)
         {
             s_currentAppStatus.CloseAllUI();
@@ -44,10 +46,12 @@ public class ApplicationStatusManager
 
         s_currentAppStatus = GetStatus(statusName);
 
-        ApplicationManager.Instance.StartCoroutine(s_currentAppStatus.InChangeScene(() =>
-        {
-            s_currentAppStatus.OnEnterStatus();
-        }));
+        s_currentAppStatus.OnEnterStatus();
+
+        //ApplicationManager.Instance.StartCoroutine(s_currentAppStatus.InChangeScene(() =>
+        //{
+        //    s_currentAppStatus.OnEnterStatus();
+        //}));
     }
 
     public static T GetStatus<T>() where T : IApplicationStatus
@@ -64,6 +68,7 @@ public class ApplicationStatusManager
         else
         {
             IApplicationStatus statusTmp = (IApplicationStatus)Activator.CreateInstance(Type.GetType(statusName));
+            statusTmp.OnCreate();
             s_status.Add(statusName, statusTmp);
 
             return statusTmp;

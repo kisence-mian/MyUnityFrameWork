@@ -38,7 +38,22 @@ public class JsonNetworkService : INetworkInterface
 
             string mes = Json.Serialize(data);
             mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
-            byte[] bytes = Encoding.UTF8.GetBytes(mes + "&");
+            byte[] bytes = Encoding.UTF8.GetBytes(mes + c_endChar);
+
+            m_socketService.Send(bytes);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e.ToString());
+        }
+    }
+
+    public override void SendMessage(string MessageType, string content)
+    {
+        try
+        {
+            content = content.Replace(c_endChar.ToString(), c_endCharReplaceString);
+            byte[] bytes = Encoding.UTF8.GetBytes(content + c_endChar);
 
             m_socketService.Send(bytes);
         }
@@ -96,6 +111,9 @@ public class JsonNetworkService : INetworkInterface
 
                 s = WWW.UnEscapeURL(s);
                 s = s.Replace(c_endCharReplaceString, c_endChar.ToString());
+
+                Debug.Log(s);
+
                 Dictionary<string, object> data = Json.Deserialize(s) as Dictionary<string, object>;
 
                 msg.m_data = data;

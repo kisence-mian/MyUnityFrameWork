@@ -95,6 +95,9 @@ public class LuaEditorWindow : EditorWindow
         FileTool.ChangeFileName(pluginsPath + "/x86/tolua.dllx", pluginsPath + "/x86/tolua.dll");
         FileTool.ChangeFileName(pluginsPath + "/x86_64/tolua.dllx", pluginsPath + "/x86_64/tolua.dll");
 
+        FileTool.ChangeFileName(pluginsPath + "/CString.dllx", pluginsPath + "/x86_64/CString.dll");
+        FileTool.ChangeFileName(pluginsPath + "/Debugger.dllx", pluginsPath + "/x86_64/Debugger.dll");
+
         //初始Warp
         ToLuaMenu.GenLuaAll();
 

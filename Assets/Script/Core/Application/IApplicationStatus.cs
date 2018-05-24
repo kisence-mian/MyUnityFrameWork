@@ -39,7 +39,13 @@ public abstract class IApplicationStatus
         }
         m_uiList.Clear();
     }
+    /// <summary>
+    /// 当状态第一次创建时调用（生命周期里只调用一次）
+    /// </summary>
+    public virtual void OnCreate()
+    {
 
+    }
     /// <summary>
     /// 测试使用，直接进入游戏某个流程时，这里可以初始化测试数据
     /// </summary>

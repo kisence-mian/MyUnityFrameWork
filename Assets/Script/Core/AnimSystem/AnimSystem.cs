@@ -19,11 +19,17 @@ public class AnimSystem : MonoBehaviour
     {
         if (instance == null)
         {
-            GameObject animGameObject = new GameObject();
-            animGameObject.name = "AnimSystem";
-            instance = animGameObject.AddComponent<AnimSystem>();
+            GameObject animGameObject = GameObject.Find("AnimSystem");
+            if (animGameObject == null)
+            {
+                animGameObject = new GameObject();
+                animGameObject.name = "AnimSystem";
+                instance = animGameObject.AddComponent<AnimSystem>();
+            }
 
-#if UNITY_EDITOR 
+            if(instance == null)
+               instance = animGameObject.GetComponent<AnimSystem>();
+
             if (Application.isPlaying)
             {
                 DontDestroyOnLoad(instance.gameObject);
@@ -32,10 +38,6 @@ public class AnimSystem : MonoBehaviour
             {
                 EditorApplication.update += instance.Update;
             }
-#else
-             DontDestroyOnLoad(instance.gameObject);
-
-#endif
         }
 
         return instance;

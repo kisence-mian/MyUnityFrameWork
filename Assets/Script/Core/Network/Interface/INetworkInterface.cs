@@ -41,6 +41,11 @@ public abstract class INetworkInterface
 
     }
 
+    public virtual void SendMessage(string MessageType, string content)
+    {
+
+    }
+
     public abstract void SpiltMessage(byte[] data, ref int offset, int length);
 
 }

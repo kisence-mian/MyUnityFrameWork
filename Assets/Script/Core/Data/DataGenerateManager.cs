@@ -50,7 +50,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
         }
 
        
-        DataTable data= GetDataTable();
+        DataTable data = GetDataTable();
         for (int i = 0; i < data.TableIDs.Count; i++)
         {
             GetData(data.TableIDs[i]);

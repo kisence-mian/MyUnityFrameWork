@@ -26,7 +26,8 @@ public class ApplicationManagerComponentEditor : Editor
 
         m_app.m_Status = m_statusList[m_currentSelectIndex];
         m_app.m_globalLogic = GetGlobaLogic();
-
+        if (Application.isPlaying)
+            GUILayout.Label("CurrentStatus: " + m_app.currentStatus);
         GUILayout.Space(10);
         if (m_app.m_globalLogic.Count != 0)
         {

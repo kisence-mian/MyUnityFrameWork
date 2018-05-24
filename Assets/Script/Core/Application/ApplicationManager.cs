@@ -56,7 +56,8 @@ public class ApplicationManager : MonoBehaviour
 
     [HideInInspector]
     public List<string> m_globalLogic;
-
+    [HideInInspector]
+    public string currentStatus;
     public void Awake()
     {
         instance = this;
