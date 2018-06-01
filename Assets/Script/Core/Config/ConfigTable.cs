@@ -249,5 +249,11 @@ public enum FieldType
     Vector3,
     Color,
     Enum,
+
     StringArray,
+    IntArray,
+    FloatArray,
+    BoolArray,
+    Vector2Array,
+    Vector3Array,
 }

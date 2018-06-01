@@ -601,6 +601,32 @@ public class SingleData : Dictionary<string, string>
         throw new Exception("Don't Exist Value or DefaultValue TableName is :->" + data.m_tableName + "<- key : ->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<-");// throw  
     }
 
+    public int[] GetIntArray(string key)
+    {
+        string content = null;
+
+        try
+        {
+            if (this.ContainsKey(key))
+            {
+                content = this[key];
+                return ParseTool.String2IntArray(content);
+            }
+
+            if (data.m_defaultValue.ContainsKey(key))
+            {
+                content = data.m_defaultValue[key];
+                return ParseTool.String2IntArray(content);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new Exception("SingleData GetIntArray Error TableName is :->" + data.m_tableName + "<- key : ->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- content: ->" + content + "<- \n" + e.ToString());
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue TableName is :->" + data.m_tableName + "<- key : ->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<-");// throw  
+    }
+
     public float GetFloat(string key)
     {
         try
@@ -618,6 +644,28 @@ public class SingleData : Dictionary<string, string>
         catch (Exception e)
         {
             throw new Exception("SingleData GetFloat Error TableName is :->" + data.m_tableName + "<- key :->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
+    }
+
+    public float[] GetFloatArray(string key)
+    {
+        try
+        {
+            if (this.ContainsKey(key))
+            {
+                return ParseTool.String2FloatArray(this[key]);
+            }
+
+            if (data.m_defaultValue.ContainsKey(key))
+            {
+                return ParseTool.String2FloatArray(data.m_defaultValue[key]);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new Exception("SingleData GetFloatArray Error TableName is :->" + data.m_tableName + "<- key :->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
@@ -644,6 +692,28 @@ public class SingleData : Dictionary<string, string>
         catch (Exception e)
         {
             throw new Exception("SingleData GetBool Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- content: ->" + content + "<- \n" + e.ToString());
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
+    }
+
+    public bool[] GetBoolArray(string key)
+    {
+        try
+        {
+            if (this.ContainsKey(key))
+            {
+                return ParseTool.String2BoolArray(this[key]);
+            }
+
+            if (data.m_defaultValue.ContainsKey(key))
+            {
+                return ParseTool.String2BoolArray(data.m_defaultValue[key]);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new Exception("SingleData GetBoolArray Error TableName is :->" + data.m_tableName + "<- key :->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
@@ -710,6 +780,52 @@ public class SingleData : Dictionary<string, string>
             if (data.m_defaultValue.ContainsKey(key))
             {
                 return ParseTool.String2Vector2(data.m_defaultValue[key]);
+            }
+        }
+        catch (Exception e)
+        {
+            throw new Exception("SingleData GetVector2 Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
+    }
+
+    public Vector2[] GetVector2Array(string key)
+    {
+        try
+        {
+            if (this.ContainsKey(key))
+            {
+                return ParseTool.String2Vector2Array(this[key]);
+            }
+
+            if (data.m_defaultValue.ContainsKey(key))
+            {
+                return ParseTool.String2Vector2Array(data.m_defaultValue[key]);
+            }
+
+        }
+        catch (Exception e)
+        {
+            throw new Exception("SingleData GetVector2 Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-"); // throw  
+    }
+
+
+    public Vector3[] GetVector3Array(string key)
+    {
+        try
+        {
+            if (this.ContainsKey(key))
+            {
+                return ParseTool.String2Vector3Array(this[key]);
+            }
+
+            if (data.m_defaultValue.ContainsKey(key))
+            {
+                return ParseTool.String2Vector3Array(data.m_defaultValue[key]);
             }
 
         }
@@ -807,29 +923,6 @@ public class SingleData : Dictionary<string, string>
         catch (Exception e)
         {
             throw new Exception("SingleData GetStringArray Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
-        }
-
-        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-");// throw  
-    }
-
-    public int[] GetIntArray(string key)
-    {
-        try
-        {
-            if (this.ContainsKey(key))
-            {
-                return ParseTool.String2IntArray(this[key]);
-            }
-
-            if (data.m_defaultValue.ContainsKey(key))
-            {
-                return ParseTool.String2IntArray(data.m_defaultValue[key]);
-            }
-
-        }
-        catch (Exception e)
-        {
-            throw new Exception("SingleData GetIntArray Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-");// throw  

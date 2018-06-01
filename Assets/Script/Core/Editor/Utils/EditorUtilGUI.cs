@@ -53,6 +53,11 @@ public class EditorUtilGUI
         {
             case FieldType.String:
             case FieldType.StringArray:
+            case FieldType.BoolArray:
+            case FieldType.IntArray:
+            case FieldType.FloatArray:
+            case FieldType.Vector2Array:
+            case FieldType.Vector3Array:
                 content = EditorGUILayout.TextField(labelContent, data.GetString());
                 break;
 

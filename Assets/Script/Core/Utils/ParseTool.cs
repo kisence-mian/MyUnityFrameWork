@@ -5,7 +5,38 @@ using System;
 public class ParseTool : MonoBehaviour 
 {
 
-	public static Vector2 String2Vector2(string value)
+    public static float[] String2FloatArray(string value)
+    {
+        string[] strArray = String2StringArray(value);
+        float[] array = new float[strArray.Length];
+
+        for (int i = 0; i < strArray.Length; i++)
+        {
+            float tmp = float.Parse(strArray[i]);
+
+            array[i] = tmp;
+        }
+
+        return array;
+    }
+
+    public static bool[] String2BoolArray(string value)
+    {
+        string[] strArray = String2StringArray(value);
+        bool[] array = new bool[strArray.Length];
+
+        for (int i = 0; i < strArray.Length; i++)
+        {
+            bool tmp = bool.Parse(strArray[i]);
+
+            array[i] = tmp;
+        }
+
+        return array;
+    }
+
+
+    public static Vector2 String2Vector2(string value)
     {
         try
         {
@@ -19,6 +50,23 @@ public class ParseTool : MonoBehaviour
         {
             throw new Exception("ParseVector2: Don't convert value to Vector2 value:" + value + "\n" + e.ToString()); // throw  
         }
+    }
+
+    public static Vector2[] String2Vector2Array(string value)
+    {
+        string[] strArray = String2StringArray(value);
+        Vector2[] array = new Vector2[strArray.Length];
+
+        for (int i = 0; i < strArray.Length; i++)
+        {
+            string[] values = strArray[i].Split(',');
+            float x = float.Parse(values[0]);
+            float y = float.Parse(values[1]);
+
+            array[i] = new Vector2(x, y);
+        }
+
+        return array;
     }
 
     public static Vector3 String2Vector3(string value)
@@ -37,6 +85,25 @@ public class ParseTool : MonoBehaviour
             throw new Exception("ParseVector3: Don't convert value to Vector3 value:" + value + "\n" + e.ToString()); // throw  
         }
     }
+
+    public static Vector3[] String2Vector3Array(string value)
+    {
+        string[] strArray = String2StringArray(value);
+        Vector3[] array = new Vector3[strArray.Length];
+
+        for (int i = 0; i < strArray.Length; i++)
+        {
+            string[] values = strArray[i].Split(',');
+            float x = float.Parse(values[0]);
+            float y = float.Parse(values[1]);
+            float z = float.Parse(values[2]);
+
+            array[i] = new Vector3(x, y , z);
+        }
+
+        return array;
+    }
+
 
     public static Color String2Color(string value)
     {

@@ -883,7 +883,13 @@ public class DataEditorWindow : EditorWindow
             case FieldType.Vector2: return "GetVector2";
             case FieldType.Vector3: return "GetVector3";
             case FieldType.Enum: return "GetEnum<" + enumType + ">";
+
             case FieldType.StringArray: return "GetStringArray";
+            case FieldType.IntArray: return "GetIntArray";
+            case FieldType.FloatArray: return "GetFloatArray";
+            case FieldType.BoolArray: return "GetBoolArray";
+            case FieldType.Vector2Array: return "GetVector2Array";
+            case FieldType.Vector3Array: return "GetVector3Array";
             default: return "";
         }
     }
@@ -900,7 +906,13 @@ public class DataEditorWindow : EditorWindow
             case FieldType.Vector2: return "Vector2";
             case FieldType.Vector3: return "Vector3";
             case FieldType.Enum: return enumType;
+
             case FieldType.StringArray: return "string[]";
+            case FieldType.IntArray: return "int[]";
+            case FieldType.FloatArray: return "float[]";
+            case FieldType.BoolArray: return "bool[]";
+            case FieldType.Vector2Array: return "Vector2[]";
+            case FieldType.Vector3Array: return "Vector3[]";
             default: return "";
         }
     }
