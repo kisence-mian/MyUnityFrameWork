@@ -261,6 +261,8 @@ public class DataEditorWindow : EditorWindow
 
             EditorDataGUI(dict, content);
 
+            EditorGUILayout.EndScrollView();
+
             if (!dict.ContainsKey(mianKey) && mianKey != "")
             {
                 EditorGUILayout.BeginHorizontal();
@@ -276,8 +278,6 @@ public class DataEditorWindow : EditorWindow
                 EditorGUILayout.Space();
                 EditorGUILayout.EndHorizontal();
             }
-
-            EditorGUILayout.EndScrollView();
 
             EditorGUILayout.Space();
         }

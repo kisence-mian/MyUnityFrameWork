@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 
 //[RequireComponent(typeof(AudioListener))]
+        [Obsolete("AudioManager 已过时,请使用AudioPlayManager",false)]
 public class AudioManager : MonoBehaviour
 {
     private static AudioManager s_instance;

@@ -47,7 +47,7 @@ public class LanguageComponmentEditor : Editor
 
         m_lc.m_moduleName = moduleName;
         m_lc.m_languageID = contentID;
-
+        m_lc.m_text.text = LanguageManager.GetContent(moduleName, contentID);
         base.OnInspectorGUI();
     }
 

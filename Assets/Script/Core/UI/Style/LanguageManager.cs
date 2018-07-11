@@ -117,7 +117,34 @@ public class LanguageManager
     {
         return GetContent(moduleName, contentID, contentParams.ToArray());
     }
-
+    /// <summary>
+    /// moduleName_key ： MiniGame/title_0
+    /// </summary>
+    /// <param name="moduleName_key"></param>
+    /// <param name="contentParams"></param>
+    /// <returns></returns>
+    public static string GetContentByKey(string moduleName_key, params object[] contentParams)
+    {
+        string[] ss = moduleName_key.Split('/');
+        string moduleName="";
+        string contentID = "";
+        if (ss.Length>2)
+        {
+            for (int i = 0; i < ss.Length-1; i++)
+            {
+                moduleName += ss[i];
+                if (i != ss.Length - 2)
+                    moduleName += "_";
+            }
+            contentID = ss[2];
+        }
+        else
+        {
+            moduleName = ss[0];
+            contentID = ss[1];
+        }
+        return GetContent(moduleName, contentID, contentParams); 
+    }
     public static string GetContent(string moduleName, string contentID, params object[] contentParams)
     {
         Init();

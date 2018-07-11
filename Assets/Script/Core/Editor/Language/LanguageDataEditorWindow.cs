@@ -646,6 +646,17 @@ public class LanguageDataEditorWindow : EditorWindow
         }
         return s_languageKeyList;
     }
+    public static List<string> GetLanguageLayersKeyList()
+    {
+        List<string> list = GetLanguageKeyList();
+        for (int i = 0; i < list.Count; i++)
+        {
+            string[] ss = list[i].Split('/');
+
+            list[i] = ss[0].Replace('_', '/') + "/" + ss[1];
+        }
+        return list;
+    }
 
     #endregion
 

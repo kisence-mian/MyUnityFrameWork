@@ -12,6 +12,7 @@ using UnityEngine;
 /// </summary>
 public class JsonMessageProcessingController
 {
+    public const string ErrorCodeMessage = "ErrorCodeMessage";
     public static void Init()
     {
         InputManager.AddAllEventListener<InputNetworkMessageEvent>(MessageReceiveCallBack);
@@ -20,7 +21,8 @@ public class JsonMessageProcessingController
 
     private static void MessageReceiveCallBack(InputNetworkMessageEvent inputEvent)
     {
-        Debug.Log("MessageReceiveCallBack ;" + JsonUtils.ToJson(inputEvent));
+        if (ApplicationManager.Instance.m_AppMode != AppMode.Release)
+            Debug.Log("MessageReceiveCallBack ;" + JsonUtils.ToJson(inputEvent));
 
         Type type = Type.GetType(inputEvent.m_MessgaeType);
 
@@ -30,10 +32,17 @@ public class JsonMessageProcessingController
             return;
         }
 
-        object dataObj = JsonUtils.JsonToClassOrStruct( inputEvent.Data["Content"].ToString(),type);// deserializer.Deserialize(type, inputEvent.Data["Content"].ToString());
+        object dataObj = JsonUtils.FromJson(type, inputEvent.Data["Content"].ToString());// deserializer.Deserialize(type, inputEvent.Data["Content"].ToString());
+        MessageClassInterface msgInterface = (MessageClassInterface)dataObj;
+        msgInterface.DispatchMessage();
 
-        MethodInfo method= type.GetMethod("DispatchMessage");
-        method.Invoke(dataObj, null);
+        if(msgInterface is CodeMessageBase)
+        {
+            CodeMessageBase codeMsg = (CodeMessageBase)msgInterface;
+
+            GlobalEvent.DispatchEvent(ErrorCodeMessage, codeMsg);
+        }
+
     }
     static Dictionary<string, object> mesDic = new Dictionary<string, object>();
     public static void SendMessage<T>(T data) 
@@ -45,5 +54,6 @@ public class JsonMessageProcessingController
         mesDic.Add("Content", content);
         NetworkManager.SendMessage(mt, mesDic);
     }
+
 }
 

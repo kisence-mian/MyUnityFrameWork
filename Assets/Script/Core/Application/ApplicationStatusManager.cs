@@ -9,6 +9,9 @@ public class ApplicationStatusManager
     /// 当前程序在哪个状态
     /// </summary>
     public static IApplicationStatus s_currentAppStatus;
+    public static string s_currentAppStatusName;
+
+    public static CallBack<IApplicationStatus> OnStatusChangeCallBack;
 
     //可切换状态
     static Dictionary<string,IApplicationStatus> s_status = new Dictionary<string,IApplicationStatus>();
@@ -36,6 +39,10 @@ public class ApplicationStatusManager
 
     public static void EnterStatus(string statusName)
     {
+        if (s_currentAppStatusName == statusName)
+            return;
+
+        s_currentAppStatusName = statusName;
         ApplicationManager.Instance.currentStatus = statusName;
 
         if (s_currentAppStatus != null)
@@ -48,6 +55,8 @@ public class ApplicationStatusManager
 
         s_currentAppStatus.OnEnterStatus();
 
+        if (OnStatusChangeCallBack != null)
+            OnStatusChangeCallBack(s_currentAppStatus);
         //ApplicationManager.Instance.StartCoroutine(s_currentAppStatus.InChangeScene(() =>
         //{
         //    s_currentAppStatus.OnEnterStatus();

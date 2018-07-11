@@ -36,7 +36,11 @@ public class AnimSystem : MonoBehaviour
             }
             else
             {
+                //不加编译器宏会导致打包失败
+#if UNITY_EDITOR
+
                 EditorApplication.update += instance.Update;
+#endif
             }
         }
 

@@ -21,6 +21,8 @@ public class NetworkManager
         }
     }
 
+   
+
     /// <summary>
     /// 对旧代码的兼容
     /// </summary>
@@ -46,39 +48,31 @@ public class NetworkManager
     /// <param name="protocolType">通讯协议</param>
     public static void Init<TProtocol,TSocket>(ProtocolType protocolType = ProtocolType.Tcp) where TProtocol : INetworkInterface,new () where TSocket : SocketBase,new()
     {
-        //提前加载网络事件派发器，避免异步冲突
-        InputManager.LoadDispatcher<InputNetworkConnectStatusEvent>();
-        InputManager.LoadDispatcher<InputNetworkMessageEvent>();
-
+        
         s_network = new TProtocol();
         s_network.m_socketService = new TSocket();
-        s_network.m_socketService.m_byteCallBack = s_network.SpiltMessage;
-        s_network.m_socketService.m_connectStatusCallback = ConnectStatusChange;
-        s_network.m_socketService.m_protocolType = protocolType;
-        s_network.m_socketService.Init();
-
-        s_network.Init();
-        s_network.m_messageCallBack = ReceviceMeaasge;
-
-        ApplicationManager.s_OnApplicationUpdate += Update;
-        ApplicationManager.s_OnApplicationQuit += DisConnect;
 
         //ApplicationManager.s_OnApplicationOnGUI += GUI;
+        NetInit();
     }
 
     public static void Init(string networkInterfaceName,string socketName)
     {
-        //提前加载网络事件派发器，避免异步冲突
-        InputManager.LoadDispatcher<InputNetworkConnectStatusEvent>();
-        InputManager.LoadDispatcher<InputNetworkMessageEvent>();
-
         Type type = Type.GetType(networkInterfaceName);
 
         s_network = Activator.CreateInstance(type) as INetworkInterface;
 
         Type socketType = Type.GetType(networkInterfaceName);
-
         s_network.m_socketService = Activator.CreateInstance(socketType) as SocketBase;
+
+        NetInit();
+    }
+
+    private static void NetInit()
+    {
+        //提前加载网络事件派发器，避免异步冲突
+        InputManager.LoadDispatcher<InputNetworkConnectStatusEvent>();
+        InputManager.LoadDispatcher<InputNetworkMessageEvent>();
         s_network.m_socketService.m_byteCallBack = s_network.SpiltMessage;
         s_network.m_socketService.m_connectStatusCallback = ConnectStatusChange;
         s_network.m_socketService.Init();
@@ -88,8 +82,50 @@ public class NetworkManager
 
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationQuit += DisConnect;
+
+        HeatBeatInit();
     }
 
+    private static byte[] heatBeatMsg;
+    private static void HeatBeatInit()
+    {
+        heatBeatMsg = System.Text.Encoding.UTF8.GetBytes("&");
+    }
+    #region 心跳包操作 HeatBeat
+    private static float heatBeatDelayTime = 3f;
+    /// <summary>
+    /// 设置心跳包发送间隔时间
+    /// </summary>
+    public static float HeatBeatDelayTime
+    {
+        get
+        {
+            return heatBeatDelayTime;
+        }
+
+        set
+        {
+            heatBeatDelayTime =Mathf.Clamp( value,2f,100);
+        }
+    }
+    private static float tempHeatBeatTimer;
+    private static bool startSendHeatBeat = false;
+    private static void StartSendHeatBeatMsg()
+    {
+        if (startSendHeatBeat)
+        {
+            if(tempHeatBeatTimer<=0)
+            {
+                tempHeatBeatTimer = HeatBeatDelayTime;
+                SendMessage(heatBeatMsg);
+            }
+            else
+            {
+                tempHeatBeatTimer -= Time.unscaledDeltaTime;
+            }
+        }
+    }
+    #endregion
     public static void Dispose()
     {
         InputManager.UnLoadDispatcher<InputNetworkConnectStatusEvent>();
@@ -117,6 +153,10 @@ public class NetworkManager
         s_network.Close();
     }
 
+    public static void SendMessage(byte[] msg)
+    {
+        s_network.m_socketService.Send(msg);
+    }
     public static void SendMessage(string messageType ,Dictionary<string,object> data)
     {
         if(IsConnect)
@@ -194,6 +234,15 @@ public class NetworkManager
     static void Dispatch(NetworkState status)
     {
         InputNetworkEventProxy.DispatchStatusEvent(status);
+
+        if(status == NetworkState.Connected)
+        {
+            startSendHeatBeat = true;
+        }
+        else
+        {
+            startSendHeatBeat = false;
+        }
     }
 
     #region Update
@@ -238,7 +287,9 @@ public class NetworkManager
         {
             s_network.Update();
         }
-       
+
+        StartSendHeatBeatMsg();
+
     }
     //static float msgCountTimer = 0;
     //static int count = 0;
@@ -255,7 +306,7 @@ public class NetworkManager
     //    }
 
     //}
-
+   
     #endregion
 }
 
