@@ -21,33 +21,7 @@ public static class ConfigManager
 
     public static bool GetIsExistConfig(string ConfigName)
     {
-        string dataJson = "";
-
-        #if UNITY_EDITOR
-            if(!Application.isPlaying)
-            {
-                dataJson = ResourceIOTool.ReadStringByResource(
-                    PathTool.GetRelativelyPath(c_directoryName,
-                                ConfigName,
-                                c_expandName));
-            }
-            else
-            {
-                dataJson = ResourceManager.ReadTextFile(ConfigName);
-            }
-
-        #else
-             dataJson = ResourceManager.ReadTextFile(ConfigName);
-        #endif
-
-        if (dataJson == "")
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return ResourceManager.GetResourceIsExist(ConfigName);
     }
 
     public static Dictionary<string, SingleField> GetData(string ConfigName)

@@ -24,6 +24,11 @@ public static class ResourceManager
         return loadType;
     }
 
+    public static bool GetResourceIsExist(string name)
+    {
+        return  ResourcesConfigManager.GetIsExitRes(name);
+    }
+
     //读取一个文本
     public static string ReadTextFile(string textName)
     {
