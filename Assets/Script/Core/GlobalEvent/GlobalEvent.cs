@@ -75,6 +75,11 @@ public class GlobalEvent
         }
     }
 
+    internal static void AddTypeEvent<T>()
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// 移除某类事件
     /// </summary>

@@ -16,6 +16,8 @@ public class LanguageManager
     public const string c_mainKey  = "key";
     public const string c_valueKey = "value";
 
+
+
     static public List<string> s_LanguageList = new List<string>();                    //语言列表
     static public List<string> s_modelList = new List<string>();                       //模块列表
     static public SystemLanguage s_defaultlanguage = SystemLanguage.ChineseSimplified; //默认语言
@@ -28,6 +30,7 @@ public class LanguageManager
     public static bool IsInit
     {
         get { return LanguageManager.isInit; }
+        set { isInit = value; }
     }
 
     public static void Init()
@@ -125,25 +128,52 @@ public class LanguageManager
     /// <returns></returns>
     public static string GetContentByKey(string moduleName_key, params object[] contentParams)
     {
-        string[] ss = moduleName_key.Split('/');
-        string moduleName="";
-        string contentID = "";
-        if (ss.Length>2)
+        string[] res = ChangeKey2ModuleID(moduleName_key);
+        return GetContent(res[0], res[1], contentParams); 
+    }
+    public static bool HaveKey(string moduleName_key)
+    {
+        Init();
+        string[] res = ChangeKey2ModuleID(moduleName_key);
+        string moduleName = res[0];
+        string contentID = res[1];
+
+        if (!s_languageDataDict.ContainsKey(moduleName))
         {
-            for (int i = 0; i < ss.Length-1; i++)
+            return false;
+        }
+
+        DataTable data = s_languageDataDict[moduleName];
+
+        if (!data.ContainsKey(contentID))
+        {
+            return false;
+        }
+
+        return true;
+    }
+    private static string[] ChangeKey2ModuleID(string moduleName_key)
+    {
+        string[] ss = moduleName_key.Split('/');
+        string moduleName = "";
+        string contentID = "";
+        if (ss.Length > 2)
+        {
+            for (int i = 0; i < ss.Length - 1; i++)
             {
                 moduleName += ss[i];
                 if (i != ss.Length - 2)
                     moduleName += "_";
             }
-            contentID = ss[2];
+            contentID = ss[ss.Length - 1];
         }
         else
         {
             moduleName = ss[0];
             contentID = ss[1];
         }
-        return GetContent(moduleName, contentID, contentParams); 
+        string[] data = new string[] { moduleName, contentID };
+        return data;
     }
     public static string GetContent(string moduleName, string contentID, params object[] contentParams)
     {
@@ -169,18 +199,17 @@ public class LanguageManager
             return "Dont find language : ->" + contentID + "<-";
         }
 
-        if (contentParams == null || contentParams.Length == 0)
-            return content;
-        else
+        if (contentParams != null && contentParams.Length > 0)         
         {
             for (int i = 0; i < contentParams.Length; i++)
             {
                 string replaceTmp = "{" + i + "}";
                 content = content.Replace(replaceTmp, contentParams[i].ToString());
-            }
-
-            return content;
+            }      
         }
+        if ( ApplicationManager.Instance.showLanguageValue && ApplicationManager.Instance.m_AppMode == AppMode.Developing)
+            content = "[" + content + "]";
+        return content;
     }
 
     public static string GetLanguageDataSaveName(string langeuageName, string modelName)

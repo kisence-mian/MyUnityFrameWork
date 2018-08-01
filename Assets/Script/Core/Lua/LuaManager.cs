@@ -35,7 +35,7 @@ public class LuaManager
             Debug.LogError("Lua Init Execption " + e.ToString());
         }
 #else
-        throw new Exception("USE_LUA not Define ! ");
+       // throw new Exception("USE_LUA not Define ! ");
 #endif
     }
 

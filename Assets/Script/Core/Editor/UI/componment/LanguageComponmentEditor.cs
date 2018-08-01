@@ -10,8 +10,8 @@ using UnityEngine.UI;
 public class LanguageComponmentEditor : Editor
 {
     LanguageComponent m_lc;
-    string[] m_languageList;
-    int m_currentSelectIndex = 0;
+    List<string> m_languageList;
+  
 
     public override void OnInspectorGUI()
     {
@@ -26,42 +26,21 @@ public class LanguageComponmentEditor : Editor
             if (m_lc.m_text == null)
             {
                 EditorGUILayout.LabelField("没有找到Text组件！", EditorGUIStyleData.ErrorMessageLabel);
+                return;
             }
         }
+        if (m_languageList == null)
+            m_languageList = LanguageDataEditorUtils.GetLanguageLayersKeyList();
 
-        m_languageList = LanguageDataEditorWindow.GetLanguageKeyList().ToArray();
-
-        if (m_currentSelectIndex == 0)
+        GUILayout.Space(6);
+        m_lc.languageKey = EditorDrawGUIUtil.DrawPopup("多语言key", m_lc.languageKey, m_languageList);
+        m_lc.ResetLanguage();
+        GUILayout.Space(8);
+        if (GUILayout.Button("刷新多语言key"))
         {
-            m_currentSelectIndex = GetIndex(m_lc.m_moduleName,m_lc.m_languageID);
+            m_languageList = LanguageDataEditorUtils.GetLanguageLayersKeyList();
         }
-
-        m_currentSelectIndex = EditorGUILayout.Popup("当前内容：", m_currentSelectIndex, m_languageList);
-
-        string content = m_languageList[m_currentSelectIndex];
-
-        string[] tmp = content.Split('/');
-
-        string moduleName = tmp[0];
-        string contentID = tmp[1];
-
-        m_lc.m_moduleName = moduleName;
-        m_lc.m_languageID = contentID;
-        m_lc.m_text.text = LanguageManager.GetContent(moduleName, contentID);
-        base.OnInspectorGUI();
-    }
-
-    public int GetIndex(string mouleName,string content)
-    {
-        for (int i = 0; i < m_languageList.Length; i++)
-        {
-            if (m_languageList[i].Equals(mouleName + "/" + content))
-            {
-                return i;
-            }
-        }
-
-        return 0;
+  
     }
 
 }

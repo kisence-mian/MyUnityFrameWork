@@ -9,7 +9,12 @@ public class ApplicationManager : MonoBehaviour
 
     public static ApplicationManager Instance
     {
-        get { return ApplicationManager.instance; }
+        get {
+            if (instance == null)
+            {
+              instance =  FindObjectOfType<ApplicationManager>();
+            }
+            return ApplicationManager.instance; }
         set { ApplicationManager.instance = value; }
     }
 
@@ -58,10 +63,20 @@ public class ApplicationManager : MonoBehaviour
     public List<string> m_globalLogic;
     [HideInInspector]
     public string currentStatus;
+    /// <summary>
+    /// 显示括号标识多语言转换的字段
+    /// </summary>
+    public bool showLanguageValue = false;
     public void Awake()
     {
         instance = this;
         AppLaunch();
+    }
+
+    private void OnEnable()
+    {
+        instance = this;
+        Debug.Log(this.name + " : OnEnable");
     }
 
     /// <summary>

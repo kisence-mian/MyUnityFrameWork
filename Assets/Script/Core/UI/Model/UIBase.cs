@@ -715,6 +715,25 @@ public class UIBase : MonoBehaviour
 
         return UIItem;
     }
+    public UIBase CreateItem(GameObject itemObj, GameObject parent, bool isActive)
+    {
+        GameObject item = GameObjectManager.CreateGameObjectByPool(itemObj, parent, isActive);
+
+        item.transform.localScale = Vector3.one;
+        UIBase UIItem = item.GetComponent<UIBase>();
+
+        if (UIItem == null)
+        {
+            throw new Exception("CreateItem Error : ->" + itemObj.name + "<- don't have UIBase Component!");
+        }
+
+        UIItem.Init(m_childUIIndex++);
+        UIItem.UIName = UIEventKey + "_" + UIItem.UIName;
+
+        m_ChildList.Add(UIItem);
+
+        return UIItem;
+    }
 
     public UIBase CreateItem(string itemName, string prantName)
     {

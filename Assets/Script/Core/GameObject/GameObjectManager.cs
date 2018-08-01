@@ -89,57 +89,61 @@ public class GameObjectManager :MonoBehaviour
     /// <returns>返回这个对象</returns>
     public static GameObject CreateGameObjectByPool(string name,GameObject parent = null,bool isSetActive = true)
     {
+        GameObject go = null;
         if (IsExist(name))
         {
-            GameObject go = s_objectPool[name][0];
+             go = s_objectPool[name][0];
             s_objectPool[name].RemoveAt(0);
 
-            if(isSetActive)
-                go.SetActive(true);
-
-            if (parent == null)
-            {
-                go.transform.SetParent(null);
-            }
-            else
-            {
-                go.transform.SetParent(parent.transform);
-            }
-
-            //go.transform.localScale = Vector3.one;
-
-            return go;
+           
         }
         else
         {
-            return CreateGameObject(name, parent);
+            go = CreateGameObject(name, parent);
         }
+        if (isSetActive)
+            go.SetActive(true);
+
+        if (parent == null)
+        {
+            go.transform.SetParent(null);
+        }
+        else
+        {
+            go.transform.SetParent(parent.transform);
+        }
+
+        //go.transform.localScale = Vector3.one;
+
+        return go;
     }
 
     public static GameObject CreateGameObjectByPool(GameObject prefab, GameObject parent = null, bool isSetActive = true)
     {
+        GameObject go = null;
         if (IsExist(prefab.name))
         {
-            GameObject go = s_objectPool[prefab.name][0];
+             go = s_objectPool[prefab.name][0];
             s_objectPool[prefab.name].RemoveAt(0);
 
-            if (isSetActive)
-                go.SetActive(true);
-
-            if (parent == null)
-            {
-                go.transform.SetParent(null);
-            }
-            else
-            {
-                go.transform.SetParent(parent.transform);
-            }
-            return go;
+          
         }
         else
         {
-            return CreateGameObject(prefab, parent);
+            go= CreateGameObject(prefab, parent);
         }
+        if (isSetActive)
+            go.SetActive(true);
+
+        if (parent == null)
+        {
+            go.transform.SetParent(null);
+        }
+        else
+        {
+            go.transform.SetParent(parent.transform);
+        }
+        return go;
     }
 
     /// <summary>

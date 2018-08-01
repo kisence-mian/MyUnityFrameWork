@@ -8,33 +8,47 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using FrameWork;
+using HDJ.Framework.Utils;
 
 public class DataEditorWindow : EditorWindow
 {
     UILayerManager m_UILayerManager;
+    static DataEditorWindow win;
 
     [MenuItem("Window/数据编辑器 &2", priority = 501)]
     public static void ShowWindow()
     {
-        EditorWindow.GetWindow(typeof(DataEditorWindow));
+         win = EditorWindow.GetWindow<DataEditorWindow>();
+        win.autoRepaintOnSceneChange = true;
+        FocusWindowIfItsOpen<DataEditorWindow>();
+        win.wantsMouseMove = true;
     }
 
     List<String> m_dataNameList = new List<string>();
 
-    string m_currentDataName;
     DataTable m_currentData;
-    Dictionary<string, bool> m_foldList = new Dictionary<string, bool>();
-
+    //Dictionary<string, bool> m_foldList = new Dictionary<string, bool>();
+    private List<string> langKeys;
     void OnEnable()
     {
-        //ConvertUtf8();
-
-        m_currentSelectIndex = 0;
         EditorGUIStyleData.Init();
 
         FindAllDataName();
-    }
+        langKeys = LanguageDataEditorUtils.GetLanguageLayersKeyList();
 
+        if (!string.IsNullOrEmpty(chooseFileName))
+            LoadData(chooseFileName);
+
+        configFileNames.Clear();
+        string m_directoryPath = Application.dataPath + "/Resources/" + DataManager.c_directoryName;
+        configFileNames.AddRange(PathUtils.GetDirectoryFileNames(m_directoryPath, new string[] { ".txt" }, false, false));
+
+    }
+    public static void Refresh()
+    {
+        if (win)
+            win.OnEnable();
+    }
     //当选择改变时
     void OnSelectionChange()
     {
@@ -50,11 +64,11 @@ public class DataEditorWindow : EditorWindow
 
             FindAllDataName();
 
-            if (m_currentDataName != null
-                && m_currentDataName != ""
-                && m_currentDataName != "None")
+            if (chooseFileName != null
+                && chooseFileName != ""
+                && chooseFileName != "None")
             {
-                LoadData(m_currentDataName);
+                LoadData(chooseFileName);
             }
         }
     }
@@ -65,113 +79,940 @@ public class DataEditorWindow : EditorWindow
     {
         titleContent.text = "数据编辑器";
 
-        EditorGUILayout.BeginVertical();
+        EditorDrawGUIUtil.RichTextSupport = true;
+        GUILayout.Space(8);
+        ChooseFile();
+        GUILayout.Space(5);
+        DrawTableDataGUI();
+        GUILayout.FlexibleSpace();
 
-        SelectDataGUI();
-
-        DataGUI();
-
-        AddDataGUI();
-
+        SaveDataGUI();
+        GenerateDataClassGUI();
         GenerateAllDataClassGUI();
 
         CleanCacheGUI();
-
-        EditorGUILayout.EndVertical();
     }
+    private string chooseFileName = "";
 
-    #region 数据文件相关
-
-    int m_currentSelectIndex = 0;
-    void SelectDataGUI()
+    void ChooseFile()
     {
-        string[] mask = m_dataNameList.ToArray();
-        m_currentSelectIndex = EditorGUILayout.Popup("当前数据：", m_currentSelectIndex, mask);
-        if (mask.Length !=0 )
+        GUILayout.BeginHorizontal();
+        chooseFileName = EditorDrawGUIUtil.DrawPopup("选择文件", chooseFileName, m_dataNameList, LoadData);
+        if (GUILayout.Button("删除", GUILayout.Width(50)))
         {
-            LoadData(  mask[m_currentSelectIndex]);
-        }
-    }
-
-    void LoadData(string dataName)
-    {
-        if (m_currentDataName != dataName)
-        {
-            m_currentDataName = dataName;
-
-            if (m_currentDataName != "None")
-                m_currentData = DataManager.GetData(dataName); 
-        }
-    }
-    bool isConfigFold;
-    string dataName = "";
-    string mainKey = "";
-
-    void AddDataGUI()
-    {
-        EditorGUI.indentLevel = 0;
-
-        isConfigFold = EditorGUILayout.Foldout(isConfigFold, "新增数据");
-        
-        if (isConfigFold)
-        {
-            EditorGUI.indentLevel = 1;
-
-            dataName = EditorGUILayout.TextField("数据名", dataName);
-
-            mainKey  = EditorGUILayout.TextField("主键名", mainKey);
-
-            if (!m_dataNameList.Contains(dataName) && dataName != "" && mainKey != "")
+            if (EditorUtility.DisplayDialog("警告", "是否删除文件[" + chooseFileName + "]", "确定", "取消"))
             {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.Space();
-                if (GUILayout.Button("新增", GUILayout.Width(position.width - 60)))
+                File.Delete(Application.dataPath + "/Resources/" + DataManager.c_directoryName + "/" + chooseFileName + ".txt");
+                AssetDatabase.Refresh();
+                m_currentData = null;
+                return;
+            }
+        }
+        if (GUILayout.Button("添加", GUILayout.Width(50)))
+        {
+            GeneralDataModificationWindow.otherParameter = "";
+            GeneralDataModificationWindow.OpenWindow(this, "添加新配置文件", "", (value) =>
+            {
+                value = EditorDrawGUIUtil.DrawBaseValue("新建配置文件:", value);
+                GeneralDataModificationWindow.otherParameter = EditorDrawGUIUtil.DrawBaseValue("主键名:", GeneralDataModificationWindow.otherParameter);
+                if (string.IsNullOrEmpty(value.ToString()) || string.IsNullOrEmpty(GeneralDataModificationWindow.otherParameter.ToString()))
                 {
-                    DataTable data = new DataTable();
-                    data.TableKeys.Add(mainKey);
-
-                    SaveData(dataName, data);
-                    AssetDatabase.Refresh();
-
-                    LoadData(dataName);
-
-                    dataName = "";
+                    EditorGUILayout.HelpBox("文件名不能为空！！", MessageType.Error);
                 }
+                return value;
+            },
+            (value) =>
+            {
+                if (string.IsNullOrEmpty(value.ToString()) || string.IsNullOrEmpty(GeneralDataModificationWindow.otherParameter.ToString()))
+                {
+                    return false;
+                }
+                else
+                    return true;
 
-                EditorGUILayout.Space();
-                EditorGUILayout.EndHorizontal();
+            },
+            (value) =>
+            {
+                DataTable data = new DataTable();
+                data.TableKeys.Add(GeneralDataModificationWindow.otherParameter.ToString());
+
+                SaveData(value.ToString(), data);
+                AssetDatabase.Refresh();
+
+                LoadData(chooseFileName);
+                AssetDatabase.Refresh();
+            });
+        }
+
+        GUILayout.EndHorizontal();
+    }
+    private void LoadData(string fileName)
+    {
+        if (string.IsNullOrEmpty(fileName))
+            return;
+
+        chooseFileName = fileName;
+
+        if (chooseFileName != "None")
+        {
+           
+            m_currentData = DataManager.GetData(fileName);
+        }
+        else
+            return;
+
+        int widthCount = m_currentData.TableKeys.Count;
+        withItemList.Clear();
+        for (int i = 0; i < widthCount; i++)
+        {
+                withItemList.Add(wWith);
+        }
+        heightItemList.Clear();
+        //所有的数据行+描述+默认值+空一行
+        heightItemList.Add(40);
+        for (int i = 0; i < m_currentData.Count+2; i++)
+        {
+            heightItemList.Add(wHeight);
+        }
+
+        selectRowIndexs.Clear();
+        selectColumnIndexs.Clear();
+    }
+
+    private List<float> withItemList = new List<float>();
+    private List<float> heightItemList = new List<float>();
+    private int minItem = 30;
+    private const int wHeight = 45;
+    private const int wWith = 110;
+    private Vector2 svPos;
+
+    private string searchValue = "";
+    //标记选择行
+    private List<int> selectRowIndexs = new List<int>();
+    private List<int> selectColumnIndexs = new List<int>();
+
+    private GUIStyle buttonStyle;
+    private GUIStyle helpBoxStyle;
+
+    private int oldButtonFontSize = 0;
+    private int nowButtonFontSize = 0;
+    private int MaxButtonFontSize = 40;
+    /// <summary>
+    /// 绘制所有格子
+    /// </summary>
+    void DrawTableDataGUI()
+    {
+        if (m_currentData == null)
+            return;
+        if (buttonStyle == null)
+        {
+            buttonStyle = "Button";
+            helpBoxStyle = "HelpBox";
+        }
+
+        GUILayout.BeginHorizontal();
+        if (GUILayout.Button("添加一行数据", GUILayout.Width(90)))
+        {
+            AddLineDataGUI();
+        }
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("加载上一次保存", GUILayout.Width(90)))
+        {
+            DataManager.CleanCache();
+            LoadData(chooseFileName);
+
+        }
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("添加字段", GUILayout.Width(90)))
+        {
+            Add2FieldGUI();
+        }
+        GUILayout.FlexibleSpace();
+
+        //字体大小调节
+        helpBoxStyle.fontSize = helpBoxStyle.font.fontSize;
+        oldButtonFontSize = helpBoxStyle.fontSize;
+        if (nowButtonFontSize == 0)
+            nowButtonFontSize = oldButtonFontSize;
+       
+        nowButtonFontSize= EditorGUILayout.IntSlider("字体大小",nowButtonFontSize, oldButtonFontSize / 2, MaxButtonFontSize);
+        GUILayout.FlexibleSpace();
+        searchValue = EditorDrawGUIUtil.DrawSearchField(searchValue);
+        GUILayout.EndHorizontal();
+        GUILayout.Space(5);
+
+        Rect r = new Rect(0, 60, Screen.width, 18);
+
+        Rect svPos_temp = new Rect(new Vector2(0, r.y), new Vector2(Screen.width, Screen.height - r.y - 120));
+        Vector2 v = GetCententSize();
+        svPos = GUI.BeginScrollView(svPos_temp, svPos, new Rect(r.x, r.y, v.x, v.y));
+
+
+        float tempWith = wWith;
+
+
+        GUI.Label(new Rect(r.position, new Vector2(wWith, wHeight)), "", "SelectionRect");
+        for (int i = 0; i < withItemList.Count; i++)
+        {
+            Rect dragR = new Rect(tempWith, r.y, withItemList[i], wHeight);
+            Rect maxR = new Rect(tempWith, r.y, Screen.width * 5, wHeight);
+            dragR = EditorDrawGUIUtility.DrawCanDragArea(dragR, maxR, null, EditorCanDragAreaSide.Right);
+            if (dragR.width < minItem)
+                dragR.width = minItem;
+            withItemList[i] = dragR.width;
+
+            tempWith += withItemList[i];
+
+            if (GUI.Button(new Rect(dragR.position,new Vector2(dragR.width, dragR.height/3)), "▼"))
+            {
+                if (selectColumnIndexs.Contains(i))
+                    selectColumnIndexs.Remove(i);
+                else
+                    selectColumnIndexs.Add(i);
+            }
+            if (GUI.Button(new Rect( dragR.x, dragR.y+ dragR.height/3, dragR.width, dragR.height*2/3), i.ToString()))
+            {
+                if (i == 0)
+                    continue;
+
+                List<string> keys = m_currentData.TableKeys;
+                string key = keys[i];
+                if (EditorUtility.DisplayDialog("警告", "是否删除字段[" + key + "]", "确定", "取消"))
+                {
+                    DeleteField(m_currentData, key);
+                    withItemList.RemoveAt(i);
+                    return;
+                }
+            }
+           
+        }
+
+        float tempHeight = r.y + wHeight;
+        for (int i = 0; i < heightItemList.Count; i++)
+        {
+            Rect dragR = new Rect(r.x, tempHeight, wWith, heightItemList[i]);
+            Rect maxR = new Rect(r.x, tempHeight, wWith, position.height);
+            dragR = EditorDrawGUIUtility.DrawCanDragArea(dragR, maxR, null, EditorCanDragAreaSide.Bottom);
+            if (dragR.height < minItem)
+                dragR.height = minItem;
+            heightItemList[i] = dragR.height;
+
+            tempHeight += heightItemList[i];
+            string vStr = "";
+            if (i == 0)
+            {
+                vStr = "D";
+                GUI.Label(dragR, vStr, buttonStyle);
+            }
+            else if(i == 1)
+            {
+                vStr = "description";
+                GUI.Label(dragR, vStr, buttonStyle);
+            }
+            else if (i == 2)
+            {
+                vStr = "default";
+                GUI.Label(dragR, vStr, buttonStyle);
             }
             else
             {
-                if (m_dataNameList.Contains(dataName))
+                int num = i - 3;
+                vStr = num.ToString();
+                if (GUI.Button(new Rect(dragR.position, new Vector2(dragR.width/4, dragR.height)), "►"))
                 {
-                    EditorGUILayout.LabelField("已存在该配置");
+                    if (selectRowIndexs.Contains(i))
+                        selectRowIndexs.Remove(i);
+                    else
+                        selectRowIndexs.Add(i);
                 }
-
-                if (mainKey == "")
+                if (GUI.Button(new Rect(dragR.x+ dragR.width/4, dragR.y , dragR.width*3/4, dragR.height), vStr))
                 {
-                    EditorGUILayout.LabelField("主键不能为空");
+                    if (EditorUtility.DisplayDialog("警告", "是否删除第[" + num + "]行数据", "确定", "取消"))
+                    {
+                        m_currentData.Remove(m_currentData.TableIDs[num]);
+                        m_currentData.TableIDs.RemoveAt(num);
+
+
+                        heightItemList.RemoveAt(i);
+                        return;
+                    }
                 }
             }
-        }
 
-        EditorGUILayout.Space();
+        }
+            DrawGridItem(r.position + new Vector2(wWith, wHeight));
+
+        GUI.EndScrollView();
+
     }
 
-    void DeleteDataGUI()
+    private Vector2 GetCententSize()
     {
-        if (m_currentDataName != "None")
+        float tempWith = wWith;
+        for (int i = 0; i < withItemList.Count; i++)
         {
-            if (GUILayout.Button("删除数据"))
+            tempWith += withItemList[i];
+        }
+        tempWith += wWith;
+
+        float tempHeight = wHeight;
+        for (int i = 0; i < heightItemList.Count; i++)
+        {
+
+            tempHeight += heightItemList[i];
+        }
+        tempHeight += wHeight;
+        return new Vector2(tempWith, tempHeight);
+    }
+    /// <summary>
+    /// 绘制每个数据格子
+    /// </summary>
+    /// <param name="startPos"></param>
+    private void DrawGridItem(Vector2 startPos)
+    {
+        helpBoxStyle.fontSize = nowButtonFontSize;
+        float tempHeight = 0;
+        for (int i = 0; i < heightItemList.Count; i++)
+        {
+            float h = heightItemList[i];
+            float tempWith = 0;
+
+          
+            for (int j = 0; j < withItemList.Count; j++)
             {
-                if (EditorUtility.DisplayDialog("警告", "确定要删除该数据吗！", "是", "取消"))
+                float w = withItemList[j];
+
+                Vector2 size = new Vector2(w, h);
+                Vector2 pos = startPos + new Vector2(tempWith, tempHeight);
+
+                object value = null;
+                string showStr = "";
+
+                string field = m_currentData.TableKeys[j];
+                FieldType fieldValueType = GetFieldType(j, field);
+                string enumType = GetEnumType(fieldValueType, field);
+       
+                string defaultValue = GetDefaultValue(fieldValueType, enumType, field);
+
+
+                if (i == 0)
                 {
-                    File.Delete(Application.dataPath + "/Resources/" + DataManager.c_directoryName + "/" + m_currentDataName + ".txt");
-                    AssetDatabase.Refresh();
+                    GUI.color = Color.yellow;
+                  
+                    showStr = EditorDrawGUIUtil.GetFormatName(field, DataConfigUtils.ConfigFieldValueType2Type(fieldValueType, enumType), "red");
+                }
+                else if (i == 1)
+                {
+                    GUI.color = Color.cyan;
+
+                    showStr = GetDescription(field);
+                }
+                else if (i == 2)
+                {
+                    GUI.color = Color.green;
+
+                    showStr = defaultValue;
+                }
+                else
+                {
+                    SingleData data = m_currentData[m_currentData.TableIDs[i - 3]];
+
+                    bool isDefault = false;
+                    if (data.ContainsKey(field) && data[field] != defaultValue)
+                    {
+                        DataFieldAssetType fieldAssetType = GetDataFieldAssetType(field);
+                        if (fieldAssetType == DataFieldAssetType.LocalizedLanguage)
+                        {
+                            string k = data[field];
+                            if (LanguageManager.HaveKey(k))
+                                showStr = LanguageManager.GetContentByKey(k);
+                            else
+                                showStr = k;
+                        }
+                        else
+                            showStr = data[field];
+                    }
+                    else
+                    {
+                        showStr = defaultValue;
+                        isDefault = true;
+                    }
+                    if (!string.IsNullOrEmpty(searchValue))
+                        showStr = ShowContainsChar(showStr, searchValue);
+
+                    if (isDefault)
+                        showStr = "<color=green>" + showStr + "</color>";
+                }
+              
+                if (i == 1 || i == 2)
+                {
+                    GUI.Button(new Rect(pos, size), showStr, helpBoxStyle);
+                }
+                else
+                {
+                    if (selectColumnIndexs.Contains(j))
+                        GUI.color = Color.magenta;
+                    if (selectRowIndexs .Contains(i))
+                        GUI.color = Color.cyan;
+                    if (GUI.Button(new Rect(pos, size), showStr, helpBoxStyle))
+                    {
+
+
+                        modifiIndex = new Vector2Int(i - 2, j);
+                        if (i == 0)
+                        {
+                            TableConfigFieldInfo f = new TableConfigFieldInfo();
+                            f.fieldName = field;
+                            f.description = m_currentData.m_noteValue.ContainsKey(field) ? m_currentData.m_noteValue[field] : "";
+                            f.fieldValueType = fieldValueType;
+                            f.defultValue = DataConfigUtils.TableString2ObjectValue(defaultValue, fieldValueType, enumType);
+                            f.enumType = enumType;
+                            f.fieldAssetType = GetDataFieldAssetType(field);
+                            value = f;
+                        }
+                        else
+                        {
+                            SingleData data = m_currentData[m_currentData.TableIDs[i - 3]];
+
+                            if (data.ContainsKey(field))
+                                defaultValue = data[field];
+                            value = DataConfigUtils.TableString2ObjectValue(defaultValue, fieldValueType, enumType);
+                        }
+                        GeneralDataModificationWindow.OpenWindow(this, "修改数据", value, DrawModifiValueGUI, CheckModifiValueCallBack, ModificationCompleteCallBack);
+                    }
+                }
+               
+                GUI.color = Color.white;
+                tempWith += w;
+            }
+
+            tempHeight += h;
+        }
+        helpBoxStyle.fontSize = oldButtonFontSize;
+    }
+    private string ShowContainsChar(string value,string searchValue)
+    {
+        string res = value;
+        if (value.Contains(searchValue))
+        {
+           res= value.Replace(searchValue, "<color=red>" + searchValue + "</color>");
+        }
+
+        return res;
+    }
+    private DataFieldAssetType GetDataFieldAssetType(string field)
+    {
+        DataFieldAssetType type;
+        if (!m_currentData.m_fieldAssetTypes.TryGetValue(field,out type))
+        {
+            type = DataFieldAssetType.Data;
+        }
+        return type;
+    }
+
+    private FieldType GetFieldType(int index, string field)
+    {
+        FieldType fieldValueType = index == 0 ? FieldType.String : m_currentData.m_tableTypes[field];
+        return fieldValueType;
+    }
+    private string GetEnumType(FieldType fieldValueType,  string field)
+    {
+        string enumType = fieldValueType == FieldType.Enum ?
+                   (m_currentData.m_tableEnumTypes.ContainsKey(field) ? m_currentData.m_tableEnumTypes[field] : EditorTool.GetAllEnumType()[0])
+                   : "";
+        return enumType;
+    }
+
+    private string GetDefaultValue(FieldType fieldValueType, string enumType, string field)
+    {
+        string defaultValue;
+
+        if (!m_currentData.m_defaultValue.TryGetValue(field, out defaultValue))
+        {
+            Type t = DataConfigUtils.ConfigFieldValueType2Type(fieldValueType, enumType);
+            object obj = ReflectionUtils.CreateDefultInstance(t);
+            defaultValue = DataConfigUtils.ObjectValue2TableString(obj);
+            m_currentData.m_defaultValue.Add(field, defaultValue);
+        }
+
+        return defaultValue;
+    }
+    private string GetDescription(string field)
+    {
+        string value;
+        if (!m_currentData.m_noteValue.TryGetValue(field, out value))
+        {
+            value = "";
+            m_currentData.m_noteValue.Add(field, value);
+        }
+        return value;
+    }
+
+    /// <summary>
+    /// 绘制数据修改窗口
+    /// </summary>
+    /// <param name="t"></param>
+    /// <returns></returns>
+    private object DrawModifiValueGUI(object t)
+    {
+        if (t is TableConfigFieldInfo)
+        {
+            TableConfigFieldInfo info = (TableConfigFieldInfo)t;
+            DrawTableConfigFieldInfo(info);
+            string df = DataConfigUtils.ObjectValue2TableString(info.defultValue);
+            if (string.IsNullOrEmpty(df))
+                EditorGUILayout.HelpBox("默认值不能为空！！", MessageType.Error);
+            if (CheckIsNameRepeat(info))
+                EditorGUILayout.HelpBox("字段名不能重复！！", MessageType.Error);
+        }
+        else
+        {
+            string field = m_currentData.TableKeys[modifiIndex.y];
+            SingleData data = m_currentData[m_currentData.TableIDs[modifiIndex.x-1]];
+            
+            EditorDrawGUIUtil.CanEdit = false;
+            field = EditorDrawGUIUtil.DrawBaseValue("字段名", field).ToString();
+            EditorDrawGUIUtil.CanEdit = true;
+            GUILayout.Space(7);
+
+            string description = GetDescription(field);
+            GUILayout.Label("字段描述：" + description);
+
+            FieldType fieldValueType = GetFieldType(modifiIndex.y, field);
+            string enumType = GetEnumType(fieldValueType, field);
+
+            string defaultValue = GetDefaultValue(fieldValueType, enumType, field);
+            DataFieldAssetType fieldAssetType = GetDataFieldAssetType(field);
+            GUILayout.BeginHorizontal();
+
+            GUILayout.Label("默认值 :" + defaultValue);
+            GUILayout.FlexibleSpace();
+
+            if (GUILayout.Button("默认值", GUILayout.Width(60)))
+            {
+                t = DataConfigUtils.TableString2ObjectValue(defaultValue, fieldValueType, enumType);
+            }
+            GUILayout.EndHorizontal();
+
+            string text = "值";
+            if (fieldAssetType == DataFieldAssetType.LocalizedLanguage)
+            {
+                t = DrawLocalizedLanguageField(text, t);
+
+            }
+            else if (fieldAssetType == DataFieldAssetType.Prefab)
+            {
+                t = DrawPrefabGUI(text, t);
+            }
+            else if (fieldAssetType == DataFieldAssetType.Texture)
+            {
+                t = DrawTextureGUI(text, t);
+            }
+            else if (fieldAssetType == DataFieldAssetType.TableKey)
+            {
+                t = DrawTableGUI(text, t);
+            }
+            else
+            {
+                t = EditorDrawGUIUtil.DrawBaseValue(text, t);
+            }
+        }
+
+        return t;
+    }
+    private bool CheckModifiValueCallBack(object t)
+    {
+        if (t is TableConfigFieldInfo)
+        {
+            TableConfigFieldInfo info = (TableConfigFieldInfo)t;
+
+            if (string.IsNullOrEmpty(info.fieldName))
+                return false;
+
+            if (CheckIsNameRepeat(info))
+                return false;
+
+            string df = DataConfigUtils.ObjectValue2TableString(info.defultValue);
+            if (string.IsNullOrEmpty(df))
+                return false;
+
+        }
+
+        return true;
+    }
+    private bool CheckIsNameRepeat(TableConfigFieldInfo info)
+    {
+        string field = m_currentData.TableKeys[modifiIndex.y];
+
+        for (int i = 0; i < m_currentData.TableKeys.Count; i++)
+        {
+            string f = m_currentData.TableKeys[i];
+            if (i == modifiIndex.y)
+                continue;
+            else
+            {
+                if (f == info.fieldName)
+                    return true;
+            }
+        }
+
+        return false;
+    }
+    /// <summary>
+    /// 绘制字段信息
+    /// </summary>
+    /// <param name="temp"></param>
+    private void DrawTableConfigFieldInfo(TableConfigFieldInfo temp)
+    {
+        Type type = DataConfigUtils.ConfigFieldValueType2Type(temp.fieldValueType,temp.enumType);
+        if (temp.defultValue == null || type.FullName != temp.defultValue.GetType().FullName)
+            temp.defultValue = ReflectionUtils.CreateDefultInstance(type);
+
+        //是否使用多语言字段
+      
+
+        GUILayout.BeginVertical("box");
+
+        GUILayout.EndVertical();
+        temp = (TableConfigFieldInfo)EditorDrawGUIUtil.DrawClassData("字段信息", temp, new List<string>() { "defultValue", "enumType" }, null, () =>
+        {
+            if (temp.fieldAssetType == DataFieldAssetType.LocalizedLanguage
+            || temp.fieldAssetType== DataFieldAssetType.Prefab
+            || temp.fieldAssetType == DataFieldAssetType.TableKey
+            || temp.fieldAssetType== DataFieldAssetType.Texture)
+            {
+                if (type != typeof(string))
+                {
+                    temp.fieldAssetType = DataFieldAssetType.Data;
+                }
+            }
+            string text = "默认值";
+            if (temp.fieldAssetType== DataFieldAssetType.LocalizedLanguage)
+            {
+                temp.defultValue = DrawLocalizedLanguageField(text, temp.defultValue);
+            }
+            else if(temp.fieldAssetType == DataFieldAssetType.Prefab)
+            {
+              temp.defultValue= DrawPrefabGUI(text, temp.defultValue);
+            }
+            else if(temp.fieldAssetType == DataFieldAssetType.Texture)
+            {
+                temp.defultValue = DrawTextureGUI(text, temp.defultValue);
+            }
+            else if (temp.fieldAssetType == DataFieldAssetType.TableKey)
+            {
+                temp.defultValue = DrawTableGUI(text, temp.defultValue);
+            }
+            else
+            {
+                temp.defultValue = EditorDrawGUIUtil.DrawBaseValue(text, temp.defultValue);
+            }
+            if(temp.fieldValueType== FieldType.Enum)
+            {
+                List<string> enumList = new List<string>(EditorTool.GetAllEnumType());
+                temp.enumType = EditorDrawGUIUtil.DrawPopup("枚举类型", temp.enumType, enumList);
+            }
+        });
+    }
+
+    private List<string> configFileNames = new List<string>();
+    private List<string> fieldNames = new List<string>();
+    private List<string> tableKeys = new List<string>();
+    private string tableName = "";
+    private string fieldName = "";
+    private string tableKey = "";
+    private object DrawTableGUI(string text, object defultValue)
+    {
+        string value = defultValue.ToString();
+        GUILayout.Label(text + " : " + value);
+
+        if(string.IsNullOrEmpty(tableName) && !string.IsNullOrEmpty(value))
+        {
+            string[] tempStrs = value.Split('/');
+            if(tempStrs.Length==3)
+            {
+                tableName = tempStrs[0];
+                fieldName = tempStrs[1];
+                tableKey = tempStrs[2];
+            }
+        }
+        tableName = EditorDrawGUIUtil.DrawPopup("表格名", tableName, configFileNames, (tName) =>
+        {
+            if (string.IsNullOrEmpty(tName))
+                return;
+            fieldNames.Clear();
+            DataTable d = DataManager.GetData(tName);
+            fieldNames.AddRange(d.TableKeys);
+            tableKeys.AddRange(d.TableIDs);
+        });
+        
+        fieldName = EditorDrawGUIUtil.DrawPopup("字段名", fieldName, fieldNames);
+        tableKey = EditorDrawGUIUtil.DrawPopup("表格数据key", tableKey, tableKeys);
+
+        defultValue = tableName + "/" + fieldName + "/" + tableKey;
+        return defultValue;
+    }
+
+    private object DrawLocalizedLanguageField(string text, object value)
+    {
+        value = EditorDrawGUIUtil.DrawPopup(text, value.ToString(), langKeys);
+        GUILayout.Label("多语言字段[" + value + "] : " + LanguageManager.GetContentByKey(value.ToString()));
+        return value;
+    }
+
+    private Editor previewEditor;
+    private GameObject previewObj;
+    private object editPrefabValue = null;
+    private object DrawPrefabGUI(string text, object value)
+    {
+        if (editPrefabValue != null)
+        {
+            value = editPrefabValue;
+            editPrefabValue = null;
+        }
+
+        GUILayout.BeginHorizontal();
+        value= EditorDrawGUIUtil.DrawBaseValue(text, value);
+        if (GUILayout.Button("o", GUILayout.Width(20)))
+        {
+            ObjectSelectorWindow.Show(GeneralDataModificationWindow.GetInstance(), value.ToString(),
+                new string[] { "Assets/Resources" },
+                typeof(GameObject),
+                (assetName, obj) =>
+                {
+                    editPrefabValue = assetName;
+                }
+                );
+        }
+        GUILayout.EndHorizontal();
+        string content = value.ToString();
+        bool isHave = false;
+        try
+        {
+            ResourcesConfigManager.Initialize();
+            if (ResourcesConfigManager.GetIsExitRes(content))
+            {
+                GameObject obj = ResourceManager.Load<GameObject>(content);
+                if (obj)
+                {
+
+                    if(obj!= previewObj)
+                    {
+                        previewEditor = Editor.CreateEditor(obj);
+                        previewObj = obj;
+                    }
+
+                    previewEditor.OnPreviewGUI(GUILayoutUtility.GetRect(300, 300), EditorStyles.helpBox);
+                    isHave = true;
                 }
             }
         }
+        catch { }
+
+        if (!isHave)
+        {
+            EditorGUILayout.HelpBox("没有预制 ["+value+"] ！！", MessageType.Error);
+        }
+
+        return value;
     }
+    private Editor previewEditor1;
+    private Texture2D previewTex;
+    private object editTextureValue;
+    private object DrawTextureGUI(string text, object value)
+    {
+        if (editTextureValue != null)
+        {
+            value = editTextureValue;
+            editTextureValue = null;
+        }
+
+        GUILayout.BeginHorizontal();
+        value = EditorDrawGUIUtil.DrawBaseValue(text, value);
+        if (GUILayout.Button("o", GUILayout.Width(20)))
+        {
+            ObjectSelectorWindow.Show(GeneralDataModificationWindow.GetInstance(), value.ToString(),
+                new string[] { "Assets/Resources" },
+                typeof(GameObject),
+                (assetName, obj) =>
+                {
+                    editTextureValue = assetName;
+                }
+                );
+        }
+        GUILayout.EndHorizontal();
+        string content = value.ToString();
+        bool isHave = false;
+        try
+        {
+            ResourcesConfigManager.Initialize();
+            if (ResourcesConfigManager.GetIsExitRes(content))
+            {
+                Texture2D obj = ResourceManager.Load<Texture2D>(content);
+                if (obj)
+                {
+
+                    if (obj != previewTex)
+                    {
+                        previewEditor1 = Editor.CreateEditor(obj);
+                        previewTex = obj;
+                    }
+
+                    previewEditor1.OnPreviewGUI(GUILayoutUtility.GetRect(300, 300), EditorStyles.helpBox);
+                    isHave = true;
+                }
+            }
+        }
+        catch { }
+
+        if (!isHave)
+        {
+            EditorGUILayout.HelpBox("没有图片 [" + value + "] ！！", MessageType.Error);
+        }
+
+        return value;
+    }
+    private Vector2Int modifiIndex = new Vector2Int();
+
+
+    /// <summary>
+    /// 修改格子数据完成回调
+    /// </summary>
+    /// <param name="t"></param>
+    private void ModificationCompleteCallBack(object t)
+    {
+        if (t is TableConfigFieldInfo)
+        {
+            TableConfigFieldInfo temp = (TableConfigFieldInfo)t;
+
+            string field = m_currentData.TableKeys[modifiIndex.y];
+            if (field != temp.fieldName)
+            {
+                RenameField(m_currentData, field, temp.fieldName);
+                field = temp.fieldName;
+            }
+           // SingleData data = m_currentData[m_currentData.TableIDs[modifiIndex.y]];
+            m_currentData.m_defaultValue[field] = DataConfigUtils.ObjectValue2TableString(temp.defultValue);
+
+            if (m_currentData.m_noteValue.ContainsKey(field))
+                m_currentData.m_noteValue[field] = temp.description;
+            else
+            {
+                if (!string.IsNullOrEmpty(temp.description))
+                {
+                    m_currentData.m_noteValue.Add(field, temp.description);
+                }
+            }
+
+            if (m_currentData.m_tableTypes[field] != temp.fieldValueType)
+            {
+                m_currentData.m_tableTypes[field] = temp.fieldValueType;
+                ResetDataField(m_currentData, field, temp.fieldValueType, temp.enumType,temp.defultValue);
+            }
+            if (temp.fieldValueType == FieldType.Enum)
+            {
+                if (m_currentData.m_tableEnumTypes.ContainsKey(field))
+                    
+                    m_currentData.m_tableEnumTypes[field] = temp.enumType;
+
+                else
+                    m_currentData.m_tableEnumTypes.Add(field, temp.enumType);
+            }
+            m_currentData.m_fieldAssetTypes[field] = temp.fieldAssetType;
+        }
+        else
+        {
+            string field = m_currentData.TableKeys[modifiIndex.y];
+            SingleData data = m_currentData[m_currentData.TableIDs[modifiIndex.x-1]];
+            data[field] = DataConfigUtils.ObjectValue2TableString(t);
+        }
+    }
+
+    /// <summary>
+    /// 添加一个字段
+    /// </summary>
+    private void Add2FieldGUI()
+    {     
+        GeneralDataModificationWindow.OpenWindow(this, "添加字段", new TableConfigFieldInfo(), (value) =>
+        {
+            TableConfigFieldInfo info = (TableConfigFieldInfo)value;
+            DrawTableConfigFieldInfo(info);
+            
+            if (string.IsNullOrEmpty(info.fieldName))
+                EditorGUILayout.HelpBox("字段名不能为空！！", MessageType.Error);
+            else if (m_currentData.TableKeys.Contains(info.fieldName))
+                EditorGUILayout.HelpBox("字段名重复！！", MessageType.Error);
+            string df = DataConfigUtils.ObjectValue2TableString(info.defultValue);
+            if(string.IsNullOrEmpty(df))
+                EditorGUILayout.HelpBox("默认值不能为空！！", MessageType.Error);
+            return value;
+        },
+        (value) =>
+        {
+            TableConfigFieldInfo info = (TableConfigFieldInfo)value;
+            if (string.IsNullOrEmpty(info.fieldName) || m_currentData.TableKeys.Contains(info.fieldName))
+                return false;
+            string df = DataConfigUtils.ObjectValue2TableString(info.defultValue);
+            if (string.IsNullOrEmpty(df))
+                return false;
+            return true;
+
+        },
+        (value) =>
+        {
+            TableConfigFieldInfo info = (TableConfigFieldInfo)value;
+            AddField(m_currentData, info);
+            withItemList.Add(wWith);
+        });
+    }
+  
+    /// <summary>
+    /// 添加一行数据
+    /// </summary>
+    private void AddLineDataGUI()
+    {
+        GeneralDataModificationWindow.OpenWindow(this, "插入一行数据", "", (value) =>
+        { 
+            value =  EditorDrawGUIUtil.DrawBaseValue("Key:", value);
+            if (string.IsNullOrEmpty(value.ToString()))
+                EditorGUILayout.HelpBox("Key不能为空！！", MessageType.Error);
+            else if (m_currentData.TableKeys.Contains(value.ToString()))
+                EditorGUILayout.HelpBox("Key重复！！", MessageType.Error);
+            return value;
+        },
+         (value) =>
+         {
+
+             if (string.IsNullOrEmpty(value.ToString()) || m_currentData.TableKeys.Contains(value.ToString()))
+                 return false;
+
+             return true;
+
+         },
+       (value) =>
+       {
+           heightItemList.Add(30);
+           SingleData data = new SingleData();
+           DataTable table = m_currentData;
+           List<string> keys = table.TableKeys;
+           for (int i = 0; i < keys.Count; i++)
+           {
+               string keyTmp = keys[i];
+               if (i == 0)
+               {
+                   data.Add(keyTmp, value.ToString());
+               }
+               else
+               data.Add(keyTmp, table.m_defaultValue[keyTmp]);
+           }
+           m_currentData.AddData(data);
+       });
+
+       
+    }
+    #region 数据文件相关
+
+  
 
     void CleanCacheGUI()
     {
@@ -185,478 +1026,93 @@ public class DataEditorWindow : EditorWindow
 
     #region 记录相关
 
-    Vector2 pos = Vector3.zero;
-
-    bool isFoldList = true;
-    void DataGUI()
-    {
-        if (m_currentData != null
-            && m_currentDataName != "None")
-        {
-            EditorGUI.indentLevel = 1;
-            isFoldList = EditorGUILayout.Foldout(isFoldList, "记录列表");
-            if (isFoldList)
-            {
-                pos = EditorGUILayout.BeginScrollView(pos, GUILayout.ExpandHeight(false));
-
-                List<string> keys = m_currentData.TableIDs;
-
-                for (int i = 0; i < keys.Count; i++)
-                {
-                    EditorGUI.indentLevel = 2;
-                    DataItemGUI(m_currentData, keys[i]);
-                }
-
-                EditorGUILayout.EndScrollView();
-                EditorGUILayout.Space();
-            }
-
-            EditorGUI.indentLevel = 1;
-            AddDataGUI(m_currentData);
-
-            EditorGUI.indentLevel = 1;
-            EditorDataGUI();
-
-            GenerateDataClassGUI();
-
-            SaveDataGUI();
-
-            DeleteDataGUI();
-
-            EditorGUILayout.Space();
-        }
-
-    }
-
-
-    bool isFold = false;
-    string mianKey = "";
-    SingleData content = new SingleData();
-
-    Vector2 AddDataPos = Vector2.zero; 
-    void AddDataGUI(DataTable dict)
-    {
-        isFold = EditorGUILayout.Foldout(isFold, "新增记录");
-        if (isFold)
-        {
-            EditorGUI.indentLevel++;
-
-            string key = dict.TableKeys[0];
-
-            AddDataPos = EditorGUILayout.BeginScrollView(AddDataPos, GUILayout.ExpandHeight(false));
-
-            EditorGUILayout.LabelField("<主键>字段名", key);
-            mianKey = EditorUtilGUI.FieldGUI_TypeValue(FieldType.String, mianKey,null);
-
-            if (mianKey == "")
-            {
-                EditorGUILayout.LabelField("主键不能为空！");
-            }
-            else if (dict.ContainsKey(mianKey))
-            {
-                EditorGUILayout.LabelField("重复的主键！", EditorGUIStyleData.WarnMessageLabel);
-            }
-
-            EditorGUILayout.Space();
-
-            EditorDataGUI(dict, content);
-
-            EditorGUILayout.EndScrollView();
-
-            if (!dict.ContainsKey(mianKey) && mianKey != "")
-            {
-                EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.Space();
-                if (GUILayout.Button("新增", GUILayout.Width(position.width - 60)))
-                {
-                    content.Add(key, mianKey);
-
-                    m_currentData.AddData(content);
-                    content = new SingleData();
-                    mianKey = "";
-                }
-                EditorGUILayout.Space();
-                EditorGUILayout.EndHorizontal();
-            }
-
-            EditorGUILayout.Space();
-        }
-
-
-    }
-
-    void DataItemGUI(DataTable table, string key)
-    {
-        if (!m_foldList.ContainsKey(key))
-        {
-            m_foldList.Add(key, false);
-        }
-
-        EditorGUILayout.BeginHorizontal();
-
-        m_foldList[key] = EditorGUILayout.Foldout(m_foldList[key], key);
-
-        if (GUILayout.Button("删除记录", GUILayout.Width(EditorGUIStyleData.s_ButtonWidth_small)))
-        {
-            table.RemoveData(key);
-            return;
-        }
-
-        EditorGUILayout.EndHorizontal();
-
-        EditorGUI.indentLevel ++;
-
-        if (m_foldList[key])
-        {
-            SingleData data = table[key];
-
-            List<string> keys = table.TableKeys;
-
-            //这里只显示主键
-            for (int i = 0; i < keys.Count; i++)
-            {
-                string keyTmp = keys[i];
-               
-                if (i == 0)
-                {
-                    EditorGUILayout.LabelField("["+ keyTmp+"]");
-
-                    EditorGUI.indentLevel++;
-                    //EditorGUI.indentLevel++;
-
-                    EditorGUILayout.LabelField("<主键>字段名", keyTmp);
-                    EditorGUILayout.LabelField("字段值", data[keyTmp]);
-
-                    EditorGUI.indentLevel--;
-                    //EditorGUI.indentLevel--;
-                }
-            }
-            //显示其他键
-            EditorDataGUI(table, data);
-        }
-    }
-
-    SingleData EditorDataGUI(DataTable table, SingleData data)
-    {
-        try
-        {
-            List<string> keys = table.TableKeys;
-            for (int i = 0; i < keys.Count; i++)
-            {
-                string keyTmp = keys[i];
-                FieldType type = table.GetFieldType(keyTmp);
-
-                if (i != 0)
-                {
-                    bool cancelDefault = false;
-                    EditorGUILayout.BeginHorizontal();
-                    
-                    if (data.ContainsKey(keyTmp))
-                    {
-                        EditorGUILayout.LabelField("[" + keyTmp + "]");
-
-                        if (GUILayout.Button("使用默认值"))
-                        {
-                            data.Remove(keyTmp);
-                            EditorGUILayout.EndHorizontal();
-
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        EditorGUILayout.LabelField("[" + keyTmp + "] (默认值)");
-                        if (GUILayout.Button("取消默认值"))
-                        {
-                            cancelDefault = true;
-                        }
-                    }
-
-                    EditorGUILayout.EndHorizontal();
-
-                    //EditorGUI.indentLevel++;
-                    EditorGUI.indentLevel++;
-
-                    //非默认值情况
-                    if (data.ContainsKey(keyTmp))
-                    {
-                        EditorGUILayout.LabelField("字段名", keyTmp);
-                        EditorGUILayout.LabelField("注释", table.GetNote(keyTmp));
-
-                        string newContent = EditorUtilGUI.FieldGUI_TypeValue(type, data[keyTmp], table.GetEnumType(keyTmp));
-
-                        if (newContent != data[keyTmp])
-                        {
-                            data[keyTmp] = newContent;
-                        }
-                    }
-                    //如果是默认值则走这里
-                    else
-                    {
-                        EditorGUILayout.LabelField("字段名", keyTmp);
-                        EditorGUILayout.LabelField("注释", table.GetNote(keyTmp));
-                        string newContent = "";
-
-                        if (table.m_defaultValue.ContainsKey(keyTmp))
-                        {
-                            newContent = new SingleField(type, table.GetDefault(keyTmp), table.GetEnumType(keyTmp)).m_content;
-                        }
-                        else
-                        {
-                            newContent = new SingleField(type, null, table.GetEnumType(keyTmp)).m_content;
-                        }
-
-                        if (type != FieldType.Enum)
-                        {
-                            EditorGUILayout.LabelField("字段类型", type.ToString());
-                        }
-                        else
-                        {
-                            EditorGUILayout.LabelField("字段类型", type.ToString() + "/" + table.GetEnumType(keyTmp));
-                        }
-
-                        EditorGUILayout.LabelField("(默认)字段内容", new SingleField(type, newContent, table.GetEnumType(keyTmp)).GetShowString());
-
-                        if (cancelDefault)
-                        {
-                            data.Add(keyTmp, newContent);
-                        }
-                    }
-
-                    EditorGUI.indentLevel--;
-                    //EditorGUI.indentLevel--;
-                }
-
-                EditorGUILayout.Space();
-            }
-        }
-        catch(Exception e)
-        {
-            EditorGUILayout.TextArea(e.ToString(),EditorGUIStyleData.ErrorMessageLabel);
-        }
-
-        return data;
-    }
 
     #endregion
 
     #region 字段相关
 
-    bool m_isEditorFold = false;
-    FieldType m_editorNewType;
-    int m_editorNewEnumIndex = 0;
-    string m_editorNoteContent = "";
-    Vector2 m_EditorPos = Vector2.zero;
-    void EditorDataGUI()
+    static private void RenameField(DataTable table,string oldFieldName,string newFieldName)
     {
-        m_isEditorFold = EditorGUILayout.Foldout(m_isEditorFold, "编辑数据");
-        EditorGUI.indentLevel ++;
+        int indexFiled = table.TableKeys.IndexOf(oldFieldName);
+        table.TableKeys[indexFiled] = newFieldName;
 
-        if (m_isEditorFold)
+        table.m_noteValue = RenameDictionaryKey(table.m_noteValue, oldFieldName, newFieldName);
+        table.m_tableTypes = RenameDictionaryKey(table.m_tableTypes, oldFieldName, newFieldName);
+        table.m_tableEnumTypes = RenameDictionaryKey(table.m_tableEnumTypes, oldFieldName, newFieldName);
+        table.m_defaultValue = RenameDictionaryKey(table.m_defaultValue, oldFieldName, newFieldName);
+        foreach (var item in table.TableIDs)
         {
-            List<string> keys = m_currentData.TableKeys;
-            m_EditorPos = EditorGUILayout.BeginScrollView(m_EditorPos, GUILayout.ExpandHeight(false));
-            for (int i = 0; i < keys.Count; i++)
-            {
-                string key = keys[i];
-                FieldType type = m_currentData.GetFieldType(key);
-                int EnumTypeIndex = EditorTool.GetAllEnumTypeIndex(m_currentData.GetEnumType(key));
+            table[item] = (SingleData)RenameDictionaryKey(table[item], oldFieldName, newFieldName);
+        }
+    }
+    private static Dictionary<K, V> RenameDictionaryKey<K,V>(Dictionary<K,V> dic , K oldFieldName, K newFieldName)
+    {
+        if (!dic.ContainsKey(oldFieldName))
+            return dic;
+        List<K> keys = new List<K>(dic.Keys);
+        List<V> values = new List<V>(dic.Values);
+        int indexFiled = keys.IndexOf(oldFieldName);
+       keys[indexFiled] = newFieldName;
 
-                if (i == 0)
-                {
-                    EditorGUILayout.LabelField("<主键>字段名", key);
-                    EditorGUILayout.LabelField("字段类型", m_currentData.GetFieldType(keys[i]).ToString());
-                }
-                else
-                {
-                    EditorGUILayout.BeginHorizontal();
+        dic.Clear();
+        for (int i = 0; i < keys.Count; i++)
+        {
+            dic.Add(keys[i], values[i]);
+        }
 
-                    EditorGUILayout.LabelField("字段名", key);
+        return dic;
+    }
+    /// <summary>
+    /// 添加字段
+    /// </summary>
+    /// <param name="info"></param>
+    private static  void AddField(DataTable table, TableConfigFieldInfo info)
+    {
+        table.TableKeys.Add(info.fieldName);
+        table.m_noteValue.Add(info.fieldName, info.description);
+        table.m_tableTypes.Add(info.fieldName, info.fieldValueType);
+        table.m_fieldAssetTypes.Add(info.fieldName, info.fieldAssetType);
+        if (info.fieldValueType == FieldType.Enum)
+        {
+            table.m_tableEnumTypes.Add(info.fieldName, info.enumType);
+        }
+        table.m_defaultValue.Add(info.fieldName, DataConfigUtils.ObjectValue2TableString(info.defultValue));
 
-                    if(GUILayout.Button("删除字段"))
-                    {
-                        if (EditorUtility.DisplayDialog("警告", "确定要删除该字段吗？", "是", "取消"))
-                        {
-                            DeleteField(m_currentData, key);
-                            continue;
-                        }
-                    }
-
-                    EditorGUILayout.EndHorizontal();
-
-                    bool isNewType = false;
-
-                    m_editorNoteContent = EditorGUILayout.TextField("注释", m_currentData.GetNote(key));
-                    m_currentData.SetNote(key, m_editorNoteContent);
-
-                    m_editorNewType = (FieldType)EditorGUILayout.EnumPopup("字段类型", type);
-
-                    if (m_editorNewType == FieldType.Enum)
-                    {
-                        m_editorNewEnumIndex = EditorGUILayout.Popup("枚举类型", EnumTypeIndex, EditorTool.GetAllEnumType());
-
-                        if (EnumTypeIndex != m_editorNewEnumIndex)
-                        {
-                            isNewType = true;
-                        }
-                    }
-
-                    if (type != m_editorNewType)
-                    {
-                        isNewType = true;
-                    }
-
-                    if (isNewType)
-                    {
-                        //弹出警告并重置数据
-                        if (EditorUtility.DisplayDialog("警告", "改变字段类型会重置该字段的所有数据和默认值\n是否继续？", "是", "取消"))
-                        {
-                            if (m_editorNewEnumIndex == -1)
-                            {
-                                m_editorNewEnumIndex = 0;
-                            }
-                            m_currentData.SetFieldType(key, m_editorNewType, EditorTool.GetAllEnumType()[m_editorNewEnumIndex]);
-                            ResetDataField(m_currentData, key, m_editorNewType, EditorTool.GetAllEnumType()[m_editorNewEnumIndex]);
-
-                             type = m_editorNewType;
-                             EnumTypeIndex = m_editorNewEnumIndex;
-                             content = new SingleData();
-                        }
-                    }
-
-                    string newContent;
-                    if (type == FieldType.Enum)
-                    {
-                        newContent = EditorUtilGUI.FieldGUI_Type(type, EditorTool.GetAllEnumType()[EnumTypeIndex], m_currentData.GetDefault(key), "默认值");
-                    }
-                    else
-                    {
-                        newContent = EditorUtilGUI.FieldGUI_Type(type, null, m_currentData.GetDefault(key), "默认值");
-                    }
-
-                    m_currentData.SetDefault(key, newContent);
-                }
-
-                EditorGUILayout.Space();
-            }
-
-            EditorGUILayout.EndScrollView();
-
-            AddFieldGUI();
+        foreach (var item in table.Values)
+        {
+            item.Add(info.fieldName, DataConfigUtils.ObjectValue2TableString(info.defultValue));
         }
     }
 
-    void DeleteFieldGUI()
-    {
-    }
-
-    void DeleteField(DataTable table,string fieldName)
+    static void DeleteField(DataTable table,string fieldName)
     {
         table.TableKeys.Remove(fieldName);
-    }
-
-    bool m_isAddFoldField = false;
-    string m_newFieldName = "";
-    FieldType m_newAddType = FieldType.String;
-    string m_newFieldDefaultValue = "";
-    int m_newEnumTypeIndex = 0;
-    string m_addNoteContent = "";
-    void AddFieldGUI()
-    {
-        EditorGUILayout.Space();
-        m_isAddFoldField = EditorGUILayout.Foldout(m_isAddFoldField, "新增字段");
-        EditorGUI.indentLevel ++;
-
-        if (m_isAddFoldField)
+        if (table.m_noteValue.ContainsKey(fieldName))
         {
-            m_newFieldName = EditorGUILayout.TextField("字段名", m_newFieldName);
-            FieldType typeTmp = (FieldType)EditorGUILayout.EnumPopup("字段类型", m_newAddType);
-
-            bool isNewFieldType = false;
-
-            if (typeTmp != m_newAddType)
-            {
-                m_newAddType = typeTmp;
-                isNewFieldType = true;
-            }
-
-            m_addNoteContent = EditorGUILayout.TextField("注释", m_addNoteContent);
-
-            if (typeTmp == FieldType.Enum) 
-            {
-                int newEnumTypeIndex = EditorGUILayout.Popup("枚举类型", m_newEnumTypeIndex, EditorTool.GetAllEnumType());
-
-                if (newEnumTypeIndex != m_newEnumTypeIndex)
-                {
-                    m_newEnumTypeIndex = newEnumTypeIndex;
-                    isNewFieldType = true;
-                }
-            }
-
-            //更改字段类型重设初始值
-            if (isNewFieldType)
-            {
-                if (typeTmp == FieldType.Enum)
-                {
-                    m_newFieldDefaultValue = new SingleField(m_newAddType, null, EditorTool.GetAllEnumType()[m_newEnumTypeIndex]).m_content;
-                }
-                else
-                {
-                    m_newFieldDefaultValue = new SingleField(m_newAddType, null, null).m_content;
-                }
-            }
-
-            //是否是一个合理的字段名
-            bool isShowButton = true;
-
-            if (m_newFieldName == "")
-            {
-                isShowButton = false;
-            }
-
-            if (m_currentData.TableKeys.Contains(m_newFieldName))
-            {
-                isShowButton = false;
-                EditorGUILayout.TextField("字段名不能重复！",EditorGUIStyleData.WarnMessageLabel);
-            }
-
-            m_newFieldDefaultValue = EditorUtilGUI.FieldGUI_Type(m_newAddType, EditorTool.GetAllEnumType()[m_newEnumTypeIndex], m_newFieldDefaultValue, "默认值");
-
-            if (isShowButton)
-            {
-                if (GUILayout.Button("新增字段")) 
-                {
-                    if (m_newAddType == FieldType.Enum)
-                    {
-                        AddField(m_currentData, m_newFieldName, m_newAddType, m_newFieldDefaultValue, EditorTool.GetAllEnumType()[m_newEnumTypeIndex], m_addNoteContent);
-                    }
-                    else
-                    {
-                        AddField(m_currentData, m_newFieldName, m_newAddType, m_newFieldDefaultValue, null, m_addNoteContent);
-                    }
-                    
-                    m_newFieldName = "";
-                    m_newFieldDefaultValue = "";
-                    m_addNoteContent = "";
-                    m_newAddType = FieldType.String;
-                    m_newEnumTypeIndex = 0;
-                }
-            }
-
+            table.m_noteValue.Remove(fieldName);
         }
-    }
+        if (table.m_tableTypes.ContainsKey(fieldName))
+        {
+            table.m_tableTypes.Remove(fieldName);
+        }
+        if (table.m_tableEnumTypes.ContainsKey(fieldName))
+        {
+            table.m_tableEnumTypes.Remove(fieldName);
+        }
+        if (table.m_defaultValue.ContainsKey(fieldName))
+        {
+            table.m_defaultValue.Remove(fieldName);
+        }
+        foreach (var item in table.Values)
+        {
+            if (item.ContainsKey(fieldName))
+                item.Remove(fieldName);
+        }
+    } 
 
-    void AddField(DataTable table, string fieldName,FieldType type ,string value,string enumType,string note)
+    static void ResetDataField(DataTable data,string key,FieldType type,string enumType,object defaultValue)
     {
-        table.TableKeys.Add(fieldName);
-        table.SetFieldType(fieldName, type, enumType);
-        table.SetDefault(fieldName, value);
-        table.SetNote(fieldName, note);
-    }
-
-    void ResetDataField(DataTable data,string key,FieldType type,string enumType)
-    {
-        string newContent = new SingleField(type, null, enumType).m_content;
+        string newContent = DataConfigUtils.ObjectValue2TableString(defaultValue);
 
         for (int i = 0; i < data.TableIDs.Count; i++)
         {
@@ -668,16 +1124,23 @@ public class DataEditorWindow : EditorWindow
             }
         }
 
-        data.SetDefault(key,newContent);
+        if (data.m_defaultValue.ContainsKey(key))
+        {
+            data.m_defaultValue[key] = newContent;
+        }
+        else
+        {
+            data.m_defaultValue.Add(key, newContent);
+        }
     }
 
     void SaveDataGUI()
     {
         if (GUILayout.Button("保存"))
         {
-            SaveData(m_currentDataName, m_currentData);
+            SaveData(chooseFileName, m_currentData);
             AssetDatabase.Refresh();
-            LoadData(m_currentDataName);
+            LoadData(chooseFileName);
         }
     }
 
@@ -685,7 +1148,7 @@ public class DataEditorWindow : EditorWindow
     {
         if (GUILayout.Button("生成Data类"))
         {
-            CreatDataCSharpFile(m_currentDataName, m_currentData);
+            CreatDataCSharpFile(chooseFileName, m_currentData);
             AssetDatabase.Refresh();
         }
     }
@@ -991,6 +1454,25 @@ public class DataEditorWindow : EditorWindow
     }
 
 #endregion
+}
+
+/// <summary>
+/// 字段描述信息
+/// </summary>
+public class TableConfigFieldInfo
+{
+    [ShowGUIName("字段名")]
+    public string fieldName = "";
+    [ShowGUIName("描述")]
+    public string description = "";
+    [ShowGUIName("数据类型")]
+    public FieldType fieldValueType;
+    [ShowGUIName("数据用途")]
+    public DataFieldAssetType fieldAssetType;
+    [ShowGUIName("默认值")]
+    public object defultValue = null;
+    public string enumType = "";
+
 }
 
 

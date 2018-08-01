@@ -21,6 +21,7 @@ public class ApplicationManagerComponentEditor : Editor
 
         m_statusList = GetStatusList();
         m_currentSelectIndex = GetStatusIndex();
+        //m_app.showLanguageValue = EditorGUILayout.Toggle("Show Language Value", m_app.showLanguageValue);
 
         m_currentSelectIndex = EditorGUILayout.Popup("First Status:", m_currentSelectIndex, m_statusList);
 

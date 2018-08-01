@@ -37,6 +37,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
         }
     }
 
+
     /// <summary>
     /// 全查表
     /// </summary>

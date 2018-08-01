@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Text;
 using System;
+
 /*
  * gameLoadType 为 Resource 时 ，所有资源从Resource读取
  * gameLoadType 不为 Resource时，资源读取方式从配置中读取

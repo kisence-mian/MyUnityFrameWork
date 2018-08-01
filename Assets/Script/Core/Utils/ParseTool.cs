@@ -2,7 +2,7 @@
 using System.Collections;
 using System;
 
-public class ParseTool : MonoBehaviour 
+public static class ParseTool  
 {
 
     public static float[] String2FloatArray(string value)

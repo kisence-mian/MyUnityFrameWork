@@ -33,6 +33,12 @@ public static class ResourcesConfigManager
 
     public static bool GetIsExitRes(string resName)
     {
+
+#if UNITY_EDITOR
+
+        Initialize();
+#endif
+
         if (m_bundleConfigs == null)
         {
             throw new Exception("RecourcesConfigManager GetBundleConfig : bundleConfigs is null  do you Initialize?");

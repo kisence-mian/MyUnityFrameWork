@@ -42,8 +42,8 @@ public class JsonMessageProcessingController
 
             GlobalEvent.DispatchEvent(ErrorCodeMessage, codeMsg);
         }
-
     }
+
     static Dictionary<string, object> mesDic = new Dictionary<string, object>();
     public static void SendMessage<T>(T data) 
     {
@@ -54,6 +54,5 @@ public class JsonMessageProcessingController
         mesDic.Add("Content", content);
         NetworkManager.SendMessage(mt, mesDic);
     }
-
 }
 

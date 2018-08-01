@@ -28,6 +28,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
     #region 初始化
 
+    
     void OnEnable()
     {
         EditorGUIStyleData.Init();
@@ -376,16 +377,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
         if (GUILayout.Button("自动添加 Resource 目录下的资源并保存"))
         {
-            bundles.Clear();
-            ArrangeBundlesByLayer();
-
-            AddAllResourceBundle();  //添加资源文件
-            ArrangeBundlesByLayer(); //整理资源路径
-
-            CreatePackageFile();                 //保存编辑器文件
-            CheckAndCreatBundelPackageConfig(); //生成资源路径文件
-
-            ResourcesConfigManager.ClearConfig();
+            AddResEndSave();
         }
 
         if (GUILayout.Button("增加选中资源"))
@@ -418,6 +410,19 @@ public class BundleConfigEditorWindow : EditorWindow
         //EditorGUILayout.EndHorizontal();
     }
 
+    public void AddResEndSave()
+    {
+        bundles.Clear();
+        ArrangeBundlesByLayer();
+
+        AddAllResourceBundle();  //添加资源文件
+        ArrangeBundlesByLayer(); //整理资源路径
+
+        CreatePackageFile();                 //保存编辑器文件
+        CheckAndCreatBundelPackageConfig(); //生成资源路径文件
+
+        ResourcesConfigManager.ClearConfig();
+    }
     void LogView()
     {
         EditorGUI.indentLevel = 1;

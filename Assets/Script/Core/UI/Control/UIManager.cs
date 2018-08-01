@@ -36,6 +36,7 @@ public class UIManager : MonoBehaviour
         s_UIStackManager = instance.GetComponent<UIStackManager>();
         s_UIcamera       = instance.GetComponentInChildren<Camera>();
 
+
         DontDestroyOnLoad(instance);
     }
 
@@ -118,6 +119,9 @@ public class UIManager : MonoBehaviour
         RemoveHideUI(UIbase);
         AddUI(UIbase);
 
+        s_UIStackManager.OnUIOpen(UIbase);
+        s_UILayerManager.SetLayer(UIbase);      //设置层级
+
         UISystemEvent.Dispatch(UIbase, UIEvent.OnOpen);  //派发OnOpen事件
         try
         {
@@ -128,8 +132,7 @@ public class UIManager : MonoBehaviour
             Debug.LogError(UIName + " OnOpen Exception: " + e.ToString());
         }
 
-        s_UIStackManager.OnUIOpen(UIbase);
-        s_UILayerManager.SetLayer(UIbase);      //设置层级
+
         s_UIAnimManager.StartEnterAnim(UIbase, callback, objs); //播放动画
         return UIbase;
     }
