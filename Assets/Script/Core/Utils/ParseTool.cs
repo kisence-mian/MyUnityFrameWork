@@ -40,7 +40,7 @@ public static class ParseTool
     {
         try
         {
-            string[] values = value.Split('|');
+            string[] values = value.Split(',');
             float x = float.Parse(values[0]);
             float y = float.Parse(values[1]);
 
@@ -73,7 +73,7 @@ public static class ParseTool
     {
         try
         {
-            string[] values = value.Split('|');
+            string[] values = value.Split(',');
             float x = float.Parse(values[0]);
             float y = float.Parse(values[1]);
             float z = float.Parse(values[2]);
@@ -109,7 +109,7 @@ public static class ParseTool
     {
         try
         {
-            string[] values = value.Split('|');
+            string[] values = value.Split(',');
             float r = float.Parse(values[0]);
             float g = float.Parse(values[1]);
             float b = float.Parse(values[2]);

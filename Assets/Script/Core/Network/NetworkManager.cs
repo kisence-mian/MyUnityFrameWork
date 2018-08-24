@@ -21,8 +21,6 @@ public class NetworkManager
         }
     }
 
-   
-
     /// <summary>
     /// 对旧代码的兼容
     /// </summary>

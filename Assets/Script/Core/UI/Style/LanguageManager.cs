@@ -35,11 +35,13 @@ public class LanguageManager
 
     public static void Init()
     {
+        //Debug.Log("1 当前语言: " + Application.systemLanguage + " isInit " + isInit);
+
         if (!isInit)
         {
             isInit = true;
 
-            //Debug.Log("当前语言: " + Application.systemLanguage);
+            Debug.Log("当前语言: " + Application.systemLanguage);
             LoadConfig();
             SetLanguage(Application.systemLanguage);
         }
@@ -128,18 +130,27 @@ public class LanguageManager
     /// <returns></returns>
     public static string GetContentByKey(string moduleName_key, params object[] contentParams)
     {
+        if (string.IsNullOrEmpty(moduleName_key))
+            return "Error : key is null";
         string[] res = ChangeKey2ModuleID(moduleName_key);
+        if (res == null)
+            return "Error : format is error！";
         return GetContent(res[0], res[1], contentParams); 
     }
     public static bool HaveKey(string moduleName_key)
     {
         Init();
+        if (string.IsNullOrEmpty(moduleName_key))
+            return false;
         string[] res = ChangeKey2ModuleID(moduleName_key);
+        if (res == null)
+            return false;
         string moduleName = res[0];
         string contentID = res[1];
 
         if (!s_languageDataDict.ContainsKey(moduleName))
         {
+            //Debug.Log("s_languageDataDict.ContainsKey》》》 moduleName :" + moduleName + "  contentID :" + contentID);
             return false;
         }
 
@@ -147,6 +158,7 @@ public class LanguageManager
 
         if (!data.ContainsKey(contentID))
         {
+            //Debug.Log("data.ContainsKeyy》》》 moduleName :" + moduleName + "  contentID :" + contentID);
             return false;
         }
 
@@ -154,6 +166,11 @@ public class LanguageManager
     }
     private static string[] ChangeKey2ModuleID(string moduleName_key)
     {
+        if (!moduleName_key.Contains("/"))
+        {
+            Debug.LogError("多语言key格式错误 ：" + moduleName_key);
+            return null;
+        }
         string[] ss = moduleName_key.Split('/');
         string moduleName = "";
         string contentID = "";
@@ -207,7 +224,7 @@ public class LanguageManager
                 content = content.Replace(replaceTmp, contentParams[i].ToString());
             }      
         }
-        if ( ApplicationManager.Instance.showLanguageValue && ApplicationManager.Instance.m_AppMode == AppMode.Developing)
+        if (ApplicationManager.Instance!=null && ApplicationManager.Instance.showLanguageValue && ApplicationManager.Instance.m_AppMode == AppMode.Developing)
             content = "[" + content + "]";
         return content;
     }

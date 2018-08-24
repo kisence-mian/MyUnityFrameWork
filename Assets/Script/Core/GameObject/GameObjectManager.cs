@@ -81,6 +81,19 @@ public class GameObjectManager :MonoBehaviour
         return false;
     }
 
+    //判断是否在对象池中
+    public static bool IsExist(GameObject go)
+    {
+        if (s_objectPool.ContainsKey(go.name) && s_objectPool[go.name].Count > 0)
+        {
+            return s_objectPool[go.name].Contains(go);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
     /// <summary>
     /// 从对象池取出一个对象，如果没有，则直接创建它
     /// </summary>

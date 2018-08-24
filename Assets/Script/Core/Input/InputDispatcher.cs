@@ -91,8 +91,6 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
 
     void DispatchSingleEvent(Event inputEvent, InputEventHandle<Event> callBack)
     {
-        //Debug.Log("DispatchSingleEvent");
-
         if (callBack != null)
         {
             try

@@ -237,7 +237,7 @@ namespace HDJ.Framework.Utils
                 }
             }
             if(instance==null)
-                Debug.LogError(error);
+                Debug.LogError("Type :"+type+"\n"+ error);
             return instance;
         }
         public static object CreateDefultInstance(Type type)

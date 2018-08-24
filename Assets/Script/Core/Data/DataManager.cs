@@ -55,7 +55,6 @@ public class DataManager
             {
                 throw new Exception("Dont Find ->" + DataName + "<-");
             }
-
             data = DataTable.Analysis(dataJson);
             data.m_tableName = DataName;
 

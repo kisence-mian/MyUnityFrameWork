@@ -65,6 +65,7 @@ public class GeneralDataModificationWindow : EditorWindow
              {
                  modifi_Value = EditorDrawGUIUtil.DrawBaseValue("Value", modifi_Value);
              }
+             GUILayout.FlexibleSpace();
          });
 
         GUILayout.FlexibleSpace();

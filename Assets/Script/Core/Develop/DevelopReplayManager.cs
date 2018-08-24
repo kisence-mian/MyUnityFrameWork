@@ -88,8 +88,9 @@ public class DevelopReplayManager
             RandomService.SetRandomList(s_randomList);
 
             //关闭正常输入，保证回放数据准确
-            InputUIEventProxy.IsActive = false;
             IInputProxyBase.IsActive = false;
+            InputUIEventProxy.IsActive = false;
+            InputOperationEventProxy.IsActive = false;
             InputNetworkEventProxy.IsActive = false;
         }
         else

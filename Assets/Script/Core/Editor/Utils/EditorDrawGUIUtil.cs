@@ -19,7 +19,7 @@ public class EditorDrawGUIUtil
     /// </summary>
     public static bool CanEdit = true;
 
-    private static bool richTextSupport =false;
+    private static bool richTextSupport = false;
     /// <summary>
     /// 控件文本是否支持富文本
     /// </summary>
@@ -40,12 +40,12 @@ public class EditorDrawGUIUtil
     }
 
 
-    private static void SetRichText(Type type,object data, bool isOn)
+    private static void SetRichText(Type type, object data, bool isOn)
     {
-        FieldInfo[] fs= type.GetFields(BindingFlags.Static | BindingFlags.Public| BindingFlags.NonPublic);
+        FieldInfo[] fs = type.GetFields(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
         foreach (var f in fs)
         {
-            if(f.FieldType== typeof(GUIStyle))
+            if (f.FieldType == typeof(GUIStyle))
             {
                 GUIStyle style = (GUIStyle)f.GetValue(null);
                 style.richText = isOn;
@@ -55,11 +55,11 @@ public class EditorDrawGUIUtil
         PropertyInfo[] ps = type.GetProperties(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
         foreach (var p in ps)
         {
-            if (p.CanRead && p.CanWrite&& p.PropertyType == typeof(GUIStyle))
+            if (p.CanRead && p.CanWrite && p.PropertyType == typeof(GUIStyle))
             {
-                GUIStyle style = (GUIStyle)p.GetValue(null,null);
+                GUIStyle style = (GUIStyle)p.GetValue(null, null);
                 style.richText = isOn;
-                p.SetValue(null, style,null);
+                p.SetValue(null, style, null);
             }
         }
         if (data != null)
@@ -79,12 +79,17 @@ public class EditorDrawGUIUtil
             {
                 if (p.CanRead && p.CanWrite && p.PropertyType == typeof(GUIStyle))
                 {
-                    GUIStyle style = (GUIStyle)p.GetValue(data,null);
+                    GUIStyle style = (GUIStyle)p.GetValue(data, null);
                     style.richText = isOn;
-                    p.SetValue(data, style,null);
+                    p.SetValue(data, style, null);
                 }
             }
         }
+    }
+
+    public static object DrawBaseValue(string content, object data)
+    {
+        return DrawBaseValue(new GUIContent(content), data);
     }
     /// <summary>
     /// 绘制object
@@ -92,83 +97,86 @@ public class EditorDrawGUIUtil
     /// <param name="showName"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static object DrawBaseValue(string name, object data)
+    public static object DrawBaseValue(GUIContent content, object data)
     {
         if (data == null)
             return data;
-        
-       Type type = data.GetType();
-       string showName = richTextSupport? GetFormatName(name, type, "yellow", data): GetFormatName(name, type, "", data);
+
+        Type type = data.GetType();
+        content.text = richTextSupport ? GetFormatName(content.text, type, "yellow", data) : GetFormatName(content.text, type, "", data);
 
         object obj = data;
         if (CanEdit)
         {
             if (type == typeof(int))
             {
-                obj = EditorGUILayout.IntField(new GUIContent(showName), (int)data);
+                obj = EditorGUILayout.IntField(content, (int)data);
             }
             else if (type == typeof(short))
             {
-                obj = EditorGUILayout.IntField(new GUIContent(showName), (short)data);
+                obj = EditorGUILayout.IntField(content, (short)data);
             }
             else if (type == typeof(long))
             {
-                obj = EditorGUILayout.LongField(new GUIContent(showName), (long)data);
+                obj = EditorGUILayout.LongField(content, (long)data);
             }
             else if (type == typeof(double))
             {
-                obj = EditorGUILayout.DoubleField(new GUIContent(showName), (double)data);
+                obj = EditorGUILayout.DoubleField(content, (double)data);
             }
             else if (type == typeof(float))
             {
-                obj = EditorGUILayout.FloatField(new GUIContent(showName), (float)data);
+                obj = EditorGUILayout.FloatField(content, (float)data);
             }
             else if (type == typeof(bool))
             {
-                obj = EditorGUILayout.Toggle(new GUIContent(showName), (bool)data);
+                obj = EditorGUILayout.Toggle(content, (bool)data);
             }
             else if (type == typeof(string))
             {
+                GUIStyle style = "TextArea";
+                style.wordWrap = true;
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(showName, GUILayout.MaxWidth(Screen.width / 2));
-                obj = EditorGUILayout.TextArea(data.ToString(), GUILayout.MaxWidth(Screen.width / 2));
+                GUILayout.Label(content, GUILayout.MaxWidth(Screen.width / 2));
+
+                obj = EditorGUILayout.TextArea(data.ToString(), style, GUILayout.MaxWidth(Screen.width / 2));
                 GUILayout.EndHorizontal();
             }
             else if (type.BaseType.FullName == typeof(UnityEngine.Object).FullName || type.BaseType.FullName == typeof(Component).FullName || type.BaseType.FullName == typeof(MonoBehaviour).FullName)
             {
-                obj = EditorGUILayout.ObjectField(showName, (UnityEngine.Object)data, type, true);
+                obj = EditorGUILayout.ObjectField(content, (UnityEngine.Object)data, type, true);
             }
             else if (type.BaseType == typeof(Enum))
             {
-                obj = EditorGUILayout.EnumPopup(new GUIContent(showName), (Enum)Enum.Parse(type, data.ToString()));
+                obj = EditorGUILayout.EnumPopup(content, (Enum)Enum.Parse(type, data.ToString()));
             }
             else if (type == typeof(Vector3))
             {
-                obj = EditorGUILayout.Vector3Field(new GUIContent(showName), (Vector3)data);
+                obj = EditorGUILayout.Vector3Field(content, (Vector3)data);
             }
             else if (type == typeof(Vector2))
             {
-                obj = EditorGUILayout.Vector2Field(new GUIContent(showName), (Vector2)data);
+                obj = EditorGUILayout.Vector2Field(content, (Vector2)data);
             }
             else if (type == typeof(Vector3Int))
             {
-                obj = EditorGUILayout.Vector3IntField(new GUIContent(showName), (Vector3Int)data);
+                obj = EditorGUILayout.Vector3IntField(content, (Vector3Int)data);
             }
             else if (type == typeof(Vector2Int))
             {
-                obj = EditorGUILayout.Vector2IntField(new GUIContent(showName), (Vector2Int)data);
+                obj = EditorGUILayout.Vector2IntField(content, (Vector2Int)data);
             }
             else if (type == typeof(Vector4))
             {
-                obj = EditorGUILayout.Vector4Field(new GUIContent(showName), (Vector4)data);
+                obj = EditorGUILayout.Vector4Field(content, (Vector4)data);
             }
             else if (type == typeof(Color))
             {
-                obj = EditorGUILayout.ColorField(new GUIContent(showName), (Color)data);
+                obj = EditorGUILayout.ColorField(content, (Color)data);
             }
             else if (type.Name == typeof(List<>).Name)
             {
-                DrawFoldout(data, showName, () =>
+                DrawFoldout(data, content, () =>
                 {
                     obj = DrawList("", data, null, null);
                 });
@@ -176,18 +184,18 @@ public class EditorDrawGUIUtil
             }
             else if (type.Name == typeof(Dictionary<,>).Name)
             {
-                DrawFoldout(data, showName, () =>
+                DrawFoldout(data, content, () =>
                 {
                     obj = DrawDictionary("", data);
                 });
             }
             else if (type.IsArray)
             {
-                obj = DrawArray(showName, data, null, null);
+                obj = DrawArray(content, data, null, null);
             }
             else if ((type.IsClass && type != typeof(string)) || type.IsValueType)
             {
-                DrawFoldout(data, showName, () =>
+                DrawFoldout(data, content, () =>
                 {
                     obj = DrawClassData("", type.FullName, data);
                 });
@@ -196,9 +204,9 @@ public class EditorDrawGUIUtil
         }
         else
         {
-            if (type.IsPrimitive 
-                || type == typeof(string) 
-                || type.IsEnum 
+            if (type.IsPrimitive
+                || type == typeof(string)
+                || type.IsEnum
                 || type == typeof(Vector2)
                || type == typeof(Vector3)
                 || type == typeof(Vector2Int)
@@ -208,43 +216,43 @@ public class EditorDrawGUIUtil
             {
                 string showStr = data.ToString();
 
-                 DrawLableString(showName, showStr);
-                
+                DrawLableString(content, showStr);
+
             }
             else if (type.BaseType == typeof(UnityEngine.Object) || type.BaseType == typeof(Component) || type.BaseType == typeof(MonoBehaviour))
             {
-                EditorGUILayout.ObjectField(showName, (UnityEngine.Object)data, type, true);
+                EditorGUILayout.ObjectField(content, (UnityEngine.Object)data, type, true);
             }
             else if (type.Name == typeof(List<>).Name)
             {
-                DrawFoldout(data, showName, () =>
+                DrawFoldout(data, content, () =>
                 {
                     obj = DrawList("", data, null, null);
                 });
             }
             else if (type.Name == typeof(Dictionary<,>).Name)
             {
-                DrawFoldout(data, showName, () =>
+                DrawFoldout(data, content, () =>
                 {
                     obj = DrawDictionary("", data);
                 });
             }
             else if (type.IsArray)
             {
-                DrawArray(showName, data, null, null);
+                DrawArray(content, data, null, null);
             }
             else if (type.IsClass && type != typeof(string) || type.IsValueType)
             {
-                DrawFoldout(data, showName, () =>
+                DrawFoldout(data, content, () =>
                 {
                     obj = DrawClassData("", type.FullName, data);
                 });
             }
-           
+
         }
         return obj;
     }
-    private static void DrawLableString(string name, string data)
+    private static void DrawLableString(GUIContent name, string data)
     {
         GUILayout.BeginHorizontal("dockarea");
         EditorGUILayout.LabelField(name, GUILayout.MaxWidth(Screen.width / 2));
@@ -276,7 +284,7 @@ public class EditorDrawGUIUtil
         else
         {
             string name = GetFormatName(tempName, field.FieldType);
-            DrawLableString(name, "Null");
+            DrawLableString(new GUIContent(name), "Null");
         }
         return data;
     }
@@ -311,14 +319,17 @@ public class EditorDrawGUIUtil
             else
             {
                 string name = GetFormatName(tempName, property.PropertyType);
-                DrawLableString(name, "Null");
+                DrawLableString(new GUIContent(name), "Null");
             }
         }
 
         return data;
     }
 
-
+    public static object DrawClassData(string name, string classFullName, object obj)
+    {
+        return DrawClassData(new GUIContent(name), classFullName, obj);
+    }
     /// <summary>
     /// 绘制类
     /// </summary>
@@ -326,7 +337,7 @@ public class EditorDrawGUIUtil
     /// <param name="classFullName"></param>
     /// <param name="obj"></param>
     /// <returns></returns>
-    public static object DrawClassData(string name, string classFullName, object obj)
+    public static object DrawClassData(GUIContent name, string classFullName, object obj)
     {
 
         Type t = ReflectionUtils.GetTypeByTypeFullName(classFullName);
@@ -343,6 +354,10 @@ public class EditorDrawGUIUtil
         }
         return DrawClassData(name, obj, null, null);
     }
+    public static object DrawClassData(string name, object data, List<string> hideFieldPropertyNames = null, CallBack<MemberInfo> callAffterDrawField = null, CallBack callEndClassDraw = null)
+    {
+        return DrawClassData(new GUIContent(name), data, hideFieldPropertyNames, callAffterDrawField, callEndClassDraw);
+    }
     /// <summary>
     /// 绘制类或结构体
     /// </summary>
@@ -350,7 +365,7 @@ public class EditorDrawGUIUtil
     /// <param name="hideFieldPropertyNames">隐藏某些字段不绘制</param>
     /// <param name="callAffterDrawField">每绘制一个字段后调用</param>
     /// <returns></returns>
-    public static object DrawClassData(string name, object data, List<string> hideFieldPropertyNames = null, CallBack<MemberInfo> callAffterDrawField = null, CallBack callEndClassDraw = null)
+    public static object DrawClassData(GUIContent name, object data, List<string> hideFieldPropertyNames = null, CallBack<MemberInfo> callAffterDrawField = null, CallBack callEndClassDraw = null)
     {
         if (data == null)
         {
@@ -359,7 +374,7 @@ public class EditorDrawGUIUtil
         }
 
         Type t = data.GetType();
-        if (!string.IsNullOrEmpty(name))
+        if (!string.IsNullOrEmpty(name.text))
             GUILayout.Label(name);
 
         if (SpecialClassDeal(name, data))
@@ -406,7 +421,7 @@ public class EditorDrawGUIUtil
             propertys = tempF.ToArray();
         }
 
-        GUILayout.Space(1);
+        GUILayout.Space(10);
 
         GUILayout.BeginVertical("box");
         if (fs.Length > 0)
@@ -516,14 +531,20 @@ public class EditorDrawGUIUtil
         GUILayout.EndVertical();
         return obj;
     }
+    public static object DrawList(string name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null)
+    {
+        return DrawList(new GUIContent(name), data, addCustomData, ItemChnageCallBack, customDrawItem);
+    }
     /// <summary>
     /// 绘制List泛型
     /// </summary>
     /// <param name="name"></param>
     /// <param name="data"></param>
+    /// <param name="addCustomData">自定义添加新的Item</param>
+    /// <param name="ItemChnageCallBack">当Item添加或删除时回调</param>
+    /// <param name="customDrawItem">自定义绘制Item</param>
     /// <returns></returns>
-    public static object DrawList(string name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null
-        ,CallBackR<object,object> DrawItem =null)
+    public static object DrawList(GUIContent name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null)
     {
         if (data == null)
         {
@@ -574,14 +595,16 @@ public class EditorDrawGUIUtil
             {
                 object da = methodInfo.Invoke(data, new object[] { i });
                 GUILayout.BeginHorizontal();
-                if (DrawItem != null)
+                GUILayout.BeginVertical();
+                if (customDrawItem != null)
                 {
-                    da = DrawItem(da);
+                    da = customDrawItem(da);
                 }
                 else
                 {
                     da = DrawBaseValue("" + i, da);
                 }
+                GUILayout.EndVertical();
                 methodInfo1.Invoke(data, new object[] { i, da });
                 if (CanEdit && GUILayout.Button("↑", GUILayout.Width(15)))
                 {
@@ -616,13 +639,21 @@ public class EditorDrawGUIUtil
 
         return data;
     }
+
+    public static object DrawArray(string name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null)
+    {
+        return DrawArray(new GUIContent(name), data, addCustomData, ItemChnageCallBack, customDrawItem);
+    }
     /// <summary>
     /// 绘制数组
-    /// </summary> 
+    /// </summary>
     /// <param name="name"></param>
     /// <param name="data"></param>
+    /// <param name="addCustomData">自定义添加新的Item</param>
+    /// <param name="ItemChnageCallBack">当Item添加或删除时回调</param>
+    /// <param name="customDrawItem">自定义绘制Item</param>
     /// <returns></returns>
-    public static object DrawArray(string name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null)
+    public static object DrawArray(GUIContent name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null)
     {
         if (data == null)
         {
@@ -640,11 +671,15 @@ public class EditorDrawGUIUtil
 
         MethodInfo AddRange = typeDataList.GetMethod("AddRange");
         AddRange.Invoke(instance, new object[] { data });
-        instance = DrawList(name, instance, addCustomData, ItemChnageCallBack);
+        instance = DrawList(name, instance, addCustomData, ItemChnageCallBack, customDrawItem);
 
         MethodInfo ToArray = typeDataList.GetMethod("ToArray");
         return ToArray.Invoke(instance, null);
 
+    }
+    public static object DrawDictionary(string name, object data)
+    {
+        return DrawDictionary(new GUIContent(name), data);
     }
     /// <summary>
     /// 绘制字典类型
@@ -652,7 +687,7 @@ public class EditorDrawGUIUtil
     /// <param name="name"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static object DrawDictionary(string name, object data)
+    public static object DrawDictionary(GUIContent name, object data)
     {
 
         if (data == null)
@@ -737,7 +772,6 @@ public class EditorDrawGUIUtil
         return data;
     }
 
-    private static MethodInfo searchMethod= typeof(EditorGUILayout).GetMethod("ToolbarSearchField", BindingFlags.NonPublic | BindingFlags.Static, null, new System.Type[] { typeof(string), typeof(GUILayoutOption[]) }, null);
     /// <summary>
     /// 绘制搜索框
     /// </summary>
@@ -746,9 +780,10 @@ public class EditorDrawGUIUtil
     /// <returns></returns>
     public static string DrawSearchField(string value, params GUILayoutOption[] options)
     {
-        if (searchMethod != null)
+        MethodInfo info = typeof(EditorGUILayout).GetMethod("ToolbarSearchField", BindingFlags.NonPublic | BindingFlags.Static, null, new System.Type[] { typeof(string), typeof(GUILayoutOption[]) }, null);
+        if (info != null)
         {
-            value = (string)searchMethod.Invoke(null, new object[] { value, options });
+            value = (string)info.Invoke(null, new object[] { value, options });
         }
         return value;
     }
@@ -760,7 +795,7 @@ public class EditorDrawGUIUtil
     /// <param name="color">给类型添上颜色 如 ：List<int> </param>
     /// <param name="data">用于获取List Array等的数量</param>
     /// <returns></returns>
-    public static string GetFormatName(string name, Type t,string color="", object data = null)
+    public static string GetFormatName(string name, Type t, string color = "", object data = null)
     {
         if (t == null && data == null)
             return name;
@@ -794,11 +829,11 @@ public class EditorDrawGUIUtil
         }
         if (!string.IsNullOrEmpty(color))
         {
-            typeName = "(<color="+color+">" + typeName + "</color>)";
+            typeName = "(<color=" + color + ">" + typeName + "</color>)";
         }
         else
-        typeName = "(" + typeName + ")";
-        
+            typeName = "(" + typeName + ")";
+
         if (t.IsArray)
         {
             if (data != null)
@@ -826,7 +861,7 @@ public class EditorDrawGUIUtil
     /// <param name="name"></param>
     /// <param name="data"></param>
     /// <returns></returns>
-    private static bool SpecialClassDeal(string name, object data)
+    private static bool SpecialClassDeal(GUIContent name, object data)
     {
         Type t = data.GetType();
         if (t == typeof(DateTime))
@@ -843,15 +878,19 @@ public class EditorDrawGUIUtil
 
         return false;
     }
+    public static void DrawFoldout(object taget, string content, CallBack drawGUI)
+    {
+        DrawFoldout(taget, new GUIContent(content), drawGUI);
+    }
     /// <summary>
     /// 绘制折页
     /// </summary>
     /// <param name="taget"></param>
     /// <param name="name"></param>
     /// <param name="drawGUI"></param>
-    public static void DrawFoldout(object taget, string name, CallBack drawGUI)
+    public static void DrawFoldout(object taget, GUIContent content, CallBack drawGUI)
     {
-        bool isFolder = EditorGUILayout.Foldout(EditorGUIState.GetState(taget), name);
+        bool isFolder = EditorGUILayout.Foldout(EditorGUIState.GetState(taget), content);
         if (isFolder)
         {
             if (drawGUI != null)
@@ -904,6 +943,10 @@ public class EditorDrawGUIUtil
         GUILayout.EndHorizontal();
     }
     private const string SearchFieldSelect_NameOfFocusedControl = "SearchFieldSelect_TextField";
+    public static string DrawSearchFieldSelect(string name, string selectStr, string[] displayedOptions, CallBack<string> selectCallback)
+    {
+        return DrawSearchFieldSelect(new GUIContent(name), selectStr, displayedOptions, selectCallback);
+    }
     /// <summary>
     /// 输入搜索选择框，输入文本可出现 displayedOptions 里相近的选择，选择了按钮触发selectCallback回调
     /// </summary>
@@ -912,7 +955,7 @@ public class EditorDrawGUIUtil
     /// <param name="displayedOptions"></param>
     /// <param name="selectCallback"></param>
     /// <returns></returns>
-    public static string DrawSearchFieldSelect(string name, string selectStr, string[] displayedOptions, CallBack<string> selectCallback)
+    public static string DrawSearchFieldSelect(GUIContent name, string selectStr, string[] displayedOptions, CallBack<string> selectCallback)
     {
         string res = "";
 
@@ -972,7 +1015,7 @@ public class EditorDrawGUIUtil
     /// <param name="rowCount">一行个数</param>
     /// <param name="spacing">item间的间隔</param>
     /// <param name="drawItemCallBack">绘制每个Item回调</param>
-    public static void DrawGrid<T>(List<T> data,int rowCount,Vector2 spacing, CallBack<T> drawItemCallBack)
+    public static void DrawGrid<T>(List<T> data, int rowCount, Vector2 spacing, CallBack<T> drawItemCallBack)
     {
         if (data == null)
             return;
@@ -984,28 +1027,28 @@ public class EditorDrawGUIUtil
 
         int index = 0;
         DrawScrollView(data, () =>
-         {
-             for (int i = 0; i < columnCount; i++)
-             {
-                 GUILayout.BeginHorizontal();
-                 int count = rowCount;
-                 if (exraNumber > 0 && i == (columnCount - 1))
-                     count = exraNumber;
-                 GUILayout.Space(spacing.x);
+        {
+            for (int i = 0; i < columnCount; i++)
+            {
+                GUILayout.BeginHorizontal();
+                int count = rowCount;
+                if (exraNumber > 0 && i == (columnCount - 1))
+                    count = exraNumber;
+                GUILayout.Space(spacing.x);
 
-                 for (int j = 0; j < count; j++)
-                 {
-                     if (drawItemCallBack != null)
-                         drawItemCallBack(data[index]);
-                     GUILayout.Space(spacing.x);
-                     index++;
-                 }
-                 GUILayout.FlexibleSpace();
-                 GUILayout.EndHorizontal();
-                 GUILayout.Space(spacing.y);
-             }
-         });
-      
+                for (int j = 0; j < count; j++)
+                {
+                    if (drawItemCallBack != null)
+                        drawItemCallBack(data[index]);
+                    GUILayout.Space(spacing.x);
+                    index++;
+                }
+                GUILayout.FlexibleSpace();
+                GUILayout.EndHorizontal();
+                GUILayout.Space(spacing.y);
+            }
+        });
+
     }
 
     #region 特性处理只在绘制类，结构体时有用
@@ -1063,18 +1106,18 @@ public static class EditorGUIState
     private static Dictionary<int, bool> hasherDic = new Dictionary<int, bool>();
     private static Dictionary<int, Vector2> hasherPosDic = new Dictionary<int, Vector2>();
     public static bool GetState(object obj)
-    {     
+    {
         AddObject(obj);
-       int h= objectHasherDic[obj].GetHashCode();
+        int h = objectHasherDic[obj].GetHashCode();
         return hasherDic[h];
     }
 
-    public static void SetState(object obj,bool state)
+    public static void SetState(object obj, bool state)
     {
-            AddObject(obj);
-            int h = objectHasherDic[obj].GetHashCode();
-            hasherDic[h] = state;
-        
+        AddObject(obj);
+        int h = objectHasherDic[obj].GetHashCode();
+        hasherDic[h] = state;
+
     }
     public static Vector2 GetVector2(object obj)
     {
@@ -1105,7 +1148,7 @@ public static class EditorGUIState
         }
     }
 
-   
+
 
     internal class Hasher
     {

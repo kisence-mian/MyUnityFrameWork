@@ -82,11 +82,14 @@ public class ObjectSelectorWindow : EditorWindow
             oa.type = assetType;
             oa.assetObject = obj;
             oa.path = p;
-            oa.previewIcon = AssetPreview.GetAssetPreview(obj);
+            oa.previewEditor = Editor.CreateEditor(obj);
+            oa.previewIcon = oa.previewEditor.RenderStaticPreview(p, null, (int)maxGridSize, (int)maxGridSize); //AssetPreview.GetAssetPreview(obj);
             oa.miniThumbnailIcon = AssetPreview.GetMiniThumbnail(obj);
+            
             if (oa.previewIcon == null)
             {
-                oa.previewIcon = new Texture2D(100, 100);
+                Debug.Log("Path ;" + p);
+                oa.previewIcon = new Texture2D((int)maxGridSize, (int)maxGridSize);
 
                 for (int i = 0; i < oa.previewIcon.width; i++)
                 {
@@ -206,7 +209,6 @@ public class ObjectSelectorWindow : EditorWindow
                  style.stretchHeight = true;
                  style.stretchWidth = true;
                  style.alignment = TextAnchor.LowerCenter;
-
                  if (GUILayout.Button(content, style, GUILayout.Width(gridSize), GUILayout.Height(gridSize + 10)))
                  {
                      selectAsset = item;
@@ -275,5 +277,6 @@ public class ObjectSelectorWindow : EditorWindow
         public Texture2D previewIcon;
         public Texture2D miniThumbnailIcon;
         public string path;
+        public Editor previewEditor;
     }
 }

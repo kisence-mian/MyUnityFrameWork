@@ -31,8 +31,8 @@ public class DataEditorWindow : EditorWindow
     private List<string> langKeys;
     void OnEnable()
     {
-        EditorGUIStyleData.Init();
-
+        //EditorGUIStyleData.Init();
+        win = this;
         FindAllDataName();
         langKeys = LanguageDataEditorUtils.GetLanguageLayersKeyList();
 
@@ -49,29 +49,29 @@ public class DataEditorWindow : EditorWindow
         if (win)
             win.OnEnable();
     }
-    //当选择改变时
-    void OnSelectionChange()
-    {
+    ////当选择改变时
+    //void OnSelectionChange()
+    //{
 
-    }
+    //}
 
-    //当工程改变时
-    void OnProjectChange()
-    {
-        if (!Application.isPlaying)
-        {
-            //ConvertUtf8();
+    ////当工程改变时
+    //void OnProjectChange()
+    //{
+    //    if (!Application.isPlaying)
+    //    {
+    //        //ConvertUtf8();
 
-            FindAllDataName();
+    //        FindAllDataName();
 
-            if (chooseFileName != null
-                && chooseFileName != ""
-                && chooseFileName != "None")
-            {
-                LoadData(chooseFileName);
-            }
-        }
-    }
+    //        if (chooseFileName != null
+    //            && chooseFileName != ""
+    //            && chooseFileName != "None")
+    //        {
+    //            LoadData(chooseFileName);
+    //        }
+    //    }
+    //}
 
     #region GUI
 
@@ -162,14 +162,26 @@ public class DataEditorWindow : EditorWindow
             return;
 
         int widthCount = m_currentData.TableKeys.Count;
-        withItemList.Clear();
-        for (int i = 0; i < widthCount; i++)
+        //Debug.Log(" m_currentData.TableKeys.Count :" + m_currentData.TableKeys.Count + "  withItemList.Count :" + withItemList.Count);
+        if (widthCount > withItemList.Count)
         {
+            int num = widthCount - withItemList.Count;
+            for (int i = 0; i < num; i++)
+            {
                 withItemList.Add(wWith);
+            }
         }
+        else if (widthCount < withItemList.Count)
+        {
+            while(widthCount < withItemList.Count)
+            {
+                withItemList.RemoveAt(withItemList.Count - 1);
+            }
+        }
+        //Debug.Log(" m_currentData.TableKeys.Count :" + m_currentData.TableKeys.Count + "  withItemList.Count :" + withItemList.Count);
         heightItemList.Clear();
         //所有的数据行+描述+默认值+空一行
-        heightItemList.Add(40);
+        heightItemList.Add(wHeight);
         for (int i = 0; i < m_currentData.Count+2; i++)
         {
             heightItemList.Add(wHeight);
@@ -186,7 +198,6 @@ public class DataEditorWindow : EditorWindow
     private const int wWith = 110;
     private Vector2 svPos;
 
-    private string searchValue = "";
     //标记选择行
     private List<int> selectRowIndexs = new List<int>();
     private List<int> selectColumnIndexs = new List<int>();
@@ -194,9 +205,9 @@ public class DataEditorWindow : EditorWindow
     private GUIStyle buttonStyle;
     private GUIStyle helpBoxStyle;
 
-    private int oldButtonFontSize = 0;
-    private int nowButtonFontSize = 0;
-    private int MaxButtonFontSize = 40;
+    private Vector2 topGridSVPos;
+    private Vector2 leftGridSVPos;
+
     /// <summary>
     /// 绘制所有格子
     /// </summary>
@@ -204,12 +215,184 @@ public class DataEditorWindow : EditorWindow
     {
         if (m_currentData == null)
             return;
-        if (buttonStyle == null)
+        if (buttonStyle == null || helpBoxStyle==null)
         {
             buttonStyle = "Button";
             helpBoxStyle = "HelpBox";
         }
+        Debug.unityLogger.logEnabled = false;
+        GridTopFunctionGUI();
+        GUILayout.Space(5);
 
+        Rect r = new Rect(0, 60, Screen.width, 18);
+        float detaH = wHeight;
+        if (heightItemList.Count > 3)
+        {
+            detaH = heightItemList[0] + heightItemList[1] + heightItemList[2];
+        }
+        Rect svPos_temp = new Rect(new Vector2(0, r.y), new Vector2(Screen.width-wWith, Screen.height - r.y - 120- detaH));
+        Vector2 v = GetCententSize();
+
+
+        svPos = GUI.BeginScrollView(new Rect(svPos_temp.x + wWith, svPos_temp.y + detaH, svPos_temp.width, svPos_temp.height), svPos, new Rect(r.x + wWith, r.y + detaH, v.x, v.y));
+
+        DrawGridItem(r.position + new Vector2(wWith, wHeight),2, heightItemList.Count);
+
+        GUI.EndScrollView();
+
+       //顶部格子
+        topGridSVPos = GUI.BeginScrollView(new Rect(svPos_temp.x, svPos_temp.y, svPos_temp.width+ wWith, detaH), topGridSVPos, new Rect(r.x, r.y, v.x+wWith, detaH),false,false,"Label","Label");
+        topGridSVPos = new Vector2(svPos.x, topGridSVPos.y);
+
+        DrawGridItem(r.position + new Vector2(wWith, wHeight), 0, 2);
+
+        float tempWith = wWith;
+        GUI.Label(new Rect(r.position, new Vector2(wWith, wHeight)), "", "SelectionRect");
+        for (int i = 0; i < withItemList.Count; i++)
+        {
+            Rect dragR = new Rect(tempWith, r.y, withItemList[i], wHeight);
+            Rect maxR = new Rect(tempWith, r.y, Screen.width * 5, wHeight);
+            dragR = EditorDrawGUIUtility.DrawCanDragArea(dragR, maxR, null, EditorCanDragAreaSide.Right);
+            if (dragR.width < minItem)
+                dragR.width = minItem;
+            withItemList[i] = dragR.width;
+
+            tempWith += withItemList[i];
+
+            if (GUI.Button(new Rect(dragR.position, new Vector2(dragR.width, dragR.height / 3)), "▼"))
+            {
+                if (selectColumnIndexs.Contains(i))
+                    selectColumnIndexs.Remove(i);
+                else
+                    selectColumnIndexs.Add(i);
+            }
+            if (GUI.Button(new Rect(dragR.x, dragR.y + dragR.height / 3, dragR.width, dragR.height * 2 / 3), i.ToString()))
+            {
+                if (i == 0)
+                    continue;
+
+                List<string> keys = m_currentData.TableKeys;
+                string key = keys[i];
+                if (EditorUtility.DisplayDialog("警告", "是否删除字段[" + key + "]", "确定", "取消"))
+                {
+                    DeleteField(m_currentData, key);
+                    withItemList.RemoveAt(i);
+                    return;
+                }
+            }
+
+        }
+        GUI.EndScrollView();
+
+        //左边格子
+        float tempHeight = r.y + wHeight;
+        for (int i = 0; i < 2; i++)
+        {
+            Rect dragR = new Rect(r.x, tempHeight, wWith, heightItemList[i]);
+            Rect maxR = new Rect(r.x, tempHeight, wWith, position.height);
+            dragR = EditorDrawGUIUtility.DrawCanDragArea(dragR, maxR, null, EditorCanDragAreaSide.Bottom);
+            if (dragR.height < minItem)
+                dragR.height = minItem;
+            heightItemList[i] = dragR.height;
+
+            tempHeight += heightItemList[i];
+            string vStr = "";
+            if (i == 0)
+            {
+                vStr = "D";
+                GUI.Label(dragR, vStr, buttonStyle);
+            }
+            else if (i == 1)
+            {
+                vStr = "description";
+                GUI.Label(dragR, vStr, buttonStyle);
+            }
+          
+
+        }
+
+      
+        leftGridSVPos = GUI.BeginScrollView(new Rect(svPos_temp.x, tempHeight,  wWith, svPos_temp.height), leftGridSVPos, new Rect(r.x, tempHeight,  wWith, v.y), false, false, "Label", "Label");
+        leftGridSVPos = new Vector2(leftGridSVPos.x, svPos.y);
+       
+        for (int i = 2; i < heightItemList.Count; i++)
+        {
+            Rect dragR = new Rect(r.x, tempHeight, wWith, heightItemList[i]);
+            Rect maxR = new Rect(r.x, tempHeight, wWith, position.height);
+            dragR = EditorDrawGUIUtility.DrawCanDragArea(dragR, maxR, null, EditorCanDragAreaSide.Bottom);
+            if (dragR.height < minItem)
+                dragR.height = minItem;
+            heightItemList[i] = dragR.height;
+
+            tempHeight += heightItemList[i];
+            string vStr = "";
+
+            if(selectRowIndexs.Contains(i))
+                GUI.color = Color.cyan;
+
+            if (i == 2)
+            {
+                vStr = "default";
+                GUI.Label(dragR, vStr, buttonStyle);
+            }
+            else
+            {
+                int num = i - 3;
+                vStr = num.ToString();
+                if (GUI.Button(new Rect(dragR.position, new Vector2(dragR.width / 4, dragR.height)), "►"))
+                {
+                    if (selectRowIndexs.Contains(i))
+                        selectRowIndexs.Remove(i);
+                    else
+                        selectRowIndexs.Add(i);
+                }
+                if (GUI.Button(new Rect(dragR.x + dragR.width / 4, dragR.y, dragR.width * 3 / 4, dragR.height), vStr))
+                {
+                    if (EditorUtility.DisplayDialog("警告", "是否删除第[" + num + "]行数据", "确定", "取消"))
+                    {
+                        m_currentData.Remove(m_currentData.TableIDs[num]);
+                        m_currentData.TableIDs.RemoveAt(num);
+
+
+                        heightItemList.RemoveAt(i);
+                        return;
+                    }
+                }
+            }
+            GUI.color = Color.white;
+
+        }
+        GUI.EndScrollView();
+
+        Debug.unityLogger.logEnabled = true;
+    }
+
+    private Vector2 GetCententSize()
+    {
+        float tempWith = 0;
+        for (int i = 0; i < withItemList.Count; i++)
+        {
+            tempWith += withItemList[i];
+        }
+        tempWith += wWith;
+
+        float tempHeight = 0;
+        for (int i = 2; i < heightItemList.Count; i++)
+        {
+
+            tempHeight += heightItemList[i];
+        }
+        tempHeight += wHeight;
+        return new Vector2(tempWith, tempHeight);
+    }
+
+    private int oldButtonFontSize = 0;
+    private int nowButtonFontSize = 0;
+    private int MaxButtonFontSize = 40;
+
+    private string searchValue = "";
+    private void GridTopFunctionGUI()
+    {
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("添加一行数据", GUILayout.Width(90)))
         {
@@ -234,145 +417,25 @@ public class DataEditorWindow : EditorWindow
         oldButtonFontSize = helpBoxStyle.fontSize;
         if (nowButtonFontSize == 0)
             nowButtonFontSize = oldButtonFontSize;
-       
-        nowButtonFontSize= EditorGUILayout.IntSlider("字体大小",nowButtonFontSize, oldButtonFontSize / 2, MaxButtonFontSize);
+
+        nowButtonFontSize = EditorGUILayout.IntSlider("字体大小", nowButtonFontSize, oldButtonFontSize / 2, MaxButtonFontSize);
         GUILayout.FlexibleSpace();
         searchValue = EditorDrawGUIUtil.DrawSearchField(searchValue);
         GUILayout.EndHorizontal();
-        GUILayout.Space(5);
-
-        Rect r = new Rect(0, 60, Screen.width, 18);
-
-        Rect svPos_temp = new Rect(new Vector2(0, r.y), new Vector2(Screen.width, Screen.height - r.y - 120));
-        Vector2 v = GetCententSize();
-        svPos = GUI.BeginScrollView(svPos_temp, svPos, new Rect(r.x, r.y, v.x, v.y));
-
-
-        float tempWith = wWith;
-
-
-        GUI.Label(new Rect(r.position, new Vector2(wWith, wHeight)), "", "SelectionRect");
-        for (int i = 0; i < withItemList.Count; i++)
-        {
-            Rect dragR = new Rect(tempWith, r.y, withItemList[i], wHeight);
-            Rect maxR = new Rect(tempWith, r.y, Screen.width * 5, wHeight);
-            dragR = EditorDrawGUIUtility.DrawCanDragArea(dragR, maxR, null, EditorCanDragAreaSide.Right);
-            if (dragR.width < minItem)
-                dragR.width = minItem;
-            withItemList[i] = dragR.width;
-
-            tempWith += withItemList[i];
-
-            if (GUI.Button(new Rect(dragR.position,new Vector2(dragR.width, dragR.height/3)), "▼"))
-            {
-                if (selectColumnIndexs.Contains(i))
-                    selectColumnIndexs.Remove(i);
-                else
-                    selectColumnIndexs.Add(i);
-            }
-            if (GUI.Button(new Rect( dragR.x, dragR.y+ dragR.height/3, dragR.width, dragR.height*2/3), i.ToString()))
-            {
-                if (i == 0)
-                    continue;
-
-                List<string> keys = m_currentData.TableKeys;
-                string key = keys[i];
-                if (EditorUtility.DisplayDialog("警告", "是否删除字段[" + key + "]", "确定", "取消"))
-                {
-                    DeleteField(m_currentData, key);
-                    withItemList.RemoveAt(i);
-                    return;
-                }
-            }
-           
-        }
-
-        float tempHeight = r.y + wHeight;
-        for (int i = 0; i < heightItemList.Count; i++)
-        {
-            Rect dragR = new Rect(r.x, tempHeight, wWith, heightItemList[i]);
-            Rect maxR = new Rect(r.x, tempHeight, wWith, position.height);
-            dragR = EditorDrawGUIUtility.DrawCanDragArea(dragR, maxR, null, EditorCanDragAreaSide.Bottom);
-            if (dragR.height < minItem)
-                dragR.height = minItem;
-            heightItemList[i] = dragR.height;
-
-            tempHeight += heightItemList[i];
-            string vStr = "";
-            if (i == 0)
-            {
-                vStr = "D";
-                GUI.Label(dragR, vStr, buttonStyle);
-            }
-            else if(i == 1)
-            {
-                vStr = "description";
-                GUI.Label(dragR, vStr, buttonStyle);
-            }
-            else if (i == 2)
-            {
-                vStr = "default";
-                GUI.Label(dragR, vStr, buttonStyle);
-            }
-            else
-            {
-                int num = i - 3;
-                vStr = num.ToString();
-                if (GUI.Button(new Rect(dragR.position, new Vector2(dragR.width/4, dragR.height)), "►"))
-                {
-                    if (selectRowIndexs.Contains(i))
-                        selectRowIndexs.Remove(i);
-                    else
-                        selectRowIndexs.Add(i);
-                }
-                if (GUI.Button(new Rect(dragR.x+ dragR.width/4, dragR.y , dragR.width*3/4, dragR.height), vStr))
-                {
-                    if (EditorUtility.DisplayDialog("警告", "是否删除第[" + num + "]行数据", "确定", "取消"))
-                    {
-                        m_currentData.Remove(m_currentData.TableIDs[num]);
-                        m_currentData.TableIDs.RemoveAt(num);
-
-
-                        heightItemList.RemoveAt(i);
-                        return;
-                    }
-                }
-            }
-
-        }
-            DrawGridItem(r.position + new Vector2(wWith, wHeight));
-
-        GUI.EndScrollView();
-
-    }
-
-    private Vector2 GetCententSize()
-    {
-        float tempWith = wWith;
-        for (int i = 0; i < withItemList.Count; i++)
-        {
-            tempWith += withItemList[i];
-        }
-        tempWith += wWith;
-
-        float tempHeight = wHeight;
-        for (int i = 0; i < heightItemList.Count; i++)
-        {
-
-            tempHeight += heightItemList[i];
-        }
-        tempHeight += wHeight;
-        return new Vector2(tempWith, tempHeight);
     }
     /// <summary>
     /// 绘制每个数据格子
     /// </summary>
     /// <param name="startPos"></param>
-    private void DrawGridItem(Vector2 startPos)
+    private void DrawGridItem(Vector2 startPos,int heightStartIndex,int heightEndIndex)
     {
         helpBoxStyle.fontSize = nowButtonFontSize;
         float tempHeight = 0;
-        for (int i = 0; i < heightItemList.Count; i++)
+        for (int i = 0; i < heightStartIndex; i++)
+        {
+            tempHeight += heightItemList[i];
+        }
+        for (int i = heightStartIndex; i < heightEndIndex; i++)
         {
             float h = heightItemList[i];
             float tempWith = 0;
@@ -418,24 +481,31 @@ public class DataEditorWindow : EditorWindow
                     SingleData data = m_currentData[m_currentData.TableIDs[i - 3]];
 
                     bool isDefault = false;
-                    if (data.ContainsKey(field) && data[field] != defaultValue)
+                    if (data.ContainsKey(field))
                     {
-                        DataFieldAssetType fieldAssetType = GetDataFieldAssetType(field);
-                        if (fieldAssetType == DataFieldAssetType.LocalizedLanguage)
+                        if (data[field] != defaultValue)
                         {
-                            string k = data[field];
-                            if (LanguageManager.HaveKey(k))
-                                showStr = LanguageManager.GetContentByKey(k);
-                            else
-                                showStr = k;
+                            showStr = data[field];
                         }
                         else
-                            showStr = data[field];
+                        {
+                            showStr = defaultValue;
+                            isDefault = true;
+                        }      
                     }
                     else
                     {
                         showStr = defaultValue;
                         isDefault = true;
+                    }
+                    DataFieldAssetType fieldAssetType = GetDataFieldAssetType(field);
+                    if (fieldAssetType == DataFieldAssetType.LocalizedLanguage)
+                    {
+                        string k = showStr;
+                        if (LanguageManager.HaveKey(k))
+                        {
+                            showStr = LanguageManager.GetContentByKey(k);
+                        }
                     }
                     if (!string.IsNullOrEmpty(searchValue))
                         showStr = ShowContainsChar(showStr, searchValue);
@@ -756,7 +826,15 @@ public class DataEditorWindow : EditorWindow
     private object DrawLocalizedLanguageField(string text, object value)
     {
         value = EditorDrawGUIUtil.DrawPopup(text, value.ToString(), langKeys);
+        GUILayout.Space(6);
         GUILayout.Label("多语言字段[" + value + "] : " + LanguageManager.GetContentByKey(value.ToString()));
+        GUILayout.Space(8);
+        if (GUILayout.Button("打开编辑当前多语言字段"))
+        {
+            LanguageDataEditorWindow w = LanguageDataEditorWindow.ShowWindow();
+            w.searchValue = value.ToString();
+            w.toolbarOption = 1;
+        }
         return value;
     }
 
@@ -833,7 +911,7 @@ public class DataEditorWindow : EditorWindow
         {
             ObjectSelectorWindow.Show(GeneralDataModificationWindow.GetInstance(), value.ToString(),
                 new string[] { "Assets/Resources" },
-                typeof(GameObject),
+                typeof(Texture),
                 (assetName, obj) =>
                 {
                     editTextureValue = assetName;
@@ -857,7 +935,6 @@ public class DataEditorWindow : EditorWindow
                         previewEditor1 = Editor.CreateEditor(obj);
                         previewTex = obj;
                     }
-
                     previewEditor1.OnPreviewGUI(GUILayoutUtility.GetRect(300, 300), EditorStyles.helpBox);
                     isHave = true;
                 }
@@ -1018,6 +1095,7 @@ public class DataEditorWindow : EditorWindow
     {
         if (GUILayout.Button("清除缓存"))
         {
+            LanguageManager.IsInit = false;
             DataManager.CleanCache();
         }
     }
@@ -1136,11 +1214,26 @@ public class DataEditorWindow : EditorWindow
 
     void SaveDataGUI()
     {
+        //if (GUILayout.Button("Change"))
+        //{
+        //    foreach (var sd in m_currentData.Values)
+        //    {
+        //        foreach (var item in sd)
+        //        {
+        //            if(item.Key== "DescribeKey")
+        //            {
+        //                sd[item.Key]= "{[0,4][" + item.Value + "]}";
+        //                Debug.Log(m_currentData.Count + " " + item.Key);
+        //                break;
+        //            }
+        //        }
+        //    }
+        //}
         if (GUILayout.Button("保存"))
         {
             SaveData(chooseFileName, m_currentData);
             AssetDatabase.Refresh();
-            LoadData(chooseFileName);
+            //LoadData(chooseFileName);
         }
     }
 
