@@ -956,7 +956,7 @@ public class UIBase : MonoBehaviour
 
     public void SetText(string TextID, string content)
     {
-        GetText(TextID).text = content.Replace("//n", "/n");
+        GetText(TextID).text = content.Replace("\\n", "\n");
     }
 
     public void SetImageColor(string ImageID, Color color)

@@ -1,0 +1,474 @@
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System;
+using System.Reflection;
+using HDJ.Framework.Tools;
+
+namespace HDJ.Framework.Utils
+{
+    /// <summary>
+    /// Json处理工具类
+    /// </summary>
+    public static class JsonUtils
+    {
+        private static Type list_Type = typeof(List<>);
+        private static Type dictionary_Type = typeof(Dictionary<,>);
+        private static BindingFlags flags = BindingFlags.Instance | BindingFlags.Public;
+        private static Type notJsonSerialized_Type = typeof(NotJsonSerializedAttribute);
+        public static string ToJson(object data)
+        {
+            object temp = ChangeObjectToJsonObject(data);
+            if (null == temp)
+                return "";
+            return SimpleJsonTool.SerializeObject(temp);
+        }
+        public static T FromJson<T>(string json)
+        {
+            object obj = FromJson(typeof(T), json);
+            return obj == null ? default(T) : (T)obj;
+        }
+        public static object FromJson(Type type, string json)
+        {
+            object jsonObj = SimpleJsonTool.DeserializeObject(json);
+            return ChangeJsonDataToObjectByType(type, jsonObj);
+        }
+
+        #region   List<T>
+        /// <summary>
+        /// Json转换List<T>
+        /// </summary>
+        /// <param name="json"></param>
+        /// <param name="itemType">T的type</param>
+        /// <returns></returns>
+        private static object JsonToList(string json, Type itemType)
+        {
+            if (string.IsNullOrEmpty(json))
+                return null;
+            object obj = SimpleJsonTool.DeserializeObject(json);
+            object res = JsonObjectToList(obj, itemType);
+            return res;
+        }
+        private static object JsonObjectToList(object obj, Type itemType)
+        {
+            IList<object> listData = obj as IList<object>;
+            Type listType = list_Type.MakeGenericType(itemType);
+            object list = ReflectionUtils.CreateDefultInstance(listType);
+            if (listData == null || listData.Count == 0)
+                return list;
+
+            MethodInfo addMethod = listType.GetMethod("Add");
+            for (int i = 0; i < listData.Count; i++)
+            {
+                object obj0 = listData[i];
+                obj0 = ChangeJsonDataToObjectByType(itemType, obj0);
+                if (obj0 == null)
+                    continue;
+                addMethod.Invoke(list, new object[] { obj0 });
+            }
+            return list;
+        }
+
+
+        /// <summary>
+        /// List<T>转换为Json
+        /// </summary>
+        /// <param name="datas">List<T></param>
+        /// <returns>json</returns>
+        private static string ListToJson(object datas)
+        {
+            object temp = ListArrayToJsonObject(datas, true);
+            return SimpleJsonTool.SerializeObject(temp);
+
+        }
+        private static object ListArrayToJsonObject(object datas, bool isList)
+        {
+            Type type = datas.GetType();
+            PropertyInfo pro = null;
+            if (isList)
+            {
+                pro = type.GetProperty("Count");
+            }
+            else
+            {
+                pro = type.GetProperty("Length");
+            }
+
+            int count = (int)pro.GetValue(datas, null);
+            MethodInfo methodInfo = null;
+            if (isList)
+                methodInfo = type.GetMethod("get_Item", flags);
+            else
+                methodInfo = type.GetMethod("GetValue", new Type[] { typeof(int) });
+            List<object> temp = new List<object>();
+            for (int i = 0; i < count; i++)
+            {
+                object da = methodInfo.Invoke(datas, new object[] { i });
+                da = ChangeObjectToJsonObject(da);
+                if (null == da)
+                    continue;
+                temp.Add(da);
+            }
+            return temp;
+        }
+        #endregion
+
+        #region Array
+
+        /// <summary>
+        /// Json转换为Array
+        /// </summary>
+        /// <param name="json"></param>
+        /// <param name="itemType">数组的类型T[]的T类型</param>
+        /// <returns></returns>
+        private static object JsonToArray(string json, Type itemType)
+        {
+            object obj = SimpleJsonTool.DeserializeObject(json);
+            return JsonObjectToArray(obj, itemType);
+        }
+        private static object JsonObjectToArray(object data, Type itemType)
+        {
+            object result = JsonObjectToList(data, itemType);
+            MethodInfo method = result.GetType().GetMethod("ToArray");
+            //Debug.Log("JsonObjectToArray : result:" + result.GetType().FullName);
+            return method.Invoke(result, null);
+        }
+        /// <summary>
+        /// Array转换为Json
+        /// </summary>
+        /// <param name="datas"></param>
+        /// <returns></returns>
+        private static string ArrayToJson(object datas)
+        {
+            object temp = ListArrayToJsonObject(datas, false);
+            return SimpleJsonTool.SerializeObject(temp);
+        }
+        #endregion
+        #region class或struct
+        /// <summary>
+        /// class或struct转换为json
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static string ClassOrStructToJson(object data)
+        {
+            object jsonObject = ClassOrStructToJsonObject(data);
+            return SimpleJsonTool.SerializeObject(jsonObject);
+        }
+        private static object ClassOrStructToJsonObject(object data)
+        {
+            Dictionary<string, object> dic = new Dictionary<string, object>();
+            Type type = data.GetType();
+
+            FieldInfo[] fields = type.GetFields(flags);
+
+            for (int i = 0; i < fields.Length; i++)
+            {
+                FieldInfo f = fields[i];
+
+                if (ReflectionUtils.IsDelegate(f.FieldType))
+                    continue;
+
+
+                if (CheckHaveNotJsonSerializedAttribute(f))
+                    continue;
+                try
+                {
+
+                    object v = f.GetValue(data);
+                    string name = f.Name;
+                    if (v == null)
+                        continue;
+                    v = ChangeObjectToJsonObject(v);
+                    dic.Add(name, v);
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+
+            PropertyInfo[] propertys = type.GetProperties(flags);
+            for (int i = 0; i < propertys.Length; i++)
+            {
+                PropertyInfo p = propertys[i];
+                if (p.CanRead && p.CanWrite)
+                {
+                    if (ReflectionUtils.IsDelegate(p.PropertyType))
+                        continue;
+                    if (CheckHaveNotJsonSerializedAttribute(p))
+                        continue;
+                    try
+                    {
+
+                        object v = p.GetValue(data, null);
+                        if (v == null)
+                            continue;
+                        v = ChangeObjectToJsonObject(v);
+                        dic.Add(p.Name, v);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                }
+            }
+            return dic;
+        }
+
+        /// <summary>
+        /// json转换为class或struct
+        /// </summary>
+        /// <param name="json"></param>
+        /// <param name="type">class或struct的type</param>
+        /// <returns></returns>
+        private static object JsonToClassOrStruct(string json, Type type)
+        {
+            if (string.IsNullOrEmpty(json))
+                return null;
+            object obj = SimpleJsonTool.DeserializeObject(json);
+            return JsonObjectToClassOrStruct(obj, type);
+        }
+        private static object JsonObjectToClassOrStruct(object jsonObj, Type type)
+        {
+            IDictionary<string, object> dic = (IDictionary<string, object>)jsonObj;
+            object instance = ReflectionUtils.CreateDefultInstance(type);
+            if (dic == null || instance == null)
+            {
+                return null;
+            }
+            foreach (var item in dic)
+            {
+                string key = item.Key;
+                object value = item.Value;
+                FieldInfo f = type.GetField(key, flags);
+                if (f != null)
+                {
+                    value = ChangeJsonDataToObjectByType(f.FieldType, value);
+                    f.SetValue(instance, value);
+                }
+                else
+                {
+                    PropertyInfo property = type.GetProperty(key, flags);
+                    if (property != null && property.CanRead && property.CanWrite)
+                    {
+                        value = ChangeJsonDataToObjectByType(property.PropertyType, value);
+                        property.SetValue(instance, value, null);
+                    }
+                }
+            }
+            return instance;
+        }
+        #endregion
+        #region Dictionary
+        /// <summary>
+        /// Dictionary<k,v>转换为json 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static string DictionaryToJson(object data)
+        {
+            object obj = DictionaryToJsonObject(data);
+            return SimpleJsonTool.SerializeObject(obj);
+        }
+
+        private static object DictionaryToJsonObject(object data)
+        {
+            Type type = data.GetType();
+            PropertyInfo p = type.GetProperty("Count");
+            int count = (int)p.GetValue(data, null);
+
+            MethodInfo GetEnumeratorMe = type.GetMethod("GetEnumerator");
+            PropertyInfo current = GetEnumeratorMe.ReturnParameter.ParameterType.GetProperty("Current");
+            MethodInfo moveNext = GetEnumeratorMe.ReturnParameter.ParameterType.GetMethod("MoveNext");
+
+            Type[] typeArguments = type.GetGenericArguments();
+            Type KeyValuePairType = typeof(KeyValuePair<,>).MakeGenericType(typeArguments);
+            PropertyInfo keyProperty = KeyValuePairType.GetProperty("Key");
+            PropertyInfo valueProperty = KeyValuePairType.GetProperty("Value");
+
+            object enumerator = GetEnumeratorMe.Invoke(data, null);
+
+            Dictionary<object, object> dataDic = new Dictionary<object, object>();
+            for (int i = 0; i < count; i++)
+            {
+                moveNext.Invoke(enumerator, null);
+                object kv = current.GetValue(enumerator, null);
+                object key = keyProperty.GetValue(kv, null);
+                object value = valueProperty.GetValue(kv, null);
+                key = ChangeObjectToJsonObject(key);
+                value = ChangeObjectToJsonObject(value);
+                if (key == null || value == null)
+                    continue;
+                dataDic.Add(key, value);
+            }
+
+            return dataDic;
+        }
+        /// <summary>
+        /// json转换为Dictionary<k,v>
+        /// </summary>
+        /// <param name="json"></param>
+        /// <param name="keyType">key的type</param>
+        /// <param name="valueType">value的type</param>
+        /// <returns></returns>
+        private static object JsonToDictionary(string json, Type keyType, Type valueType)
+        {
+            object obj = SimpleJsonTool.DeserializeObject(json);
+            return JsonObjectToDictionary(obj, keyType, valueType);
+        }
+        private static object JsonObjectToDictionary(object data, Type keyType, Type valueType)
+        {
+            IList<object> iList = data as IList<object>;
+            //Debug.Log(iList.Count);
+            Type dicType = dictionary_Type.MakeGenericType(keyType, valueType);
+            object tempDic = Activator.CreateInstance(dicType);
+            MethodInfo addDicMe = dicType.GetMethod("Add", flags);
+
+            if (iList != null)
+            {
+                for (int i = 0; i < iList.Count; i++)
+                {
+                    //Debug.Log(iList[i].GetType().FullName);
+                    IDictionary<string, object> iDatasDic = iList[i] as IDictionary<string, object>;
+                    object key = iDatasDic["Key"];
+                    object value = iDatasDic["Value"];
+                    key = ChangeJsonDataToObjectByType(keyType, key);
+                    value = ChangeJsonDataToObjectByType(valueType, value);
+                    //Debug.Log("keyType :" + keyType + "  valueType:" + valueType + "  key:" + key.GetType() + "  value:" + value.GetType());
+                    addDicMe.Invoke(tempDic, new object[] { key, value });
+                }
+            }
+            return tempDic;
+        }
+        #endregion
+
+        #region Other
+        private static bool IsSupportBaseValueParseJson(Type t)
+        {
+            if (t.IsPrimitive || t == typeof(string) || t.IsEnum)
+                return true;
+            return false;
+        }
+        private static object ChangeJsonDataToObjectByType(Type type, object data)
+        {
+            object value = null;
+            if (data == null)
+                return value;
+            if (type.IsPrimitive || type == typeof(string))
+            {
+                value = data;
+            }
+            else if (type.IsEnum)
+            {
+                value = Enum.Parse(type, data.ToString());
+                // value = Enum.ToObject(type, data);
+            }
+            else if (type.IsArray)
+            {
+                try
+                {
+                    value = JsonObjectToArray(data, type.GetElementType());
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Array无法转换类型， data：" + data.GetType().FullName + "  type.GetElementType(): " + type.GetElementType().FullName);
+                    Debug.LogError(e);
+                }
+            }
+            else if (type.IsGenericType)
+            {
+                if (list_Type.Name == type.Name)
+                {
+                    value = JsonObjectToList(data, type.GetGenericArguments()[0]);
+                }
+                else if (dictionary_Type.Name == type.Name)
+                {
+                    Type[] ts = type.GetGenericArguments();
+                    value = JsonObjectToDictionary(data, ts[0], ts[1]);
+                }
+                else
+                {
+                    value = JsonObjectToClassOrStruct(data, type);
+                }
+            }
+            else
+            {
+                if (type.IsClass || type.IsValueType)
+                {
+                    value = JsonObjectToClassOrStruct(data, type);
+                }
+            }
+            if (value == null)
+                return value;
+            try
+            {
+                if (!type.Equals(value.GetType()))
+                    value = Convert.ChangeType(value, type);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("无法转换类型， type：" + type.FullName + "  valueType: " + value.GetType().FullName + "\n " + e);
+            }
+            return value;
+        }
+        /// <summary>
+        /// 检测是否字段或属性添加了 NotJsonSerializedAttribute 特性
+        /// </summary>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        private static bool CheckHaveNotJsonSerializedAttribute(MemberInfo member)
+        {
+            object[] attrs = member.GetCustomAttributes(false);
+            bool isSerialized = false;
+            foreach (var att in attrs)
+            {
+                if (att.GetType() == notJsonSerialized_Type)
+                {
+                    isSerialized = true;
+                    break;
+                }
+            }
+            return isSerialized;
+        }
+        private static object ChangeObjectToJsonObject(object data)
+        {
+            if (null == data)
+                return data;
+            Type t = data.GetType();
+            if (ReflectionUtils.IsDelegate(t))
+                return null;
+            object value = data;
+            if (!IsSupportBaseValueParseJson(t))
+            {
+                if (t.IsArray)
+                    value = ListArrayToJsonObject(data, false);
+                else if (t.IsClass || t.IsGenericType)
+                {
+                    if (list_Type.Name == t.Name)
+                        value = ListArrayToJsonObject(data, true);
+                    else if (dictionary_Type.Name == t.Name)
+                        value = DictionaryToJsonObject(data);
+                    else
+                        value = ClassOrStructToJsonObject(data);
+                }
+                else
+                {
+                    if (t.IsClass || t.IsValueType)
+                        value = ClassOrStructToJsonObject(data);
+                }
+            }
+            return value;
+        }
+        #endregion
+    }
+
+
+
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Property)]
+    public class NotJsonSerializedAttribute : Attribute
+    {
+
+    }
+}
