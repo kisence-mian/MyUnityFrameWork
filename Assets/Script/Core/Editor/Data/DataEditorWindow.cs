@@ -186,9 +186,24 @@ public class DataEditorWindow : EditorWindow
         {
             heightItemList.Add(wHeight);
         }
-
-        selectRowIndexs.Clear();
-        selectColumnIndexs.Clear();
+        for (int i = 0; i < selectRowIndexs.Count; i++)
+        {
+            if (selectRowIndexs[i] >= heightItemList.Count)
+            {
+                selectRowIndexs.RemoveAt(i);
+                i = i - 1;
+            }
+        }
+        for (int i = 0; i < selectColumnIndexs.Count; i++)
+        {
+            if (selectColumnIndexs[i] >= withItemList.Count)
+            {
+                selectColumnIndexs.RemoveAt(i);
+                i = i - 1;
+            }
+        }
+        //selectRowIndexs.Clear();
+        //selectColumnIndexs.Clear();
     }
 
     private List<float> withItemList = new List<float>();
