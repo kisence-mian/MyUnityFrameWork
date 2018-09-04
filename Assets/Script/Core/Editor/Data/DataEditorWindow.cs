@@ -552,7 +552,7 @@ public class DataEditorWindow : EditorWindow
                     {
 
 
-                        modifiIndex = new Vector2Int(i - 2, j);
+                        modifiIndex = new TableIndex(i - 2, j);
                         if (i == 0)
                         {
                             TableConfigFieldInfo f = new TableConfigFieldInfo();
@@ -973,7 +973,7 @@ public class DataEditorWindow : EditorWindow
 
         return value;
     }
-    private Vector2Int modifiIndex = new Vector2Int();
+    private TableIndex modifiIndex = new TableIndex();
 
 
     /// <summary>
@@ -1590,6 +1590,18 @@ public class TableConfigFieldInfo
     public object defultValue = null;
     public string enumType = "";
 
+}
+
+public struct TableIndex
+{
+    public TableIndex(int x ,int y)
+    {
+        this.x = x;
+        this.y = y;
+    }
+
+    public int x;
+    public int y;
 }
 
 
