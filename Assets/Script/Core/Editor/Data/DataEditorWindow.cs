@@ -12,6 +12,8 @@ using HDJ.Framework.Utils;
 
 public class DataEditorWindow : EditorWindow
 {
+    private const string FontPlayerPrefKey = "DataEditorWindow.FontKey";
+
     UILayerManager m_UILayerManager;
     static DataEditorWindow win;
 
@@ -43,6 +45,11 @@ public class DataEditorWindow : EditorWindow
         string m_directoryPath = Application.dataPath + "/Resources/" + DataManager.c_directoryName;
         configFileNames.AddRange(PathUtils.GetDirectoryFileNames(m_directoryPath, new string[] { ".txt" }, false, false));
 
+    }
+    private void OnDestroy()
+    {
+        PlayerPrefs.SetInt(FontPlayerPrefKey, nowButtonFontSize);
+        PlayerPrefs.Save();
     }
     public static void Refresh()
     {
@@ -430,8 +437,10 @@ public class DataEditorWindow : EditorWindow
         //字体大小调节
         helpBoxStyle.fontSize = helpBoxStyle.font.fontSize;
         oldButtonFontSize = helpBoxStyle.fontSize;
-        if (nowButtonFontSize == 0)
-            nowButtonFontSize = oldButtonFontSize;
+        if (nowButtonFontSize <= 0)
+        {  
+            nowButtonFontSize = PlayerPrefs.GetInt(FontPlayerPrefKey, oldButtonFontSize); 
+        }
 
         nowButtonFontSize = EditorGUILayout.IntSlider("字体大小", nowButtonFontSize, oldButtonFontSize / 2, MaxButtonFontSize);
         GUILayout.FlexibleSpace();
