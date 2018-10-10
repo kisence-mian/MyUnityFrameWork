@@ -10,6 +10,7 @@ public class UIWindowBase : UIBase
     public GameObject m_bgMask;
     public GameObject m_uiRoot;
 
+    public WindowStatus windowStatus;
 
     #region 重载方法
 
@@ -105,6 +106,16 @@ public class UIWindowBase : UIBase
 
 
     #endregion
+
+    public enum WindowStatus
+    {
+        Create,
+        Open,
+        Close,
+        OpenAnim,
+        CloseAnim,
+        Hide,
+    }
 }
 
 

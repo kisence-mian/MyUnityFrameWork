@@ -27,36 +27,82 @@ public class ApplicationStatusManager
         if (s_currentAppStatus != null)
             s_currentAppStatus.OnGUI();
     }
-
+    private static float s_fadeInTime = 0.5f;
+    private static float s_afterInDelayTime = 0.1f;
+    private static float s_fadeOutTime = 0.4f;
+    public static void SetFadeTime(float _fadeInTime, float afterInDelayTime, float _fadeOutTime)
+    {
+        s_fadeInTime = _fadeInTime;
+        s_afterInDelayTime = afterInDelayTime;
+        s_fadeOutTime = _fadeOutTime;
+    }
     /// <summary>
     /// 切换游戏状态
     /// </summary>
     /// <param name="l_appStatus"></param>
-    public static void EnterStatus<T>() where T:IApplicationStatus
+    public static void EnterStatus<T>(bool isFade = true) where T:IApplicationStatus
     {
-        EnterStatus(typeof(T).Name);
+        EnterStatus(typeof(T).Name,isFade);
     }
 
-    public static void EnterStatus(string statusName)
+    public static void EnterStatus(string statusName,bool isFade=true)
     {
         if (s_currentAppStatusName == statusName)
             return;
-
-        s_currentAppStatusName = statusName;
-        ApplicationManager.Instance.currentStatus = statusName;
-
-        if (s_currentAppStatus != null)
+        if (!isFade)
         {
-            s_currentAppStatus.CloseAllUI();
-            s_currentAppStatus.OnExitStatus();
+            if (s_currentAppStatus != null)
+            {
+                s_currentAppStatus.CloseAllUI();
+                s_currentAppStatus.OnExitStatus();
+            }
+
+            s_currentAppStatusName = statusName;
+            ApplicationManager.Instance.currentStatus = statusName;
+
+            s_currentAppStatus = GetStatus(statusName);
+
+            s_currentAppStatus.OnEnterStatus();
+
+            if (OnStatusChangeCallBack != null)
+                OnStatusChangeCallBack(s_currentAppStatus);
         }
+        else
+        {
 
-        s_currentAppStatus = GetStatus(statusName);
+            if (s_currentAppStatus != null)
+            {
+                UIManager.SetEventSystemEnable(false);
+                CameraFade.Instance.FadeInToOut(s_fadeInTime, s_afterInDelayTime, s_fadeOutTime, () =>
+                {
+                    UIManager.SetEventSystemEnable(true);
+                    s_currentAppStatus.CloseAllUI(false);
+                    s_currentAppStatus.OnExitStatus();
+                    s_currentAppStatusName = statusName;
+                    ApplicationManager.Instance.currentStatus = statusName;
 
-        s_currentAppStatus.OnEnterStatus();
+                    s_currentAppStatus = GetStatus(statusName);
 
-        if (OnStatusChangeCallBack != null)
-            OnStatusChangeCallBack(s_currentAppStatus);
+                    s_currentAppStatus.OnEnterStatus();
+
+                    if (OnStatusChangeCallBack != null)
+                        OnStatusChangeCallBack(s_currentAppStatus);
+                });
+            }
+            else
+            {
+                s_currentAppStatusName = statusName;
+                ApplicationManager.Instance.currentStatus = statusName;
+
+                s_currentAppStatus = GetStatus(statusName);
+
+                s_currentAppStatus.OnEnterStatus();
+
+                if (OnStatusChangeCallBack != null)
+                    OnStatusChangeCallBack(s_currentAppStatus);
+            }
+
+        }
         //ApplicationManager.Instance.StartCoroutine(s_currentAppStatus.InChangeScene(() =>
         //{
         //    s_currentAppStatus.OnEnterStatus();
@@ -76,12 +122,29 @@ public class ApplicationStatusManager
         }
         else
         {
-            IApplicationStatus statusTmp = (IApplicationStatus)Activator.CreateInstance(Type.GetType(statusName));
+            return CreateStatus(statusName);
+        }
+    }
+
+    public static T CreateStatus<T>() where T : IApplicationStatus
+    {
+        return (T)CreateStatus(typeof(T).Name);
+    }
+
+    public static IApplicationStatus CreateStatus(string statusName)
+    {
+        IApplicationStatus statusTmp=null;
+        if (!s_status.ContainsKey(statusName))
+        {
+             statusTmp = (IApplicationStatus)Activator.CreateInstance(Type.GetType(statusName));
             statusTmp.OnCreate();
             s_status.Add(statusName, statusTmp);
-
-            return statusTmp;
         }
+        else
+        {
+            statusTmp= s_status[statusName];
+        }
+        return statusTmp;
     }
 
     /// <summary>

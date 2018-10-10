@@ -1,13 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEditor;
-using UnityEngine.UI;
 using System;
-using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using FrameWork;
+
 using HDJ.Framework.Utils;
 
 public class DataEditorWindow : EditorWindow
@@ -22,28 +20,24 @@ public class DataEditorWindow : EditorWindow
     {
          win = EditorWindow.GetWindow<DataEditorWindow>();
         win.autoRepaintOnSceneChange = true;
-        FocusWindowIfItsOpen<DataEditorWindow>();
         win.wantsMouseMove = true;
     }
 
-    List<String> m_dataNameList = new List<string>();
+    List<String> configFileNames = new List<string>();
 
     DataTable m_currentData;
-    //Dictionary<string, bool> m_foldList = new Dictionary<string, bool>();
     private List<string> langKeys;
     void OnEnable()
     {
-        //EditorGUIStyleData.Init();
         win = this;
-        FindAllDataName();
         langKeys = LanguageDataEditorUtils.GetLanguageLayersKeyList();
-
-        if (!string.IsNullOrEmpty(chooseFileName))
-            LoadData(chooseFileName);
 
         configFileNames.Clear();
         string m_directoryPath = Application.dataPath + "/Resources/" + DataManager.c_directoryName;
         configFileNames.AddRange(PathUtils.GetDirectoryFileNames(m_directoryPath, new string[] { ".txt" }, false, false));
+
+        if (!string.IsNullOrEmpty(chooseFileName) && configFileNames.Contains(chooseFileName))
+            LoadData(chooseFileName);
 
     }
     private void OnDestroy()
@@ -56,81 +50,78 @@ public class DataEditorWindow : EditorWindow
         if (win)
             win.OnEnable();
     }
-    ////当选择改变时
-    //void OnSelectionChange()
-    //{
-
-    //}
-
-    ////当工程改变时
-    //void OnProjectChange()
-    //{
-    //    if (!Application.isPlaying)
-    //    {
-    //        //ConvertUtf8();
-
-    //        FindAllDataName();
-
-    //        if (chooseFileName != null
-    //            && chooseFileName != ""
-    //            && chooseFileName != "None")
-    //        {
-    //            LoadData(chooseFileName);
-    //        }
-    //    }
-    //}
-
     #region GUI
 
     void OnGUI()
     {
         titleContent.text = "数据编辑器";
+        if (buttonStyle == null || helpBoxStyle == null)
+        {
+            buttonStyle = "Button";
+            helpBoxStyle = "HelpBox";
+        }
 
         EditorDrawGUIUtil.RichTextSupport = true;
         GUILayout.Space(8);
         ChooseFile();
         GUILayout.Space(5);
+        if (string.IsNullOrEmpty(chooseFileName))
+            return;
+        if (m_currentData == null)
+            return;
+        GridTopFunctionGUI();
+        GUILayout.Space(5);
+
         DrawTableDataGUI();
         GUILayout.FlexibleSpace();
-
-        SaveDataGUI();
-        GenerateDataClassGUI();
-        GenerateAllDataClassGUI();
-
-        CleanCacheGUI();
     }
     private string chooseFileName = "";
 
     void ChooseFile()
     {
         GUILayout.BeginHorizontal();
-        chooseFileName = EditorDrawGUIUtil.DrawPopup("选择文件", chooseFileName, m_dataNameList, LoadData);
-        if (GUILayout.Button("删除", GUILayout.Width(50)))
+        chooseFileName = EditorDrawGUIUtil.DrawPopup("选择文件", chooseFileName, configFileNames, LoadData);
+        if (GUILayout.Button("删除", GUILayout.Width(60)))
         {
             if (EditorUtility.DisplayDialog("警告", "是否删除文件[" + chooseFileName + "]", "确定", "取消"))
             {
                 File.Delete(Application.dataPath + "/Resources/" + DataManager.c_directoryName + "/" + chooseFileName + ".txt");
                 AssetDatabase.Refresh();
                 m_currentData = null;
+                Refresh();
                 return;
             }
         }
-        if (GUILayout.Button("添加", GUILayout.Width(50)))
+        if (GUILayout.Button("添加", GUILayout.Width(60)))
         {
             GeneralDataModificationWindow.otherParameter = "";
             GeneralDataModificationWindow.OpenWindow(this, "添加新配置文件", "", (value) =>
             {
                 value = EditorDrawGUIUtil.DrawBaseValue("新建配置文件:", value);
                 GeneralDataModificationWindow.otherParameter = EditorDrawGUIUtil.DrawBaseValue("主键名:", GeneralDataModificationWindow.otherParameter);
-                if (string.IsNullOrEmpty(value.ToString()) || string.IsNullOrEmpty(GeneralDataModificationWindow.otherParameter.ToString()))
+                string fileName = value.ToString();
+                string key = GeneralDataModificationWindow.otherParameter.ToString();
+                if (string.IsNullOrEmpty(fileName) || string.IsNullOrEmpty(key))
                 {
-                    EditorGUILayout.HelpBox("文件名不能为空！！", MessageType.Error);
+                    EditorGUILayout.HelpBox("文件名或主键名不能为空！！", MessageType.Error);
                 }
+                else if ((key.Contains(" ")) || (fileName.Contains(" ")))
+                    EditorGUILayout.HelpBox("文件名或主键名有空格！！", MessageType.Error);
+               else if (configFileNames.Contains(fileName))
+                {
+                    EditorGUILayout.HelpBox("文件名重复！！", MessageType.Error);
+                }
+                
                 return value;
             },
             (value) =>
             {
-                if (string.IsNullOrEmpty(value.ToString()) || string.IsNullOrEmpty(GeneralDataModificationWindow.otherParameter.ToString()))
+                string fileName = value.ToString();
+                string key = GeneralDataModificationWindow.otherParameter.ToString();
+                if (string.IsNullOrEmpty(fileName) 
+                || string.IsNullOrEmpty(key)
+                || (key.Contains(" ")) || (fileName.Contains(" "))
+                || configFileNames.Contains(fileName))
                 {
                     return false;
                 }
@@ -141,14 +132,19 @@ public class DataEditorWindow : EditorWindow
             (value) =>
             {
                 DataTable data = new DataTable();
-                data.TableKeys.Add(GeneralDataModificationWindow.otherParameter.ToString());
-
+                string keyName = GeneralDataModificationWindow.otherParameter.ToString();
+                data.TableKeys.Add(keyName);
                 SaveData(value.ToString(), data);
-                AssetDatabase.Refresh();
-
-                LoadData(chooseFileName);
+                Refresh();
+                LoadData(value.ToString());
                 AssetDatabase.Refresh();
             });
+        }
+        if (GUILayout.Button("加载上一次保存", GUILayout.Width(90)))
+        {
+            DataManager.CleanCache();
+            LoadData(chooseFileName);
+
         }
 
         GUILayout.EndHorizontal();
@@ -160,13 +156,8 @@ public class DataEditorWindow : EditorWindow
 
         chooseFileName = fileName;
 
-        if (chooseFileName != "None")
-        {
-           
-            m_currentData = DataManager.GetData(fileName);
-        }
-        else
-            return;
+         m_currentData = DataManager.GetData(fileName);
+
 
         int widthCount = m_currentData.TableKeys.Count;
         //Debug.Log(" m_currentData.TableKeys.Count :" + m_currentData.TableKeys.Count + "  withItemList.Count :" + withItemList.Count);
@@ -209,8 +200,6 @@ public class DataEditorWindow : EditorWindow
                 i = i - 1;
             }
         }
-        //selectRowIndexs.Clear();
-        //selectColumnIndexs.Clear();
     }
 
     private List<float> withItemList = new List<float>();
@@ -235,37 +224,27 @@ public class DataEditorWindow : EditorWindow
     /// </summary>
     void DrawTableDataGUI()
     {
-        if (m_currentData == null)
-            return;
-        if (buttonStyle == null || helpBoxStyle==null)
-        {
-            buttonStyle = "Button";
-            helpBoxStyle = "HelpBox";
-        }
-        Debug.unityLogger.logEnabled = false;
-        GridTopFunctionGUI();
-        GUILayout.Space(5);
-
-        Rect r = new Rect(0, 60, Screen.width, 18);
+        Rect r = new Rect(0, 90, position.width, 18);
         float detaH = wHeight;
-        if (heightItemList.Count > 3)
+        if (heightItemList.Count >= 3)
         {
             detaH = heightItemList[0] + heightItemList[1] + heightItemList[2];
         }
-        Rect svPos_temp = new Rect(new Vector2(0, r.y), new Vector2(Screen.width-wWith, Screen.height - r.y - 120- detaH));
+        Rect svPos_temp = new Rect(new Vector2(0, r.y), new Vector2(position.width - wWith, position.height - r.y - detaH));
         Vector2 v = GetCententSize();
 
-
         svPos = GUI.BeginScrollView(new Rect(svPos_temp.x + wWith, svPos_temp.y + detaH, svPos_temp.width, svPos_temp.height), svPos, new Rect(r.x + wWith, r.y + detaH, v.x, v.y));
-
-        DrawGridItem(r.position + new Vector2(wWith, wHeight),2, heightItemList.Count);
+        //数据中两排后的数据
+        DrawGridItem(r.position + new Vector2(wWith, wHeight), 2, heightItemList.Count);
 
         GUI.EndScrollView();
 
-       //顶部格子
-        topGridSVPos = GUI.BeginScrollView(new Rect(svPos_temp.x, svPos_temp.y, svPos_temp.width+ wWith, detaH), topGridSVPos, new Rect(r.x, r.y, v.x+wWith, detaH),false,false,"Label","Label");
+        Debug.unityLogger.logEnabled = false;
+        //顶部格子
+        topGridSVPos = GUI.BeginScrollView(new Rect(svPos_temp.x, svPos_temp.y, svPos_temp.width + wWith, detaH), topGridSVPos, new Rect(r.x, r.y, v.x + wWith, detaH), false, false, "Label", "Label");
         topGridSVPos = new Vector2(svPos.x, topGridSVPos.y);
-
+        Debug.unityLogger.logEnabled = true;
+        //数据中的前两排格子
         DrawGridItem(r.position + new Vector2(wWith, wHeight), 0, 2);
 
         float tempWith = wWith;
@@ -329,14 +308,15 @@ public class DataEditorWindow : EditorWindow
                 vStr = "description";
                 GUI.Label(dragR, vStr, buttonStyle);
             }
-          
+
 
         }
-
-      
-        leftGridSVPos = GUI.BeginScrollView(new Rect(svPos_temp.x, tempHeight,  wWith, svPos_temp.height), leftGridSVPos, new Rect(r.x, tempHeight,  wWith, v.y), false, false, "Label", "Label");
+        //默认第一列
+        Debug.unityLogger.logEnabled = false;
+        leftGridSVPos = GUI.BeginScrollView(new Rect(svPos_temp.x, tempHeight, wWith, svPos_temp.height), leftGridSVPos, new Rect(r.x, tempHeight, wWith, v.y), false, false, "Label", "Label");
         leftGridSVPos = new Vector2(leftGridSVPos.x, svPos.y);
-       
+        Debug.unityLogger.logEnabled = true;
+
         for (int i = 2; i < heightItemList.Count; i++)
         {
             Rect dragR = new Rect(r.x, tempHeight, wWith, heightItemList[i]);
@@ -349,7 +329,7 @@ public class DataEditorWindow : EditorWindow
             tempHeight += heightItemList[i];
             string vStr = "";
 
-            if(selectRowIndexs.Contains(i))
+            if (selectRowIndexs.Contains(i))
                 GUI.color = Color.cyan;
 
             if (i == 2)
@@ -385,8 +365,6 @@ public class DataEditorWindow : EditorWindow
 
         }
         GUI.EndScrollView();
-
-        Debug.unityLogger.logEnabled = true;
     }
 
     private Vector2 GetCententSize()
@@ -415,27 +393,52 @@ public class DataEditorWindow : EditorWindow
     private string searchValue = "";
     private void GridTopFunctionGUI()
     {
+        GUILayout.Space(4);
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("添加一行数据", GUILayout.Width(90)))
         {
             AddLineDataGUI();
         }
-        GUILayout.FlexibleSpace();
-        if (GUILayout.Button("加载上一次保存", GUILayout.Width(90)))
-        {
-            DataManager.CleanCache();
-            LoadData(chooseFileName);
-
-        }
+      
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("添加字段", GUILayout.Width(90)))
         {
             Add2FieldGUI();
         }
         GUILayout.FlexibleSpace();
+       
+        GUILayout.Space(5);
+       
+        if (GUILayout.Button("生成Data类", GUILayout.Width(90)))
+        {
+            CreatDataCSharpFile(chooseFileName, m_currentData);
+            AssetDatabase.Refresh();
+        }
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("生成全部Data类", GUILayout.Width(120)))
+        {
+            CreatAllClass();
+        }
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("清除缓存", GUILayout.Width(90)))
+        {
+            LanguageManager.IsInit = false;
+            DataManager.CleanCache();
+        }
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("保存", GUILayout.Width(140)))
+        {
+            SaveData(chooseFileName, m_currentData);
+            AssetDatabase.Refresh();
+            ShowNotification(new GUIContent("Save Success!"));
+        }
+        GUILayout.EndHorizontal();
+        GUILayout.Space(7);
+        GUILayout.BeginHorizontal();
+
 
         //字体大小调节
-        helpBoxStyle.fontSize = helpBoxStyle.font.fontSize;
+         helpBoxStyle.fontSize = 11;
         oldButtonFontSize = helpBoxStyle.fontSize;
         if (nowButtonFontSize <= 0)
         {  
@@ -459,6 +462,7 @@ public class DataEditorWindow : EditorWindow
         {
             tempHeight += heightItemList[i];
         }
+
         for (int i = heightStartIndex; i < heightEndIndex; i++)
         {
             float h = heightItemList[i];
@@ -550,8 +554,6 @@ public class DataEditorWindow : EditorWindow
                         GUI.color = Color.cyan;
                     if (GUI.Button(new Rect(pos, size), showStr, helpBoxStyle))
                     {
-
-
                         modifiIndex = new TableIndex(i - 2, j);
                         if (i == 0)
                         {
@@ -575,7 +577,9 @@ public class DataEditorWindow : EditorWindow
                         GeneralDataModificationWindow.OpenWindow(this, "修改数据", value, DrawModifiValueGUI, CheckModifiValueCallBack, ModificationCompleteCallBack);
                     }
                 }
-               
+
+
+
                 GUI.color = Color.white;
                 tempWith += w;
             }
@@ -809,7 +813,6 @@ public class DataEditorWindow : EditorWindow
         });
     }
 
-    private List<string> configFileNames = new List<string>();
     private List<string> fieldNames = new List<string>();
     private List<string> tableKeys = new List<string>();
     private string tableName = "";
@@ -849,6 +852,7 @@ public class DataEditorWindow : EditorWindow
 
     private object DrawLocalizedLanguageField(string text, object value)
     {
+        value = EditorDrawGUIUtil.DrawBaseValue(text, value);
         value = EditorDrawGUIUtil.DrawPopup(text, value.ToString(), langKeys);
         GUILayout.Space(6);
         GUILayout.Label("多语言字段[" + value + "] : " + LanguageManager.GetContentByKey(value.ToString()));
@@ -909,7 +913,10 @@ public class DataEditorWindow : EditorWindow
                 }
             }
         }
-        catch { }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
 
         if (!isHave)
         {
@@ -964,7 +971,9 @@ public class DataEditorWindow : EditorWindow
                 }
             }
         }
-        catch { }
+        catch(Exception e) {
+            Debug.LogError(e);
+        }
 
         if (!isHave)
         {
@@ -1041,6 +1050,8 @@ public class DataEditorWindow : EditorWindow
             
             if (string.IsNullOrEmpty(info.fieldName))
                 EditorGUILayout.HelpBox("字段名不能为空！！", MessageType.Error);
+            else if (info.fieldName.Contains(" "))
+                EditorGUILayout.HelpBox("字段名不能有空格！！", MessageType.Error);
             else if (m_currentData.TableKeys.Contains(info.fieldName))
                 EditorGUILayout.HelpBox("字段名重复！！", MessageType.Error);
             string df = DataConfigUtils.ObjectValue2TableString(info.defultValue);
@@ -1051,7 +1062,7 @@ public class DataEditorWindow : EditorWindow
         (value) =>
         {
             TableConfigFieldInfo info = (TableConfigFieldInfo)value;
-            if (string.IsNullOrEmpty(info.fieldName) || m_currentData.TableKeys.Contains(info.fieldName))
+            if (string.IsNullOrEmpty(info.fieldName) || m_currentData.TableKeys.Contains(info.fieldName)|| info.fieldName.Contains(" "))
                 return false;
             string df = DataConfigUtils.ObjectValue2TableString(info.defultValue);
             if (string.IsNullOrEmpty(df))
@@ -1075,16 +1086,19 @@ public class DataEditorWindow : EditorWindow
         GeneralDataModificationWindow.OpenWindow(this, "插入一行数据", "", (value) =>
         { 
             value =  EditorDrawGUIUtil.DrawBaseValue("Key:", value);
-            if (string.IsNullOrEmpty(value.ToString()))
+            string key = value.ToString();
+            if (string.IsNullOrEmpty(key))
                 EditorGUILayout.HelpBox("Key不能为空！！", MessageType.Error);
-            else if (m_currentData.TableKeys.Contains(value.ToString()))
+            else if(key.Contains(" "))
+                EditorGUILayout.HelpBox("Key 不能有空格！！", MessageType.Error);
+            else if (m_currentData.TableKeys.Contains(key.Trim()))
                 EditorGUILayout.HelpBox("Key重复！！", MessageType.Error);
             return value;
         },
          (value) =>
          {
-
-             if (string.IsNullOrEmpty(value.ToString()) || m_currentData.TableKeys.Contains(value.ToString()))
+             string key = value.ToString();
+             if (string.IsNullOrEmpty(key) || (key.Contains(" "))|| m_currentData.TableKeys.Contains(key.Trim()))
                  return false;
 
              return true;
@@ -1111,25 +1125,6 @@ public class DataEditorWindow : EditorWindow
 
        
     }
-    #region 数据文件相关
-
-  
-
-    void CleanCacheGUI()
-    {
-        if (GUILayout.Button("清除缓存"))
-        {
-            LanguageManager.IsInit = false;
-            DataManager.CleanCache();
-        }
-    }
-
-    #endregion
-
-    #region 记录相关
-
-
-    #endregion
 
     #region 字段相关
 
@@ -1236,86 +1231,7 @@ public class DataEditorWindow : EditorWindow
         }
     }
 
-    void SaveDataGUI()
-    {
-        //if (GUILayout.Button("Change"))
-        //{
-        //    foreach (var sd in m_currentData.Values)
-        //    {
-        //        foreach (var item in sd)
-        //        {
-        //            if(item.Key== "DescribeKey")
-        //            {
-        //                sd[item.Key]= "{[0,4][" + item.Value + "]}";
-        //                Debug.Log(m_currentData.Count + " " + item.Key);
-        //                break;
-        //            }
-        //        }
-        //    }
-        //}
-        if (GUILayout.Button("保存"))
-        {
-            SaveData(chooseFileName, m_currentData);
-            AssetDatabase.Refresh();
-            //LoadData(chooseFileName);
-        }
-    }
-
-    void GenerateDataClassGUI()
-    {
-        if (GUILayout.Button("生成Data类"))
-        {
-            CreatDataCSharpFile(chooseFileName, m_currentData);
-            AssetDatabase.Refresh();
-        }
-    }
-
-    void  GenerateAllDataClassGUI()
-    {
-        if (GUILayout.Button("生成全部Data类"))
-        {
-            CreatAllClass();
-        }
-    }
-
     #endregion
-
-    #endregion
-
-    #region FindData
-
-    string m_directoryPath;
-
-    void FindAllDataName()
-    {
-        AssetDatabase.Refresh();
-        m_dataNameList = new List<string>();
-
-        m_dataNameList.Add("None");
-
-        m_directoryPath = Application.dataPath + "/Resources/" + DataManager.c_directoryName;
-
-        FindConfigName(m_directoryPath);
-    }
-
-    public void FindConfigName(string path)
-    {
-        string[] allUIPrefabName = Directory.GetFiles(path);
-        foreach (var item in allUIPrefabName)
-        {
-            if (item.EndsWith(".txt"))
-            {
-                //string configName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(item));
-                m_dataNameList.Add(FileTool.RemoveExpandName(PathTool.GetDirectoryRelativePath(m_directoryPath + "/",item)));
-            }
-        }
-
-        string[] dires = Directory.GetDirectories(path);
-        for (int i = 0; i < dires.Length; i++)
-        {
-            FindConfigName(dires[i]);
-        }
-    }
 
     #endregion
 
@@ -1323,12 +1239,11 @@ public class DataEditorWindow : EditorWindow
 
     void CreatAllClass()
     {
-        for (int i = 0; i < m_dataNameList.Count; i++)
+        for (int i = 0; i < configFileNames.Count; i++)
         {
-            if (m_dataNameList[i] != null && m_dataNameList[i] !="None")
-            {
-                CreatDataCSharpFile(m_dataNameList[i],DataManager.GetData(m_dataNameList[i]));
-            }
+
+            CreatDataCSharpFile(configFileNames[i], DataManager.GetData(configFileNames[i]));
+
         }
 
         UnityEditor.AssetDatabase.Refresh();
@@ -1499,27 +1414,8 @@ public class DataEditorWindow : EditorWindow
 
     #endregion
 
-    #region Utf-8转换
-
-    public static void ConvertUtf8()
-    {
-        FileTool.RecursionFileExecute(Application.dataPath + "/Resources/" + DataManager.c_directoryName, "txt", (name) =>
-        {
-            FileTool.ConvertFileEncoding(name, null, System.Text.Encoding.UTF8);
-        });
-    }
-
-    #endregion
-
     #region 保存数据
 
-    public static bool GetIsExistDataEditor(string DataName)
-    {
-        return "" != ResourceIOTool.ReadStringByResource(
-                        PathTool.GetRelativelyPath(DataManager.c_directoryName,
-                                                    DataName,
-                                                    DataManager.c_expandName));
-    }
 
     public static void SaveData(string ConfigName, DataTable data)
     {
@@ -1531,41 +1427,6 @@ public class DataEditorWindow : EditorWindow
                     ConfigName,
                     DataManager.c_expandName)),
             DataTable.Serialize(data));
-
-        UnityEditor.AssetDatabase.Refresh();
-    }
-
-    /// <summary>
-    /// 读取编辑器数据
-    /// </summary>
-    /// <param name="ConfigName">数据名称</param>
-    public static Dictionary<string, object> GetEditorData(string dataName)
-    {
-        UnityEditor.AssetDatabase.Refresh();
-
-        string dataJson = ResourceIOTool.ReadStringByFile(PathTool.GetEditorPath(DataManager.c_directoryName, dataName, DataManager.c_expandName));
-
-        if (dataJson == "")
-        {
-            Debug.Log(dataName + " dont find!");
-            return new Dictionary<string, object>();
-        }
-        else
-        {
-            return Json.Deserialize(dataJson) as Dictionary<string, object>;
-        }
-    }
-
-    /// <summary>
-    /// 保存编辑器数据
-    /// </summary>
-    /// <param name="ConfigName">数据名称</param>
-    /// <param name="data">数据表</param>
-    public static void SaveEditorData(string ConfigName, Dictionary<string, object> data)
-    {
-        string configDataJson = Json.Serialize(data);
-
-        EditorUtil.WriteStringByFile(PathTool.GetEditorPath(DataManager.c_directoryName, ConfigName, DataManager.c_expandName), configDataJson);
 
         UnityEditor.AssetDatabase.Refresh();
     }

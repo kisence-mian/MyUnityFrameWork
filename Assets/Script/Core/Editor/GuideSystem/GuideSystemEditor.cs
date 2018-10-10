@@ -142,7 +142,7 @@ public class GuideSystemEditor
         data.SetFieldType(GuideSystemBase.c_TipContentKey, FieldType.String, null);
 
         data.TableKeys.Add(GuideSystemBase.c_TipContentPosKey);
-        data.SetDefault(GuideSystemBase.c_TipContentPosKey, "0|0|0");
+        data.SetDefault(GuideSystemBase.c_TipContentPosKey, "0,0,0");
         data.SetNote(GuideSystemBase.c_TipContentPosKey, "提示文本位置");
         data.SetFieldType(GuideSystemBase.c_TipContentPosKey, FieldType.Vector3, null);
 

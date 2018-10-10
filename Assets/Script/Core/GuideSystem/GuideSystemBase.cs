@@ -95,11 +95,20 @@ namespace FrameWork.GuideSystem
         /// <summary>
         /// 新手引导开始点
         /// </summary>
-        public void Start()
+        public void Start(string guideKey = null)
         {
-            SingleData guideData = LoadFirstGuide();
+            SingleData guideData;
 
-            if (!IsStart 
+            if (guideKey != null)
+            {
+                guideData = GetGuideDataByName(guideKey);
+            }
+            else
+            {
+                guideData = LoadFirstGuide();
+            }
+
+            if (!IsStart
                 && guideData != null
                 && GuideStartCondition(guideData)
                 && GetGuideSwitch())

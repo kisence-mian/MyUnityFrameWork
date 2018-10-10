@@ -558,32 +558,32 @@ public class UIBase : MonoBehaviour
 
         for (int i = 0; i < m_OnClickEvents.Count; i++)
         {
-            m_OnClickEvents[i].RemoveListener(true);
+            m_OnClickEvents[i].RemoveListener();
         }
         m_OnClickEvents.Clear();
 
         for (int i = 0; i < m_LongPressEvents.Count; i++)
         {
-            m_LongPressEvents[i].RemoveListener(true);
+            m_LongPressEvents[i].RemoveListener();
         }
         m_LongPressEvents.Clear();
 
         #region 拖动事件
         for (int i = 0; i < m_DragEvents.Count; i++)
         {
-            m_DragEvents[i].RemoveListener(true);
+            m_DragEvents[i].RemoveListener();
         }
         m_DragEvents.Clear();
 
         for (int i = 0; i < m_BeginDragEvents.Count; i++)
         {
-            m_BeginDragEvents[i].RemoveListener(true);
+            m_BeginDragEvents[i].RemoveListener();
         }
         m_BeginDragEvents.Clear();
 
         for (int i = 0; i < m_EndDragEvents.Count; i++)
         {
-            m_EndDragEvents[i].RemoveListener(true);
+            m_EndDragEvents[i].RemoveListener();
         }
         m_EndDragEvents.Clear();
         #endregion
@@ -608,21 +608,21 @@ public class UIBase : MonoBehaviour
     public void AddOnClickListener(string buttonName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
         InputButtonClickRegisterInfo info = InputUIEventProxy.GetOnClickListener(GetButton(buttonName), UIEventKey, buttonName, parm, callback);
-        info.AddListener(GetRegister(m_OnClickEvents, info.eventKey));
+        info.AddListener();
         m_OnClickEvents.Add(info);
     }
 
     public void AddOnClickListenerByCreate(Button button, string compName, InputEventHandle<InputUIOnClickEvent> callback, string parm = null)
     {
         InputButtonClickRegisterInfo info = InputUIEventProxy.GetOnClickListener(button, UIEventKey, compName, parm, callback);
-        info.AddListener(GetRegister(m_OnClickEvents, info.eventKey));
+        info.AddListener();
         m_OnClickEvents.Add(info);
     }
 
     public void AddLongPressListener(string compName, InputEventHandle<InputUILongPressEvent> callback, string parm = null)
     {
         InputEventRegisterInfo<InputUILongPressEvent> info = InputUIEventProxy.GetLongPressListener(GetLongPressComp(compName), UIEventKey, compName, parm, callback);
-        info.AddListener(GetRegister(m_LongPressEvents, info.eventKey));
+        info.AddListener();
         m_LongPressEvents.Add(info);
 
     }
@@ -630,21 +630,21 @@ public class UIBase : MonoBehaviour
     public void AddDragListener(string compName, InputEventHandle<InputUIOnDragEvent> callback, string parm = null)
     {
         InputEventRegisterInfo<InputUIOnDragEvent> info = InputUIEventProxy.GetOnDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
-        info.AddListener(GetRegister(m_DragEvents, info.eventKey));
+        info.AddListener();
         m_DragEvents.Add(info);
     }
 
     public void AddBeginDragListener(string compName, InputEventHandle<InputUIOnBeginDragEvent> callback, string parm = null)
     {
         InputEventRegisterInfo<InputUIOnBeginDragEvent> info = InputUIEventProxy.GetOnBeginDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
-        info.AddListener(GetRegister(m_BeginDragEvents, info.eventKey));
+        info.AddListener();
         m_BeginDragEvents.Add(info);
     }
 
     public void AddEndDragListener(string compName, InputEventHandle<InputUIOnEndDragEvent> callback, string parm = null)
     {
         InputEventRegisterInfo<InputUIOnEndDragEvent> info = InputUIEventProxy.GetOnEndDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
-        info.AddListener(GetRegister(m_EndDragEvents, info.eventKey));
+        info.AddListener();
         m_EndDragEvents.Add(info);
     }
 
@@ -685,7 +685,7 @@ public class UIBase : MonoBehaviour
     {
         InputButtonClickRegisterInfo info = GetClickRegisterInfo(buttonName, callback, parm);
         m_OnClickEvents.Remove(info);
-        info.RemoveListener(GetRegister(m_OnClickEvents, info.eventKey));
+        info.RemoveListener();
     }
 
     #endregion

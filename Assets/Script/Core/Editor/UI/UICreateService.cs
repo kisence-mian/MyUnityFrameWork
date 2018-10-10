@@ -335,12 +335,14 @@ public class UICreateService
         GameObject Text_tips = new GameObject("Text_tip");
         Text_tips.layer = LayerMask.NameToLayer("UI");
         RectTransform txt_tipsrt = Text_tips.AddComponent<RectTransform>();
-        Text_tips.AddComponent<Text>();
+        Text text = Text_tips.AddComponent<Text>();
         txt_tipsrt.SetParent(tipsrt);
 
         guideBaseTmp.m_objectList.Add(Text_tips);
 
         guideBaseTmp.m_mask = img;
+        guideBaseTmp.m_TipText = text;
+        guideBaseTmp.m_TipTransfrom = txt_tipsrt;
 
         guideBaseTmp.m_bgMask = BgGo;
         guideBaseTmp.m_uiRoot = rootGo;

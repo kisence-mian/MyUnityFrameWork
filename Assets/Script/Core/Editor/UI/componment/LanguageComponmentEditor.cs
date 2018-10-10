@@ -31,7 +31,8 @@ public class LanguageComponmentEditor : Editor
         }
         if (m_languageList == null)
             m_languageList = LanguageDataEditorUtils.GetLanguageLayersKeyList();
-
+        GUILayout.Space(6);
+        m_lc.languageKey = EditorDrawGUIUtil.DrawBaseValue("多语言key", m_lc.languageKey).ToString();
         GUILayout.Space(6);
         m_lc.languageKey = EditorDrawGUIUtil.DrawPopup("多语言key", m_lc.languageKey, m_languageList);
         m_lc.ResetLanguage();

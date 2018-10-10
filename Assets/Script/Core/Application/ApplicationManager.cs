@@ -73,12 +73,6 @@ public class ApplicationManager : MonoBehaviour
         AppLaunch();
     }
 
-    private void OnEnable()
-    {
-        instance = this;
-        Debug.Log(this.name + " : OnEnable");
-    }
-
     /// <summary>
     /// 程序启动
     /// </summary>

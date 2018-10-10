@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 public class LanguageDataEditorWindow : EditorWindow 
@@ -18,6 +19,8 @@ public class LanguageDataEditorWindow : EditorWindow
 
     //所有语言列表
     static List<string> s_languageKeyList = new List<string>();
+    //所有文件（转换成全路径/）
+    static List<string> s_languageFullKeyList = new List<string>();
 
     private int m_currentSelectIndex;
     private string m_currentLanguage;
@@ -34,7 +37,8 @@ public class LanguageDataEditorWindow : EditorWindow
          win= EditorWindow.GetWindow<LanguageDataEditorWindow>();
         return win;
     }
-
+    FolderTreeView treeView;
+    TreeViewState treeViewState = null;
     void OnEnable()
     {
         win = this;
@@ -46,7 +50,18 @@ public class LanguageDataEditorWindow : EditorWindow
         FindAllDataName();
         LoadEditorConfig();
         LoadConfig();
+
+        if (treeViewState == null)
+            treeViewState = new TreeViewState();
+
+        treeView = new FolderTreeView(treeViewState);
+
+        treeView.SetData(s_languageFullKeyList);
+        treeView.dblclickItemCallBack = ModuleFileDblclickItemCallBack;
+        treeView.selectCallBack = ModuleFileFolderSelectCallBack;
     }
+
+   
 
     void OnProjectChange()
     {
@@ -138,6 +153,13 @@ public class LanguageDataEditorWindow : EditorWindow
         s_languageKeyList.Clear();
         s_languageKeyDict.Clear();
         s_languageKeyDict = LanguageDataEditorUtils.LoadEditorConfig(c_EditorConfigName, ref s_languageKeyList);
+        s_languageFullKeyList.Clear();
+
+        foreach (var item in s_languageKeyDict)
+        {
+            string ss = item.Key.Replace("_", "/");
+            s_languageFullKeyList.Add(ss);
+        }
     }
 
     void LoadConfig()
@@ -285,82 +307,143 @@ public class LanguageDataEditorWindow : EditorWindow
         EditorGUILayout.SelectableLabel(selectEditorModuleName);
         GUILayout.EndHorizontal();
     }
+    /// <summary>
+    /// 模块文件中双击操作，选择文件
+    /// </summary>
+    /// <param name="t"></param>
+    private void ModuleFileDblclickItemCallBack(FolderTreeViewItem t)
+    {
+        if (t.isDirectory)
+            return;
 
+        selectEditorModuleName = t.fullPath.Replace("/", "_"); ;
+        toolbarOption = 1;
+    }
+    /// <summary>
+    /// 模块文件中单击选择文件
+    /// </summary>
+    /// <param name="t"></param>
+    private void ModuleFileFolderSelectCallBack(FolderTreeViewItem t)
+    {
+        //Debug.Log(t.fullPath+ " depth :" + t.depth +" isDir :"+t.isDirectory);
+        if (t.isDirectory)
+            return;
+
+        selectItemFullName = t.fullPath.Replace("/","_");
+    }
     Vector2 pos_editorField = Vector2.zero;
-
+    private string selectItemFullName="";
     void EditorLanguageModuleFileGUI()
     {
-        if (string.IsNullOrEmpty(m_currentLanguage))
-            return;
-        EditorGUI.indentLevel = 1;
        
 
+        if (string.IsNullOrEmpty(m_currentLanguage))
+            return;
+
         GUILayout.BeginHorizontal();
-        EditorGUILayout.LabelField("▲多语言模块列表");
+        EditorGUILayout.LabelField("▲多语言模块列表(双击选择文件)");
         GUILayout.FlexibleSpace();
         if (GUILayout.Button("新增模块", GUILayout.Width(70)))
         {
             AddLanguageModelGUI();
         }
         GUILayout.EndHorizontal();
-        GUILayout.Space(5);
-
-        pos_editorField = EditorGUILayout.BeginScrollView(pos_editorField,"box", GUILayout.ExpandHeight(false));
-        int index = 0;
-        foreach (var item in s_languageKeyDict)
+        GUILayout.Space(9);
+        GUIStyle style = "box";
+        if (!string.IsNullOrEmpty(selectItemFullName))
         {
-            EditorGUI.indentLevel = 2;
-
-            GUIStyle style = "box";
-            if (item.Key == selectEditorModuleName)
-            {
-                //GUI.color = Color.red;
-                style = "U2D.createRect";
-            }
-           
-            EditorGUILayout.BeginHorizontal(style);
-            if (item.Key != selectEditorModuleName && GUILayout.Button("o",GUILayout.Width(20)))
-            {
-                selectEditorModuleName = item.Key;
-                toolbarOption = 1;
-            }
-            GUILayout.Label(index+". " + item.Key);
-            GUILayout.FlexibleSpace();
-            
-            GUILayout.Space(6);
-            if (GUILayout.Button("删除",GUILayout.Width(40)))
+            style = "U2D.createRect";
+        }
+        GUILayout.BeginHorizontal(style);
+        GUILayout.Label("选择的文件：" + selectItemFullName);
+        if (!string.IsNullOrEmpty(selectItemFullName))
+        {
+            if (GUILayout.Button("删除", GUILayout.Width(40)))
             {
                 
-                if (EditorUtility.DisplayDialog("提示", "确定删除 :"+ item.Key, "OK", "Cancel"))
+                if (EditorUtility.DisplayDialog("提示", "确定删除 :" + selectItemFullName, "OK", "Cancel"))
                 {
-                    if (item.Key == selectEditorModuleName)
+                    if (selectItemFullName == selectEditorModuleName)
                         selectEditorModuleName = "";
-                    s_languageKeyDict.Remove(item.Key);
+                    s_languageKeyDict.Remove(selectItemFullName);
 
                     foreach (var lan in s_languageList)
                     {
-                      string moduleName=  LanguageManager.GetLanguageDataName(lan, item.Key) + ".txt";
+                        string moduleName = LanguageManager.GetLanguageDataName(lan, selectItemFullName) + ".txt";
                         FileUtils.DeleteFile(Application.dataPath + "/Resources/" + DataManager.c_directoryName + "/" + c_DataPath + "/" + lan + "/" + moduleName);
                     }
                     SaveData();
                     AssetDatabase.Refresh();
-                    break;
+                    selectItemFullName = "";
+                    OnEnable();
                 }
-               
+
             }
-
-            EditorGUILayout.EndHorizontal();
-
-            GUI.color = Color.white;
-
-            EditorGUILayout.Space();
-
-            EditorGUI.indentLevel = 1;
-
-            index++;
         }
+        GUILayout.EndHorizontal();
+        GUILayout.Space(8);
+        Rect rect = GUILayoutUtility.GetRect(0, 100000, 0, 100000);
+        treeView.OnGUI(rect);
+        //pos_editorField = EditorGUILayout.BeginScrollView(pos_editorField,"box", GUILayout.ExpandHeight(false));
 
-        EditorGUILayout.EndScrollView();
+
+        //int index = 0;
+        //foreach (var item in s_languageKeyDict)
+        //{
+        //    EditorGUI.indentLevel = 2;
+
+        //    GUIStyle style = "box";
+        //    if (item.Key == selectEditorModuleName)
+        //    {
+        //        //GUI.color = Color.red;
+        //        style = "U2D.createRect";
+        //    }
+           
+        //    EditorGUILayout.BeginHorizontal(style);
+        //    if (item.Key != selectEditorModuleName && GUILayout.Button("o",GUILayout.Width(20)))
+        //    {
+        //        selectEditorModuleName = item.Key;
+        //        toolbarOption = 1;
+        //    }
+        //    GUILayout.Label(index+". " + item.Key);
+        //    GUILayout.FlexibleSpace();
+            
+        //    GUILayout.Space(6);
+
+            
+        //    if (GUILayout.Button("删除",GUILayout.Width(40)))
+        //    {
+                
+        //        if (EditorUtility.DisplayDialog("提示", "确定删除 :"+ item.Key, "OK", "Cancel"))
+        //        {
+        //            if (item.Key == selectEditorModuleName)
+        //                selectEditorModuleName = "";
+        //            s_languageKeyDict.Remove(item.Key);
+
+        //            foreach (var lan in s_languageList)
+        //            {
+        //              string moduleName=  LanguageManager.GetLanguageDataName(lan, item.Key) + ".txt";
+        //                FileUtils.DeleteFile(Application.dataPath + "/Resources/" + DataManager.c_directoryName + "/" + c_DataPath + "/" + lan + "/" + moduleName);
+        //            }
+        //            SaveData();
+        //            AssetDatabase.Refresh();
+        //            break;
+        //        }
+               
+        //    }
+
+        //    EditorGUILayout.EndHorizontal();
+
+        //    GUI.color = Color.white;
+
+        //    EditorGUILayout.Space();
+
+        //    EditorGUI.indentLevel = 1;
+
+        //    index++;
+        //}
+
+        //EditorGUILayout.EndScrollView();
 
     }
 

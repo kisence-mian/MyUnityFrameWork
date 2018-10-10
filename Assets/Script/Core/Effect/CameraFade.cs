@@ -107,7 +107,7 @@ public class CameraFade : MonoBehaviour {
         }
         yield return new WaitForEndOfFrame();
         isFading = false;
-        Debug.Log("Camera fade alpha: " + alpha);
+        //Debug.Log("Camera fade alpha: " + alpha);
         try
         {
             if (_fun != null)

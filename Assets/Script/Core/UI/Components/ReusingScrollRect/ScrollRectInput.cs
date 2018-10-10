@@ -15,7 +15,7 @@ public class ScrollRectInput : ScrollRect
 
     public virtual void Dispose()
     {
-        m_register.RemoveListener(true);
+        m_register.RemoveListener();
     }
 
     protected override void SetContentAnchoredPosition(Vector2 position)

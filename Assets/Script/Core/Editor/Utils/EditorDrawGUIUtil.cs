@@ -639,6 +639,128 @@ public class EditorDrawGUIUtil
 
         return data;
     }
+    /// <summary>
+    /// 绘制List泛型
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="data"></param>
+    /// <param name="addCustomData">自定义添加新的Item</param>
+    /// <param name="ItemChnageCallBack">当Item添加或删除时回调</param>
+    /// <param name="customDrawItem">自定义绘制Item</param>
+    /// <returns></returns>
+    public static int DrawPage(GUIContent name,int index, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null)
+    {
+        if (data == null)
+        {
+            DrawLableString(name, "Null");
+            return -1;
+        }
+
+        Type type = data.GetType();
+        Type t = type.GetGenericArguments()[0];
+
+        int count = (int)type.GetProperty("Count").GetValue(data, null);
+        //Debug.Log(name + "  count :" + count);
+
+        MethodInfo methodInfo = type.GetMethod("get_Item", BindingFlags.Instance | BindingFlags.Public);
+        MethodInfo methodInfo1 = type.GetMethod("set_Item", BindingFlags.Instance | BindingFlags.Public);
+        MethodInfo methodInfo2 = type.GetMethod("RemoveAt", BindingFlags.Instance | BindingFlags.Public);
+        MethodInfo methodInfo3 = type.GetMethod("Add", BindingFlags.Instance | BindingFlags.Public);
+        MethodInfo methodInfo4 = type.GetMethod("Reverse", new Type[] { typeof(int), typeof(int) });
+
+        GUILayout.BeginVertical("box");
+        GUILayout.BeginHorizontal();
+        GUILayout.Label(name);
+        GUILayout.FlexibleSpace();
+        if (GUILayout.Button("<",GUILayout.Width(60)))
+        {
+            index--;
+           
+        }
+        GUILayout.Label(index + "/" + (count - 1));
+        if (GUILayout.Button(">", GUILayout.Width(60)))
+        {
+            index++;
+            
+        }
+        GUILayout.FlexibleSpace();
+
+        if (index <= 0)
+            index = 0;
+        if (index >= count)
+            index = count - 1;
+
+        if (CanEdit && GUILayout.Button("+", GUILayout.Width(50)))
+        {
+            object temp = null;
+            if (addCustomData != null)
+            {
+                object tempVV = addCustomData();
+                if (tempVV == null || tempVV.GetType().FullName != t.FullName)
+                    temp = ReflectionUtils.CreateDefultInstance(t);
+                else
+                    temp = tempVV;
+            }
+            else
+                temp = ReflectionUtils.CreateDefultInstance(t);
+            methodInfo3.Invoke(data, new object[] { temp });
+            if (ItemChnageCallBack != null)
+                ItemChnageCallBack(true, temp);
+        }
+        GUILayout.EndHorizontal();
+
+
+        if (count > 0)
+        {
+            GUILayout.BeginVertical("box");
+
+            int i = index;
+                object da = methodInfo.Invoke(data, new object[] { i });
+                GUILayout.BeginHorizontal();
+                GUILayout.BeginVertical();
+                if (customDrawItem != null)
+                {
+                    da = customDrawItem(da);
+                }
+                else
+                {
+                    da = DrawBaseValue("" + i, da);
+                }
+                GUILayout.EndVertical();
+                methodInfo1.Invoke(data, new object[] { i, da });
+                if (CanEdit && GUILayout.Button("↑", GUILayout.Width(15)))
+                {
+                    if (i != 0)
+                    {
+                        methodInfo4.Invoke(data, new object[] { i - 1, 2 });
+                    }
+                   
+                }
+                if (CanEdit && GUILayout.Button("↓", GUILayout.Width(15)))
+                {
+                    if (i != (count - 1))
+                    {
+                        methodInfo4.Invoke(data, new object[] { i, 2 });
+                    }
+                  
+                }
+                if (CanEdit && GUILayout.Button("-", GUILayout.Width(30)))
+                {
+                    methodInfo2.Invoke(data, new object[] { i });
+                    if (ItemChnageCallBack != null)
+                        ItemChnageCallBack(false, da);
+                   
+                }
+                GUILayout.EndHorizontal();
+
+            
+
+            GUILayout.EndVertical();
+        }
+        GUILayout.EndVertical();
+
+        return index;
+    }
 
     public static object DrawArray(string name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null)
     {

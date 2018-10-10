@@ -15,6 +15,14 @@ public abstract class IApplicationStatus
 
         return (T)ui;
     }
+    public UIWindowBase OpenUI(string name)  
+    {
+        UIWindowBase ui = UIManager.OpenUIWindow(name);
+
+        m_uiList.Add(ui);
+
+        return ui;
+    }
 
     public void OpenUIAsync<T>() where T:UIWindowBase
     {
@@ -31,11 +39,30 @@ public abstract class IApplicationStatus
         UIManager.CloseUIWindow(ui);
     }
 
-    public void CloseAllUI()
+    public void CloseUI(UIWindowBase ui)
+    {
+        m_uiList.Remove(ui);
+        UIManager.CloseUIWindow(ui);
+    }
+
+    public bool IsUIOpen<T>() where T : UIWindowBase
     {
         for (int i = 0; i < m_uiList.Count; i++)
         {
-            UIManager.CloseUIWindow(m_uiList[i]);
+            UIWindowBase tempWin = m_uiList[i];
+            if (tempWin.GetType() == typeof(T) 
+                &&(tempWin.windowStatus == UIWindowBase.WindowStatus.Open 
+                || tempWin.windowStatus == UIWindowBase.WindowStatus.OpenAnim))
+                return true;
+        }
+        return false;
+    }
+
+    public void CloseAllUI(bool isPlayAnim = true)
+    {
+        for (int i = 0; i < m_uiList.Count; i++)
+        {
+            UIManager.CloseUIWindow(m_uiList[i],isPlayAnim);
         }
         m_uiList.Clear();
     }

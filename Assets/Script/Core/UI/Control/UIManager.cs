@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.Text.RegularExpressions;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(UIStackManager))]
 [RequireComponent(typeof(UILayerManager))]
@@ -14,6 +15,7 @@ public class UIManager : MonoBehaviour
     public static UIAnimManager s_UIAnimManager;   //UI动画管理器
     public static UIStackManager s_UIStackManager; //UI栈管理器
     public static Camera s_UIcamera;               //UICamera
+    public static EventSystem s_EventSystem;
 
     static public Dictionary<string, List<UIWindowBase>> s_UIs     = new Dictionary<string, List<UIWindowBase>>(); //打开的UI
     static public Dictionary<string, List<UIWindowBase>> s_hideUIs = new Dictionary<string, List<UIWindowBase>>(); //隐藏的UI
@@ -35,8 +37,7 @@ public class UIManager : MonoBehaviour
         s_UIAnimManager  = instance.GetComponent<UIAnimManager>();
         s_UIStackManager = instance.GetComponent<UIStackManager>();
         s_UIcamera       = instance.GetComponentInChildren<Camera>();
-
-
+        s_EventSystem = instance.GetComponentInChildren<EventSystem>();
         DontDestroyOnLoad(instance);
     }
 
@@ -68,7 +69,23 @@ public class UIManager : MonoBehaviour
         DontDestroyOnLoad(instance);
     }
 
-#endregion
+    #endregion
+
+    #region EventSystem
+
+    public static void SetEventSystemEnable(bool enable)
+    {
+        if(s_EventSystem != null)
+        {
+            s_EventSystem.enabled = enable;
+        }
+        else
+        {
+            Debug.LogError("EventSystem.current is null !");
+        }
+    }
+
+    #endregion
 
     #region UI的打开与关闭方法
 
@@ -81,12 +98,17 @@ public class UIManager : MonoBehaviour
     {
         return (T)CreateUIWindow(typeof(T).Name);
     }
+
     public static UIWindowBase CreateUIWindow(string UIName)
     {
         GameObject UItmp = GameObjectManager.CreateGameObject(UIName, s_UIManagerGo);
         UIWindowBase UIbase = UItmp.GetComponent<UIWindowBase>();
         UISystemEvent.Dispatch(UIbase, UIEvent.OnInit);  //派发OnInit事件
-        try{
+
+        UIbase.windowStatus = UIWindowBase.WindowStatus.Create;
+
+        try
+        {
             UIbase.Init(GetUIID(UIName));
         }
         catch(Exception e)
@@ -121,6 +143,8 @@ public class UIManager : MonoBehaviour
 
         s_UIStackManager.OnUIOpen(UIbase);
         s_UILayerManager.SetLayer(UIbase);      //设置层级
+
+        UIbase.windowStatus = UIWindowBase.WindowStatus.OpenAnim;
 
         UISystemEvent.Dispatch(UIbase, UIEvent.OnOpen);  //派发OnOpen事件
         try
@@ -165,7 +189,7 @@ public class UIManager : MonoBehaviour
             {
                 callback = CloseUIWindowCallBack;
             }
-
+            UI.windowStatus = UIWindowBase.WindowStatus.CloseAnim;
             s_UIAnimManager.StartExitAnim(UI, callback, objs);
         }
         else
@@ -175,6 +199,7 @@ public class UIManager : MonoBehaviour
     }
     static void CloseUIWindowCallBack(UIWindowBase UI, params object[] objs)
     {
+        UI.windowStatus = UIWindowBase.WindowStatus.Close;
         UISystemEvent.Dispatch(UI, UIEvent.OnClose);  //派发OnClose事件
         try
         {
@@ -215,7 +240,9 @@ public class UIManager : MonoBehaviour
 
     public static UIWindowBase ShowUI(UIWindowBase ui)
     {
+        ui.windowStatus = UIWindowBase.WindowStatus.Open;
         UISystemEvent.Dispatch(ui, UIEvent.OnShow);  //派发OnShow事件
+
         try
         {
             ui.Show();
@@ -237,6 +264,7 @@ public class UIManager : MonoBehaviour
 
     public static UIWindowBase HideUI(UIWindowBase ui)
     {
+        ui.windowStatus = UIWindowBase.WindowStatus.Hide;
         UISystemEvent.Dispatch(ui, UIEvent.OnHide);  //派发OnHide事件
 
         try
@@ -398,7 +426,7 @@ public class UIManager : MonoBehaviour
     {
         if (!s_UIs.ContainsKey(UIname))
         {
-            //Debug.Log("!ContainsKey " + l_UIname);
+            //Debug.Log("!ContainsKey " + UIname);
             return null;
         }
         else
@@ -566,6 +594,12 @@ public class UIManager : MonoBehaviour
         }
 
         s_hideUIs.Clear();
+    }
+
+    public static T GetHideUI<T>() where T:UIWindowBase
+    {
+        string UIname = typeof(T).Name;
+        return (T)GetHideUI(UIname);
     }
 
     /// <summary>

@@ -248,10 +248,13 @@ public class DataTable : Dictionary<string, SingleData>
 
         //type
         List<string> type = new List<string>(data.m_tableTypes.Keys);
+        Debug.Log("type count " + type.Count);
+        build.Append(c_fieldTypeTableTitle);
+
         if (type.Count > 0)
         {
-            build.Append(c_fieldTypeTableTitle);
             build.Append(c_split);
+
             for (int i = 1; i < data.TableKeys.Count; i++)
             {
                 string key = data.TableKeys[i];
@@ -290,13 +293,19 @@ public class DataTable : Dictionary<string, SingleData>
                 }
             }
         }
+        else
+        {
+            build.Append(c_newline);
+        }
 
         //note
         List<string> noteValue = new List<string>(data.m_noteValue.Keys);
+        build.Append(c_noteTableTitle);
+
         if (noteValue.Count > 0)
         {
-            build.Append(c_noteTableTitle);
             build.Append(c_split);
+
             for (int i = 1; i < data.TableKeys.Count; i++)
             {
                 string key = data.TableKeys[i];
@@ -323,14 +332,20 @@ public class DataTable : Dictionary<string, SingleData>
                 }
             }
         }
+        else
+        {
+            build.Append(c_newline);
+        }
 
         //defauleValue
         List<string> defaultValue = new List<string>(data.m_defaultValue.Keys);
 
+        build.Append(c_defaultValueTableTitle);
+
         if (defaultValue.Count >0)
         {
-            build.Append(c_defaultValueTableTitle);
-            build.Append(c_split);
+             build.Append(c_split);
+
             for (int i = 1; i < data.TableKeys.Count; i++)
             {
                 string key = data.TableKeys[i];
@@ -356,6 +371,10 @@ public class DataTable : Dictionary<string, SingleData>
                     build.Append(c_newline);
                 }
             }
+        }
+        else
+        {
+            build.Append(c_newline);
         }
 
         //value
