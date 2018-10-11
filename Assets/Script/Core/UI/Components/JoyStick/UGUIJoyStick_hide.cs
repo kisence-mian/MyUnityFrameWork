@@ -27,7 +27,7 @@ public class UGUIJoyStick_hide : UIBase, IDragHandler, IEndDragHandler, IBeginDr
     {
         //计算摇杆块的半径
         mRadius =( bg.sizeDelta.x - content.sizeDelta.x) * 0.5f;
-        referenceResolution = UIManager.s_UIManagerGo.GetComponent<CanvasScaler>().referenceResolution;
+        referenceResolution = UIManager.UIManagerGo.GetComponent<CanvasScaler>().referenceResolution;
         conversionX = referenceResolution.x / Screen.width;
         conversionY = referenceResolution.y / Screen.height;
         rocker.SetActive(false);

@@ -22,7 +22,7 @@ public class UGUIJoyStick : UIBase, IDragHandler, IEndDragHandler,IBeginDragHand
     {
         //计算摇杆块的半径
         mRadius = ((transform as RectTransform).sizeDelta.x-content.sizeDelta.x) * 0.5f;
-        Vector2 referenceResolution = UIManager.s_UIManagerGo.GetComponent<CanvasScaler>().referenceResolution;
+        Vector2 referenceResolution = UIManager.UIManagerGo.GetComponent<CanvasScaler>().referenceResolution;
         conversionX =  referenceResolution.x / Screen.width ;
         conversionY =  referenceResolution.y/Screen.height ;
     }

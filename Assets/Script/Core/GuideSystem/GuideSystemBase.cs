@@ -259,6 +259,11 @@ namespace FrameWork.GuideSystem
 
         }
 
+        protected virtual GuideWindowBase OpenGuideWindow()
+        {
+            return (GuideWindowBase)UIManager.OpenUIWindow(c_guideWindowName);
+        }
+
         /// <summary>
         /// 引导点击过滤器,返回true通过
         /// </summary>
@@ -404,7 +409,7 @@ namespace FrameWork.GuideSystem
 
             SetCurrent(LoadFirstGuide());
 
-            m_guideWindowBase = (GuideWindowBase)UIManager.OpenUIWindow(c_guideWindowName);
+            m_guideWindowBase = OpenGuideWindow();
 
             OnStart();
 
@@ -430,8 +435,7 @@ namespace FrameWork.GuideSystem
             m_isStart = false;
             m_isOperationUI = false;
 
-            if (m_guideWindowBase != null)
-                UIManager.CloseUIWindow(m_guideWindowBase);
+             CloseGuideWindow(m_guideWindowBase);
 
             m_guideWindowBase = null;
 
@@ -446,7 +450,11 @@ namespace FrameWork.GuideSystem
                 ApplicationManager.s_OnApplicationUpdate -= Update;
             }
         }
-
+        protected virtual void CloseGuideWindow( GuideWindowBase m_guideWindowBase)
+        {
+            if (m_guideWindowBase != null)
+                UIManager.CloseUIWindow(m_guideWindowBase);
+        }
         void NextGuide()
         {
             //

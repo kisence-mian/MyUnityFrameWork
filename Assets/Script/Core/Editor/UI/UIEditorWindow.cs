@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 public class UIEditorWindow : EditorWindow
 {
+    UIManager m_UIManager;
     UILayerManager m_UILayerManager;
 
     [MenuItem("Window/UI编辑器工具", priority = 600)]
@@ -24,6 +25,7 @@ public class UIEditorWindow : EditorWindow
 
         if(uiManager)
         {
+            m_UIManager = uiManager.GetComponent<UIManager>();
             m_UILayerManager = uiManager.GetComponent<UILayerManager>();
         }
 
@@ -40,6 +42,8 @@ public class UIEditorWindow : EditorWindow
         EditorGUILayout.BeginVertical();
 
         UIManagerGUI();
+
+
 
         CreateUIGUI();
 
@@ -89,8 +93,43 @@ public class UIEditorWindow : EditorWindow
             {
                 UICreateService.CreatUIManager(m_referenceResolution, m_MatchMode, m_isOnlyUICamera, m_isVertical);
             }
+
+            CreateUICameraGUI();
         }
     }
+
+    #region CreateUICamera
+
+    bool isCreateUICamera = false;
+    string cameraKey;
+    float cameraDepth = 1;
+
+    void CreateUICameraGUI()
+    {
+        isCreateUICamera = EditorGUILayout.Foldout(isCreateUICamera, "CreateUICamera:");
+        if (isCreateUICamera)
+        {
+            EditorGUI.indentLevel = 2;
+            cameraKey = EditorGUILayout.TextField("Camera Key", cameraKey);
+            cameraDepth = EditorGUILayout.FloatField("Camera Depth", cameraDepth);
+
+            if (cameraKey != "")
+            {
+                if (GUILayout.Button("CreateUICamera"))
+                {
+                    UICreateService.CreateUICamera(m_UIManager, cameraKey, cameraDepth,m_referenceResolution, m_MatchMode, m_isOnlyUICamera, m_isVertical);
+                    cameraKey = "";
+                }
+            }
+            else
+            {
+                EditorGUILayout.LabelField("Camera Key 不能为空");
+            }
+
+        }
+    }
+
+    #endregion
 
     #endregion
 
@@ -101,6 +140,8 @@ public class UIEditorWindow : EditorWindow
     bool isUseLua = true;
     bool isFoldCreateUI = false;
     string m_UIname = "";
+    int m_UICameraKeyIndex = 0;
+    string[] cameraKeyList;
     UIType m_UIType = UIType.Normal;
 
     void CreateUIGUI()
@@ -110,9 +151,14 @@ public class UIEditorWindow : EditorWindow
 
         if (isFoldCreateUI)
         {
+            cameraKeyList = UIManager.GetCameraNames();
+
             EditorGUI.indentLevel = 1;
             EditorGUILayout.LabelField("提示： 脚本和 UI 名称会自动添加Window后缀");
             m_UIname = EditorGUILayout.TextField("UI Name:", m_UIname);
+
+            m_UICameraKeyIndex = EditorGUILayout.Popup("Camera", m_UICameraKeyIndex, cameraKeyList);
+
             m_UIType = (UIType)EditorGUILayout.EnumPopup("UI Type:", m_UIType);
 
             isUseLua = EditorGUILayout.Toggle("使用 Lua", isUseLua);
@@ -138,7 +184,7 @@ public class UIEditorWindow : EditorWindow
                         {
                             if (GUILayout.Button("创建UI"))
                             {
-                                UICreateService.CreatUI(l_nameTmp, m_UIType, m_UILayerManager, isAutoCreatePrefab);
+                                UICreateService.CreatUI(l_nameTmp, cameraKeyList[m_UICameraKeyIndex], m_UIType, m_UILayerManager, isAutoCreatePrefab);
                                 m_UIname = "";
                             }
                         }

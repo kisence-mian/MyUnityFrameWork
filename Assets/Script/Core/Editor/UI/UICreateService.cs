@@ -19,16 +19,53 @@ public class UICreateService
         //UIManager
         GameObject UIManagerGo = new GameObject("UIManager");
         UIManagerGo.layer = LayerMask.NameToLayer("UI");
-        //UIManager UIManager = UIManagerGo.AddComponent<UIManager>();
-        UIManagerGo.AddComponent<UIManager>();
+        UIManager UIManager = UIManagerGo.AddComponent<UIManager>();
+
+        CreateUICamera(UIManager, "DefaultUI",1, referenceResolution, MatchMode, isOnlyUICamera, isVertical);
+
+        ProjectWindowUtil.ShowCreatedAsset(UIManagerGo);
+
+        //保存UIManager
+        ReSaveUIManager(UIManagerGo);
+    }
+
+    public static void CreateUICamera(UIManager UIManager,string key, float cameraDepth, Vector2 referenceResolution, CanvasScaler.ScreenMatchMode MatchMode, bool isOnlyUICamera, bool isVertical)
+    {
+        UILayerManager.UICameraData uICameraData = new UILayerManager.UICameraData();
+
+        uICameraData.m_key = key;
+
+        GameObject UIManagerGo = UIManager.gameObject;
+        GameObject canvas = new GameObject(key);
+        RectTransform canvasRt = canvas.AddComponent<RectTransform>();
+
+        canvasRt.SetParent(UIManagerGo.transform);
+        uICameraData.m_root = canvas;
 
         //UIcamera
         GameObject cameraGo = new GameObject("UICamera");
-        cameraGo.transform.SetParent(UIManagerGo.transform);
+        cameraGo.transform.SetParent(canvas.transform);
         cameraGo.transform.localPosition = new Vector3(0, 0, -1000);
         Camera camera = cameraGo.AddComponent<Camera>();
         camera.cullingMask = LayerMask.GetMask("UI");
         camera.orthographic = true;
+        camera.depth = cameraDepth;
+        uICameraData.m_camera = camera;
+
+        //Canvas
+        Canvas canvasComp = canvas.AddComponent<Canvas>();
+        canvasComp.renderMode = RenderMode.ScreenSpaceCamera;
+        canvasComp.worldCamera = camera;
+
+        //UI Raycaster
+        canvas.AddComponent<GraphicRaycaster>();
+
+        //CanvasScaler
+        CanvasScaler scaler = canvas.AddComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = referenceResolution;
+        scaler.screenMatchMode = MatchMode;
+
         if (!isOnlyUICamera)
         {
             camera.clearFlags = CameraClearFlags.Depth;
@@ -39,22 +76,6 @@ public class UICreateService
             camera.clearFlags = CameraClearFlags.SolidColor;
             camera.backgroundColor = Color.black;
         }
-
-        //Canvas
-        Canvas canvas = UIManagerGo.AddComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = camera;
-
-        //UI Raycaster
-        //GraphicRaycaster Graphic = UIManagerGo.AddComponent<GraphicRaycaster>();
-        UIManagerGo.AddComponent<GraphicRaycaster>();
-
-        //CanvasScaler
-        CanvasScaler scaler = UIManagerGo.AddComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = referenceResolution;
-        scaler.screenMatchMode = MatchMode;
-
         if (isVertical)
         {
             scaler.matchWidthOrHeight = 1;
@@ -67,73 +88,77 @@ public class UICreateService
         //挂载点
         GameObject goTmp = null;
         RectTransform rtTmp = null;
-        UILayerManager layerTmp = UIManagerGo.GetComponent<UILayerManager>();
+        UILayerManager UILayerManager = UIManagerGo.GetComponent<UILayerManager>();
 
         goTmp = new GameObject("GameUI");
         goTmp.layer = LayerMask.NameToLayer("UI");
-        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.SetParent(canvas.transform);
         goTmp.transform.localScale = Vector3.one;
         rtTmp = goTmp.AddComponent<RectTransform>();
         rtTmp.anchorMax = new Vector2(1, 1);
         rtTmp.anchorMin = new Vector2(0, 0);
         rtTmp.anchoredPosition3D = Vector3.zero;
         rtTmp.sizeDelta = Vector2.zero;
-        layerTmp.m_GameUILayerParent = goTmp.transform;
+        uICameraData.m_GameUILayerParent = goTmp.transform;
 
         goTmp = new GameObject("Fixed");
         goTmp.layer = LayerMask.NameToLayer("UI");
-        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.SetParent(canvas.transform);
         goTmp.transform.localScale = Vector3.one;
         rtTmp = goTmp.AddComponent<RectTransform>();
         rtTmp.anchorMax = new Vector2(1, 1);
         rtTmp.anchorMin = new Vector2(0, 0);
         rtTmp.anchoredPosition3D = Vector3.zero;
         rtTmp.sizeDelta = Vector2.zero;
-        layerTmp.m_FixedLayerParent = goTmp.transform;
+        uICameraData.m_FixedLayerParent = goTmp.transform;
 
         goTmp = new GameObject("Normal");
         goTmp.layer = LayerMask.NameToLayer("UI");
-        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.SetParent(canvas.transform);
         goTmp.transform.localScale = Vector3.one;
         rtTmp = goTmp.AddComponent<RectTransform>();
         rtTmp.anchorMax = new Vector2(1, 1);
         rtTmp.anchorMin = new Vector2(0, 0);
         rtTmp.anchoredPosition3D = Vector3.zero;
         rtTmp.sizeDelta = Vector2.zero;
-        layerTmp.m_NormalLayerParent = goTmp.transform;
+        uICameraData.m_NormalLayerParent = goTmp.transform;
 
         goTmp = new GameObject("TopBar");
         goTmp.layer = LayerMask.NameToLayer("UI");
-        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.SetParent(canvas.transform);
         goTmp.transform.localScale = Vector3.one;
         rtTmp = goTmp.AddComponent<RectTransform>();
         rtTmp.anchorMax = new Vector2(1, 1);
         rtTmp.anchorMin = new Vector2(0, 0);
         rtTmp.anchoredPosition3D = Vector3.zero;
         rtTmp.sizeDelta = Vector2.zero;
-        layerTmp.m_TopbarLayerParent = goTmp.transform;
+        uICameraData.m_TopbarLayerParent = goTmp.transform;
 
         goTmp = new GameObject("PopUp");
         goTmp.layer = LayerMask.NameToLayer("UI");
-        goTmp.transform.SetParent(UIManagerGo.transform);
+        goTmp.transform.SetParent(canvas.transform);
         goTmp.transform.localScale = Vector3.one;
         rtTmp = goTmp.AddComponent<RectTransform>();
         rtTmp.anchorMax = new Vector2(1, 1);
         rtTmp.anchorMin = new Vector2(0, 0);
         rtTmp.anchoredPosition3D = Vector3.zero;
         rtTmp.sizeDelta = Vector2.zero;
-        layerTmp.m_PopUpLayerParent = goTmp.transform;
-        //m_UILayerManager = layerTmp;
+        uICameraData.m_PopUpLayerParent = goTmp.transform;
 
-        ProjectWindowUtil.ShowCreatedAsset(UIManagerGo);
+        UILayerManager.UICameraList.Add(uICameraData);
 
+        //重新保存
+        ReSaveUIManager(UIManagerGo);
+    }
+
+    static void ReSaveUIManager(GameObject UIManagerGo)
+    {
         string Path = "Resources/UI/UIManager.prefab";
         FileTool.CreatFilePath(Application.dataPath + "/" + Path);
         PrefabUtility.CreatePrefab("Assets/" + Path, UIManagerGo, ReplacePrefabOptions.ConnectToPrefab);
-
     }
 
-    public static void CreatUI(string UIWindowName, UIType UIType,UILayerManager UILayerManager,bool isAutoCreatePrefab)
+    public static void CreatUI(string UIWindowName, string UIcameraKey,UIType UIType,UILayerManager UILayerManager,bool isAutoCreatePrefab)
     {
         GameObject uiGo = new GameObject(UIWindowName);
 
@@ -340,9 +365,9 @@ public class UICreateService
 
         guideBaseTmp.m_objectList.Add(Text_tips);
 
-        guideBaseTmp.m_mask = img;
-        guideBaseTmp.m_TipText = text;
-        guideBaseTmp.m_TipTransfrom = txt_tipsrt;
+        //guideBaseTmp.m_mask = img;
+        //guideBaseTmp.m_TipText = text;
+        //guideBaseTmp.m_TipTransfrom = txt_tipsrt;
 
         guideBaseTmp.m_bgMask = BgGo;
         guideBaseTmp.m_uiRoot = rootGo;

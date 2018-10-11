@@ -16,8 +16,6 @@ public class LanguageManager
     public const string c_mainKey  = "key";
     public const string c_valueKey = "value";
 
-
-
     static public List<string> s_LanguageList = new List<string>();                    //语言列表
     static public List<string> s_modelList = new List<string>();                       //模块列表
     static public SystemLanguage s_defaultlanguage = SystemLanguage.ChineseSimplified; //默认语言

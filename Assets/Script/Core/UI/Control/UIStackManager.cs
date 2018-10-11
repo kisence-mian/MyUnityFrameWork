@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class UIStackManager : MonoBehaviour
 {
-    List<UIWindowBase> m_normalStack = new List<UIWindowBase>();
-    List<UIWindowBase> m_fixedStack  = new List<UIWindowBase>();
-    List<UIWindowBase> m_popupStack  = new List<UIWindowBase>();
-    List<UIWindowBase> m_topBarStack = new List<UIWindowBase>();
+    public List<UIWindowBase> m_normalStack = new List<UIWindowBase>();
+    public List<UIWindowBase> m_fixedStack  = new List<UIWindowBase>();
+    public List<UIWindowBase> m_popupStack  = new List<UIWindowBase>();
+    public List<UIWindowBase> m_topBarStack = new List<UIWindowBase>();
 
     public void OnUIOpen(UIWindowBase ui)
     {

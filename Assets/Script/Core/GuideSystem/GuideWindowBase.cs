@@ -2,17 +2,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine.UI;
+using System;
 
 namespace FrameWork.GuideSystem
 {
     public class GuideWindowBase : UIWindowBase
     {
-        List<PoolObject> m_effectList = new List<PoolObject>();
-        List<RectTransform> m_uiList = new List<RectTransform>();
+        protected List<PoolObject> m_effectList = new List<PoolObject>();
+        protected List<RectTransform> m_uiList = new List<RectTransform>();
 
-        public Image m_mask;
-        public Text m_TipText;
-        public RectTransform m_TipTransfrom;
+        protected Image m_mask;
+        protected Text m_TipText;
+        protected RectTransform m_TipTransfrom;
+
+        public override void OnOpen()
+        {
+            m_mask = GetImage("mask");
+            m_TipText = GetText("Text_tip");
+            m_TipTransfrom = GetRectTransform("Tips");
+
+            OnOpenUI();
+        }
+
+        protected virtual void OnOpenUI()
+        {
+           
+        }
 
         #region 特效相关
         public GameObject CreateEffect(string effectName)

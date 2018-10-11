@@ -12,7 +12,6 @@ public class LanguageComponmentEditor : Editor
     LanguageComponent m_lc;
     List<string> m_languageList;
   
-
     public override void OnInspectorGUI()
     {
         if (m_lc == null)

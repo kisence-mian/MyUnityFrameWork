@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 public abstract class IApplicationStatus
 {
+    #region UI 管理
+
     List<UIWindowBase> m_uiList = new List<UIWindowBase>();
 
     public T OpenUI<T>() where T: UIWindowBase
@@ -66,6 +68,11 @@ public abstract class IApplicationStatus
         }
         m_uiList.Clear();
     }
+
+    #endregion
+
+    #region 生命周期
+
     /// <summary>
     /// 当状态第一次创建时调用（生命周期里只调用一次）
     /// </summary>
@@ -109,7 +116,6 @@ public abstract class IApplicationStatus
     {
 
     }
-
     public virtual IEnumerator InChangeScene(ChangSceneFinish handle)
     {
         if (handle != null)
@@ -118,14 +124,16 @@ public abstract class IApplicationStatus
             {
                 handle();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.LogError(e.ToString());
             }
         }
 
-        yield  break;
+        yield break;
     }
+
+    #endregion
 
     public delegate void ChangSceneFinish();
 }

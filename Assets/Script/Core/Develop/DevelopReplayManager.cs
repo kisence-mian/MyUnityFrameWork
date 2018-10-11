@@ -89,9 +89,9 @@ public class DevelopReplayManager
 
             //关闭正常输入，保证回放数据准确
             IInputProxyBase.IsActive = false;
-            InputUIEventProxy.IsActive = false;
-            InputOperationEventProxy.IsActive = false;
-            InputNetworkEventProxy.IsActive = false;
+            //InputUIEventProxy.IsActive = false;
+            //InputOperationEventProxy.IsActive = false;
+            //InputNetworkEventProxy.IsActive = false;
         }
         else
         {
@@ -333,15 +333,24 @@ public class DevelopReplayManager
 
     #region ReplayListGUI
 
+    static bool isUploadReplay;
+
     static void ReplayListGUI()
     {
         scrollPos = GUILayout.BeginScrollView(scrollPos);
 
         for (int i = 0; i < FileNameList.Length; i++)
         {
-            if (GUILayout.Button(FileNameList[i]))
+            if (GUILayout.Button("上传 " + FileNameList[i]))
             {
-                ChoseReplayMode(true, FileNameList[i]);
+                if(!isUploadReplay)
+                {
+                    ChoseReplayMode(true, FileNameList[i]);
+                }
+                else
+                {
+
+                }
             }
         }
 
@@ -355,6 +364,11 @@ public class DevelopReplayManager
                 FileTool.SafeDeleteDirectory(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, c_directoryName));
                 FileNameList = new string[0];
             });
+        }
+
+        if (GUILayout.Button("上传模式 ： " + isUploadReplay))
+        {
+            isUploadReplay = !isUploadReplay;
         }
 
         if (GUILayout.Button("返回上层"))

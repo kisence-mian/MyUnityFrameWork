@@ -5,12 +5,14 @@ using System;
 
 public class UIWindowBase : UIBase 
 {
+    [HideInInspector]
+    public string cameraKey;
     public UIType m_UIType;
+
+    public WindowStatus windowStatus;
 
     public GameObject m_bgMask;
     public GameObject m_uiRoot;
-
-    public WindowStatus windowStatus;
 
     #region 重载方法
 

@@ -77,7 +77,6 @@ public class LanguageDataEditorWindow : EditorWindow
         //GUI.skin.label.fontSize = 11;
         if (!Application.isPlaying)
         {
-           
             SelectLanguageGUI();
             DefaultLanguageGUI();
             SelectEditorModuleGUI();
@@ -198,10 +197,9 @@ public class LanguageDataEditorWindow : EditorWindow
         List<string> languageList = new List<string>();
         foreach (var item in s_languageList)
         {
-             
-                languageList.Add(item);
-            
+            languageList.Add(item);
         }
+
         config.Add(LanguageManager.c_languageListKey, new SingleField(languageList));
 
         //保存模块列表
