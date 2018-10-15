@@ -701,6 +701,7 @@ public class UIBase : MonoBehaviour
         GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, GetGameObject(prantName), isActive);
 
         item.transform.localScale = Vector3.one;
+        item.transform.localPosition = Vector3.zero;
         UIBase UIItem = item.GetComponent<UIBase>();
 
         if (UIItem == null)
@@ -720,6 +721,7 @@ public class UIBase : MonoBehaviour
         GameObject item = GameObjectManager.CreateGameObjectByPool(itemObj, parent, isActive);
 
         item.transform.localScale = Vector3.one;
+        item.transform.localPosition = Vector3.zero;
         UIBase UIItem = item.GetComponent<UIBase>();
 
         if (UIItem == null)

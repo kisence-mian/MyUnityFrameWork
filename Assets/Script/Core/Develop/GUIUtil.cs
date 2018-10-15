@@ -80,8 +80,8 @@ public class GUIUtil
 
     const int tipWindowStartID = 1000;
 
-    const float tipWidth = 600;
-    const float tipHeight = 500;
+    static float tipWidth = Screen.width/2;
+    static float tipHeight = Screen.height / 2;
     static void TipsGUI()
     {
         int lastID = 0;
@@ -113,11 +113,15 @@ public class GUIUtil
         return pos;
     }
 
+    static Vector2 TipsScrollPos = Vector2.zero;
+
     static void TipsWindow(int windowID)
     {
+        TipsScrollPos = GUILayout.BeginScrollView(TipsScrollPos);
         GUILayout.Label(tiplist[windowID - tipWindowStartID], GUILayout.ExpandHeight(true));
+        GUILayout.EndScrollView();
 
-        if( GUILayout.Button("OK"))
+        if ( GUILayout.Button("OK"))
         {
             tiplist.RemoveAt(windowID - tipWindowStartID);
             if(tiplist.Count == 0)

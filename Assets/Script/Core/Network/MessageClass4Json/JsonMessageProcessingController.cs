@@ -21,6 +21,12 @@ public class JsonMessageProcessingController
 
     private static void MessageReceiveCallBack(InputNetworkMessageEvent inputEvent)
     {
+        //心跳包
+        if (inputEvent.m_MessgaeType == "HB")
+        {
+            return;
+        }
+
         if (ApplicationManager.Instance.m_AppMode != AppMode.Release)
             Debug.Log("MessageReceiveCallBack ;" + JsonUtils.ToJson(inputEvent));
 

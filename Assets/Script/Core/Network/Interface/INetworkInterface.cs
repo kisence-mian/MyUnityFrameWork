@@ -13,6 +13,14 @@ public abstract class INetworkInterface
     {
     }
 
+    public virtual void Dispose()
+    {
+        m_messageCallBack = null;
+
+        m_socketService.Dispose();
+        m_socketService = null;
+    }
+
     public virtual void GetIPAddress()
     {
 

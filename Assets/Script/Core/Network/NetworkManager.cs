@@ -8,6 +8,7 @@ using System.Net.Sockets;
 public class NetworkManager 
 {
     static INetworkInterface s_network;
+    static HeartBeatBase s_heatBeat;
 
     public static bool IsConnect
     {
@@ -20,6 +21,8 @@ public class NetworkManager
             return s_network.m_socketService.isConnect;
         }
     }
+
+    #region 初始化
 
     /// <summary>
     /// 对旧代码的兼容
@@ -50,7 +53,6 @@ public class NetworkManager
         s_network = new TProtocol();
         s_network.m_socketService = new TSocket();
 
-        //ApplicationManager.s_OnApplicationOnGUI += GUI;
         NetInit();
     }
 
@@ -80,57 +82,28 @@ public class NetworkManager
 
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationQuit += DisConnect;
-
-        HeatBeatInit();
     }
 
-    private static byte[] heatBeatMsg;
-    private static void HeatBeatInit()
+    public static void InitHeartBeat<T>(int spaceTime = 15) where T:HeartBeatBase,new()
     {
-        heatBeatMsg = System.Text.Encoding.UTF8.GetBytes("&");
+        s_heatBeat = new T();
+        s_heatBeat.Init(spaceTime);
     }
-    #region 心跳包操作 HeatBeat
-    private static float heatBeatDelayTime = 3f;
-    /// <summary>
-    /// 设置心跳包发送间隔时间
-    /// </summary>
-    public static float HeatBeatDelayTime
-    {
-        get
-        {
-            return heatBeatDelayTime;
-        }
 
-        set
-        {
-            heatBeatDelayTime =Mathf.Clamp( value,2f,100);
-        }
-    }
-    private static float tempHeatBeatTimer;
-    private static bool startSendHeatBeat = false;
-    private static void StartSendHeatBeatMsg()
-    {
-        if (startSendHeatBeat)
-        {
-            if(tempHeatBeatTimer<=0)
-            {
-                tempHeatBeatTimer = HeatBeatDelayTime;
-                SendMessage(heatBeatMsg);
-            }
-            else
-            {
-                tempHeatBeatTimer -= Time.unscaledDeltaTime;
-            }
-        }
-    }
     #endregion
+
+    #region API
+
     public static void Dispose()
     {
         InputManager.UnLoadDispatcher<InputNetworkConnectStatusEvent>();
         InputManager.UnLoadDispatcher<InputNetworkMessageEvent>();
 
-        s_network.m_messageCallBack = null;
+        s_network.Dispose();
         s_network = null;
+
+        s_heatBeat.Dispose();
+        s_heatBeat = null;
 
         ApplicationManager.s_OnApplicationUpdate -= Update;
     }
@@ -141,7 +114,6 @@ public class NetworkManager
     }
     public static void Connect()
     {
-        //s_network.GetIPAddress();
         s_network.Connect();
     }
 
@@ -192,6 +164,10 @@ public class NetworkManager
         }
     }
 
+    #endregion
+
+    #region 事件派发
+
     static int msgCount = 0;
 
     static void ReceviceMeaasge(NetWorkMessage message)
@@ -232,16 +208,9 @@ public class NetworkManager
     static void Dispatch(NetworkState status)
     {
         InputNetworkEventProxy.DispatchStatusEvent(status);
-
-        if(status == NetworkState.Connected)
-        {
-            startSendHeatBeat = true;
-        }
-        else
-        {
-            startSendHeatBeat = false;
-        }
     }
+
+    #endregion
 
     #region Update
 
@@ -254,24 +223,14 @@ public class NetworkManager
     {
         if (s_messageList.Count > 0)
         {
-            int dealCount = 0;
             for (int i = 0; i < s_messageList.Count; i++)
             {
-                dealCount++;
                 Dispatch(s_messageList[i]);
 
                 s_messageList.RemoveAt(i);
                 i--;
-
-                //if (dealCount >= MaxDealCount)
-                //{
-                //    Debug.Log("s_messageList.Count " + s_messageList.Count);
-
-                //    break;
-                //}
             }
         }
-
 
         if (s_statusList.Count > 0)
         {
@@ -281,29 +240,18 @@ public class NetworkManager
             }
             s_statusList.Clear();
         }
-       if(s_network != null)
+
+        if (s_network != null)
         {
             s_network.Update();
         }
 
-        StartSendHeatBeatMsg();
-
+        if(s_heatBeat != null && IsConnect)
+        {
+            s_heatBeat.Update();
+        }
     }
-    //static float msgCountTimer = 0;
-    //static int count = 0;
-    //static void GUI()
-    //{
-    //    msgCountTimer += Time.deltaTime;
-    //    GUILayout.Label("MPS " + count);
 
-    //    if (msgCountTimer > 1)
-    //    {
-    //        count = msgCount;
-    //        msgCountTimer = 0;
-    //        msgCount = 0;
-    //    }
-
-    //}
    
     #endregion
 }

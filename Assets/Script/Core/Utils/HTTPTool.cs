@@ -116,10 +116,10 @@ public class HTTPTool
             }
             catch (Exception e)
             {
-                Debug.Log(files[0] + "上传失败 " + e.ToString());
+                Debug.Log(files[0] + "上传失败 \n" + e.ToString());
                 if (callBack != null)
                 {
-                    callBack(files[0] + "上传完成 " + e.ToString());
+                    callBack(files[0] + "上传失败 \n" + e.ToString());
                 }
             }
         }

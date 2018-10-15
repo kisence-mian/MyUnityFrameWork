@@ -89,9 +89,6 @@ public class DevelopReplayManager
 
             //关闭正常输入，保证回放数据准确
             IInputProxyBase.IsActive = false;
-            //InputUIEventProxy.IsActive = false;
-            //InputOperationEventProxy.IsActive = false;
-            //InputNetworkEventProxy.IsActive = false;
         }
         else
         {
@@ -218,23 +215,31 @@ public class DevelopReplayManager
 
     public static void LoadReplayFile(string fileName)
     {
-        string eventContent = ResourceIOTool.ReadStringByFile(
-            PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
-                                     PathTool.GetRelativelyPath(
-                                                    c_directoryName,
-                                                    fileName,
-                                                    c_eventExpandName)));
-
-        string randomContent = ResourceIOTool.ReadStringByFile(
-            PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
-                                     PathTool.GetRelativelyPath(
-                                                    c_directoryName,
-                                                    fileName,
-                                                    c_randomExpandName)));
+        string eventContent = ResourceIOTool.ReadStringByFile(GetReplayEventFilePath(fileName));
+        string randomContent = ResourceIOTool.ReadStringByFile(GetReplayRandomFilePath(fileName));
 
         LoadEventStream(eventContent.Split('\n'));
         LoadRandomList(randomContent.Split('\n'));
     }
+
+    public static string GetReplayEventFilePath(string fileName)
+    {
+        return PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
+                                     PathTool.GetRelativelyPath(
+                                                    c_directoryName,
+                                                    fileName,
+                                                    c_eventExpandName));
+    }
+
+    public static string GetReplayRandomFilePath(string fileName)
+    {
+        return PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
+                                     PathTool.GetRelativelyPath(
+                                                    c_directoryName,
+                                                    fileName,
+                                                    c_randomExpandName));
+    }
+
     public static Deserializer Deserializer = new Deserializer();
     static void LoadEventStream(string[] content)
     {
@@ -341,15 +346,22 @@ public class DevelopReplayManager
 
         for (int i = 0; i < FileNameList.Length; i++)
         {
-            if (GUILayout.Button("上传 " + FileNameList[i]))
+            if (!isUploadReplay)
             {
-                if(!isUploadReplay)
+                if (GUILayout.Button(FileNameList[i]))
                 {
                     ChoseReplayMode(true, FileNameList[i]);
                 }
-                else
+            }
+            else
+            {
+                if (GUILayout.Button("上传 " + FileNameList[i]))
                 {
+                    string replayPath = GetReplayEventFilePath(FileNameList[i]);
+                    string randomPath = GetReplayRandomFilePath(FileNameList[i]);
 
+                    HTTPTool.Upload_Request_Thread(URLManager.GetURL("ReplayFileUpLoadURL"), replayPath, UploadCallBack);
+                    HTTPTool.Upload_Request_Thread(URLManager.GetURL("ReplayFileUpLoadURL"), randomPath, UploadCallBack);
                 }
             }
         }
@@ -366,9 +378,16 @@ public class DevelopReplayManager
             });
         }
 
-        if (GUILayout.Button("上传模式 ： " + isUploadReplay))
+        if (URLManager.GetURL("ReplayFileUpLoadURL") != null)
         {
-            isUploadReplay = !isUploadReplay;
+            if (GUILayout.Button("上传模式 ： " + isUploadReplay))
+            {
+                isUploadReplay = !isUploadReplay;
+            }
+        }
+        else
+        {
+            GUILayout.Label("上传持久数据需要在 URLConfig -> ReplayFileUpLoadURL 配置上传目录");
         }
 
         if (GUILayout.Button("返回上层"))

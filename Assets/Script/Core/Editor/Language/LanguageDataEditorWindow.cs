@@ -476,7 +476,7 @@ public class LanguageDataEditorWindow : EditorWindow
              m_langeuageDataDict.Add(selectEditorModuleName, data);
 
              SaveData();
-
+             OnEnable();
          });
 
     }

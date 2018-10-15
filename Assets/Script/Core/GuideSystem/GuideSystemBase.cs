@@ -53,7 +53,8 @@ namespace FrameWork.GuideSystem
         DataTable m_guideData;
         protected SingleData m_currentGuideData;
         //int m_currentGuideIndex = 0;
-        string m_currentGuideKey = "";
+       protected string m_currentGuideKey = "";
+       protected string m_startGuideKey = "";
 
         public bool IsStart
         {
@@ -113,7 +114,7 @@ namespace FrameWork.GuideSystem
                 && GuideStartCondition(guideData)
                 && GetGuideSwitch())
             {
-                StartGuide();
+                StartGuide(guideData);
             }
         }
 
@@ -152,10 +153,10 @@ namespace FrameWork.GuideSystem
         /// 保存引导记录
         /// 可以根据情况选择是保存在本地还是发往服务器
         /// </summary>
-        protected virtual void SaveGuideRecord(SingleData data)
+        protected virtual void SaveGuideRecord(string startKey,string currentKey)
         {
-            RecordManager.SaveRecord(c_guideRecordName, data.m_SingleDataKey, true);
-            RecordManager.SaveRecord(c_guideRecordName, c_guideCurrentKeyName, data.m_SingleDataKey);
+            RecordManager.SaveRecord(c_guideRecordName, startKey, true);
+            RecordManager.SaveRecord(c_guideRecordName, c_guideCurrentKeyName, currentKey);
         }
 
         /// <summary>
@@ -403,11 +404,13 @@ namespace FrameWork.GuideSystem
             }
         }
 
-        void StartGuide()
+        void StartGuide(SingleData guideData)
         {
             m_isStart = true;
 
-            SetCurrent(LoadFirstGuide());
+            m_startGuideKey = guideData.m_SingleDataKey;
+
+            SetCurrent(guideData);
 
             m_guideWindowBase = OpenGuideWindow();
 
@@ -425,7 +428,6 @@ namespace FrameWork.GuideSystem
 
                 ApplicationManager.s_OnApplicationUpdate += Update;
             }
-
         }
 
         void EndGuide()
@@ -465,7 +467,7 @@ namespace FrameWork.GuideSystem
 
             //如果是结束点则保存这一步
             if (GuideEndCondition())
-                SaveGuideRecord(m_currentGuideData);
+                SaveGuideRecord(m_startGuideKey,m_currentGuideData.m_SingleDataKey);
 
             SingleData nextGuideData = GetNextGuideData(m_currentGuideData);
 

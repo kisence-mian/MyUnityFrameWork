@@ -24,6 +24,8 @@ public class SocketService : SocketBase
     public override void Close()
     {
         isConnect = false;
+        m_connectStatusCallback(NetworkState.ConnectBreak);
+
         if (m_Socket != null)
         {
             m_Socket.Close(0);
