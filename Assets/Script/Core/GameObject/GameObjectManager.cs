@@ -52,22 +52,16 @@ public class GameObjectManager :MonoBehaviour
         {
             throw new Exception("CreateGameObject error : l_prefab  is null");
         }
-
-        GameObject instanceTmp = Instantiate(prefab);
+        Transform transform = parent == null ? null : parent.transform;
+        GameObject instanceTmp = Instantiate(prefab, transform);
         instanceTmp.name = prefab.name;
-
-        if (parent != null)
-        {
-            instanceTmp.transform.SetParent(parent.transform);
-        }
-        //l_instanceTmp.transform.localScale = Vector3.one;
         return instanceTmp;
     }
 
 
     public static bool IsExist(string objectName)
     {
-        if (objectName == null)
+        if (string.IsNullOrEmpty( objectName))
         {
             Debug.LogError("GameObjectManager objectName is null!");
             return false;
@@ -139,7 +133,15 @@ public class GameObjectManager :MonoBehaviour
              go = s_objectPool[prefab.name][0];
             s_objectPool[prefab.name].RemoveAt(0);
 
-          
+            if (parent == null)
+            {
+                go.transform.SetParent(null);
+            }
+            else
+            {
+                go.transform.SetParent(parent.transform);
+            }
+
         }
         else
         {
@@ -148,22 +150,16 @@ public class GameObjectManager :MonoBehaviour
         if (isSetActive)
             go.SetActive(true);
 
-        if (parent == null)
-        {
-            go.transform.SetParent(null);
-        }
-        else
-        {
-            go.transform.SetParent(parent.transform);
-        }
+        
         return go;
     }
 
     /// <summary>
     /// 将一个对象放入对象池
     /// </summary>
-    /// <param name="obj">目标对象</param>
-    public static void DestroyGameObjectByPool(GameObject obj, bool isSetActive = true)
+    /// <param name="obj"></param>
+    /// <param name="isSetInactive">是否将放入的物体设为不激活状态（obj.SetActive(false)）</param>
+    public static void DestroyGameObjectByPool(GameObject obj, bool isSetInactive = true)
     {
         string key = obj.name.Replace("(Clone)", "");
 
@@ -179,7 +175,7 @@ public class GameObjectManager :MonoBehaviour
 
         s_objectPool[key].Add(obj);
 
-        if(isSetActive)
+        if(isSetInactive)
             obj.SetActive(false);
         else
         {

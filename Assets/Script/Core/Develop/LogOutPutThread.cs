@@ -28,14 +28,14 @@ public class LogOutPutThread
 #if UNITY_EDITOR
             prefix += "_Editor_" + SystemInfo.deviceName;
 #else
-    #if UNITY_ANDROID
-            prefix += "_Android_" + SystemInfo.deviceName;
-    #else
+#if UNITY_ANDROID
+            prefix += "_Android_" + SystemInfo.deviceUniqueIdentifier;
+#else
             prefix += "_Ios_" + SystemInfo.deviceName;
-    #endif
+#endif
 #endif
             DateTime now = DateTime.Now;
-            string logName = string.Format(prefix + "_{0}{1}{2}#{3}_{4}_{5}",
+            string logName = string.Format(prefix + "_{0}{1:D2}{2:D2}#{3:D2}_{4:D2}_{5:D2}",
                 now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
             string logPath = PathTool.GetAbsolutePath(ResLoadLocation.Persistent, PathTool.GetRelativelyPath(LogPath, logName, expandName));

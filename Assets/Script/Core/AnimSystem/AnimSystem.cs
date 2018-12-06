@@ -445,8 +445,95 @@ public class AnimSystem : MonoBehaviour
 
     #endregion
 
+    #region Rotate_Quaternion
+
+    public static AnimData Rotation(GameObject animObject, Quaternion? from, Quaternion to,
+
+      float time = 0.5f,
+      float delayTime = 0,
+      bool isLocal = true,
+      InterpType interp = InterpType.Default,
+      bool IsIgnoreTimeScale = false,
+      RepeatType repeatType = RepeatType.Once,
+      int repeatCount = -1,
+
+      AnimCallBack callBack = null, object[] parameter = null)
+    {
+        AnimType animType;
+        Quaternion fromTmp;
+
+        if (isLocal)
+        {
+            fromTmp = from ?? animObject.transform.localRotation;
+            animType = AnimType.LocalRotation;
+        }
+        else
+        {
+            fromTmp = from ?? animObject.transform.rotation;
+            animType = AnimType.Rotation;
+        }
+
+        AnimData l_tmp = new AnimData(); ;
+
+        l_tmp.m_animGameObejct = animObject;
+        l_tmp.m_animType = animType;
+        l_tmp.m_fromQ4 = fromTmp;
+        l_tmp.m_toQ4 = to;
+
+        l_tmp.m_isLocal = isLocal;
+
+        l_tmp.m_delayTime = delayTime;
+        l_tmp.m_totalTime = time;
+        l_tmp.m_interpolationType = interp;
+        l_tmp.m_repeatType = repeatType;
+        l_tmp.m_repeatCount = repeatCount;
+        l_tmp.m_ignoreTimeScale = IsIgnoreTimeScale;
+        l_tmp.m_callBack = callBack;
+        l_tmp.m_parameter = parameter;
+
+        l_tmp.Init();
+
+        GetInstance().animList.Add(l_tmp);
+        return l_tmp;
+
+    }
+
+
+    public static AnimData Rotation(GameObject animObject, Vector3? from, Vector3 to,
+
+     float time = 0.5f,
+     float delayTime = 0,
+     bool isLocal = true,
+     InterpType interp = InterpType.Default,
+     bool IsIgnoreTimeScale = false,
+     RepeatType repeatType = RepeatType.Once,
+     int repeatCount = -1,
+
+     AnimCallBack callBack = null, object[] parameter = null)
+    {
+
+        Quaternion? quaternion = null;
+        if (from != null)
+        {
+            quaternion = Quaternion.Euler((Vector3)from);
+        }
+        return Rotation( animObject, quaternion, Quaternion.Euler(to),
+
+          time ,
+          delayTime,
+          isLocal ,
+          interp ,
+          IsIgnoreTimeScale,
+          repeatType ,
+          repeatCount,
+
+          callBack , parameter );
+
+    }
+        #endregion
+
     #region Scale
-    public static AnimData Scale(GameObject animObject, Vector3? from, Vector3 to,
+        public static AnimData Scale(GameObject animObject, Vector3? from, Vector3 to,
         float time = 0.5f,
         InterpType interp = InterpType.Default,
         bool IsIgnoreTimeScale = false,
@@ -963,7 +1050,7 @@ public class AnimSystem : MonoBehaviour
     public static void FinishAnim(AnimData animData)
     {
         animData.m_currentTime = animData.m_totalTime;
-        animData.executeUpdate();
+        animData.ExecuteUpdate();
         animData.ExecuteCallBack();
 
         GetInstance().animList.Remove(animData);
@@ -997,7 +1084,13 @@ public class AnimSystem : MonoBehaviour
         for (int i = 0; i < animList.Count; i++)
         {
             //执行Update
-            animList[i].executeUpdate();
+            bool isError =  animList[i].ExecuteUpdate();
+
+            if(isError)
+            {
+                removeList.Add(animList[i]);
+                continue;
+            }
 
             if (animList[i].m_isDone == true)
             {
@@ -1040,6 +1133,8 @@ public enum AnimType
     LocalScale,
     LocalRotate,
     Rotate,
+    LocalRotation,
+    Rotation,
     
     Color,
     Alpha,

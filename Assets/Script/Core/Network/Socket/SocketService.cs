@@ -41,7 +41,10 @@ public class SocketService : SocketBase
 
     public override void Connect()
     {
-        Close();
+        if(isConnect)
+        {
+            Close();
+        }
 
         m_connThread = null;
         m_connThread = new Thread(new ThreadStart(RequestConnect));

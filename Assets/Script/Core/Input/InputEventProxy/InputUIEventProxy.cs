@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.UI;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
+using System;
 
 public class InputUIEventProxy : IInputProxyBase
 {
@@ -36,6 +37,65 @@ public class InputUIEventProxy : IInputProxyBase
 
         return info;
     }
+
+    internal static InputEventRegisterInfo<InputUIOnEndDragEvent> GetOnEndDragListener(string m_UIEventKey, string UIName, string ComponentName, InputEventHandle<InputUIOnEndDragEvent> callback)
+    {
+        InputEventRegisterInfo<InputUIOnEndDragEvent> info = HeapObjectPool<InputEventRegisterInfo<InputUIOnEndDragEvent>>.GetObject();
+
+        info.eventKey = InputUIOnEndDragEvent.GetEventKey(UIName, ComponentName);
+        info.callBack = callback;
+
+        InputManager.AddListener(
+            InputUIOnEndDragEvent.GetEventKey(UIName, ComponentName), callback);
+
+        return info;
+    }
+
+    //internal static InputEventRegisterInfo<InputUIOnEndDragEvent> GetOnEndDragListener(string m_UIEventKey, string name, Action<PointerEventData> onEndDrag)
+    //{
+    //    throw new NotImplementedException();
+    //}
+
+    internal static InputEventRegisterInfo<InputUIOnDragEvent> GetOnDragListener( string m_UIEventKey, string UIName, string ComponentName, InputEventHandle<InputUIOnDragEvent> callback)
+    {
+        InputEventRegisterInfo<InputUIOnDragEvent> info = HeapObjectPool<InputEventRegisterInfo<InputUIOnDragEvent>>.GetObject();
+
+        info.eventKey = InputUIOnDragEvent.GetEventKey(UIName, ComponentName);
+        info.callBack = callback;
+
+        InputManager.AddListener(
+            InputUIOnDragEvent.GetEventKey(UIName, ComponentName), callback);
+
+        return info;
+    }
+
+    internal static InputEventRegisterInfo<InputUIOnBeginDragEvent> GetOnBeginDragListener(string m_UIEventKey, string UIName, string ComponentName, InputEventHandle<InputUIOnBeginDragEvent> callback)
+    {
+        InputEventRegisterInfo<InputUIOnBeginDragEvent> info = HeapObjectPool<InputEventRegisterInfo<InputUIOnBeginDragEvent>>.GetObject();
+
+        info.eventKey = InputUIOnBeginDragEvent.GetEventKey(UIName, ComponentName);
+        info.callBack = callback;
+
+        InputManager.AddListener(
+            InputUIOnBeginDragEvent.GetEventKey(UIName, ComponentName), callback);
+
+        return info;
+    }
+
+    internal static InputEventRegisterInfo<InputUIOnMouseEvent> GetOnMouseListener(string m_UIEventKey, string UIName, string ComponentName,bool isDown, InputEventHandle<InputUIOnMouseEvent> callback)
+    {
+        InputEventRegisterInfo<InputUIOnMouseEvent> info = HeapObjectPool<InputEventRegisterInfo<InputUIOnMouseEvent>>.GetObject();
+
+        info.eventKey = InputUIOnMouseEvent.GetEventKey(UIName, ComponentName, isDown);
+        info.callBack = callback;
+
+        InputManager.AddListener(
+            InputUIOnMouseEvent.GetEventKey(UIName, ComponentName, isDown), callback);
+
+        return info;
+    }
+
+
 
     public static InputEventRegisterInfo<InputUIOnScrollEvent> GetOnScrollListener(string UIName, string ComponentName, InputEventHandle<InputUIOnScrollEvent> callback)
     {
@@ -94,6 +154,7 @@ public class InputUIEventProxy : IInputProxyBase
 
         return info;
     }
+
 
     #endregion
 
@@ -167,6 +228,20 @@ public class InputUIEventProxy : IInputProxyBase
             InputManager.Dispatch("InputUIOnBeginDragEvent",e);
         }
     }
+
+    public static void DispatchMouseEvent(string UIName, string ComponentName, bool isDown, string parm)
+    {
+        //只有允许输入时才派发事件
+        if (IsActive)
+        {
+            InputUIOnMouseEvent e = GetUIEvent<InputUIOnMouseEvent>(UIName, ComponentName, parm);
+            e.m_isDown = isDown;
+            e.m_type = isDown? InputUIEventType.PressDown:InputUIEventType.PressUp;
+
+            InputManager.Dispatch("InputUIOnMouseEvent", e);
+        }
+    }
+
 
     public static void DispatchEndDragEvent(string UIName, string ComponentName, string parm , PointerEventData data)
     {
@@ -264,6 +339,8 @@ public class InputDragRegisterInfo : InputEventRegisterInfo<InputUIOnDragEvent>
         m_acceptor.m_OnDrag -= m_OnDrag;
     }
 }
+
+
 
 public class InputBeginDragRegisterInfo : InputEventRegisterInfo<InputUIOnBeginDragEvent>
 {

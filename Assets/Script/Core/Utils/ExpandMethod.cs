@@ -163,6 +163,20 @@ public static class ExpandMethod
     }
 
     /// <summary>
+    /// 递归修改子节点的层级
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <param name="layer"></param>
+    public static void SetLayer(this GameObject obj, int layer)
+    {
+        obj.layer = layer;
+        foreach (Transform item in obj.transform)
+        {
+            item.gameObject.layer = layer;
+            SetLayer(item.gameObject, layer);
+        }
+    }
+    /// <summary>
     /// 优化的设置SetActive方法，可以节约重复设置Active的开销
     /// </summary>
     public static void SetActiveOptimize(this GameObject go, bool isActive)

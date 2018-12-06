@@ -7,7 +7,7 @@ using UnityEditor;
 public class GeneralDataModificationWindow : EditorWindow
 {
     string m_Title;
-    object value;
+    //object value;
     object modifi_Value;
     CallBackR<object, object> customDrawGUI;
     CallBack<object> modificationCompleteCallBack;
@@ -40,7 +40,7 @@ public class GeneralDataModificationWindow : EditorWindow
         FocusWindowIfItsOpen<GeneralDataModificationWindow>();
 
         win.m_Title = title;
-        win.value = value;
+        //win.value = value;
         win.modifi_Value = value;//.DeepCopySelf();
 
         win.customDrawGUI = customDrawGUI;

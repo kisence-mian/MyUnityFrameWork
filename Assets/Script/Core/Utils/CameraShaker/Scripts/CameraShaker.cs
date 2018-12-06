@@ -14,6 +14,12 @@ public class CameraShaker : MonoBehaviour
     /// </summary>
     public Vector3 DefaultRotInfluence = new Vector3(1, 1, 1);
 
+
+    public float magnitude;
+    public float roughness;
+    public float fadeInTime;
+    public float fadeOutTime;
+
     Vector3 posAddShake, rotAddShake;
 
     List<CameraShakeInstance> cameraShakeInstances = new List<CameraShakeInstance>();
@@ -28,6 +34,15 @@ public class CameraShaker : MonoBehaviour
         CameraShakerManager.AddCameraShaker(cameraTag, this);
 
         UI_Z = transform.localPosition.z;
+    }
+
+    private void OnEnable()
+    {
+        //CameraShakeInstance cameraShakeInstance = new CameraShakeInstance(magnitude, roughness, fadeInTime, fadeOutTime);
+        //cameraShakeInstance.PositionInfluence = DefaultPosInfluence;
+        //cameraShakeInstance.RotationInfluence = DefaultRotInfluence;
+        //Shake(cameraShakeInstance);
+
     }
 
     void Update()

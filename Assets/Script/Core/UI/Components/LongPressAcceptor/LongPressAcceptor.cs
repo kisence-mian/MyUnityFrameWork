@@ -22,11 +22,22 @@ public class LongPressAcceptor : MonoBehaviour ,IPointerDownHandler,IPointerUpHa
     //public InputEventHandle<InputUIOnClickEvent> OnPointerDown;
     //public InputEventHandle<InputUIOnClickEvent> OnPointerUp;
 
+    private void OnEnable()
+    {
+        ResetAcceptor();
+    }
+
+
+    void ResetAcceptor()
+    {
+        isPress = false;
+        isDispatch = false;
+        m_Timer = 0;
+    }
+
     public void OnPointerDown(PointerEventData eventData)
     {
         isPress = true;
-        isDispatch = false;
-        m_Timer = 0;
 
         if (OnLongPress != null)
         {
@@ -36,7 +47,8 @@ public class LongPressAcceptor : MonoBehaviour ,IPointerDownHandler,IPointerUpHa
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        isPress = false;
+        ResetAcceptor();
+
         if (OnLongPress != null)
         {
             OnLongPress(InputUIEventType.PressUp);
@@ -50,6 +62,8 @@ public class LongPressAcceptor : MonoBehaviour ,IPointerDownHandler,IPointerUpHa
             m_Timer += Time.deltaTime;
             if (m_Timer > LongPressTime)
             {
+                //Debug.Log(" OnLongPress ");
+
                 //派发长按事件
                 isDispatch = true;
                 if (OnLongPress != null)

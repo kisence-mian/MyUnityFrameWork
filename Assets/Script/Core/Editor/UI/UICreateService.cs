@@ -360,7 +360,7 @@ public class UICreateService
         GameObject Text_tips = new GameObject("Text_tip");
         Text_tips.layer = LayerMask.NameToLayer("UI");
         RectTransform txt_tipsrt = Text_tips.AddComponent<RectTransform>();
-        Text text = Text_tips.AddComponent<Text>();
+        //Text text = Text_tips.AddComponent<Text>();
         txt_tipsrt.SetParent(tipsrt);
 
         guideBaseTmp.m_objectList.Add(Text_tips);

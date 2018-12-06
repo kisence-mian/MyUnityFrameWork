@@ -8,6 +8,7 @@ using UnityEngine;
 public class UIWindowBaseComponmentEditor : Editor
 {
     UIWindowBase m_ui;
+    Canvas canvas;
     string[] list;
     int selectIndex = 0;
 
@@ -18,6 +19,10 @@ public class UIWindowBaseComponmentEditor : Editor
         {
             m_ui = (UIWindowBase)target;
         }
+        if (canvas == null)
+        {
+            canvas = m_ui.gameObject.GetComponent<Canvas>();
+        }
 
         list = UIManager.GetCameraNames();
         selectIndex = GetIndex(m_ui.cameraKey);
@@ -27,10 +32,11 @@ public class UIWindowBaseComponmentEditor : Editor
             m_ui.cameraKey = list[selectIndex];
 
         base.OnInspectorGUI();
-        if (GUI.changed)
+        if (!Application.isPlaying && GUI.changed)
         {
             EditorUtility.SetDirty(target);
             EditorSceneManager.MarkAllScenesDirty();
+            canvas.sortingLayerName = m_ui.m_UIType.ToString();
         }
     }
 

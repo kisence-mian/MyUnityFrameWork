@@ -37,24 +37,43 @@ public class ApplicationStatusManager
         s_fadeOutTime = _fadeOutTime;
     }
     /// <summary>
-    /// 切换游戏状态
+    /// 切换游戏状态(当当前游戏状态和要进入的游戏状态相同则不执行)
     /// </summary>
     /// <param name="l_appStatus"></param>
     public static void EnterStatus<T>(bool isFade = true) where T:IApplicationStatus
     {
-        EnterStatus(typeof(T).Name,isFade);
+        string statusName = typeof(T).Name;
+
+        EnterStatus(statusName, isFade);
+    }
+    /// <summary>
+    /// 切换游戏状态(当当前游戏状态和要进入的游戏状态相同则也执行)
+    /// </summary>
+    /// <param name="l_appStatus"></param>
+    public static void ForceEnterStatus<T>(bool isFade = true) where T : IApplicationStatus
+    {
+        string statusName = typeof(T).Name;
+        EnterStatus(statusName, isFade);
     }
 
-    public static void EnterStatus(string statusName,bool isFade=true)
+    public static void EnterStatus(string statusName,bool isFade = true)
     {
         if (s_currentAppStatusName == statusName)
             return;
+
         if (!isFade)
         {
             if (s_currentAppStatus != null)
             {
                 s_currentAppStatus.CloseAllUI();
-                s_currentAppStatus.OnExitStatus();
+                try
+                {
+                    s_currentAppStatus.OnExitStatus();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("EnterStatus Exception " + statusName + " " + e.ToString());
+                }
             }
 
             s_currentAppStatusName = statusName;
@@ -62,19 +81,36 @@ public class ApplicationStatusManager
 
             s_currentAppStatus = GetStatus(statusName);
 
-            s_currentAppStatus.OnEnterStatus();
+            try
+            {
+                s_currentAppStatus.OnEnterStatus();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("EnterStatus Exception " + statusName + " " + e.ToString());
+            }
 
-            if (OnStatusChangeCallBack != null)
+            try
+            {
+                if (OnStatusChangeCallBack != null)
                 OnStatusChangeCallBack(s_currentAppStatus);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("EnterStatus Exception " + statusName + " " + e.ToString());
+            }
         }
         else
         {
-
             if (s_currentAppStatus != null)
             {
+                Debug.Log("Change ");
+
                 UIManager.SetEventSystemEnable(false);
-                CameraFade.Instance.FadeInToOut(s_fadeInTime, s_afterInDelayTime, s_fadeOutTime, () =>
+                CameraFade.FadeInToOut(s_fadeInTime, s_afterInDelayTime, s_fadeOutTime, () =>
                 {
+                    Debug.Log("Change call back ");
+
                     UIManager.SetEventSystemEnable(true);
                     s_currentAppStatus.CloseAllUI(false);
                     s_currentAppStatus.OnExitStatus();
@@ -83,10 +119,24 @@ public class ApplicationStatusManager
 
                     s_currentAppStatus = GetStatus(statusName);
 
-                    s_currentAppStatus.OnEnterStatus();
+                    try
+                    {
+                        s_currentAppStatus.OnEnterStatus();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("EnterStatus Exception " + statusName + " " + e.ToString());
+                    }
 
-                    if (OnStatusChangeCallBack != null)
-                        OnStatusChangeCallBack(s_currentAppStatus);
+                    try
+                    {
+                        if (OnStatusChangeCallBack != null)
+                            OnStatusChangeCallBack(s_currentAppStatus);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError("EnterStatus Exception " + statusName + " " + e.ToString());
+                    }
                 });
             }
             else
@@ -96,17 +146,26 @@ public class ApplicationStatusManager
 
                 s_currentAppStatus = GetStatus(statusName);
 
-                s_currentAppStatus.OnEnterStatus();
+                try
+                {
+                    s_currentAppStatus.OnEnterStatus();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("EnterStatus Exception " + statusName + " " + e.ToString());
+                }
 
-                if (OnStatusChangeCallBack != null)
+                try
+                {
+                    if (OnStatusChangeCallBack != null)
                     OnStatusChangeCallBack(s_currentAppStatus);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("EnterStatus Exception " + statusName + " " + e.ToString());
+                }
             }
-
         }
-        //ApplicationManager.Instance.StartCoroutine(s_currentAppStatus.InChangeScene(() =>
-        //{
-        //    s_currentAppStatus.OnEnterStatus();
-        //}));
     }
 
     public static T GetStatus<T>() where T : IApplicationStatus

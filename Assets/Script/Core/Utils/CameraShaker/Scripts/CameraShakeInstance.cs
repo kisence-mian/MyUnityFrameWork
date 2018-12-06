@@ -38,13 +38,13 @@
         float tick = 0;
         Vector3 amt;
 
-        /// <summary>
-        /// Will create a new instance that will shake once and fade over the given number of seconds.
-        /// </summary>
-        /// <param name="magnitude">The intensity of the shake.</param>
-        /// <param name="fadeOutTime">How long, in seconds, to fade out the shake.</param>
-        /// <param name="roughness">Roughness of the shake. Lower values are smoother, higher values are more jarring.</param>
-        public CameraShakeInstance(float magnitude, float roughness, float fadeInTime, float fadeOutTime)
+    /// <summary>
+    /// Will create a new instance that will shake once and fade over the given number of seconds.
+    /// </summary>
+    /// <param name="magnitude">The intensity of the shake.</param> 震动的强度
+    /// <param name="fadeOutTime">How long, in seconds, to fade out the shake.</param> 在几秒钟内，多长时间可以让震动消失
+    /// <param name="roughness">Roughness of the shake. Lower values are smoother, higher values are more jarring.</param> 震动的粗糙度。较低的值更平滑，较高的值更不协调
+    public CameraShakeInstance(float magnitude, float roughness, float fadeInTime, float fadeOutTime)
         {
             this.Magnitude = magnitude;
             fadeOutDuration = fadeOutTime;

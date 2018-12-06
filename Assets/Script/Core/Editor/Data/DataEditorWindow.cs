@@ -341,14 +341,47 @@ public class DataEditorWindow : EditorWindow
             {
                 int num = i - 3;
                 vStr = num.ToString();
-                if (GUI.Button(new Rect(dragR.position, new Vector2(dragR.width / 4, dragR.height)), "►"))
+                float firstLenth = dragR.width / 4;
+                float threeQHeight = dragR.height / 3;
+                if (GUI.Button(new Rect(dragR.position, new Vector2(firstLenth, dragR.height)), "►"))
                 {
                     if (selectRowIndexs.Contains(i))
                         selectRowIndexs.Remove(i);
                     else
                         selectRowIndexs.Add(i);
                 }
-                if (GUI.Button(new Rect(dragR.x + dragR.width / 4, dragR.y, dragR.width * 3 / 4, dragR.height), vStr))
+                if(GUI.Button(new Rect(dragR.x + firstLenth, dragR.y, firstLenth, threeQHeight), "▲"))
+                {
+                    if (num > 0)
+                        m_currentData.TableIDs.Reverse(num-1, 2);
+                }
+                if (GUI.Button(new Rect(dragR.x + firstLenth, dragR.y + threeQHeight, firstLenth, threeQHeight), "◍"))
+                {
+                    GeneralDataModificationWindow.OpenWindow(this, "移动一行数据", num, (value) =>
+                    {
+                        value = EditorDrawGUIUtil.DrawBaseValue("Index:", value);
+                        GUILayout.Label("Current Index:" + num);
+                        value = Mathf.Clamp((int)value, 0, m_currentData.Count);
+
+                        return value;
+                    },
+                    null,
+            (value) =>
+             {
+                 int index = (int)value;
+                 string key = m_currentData.TableIDs[num];
+                 m_currentData.TableIDs.RemoveAt(num);
+                 m_currentData.TableIDs.Insert(index, key);
+
+             });
+                    return;
+                }
+                if (GUI.Button(new Rect(dragR.x + firstLenth, dragR.y+ threeQHeight*2, firstLenth, threeQHeight), "▼"))
+                {
+                    if(num< m_currentData.TableIDs.Count-1)
+                        m_currentData.TableIDs.Reverse(num, 2);
+                }
+                if (GUI.Button(new Rect(dragR.x + firstLenth*2, dragR.y, dragR.width - firstLenth*2, dragR.height), vStr))
                 {
                     if (EditorUtility.DisplayDialog("警告", "是否删除第[" + num + "]行数据", "确定", "取消"))
                     {
@@ -408,7 +441,12 @@ public class DataEditorWindow : EditorWindow
         GUILayout.FlexibleSpace();
        
         GUILayout.Space(5);
-       
+        if (GUILayout.Button("转换字段为多语言", GUILayout.Width(120)))
+        {
+            ChangeField2Language();
+            AssetDatabase.Refresh();
+        }
+        GUILayout.FlexibleSpace();
         if (GUILayout.Button("生成Data类", GUILayout.Width(90)))
         {
             CreatDataCSharpFile(chooseFileName, m_currentData);
@@ -450,6 +488,67 @@ public class DataEditorWindow : EditorWindow
         searchValue = EditorDrawGUIUtil.DrawSearchField(searchValue);
         GUILayout.EndHorizontal();
     }
+
+    private void ChangeField2Language()
+    {
+        List<string> strTypes = new List<string>();
+        foreach (var item in m_currentData.TableKeys)
+        {
+            if (!m_currentData.m_tableTypes.ContainsKey(item)|| m_currentData.m_tableTypes[item] == FieldType.String)
+                strTypes.Add(item);
+        }
+        GeneralDataModificationWindow.otherParameter ="";
+        GeneralDataModificationWindow.OpenWindow(this, "将字段数据转换为多语言数据", "", (value) =>
+        {
+            value = EditorDrawGUIUtil.DrawPopup("字段:", value.ToString(),strTypes);
+            GeneralDataModificationWindow.otherParameter = EditorDrawGUIUtil.DrawBaseValue("多语言文件名:", GeneralDataModificationWindow.otherParameter);
+            string key = value.ToString();
+            if (string.IsNullOrEmpty(key))
+                EditorGUILayout.HelpBox("Key不能为空！！", MessageType.Error);
+            else if (key.Contains(" "))
+                EditorGUILayout.HelpBox("Key 不能有空格！！", MessageType.Error);
+            else if (!m_currentData.TableKeys.Contains(key.Trim()))
+                EditorGUILayout.HelpBox("不包含的字段！！", MessageType.Error);
+            return value;
+        },
+         (value) =>
+         {
+             string key = value.ToString();
+             if (string.IsNullOrEmpty(key) || (key.Contains(" ")) || !m_currentData.TableKeys.Contains(key.Trim()))
+                 return false;
+
+             return true;
+
+         },
+       (value) =>
+       {
+           string l_fileName = GeneralDataModificationWindow.otherParameter.ToString();
+           string field = value.ToString();
+
+           m_currentData.m_fieldAssetTypes[field] = DataFieldAssetType.LocalizedLanguage;
+           m_currentData.m_defaultValue[field] = "null";
+
+           Dictionary<string, string> oldContentDic = new Dictionary<string, string>();
+
+           foreach (var item in m_currentData)
+           {
+               string v = item.Value[field];
+               Debug.Log("item.Key :"+ item.Key+"  v :" + v);
+               oldContentDic.Add(item.Key, v);
+           }
+
+           LanguageDataEditorWindow lWin = LanguageDataEditorWindow.ShowWindow();
+           Dictionary<string,string> newDataDic= lWin.CreateNewFile(l_fileName, oldContentDic);
+
+           foreach (var item in newDataDic)
+           {
+               m_currentData[item.Key][field] = item.Value;
+           }
+           SaveData(chooseFileName, m_currentData);
+       });
+
+    }
+
     /// <summary>
     /// 绘制每个数据格子
     /// </summary>
@@ -530,7 +629,7 @@ public class DataEditorWindow : EditorWindow
                     if (fieldAssetType == DataFieldAssetType.LocalizedLanguage)
                     {
                         string k = showStr;
-                        if (LanguageManager.HaveKey(k))
+                        if (k!="null"&& LanguageManager.HaveKey(k))
                         {
                             showStr = LanguageManager.GetContentByKey(k);
                         }
@@ -853,15 +952,24 @@ public class DataEditorWindow : EditorWindow
     private object DrawLocalizedLanguageField(string text, object value)
     {
         value = EditorDrawGUIUtil.DrawBaseValue(text, value);
-        value = EditorDrawGUIUtil.DrawPopup(text, value.ToString(), langKeys);
-        GUILayout.Space(6);
-        GUILayout.Label("多语言字段[" + value + "] : " + LanguageManager.GetContentByKey(value.ToString()));
-        GUILayout.Space(8);
-        if (GUILayout.Button("打开编辑当前多语言字段"))
+        if ("null" != value.ToString())
         {
-            LanguageDataEditorWindow w = LanguageDataEditorWindow.ShowWindow();
-            w.searchValue = value.ToString();
-            w.toolbarOption = 1;
+            value = EditorDrawGUIUtil.DrawPopup(text, value.ToString(), langKeys);
+            GUILayout.Space(6);
+            GUILayout.Label("多语言字段[" + value + "] : " + LanguageManager.GetContentByKey(value.ToString()));
+            GUILayout.Space(8);
+            if (GUILayout.Button("打开编辑当前多语言字段"))
+            {
+                LanguageDataEditorWindow w = LanguageDataEditorWindow.ShowWindow();
+                w.searchValue = value.ToString();
+                w.toolbarOption = 1;
+            }
+        }
+        else
+        {
+            GUILayout.Space(6);
+            GUILayout.Label("多语言字段为非null时支持多语言选项" );
+            GUILayout.Space(8);
         }
         return value;
     }
@@ -1083,22 +1191,25 @@ public class DataEditorWindow : EditorWindow
     /// </summary>
     private void AddLineDataGUI()
     {
+        GeneralDataModificationWindow.otherParameter = m_currentData.Count;
         GeneralDataModificationWindow.OpenWindow(this, "插入一行数据", "", (value) =>
         { 
             value =  EditorDrawGUIUtil.DrawBaseValue("Key:", value);
+            GeneralDataModificationWindow.otherParameter = EditorDrawGUIUtil.DrawBaseValue("Insert Index:", GeneralDataModificationWindow.otherParameter);
+            GeneralDataModificationWindow.otherParameter = Mathf.Clamp((int)GeneralDataModificationWindow.otherParameter, 0, m_currentData.Count);
             string key = value.ToString();
             if (string.IsNullOrEmpty(key))
                 EditorGUILayout.HelpBox("Key不能为空！！", MessageType.Error);
             else if(key.Contains(" "))
                 EditorGUILayout.HelpBox("Key 不能有空格！！", MessageType.Error);
-            else if (m_currentData.TableKeys.Contains(key.Trim()))
+            else if (m_currentData.TableIDs.Contains(key.Trim()))
                 EditorGUILayout.HelpBox("Key重复！！", MessageType.Error);
             return value;
         },
          (value) =>
          {
              string key = value.ToString();
-             if (string.IsNullOrEmpty(key) || (key.Contains(" "))|| m_currentData.TableKeys.Contains(key.Trim()))
+             if (string.IsNullOrEmpty(key) || (key.Contains(" "))|| m_currentData.TableIDs.Contains(key.Trim()))
                  return false;
 
              return true;
@@ -1106,6 +1217,8 @@ public class DataEditorWindow : EditorWindow
          },
        (value) =>
        {
+           int index = (int)GeneralDataModificationWindow.otherParameter;
+           string key = value.ToString();
            heightItemList.Add(30);
            SingleData data = new SingleData();
            DataTable table = m_currentData;
@@ -1115,16 +1228,19 @@ public class DataEditorWindow : EditorWindow
                string keyTmp = keys[i];
                if (i == 0)
                {
-                   data.Add(keyTmp, value.ToString());
+                   data.Add(keyTmp, key);
+                   data.m_SingleDataKey = key;
                }
                else
                data.Add(keyTmp, table.m_defaultValue[keyTmp]);
            }
-           m_currentData.AddData(data);
+           m_currentData.Add(key,data);
+           m_currentData.TableIDs.Insert(index, key);
        });
 
        
     }
+    
 
     #region 字段相关
 

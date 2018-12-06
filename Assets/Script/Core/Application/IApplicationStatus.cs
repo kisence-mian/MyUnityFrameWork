@@ -8,7 +8,25 @@ public abstract class IApplicationStatus
     #region UI 管理
 
     List<UIWindowBase> m_uiList = new List<UIWindowBase>();
+    /// <summary>
+    /// 获取现在ApplicationStatus管理的打开的UI的个数
+    /// </summary>
+    /// <returns></returns>
+    public int GetUIListCount()
+    {
+        return m_uiList.Count;
+    }
+    /// <summary>
+    /// 获取status打开的window的最上层Window
+    /// </summary>
+    /// <returns></returns>
+    public UIWindowBase GetStatusTopUIWindow()
+    {
+        if (m_uiList.Count > 0)
+            return m_uiList[m_uiList.Count - 1];
 
+        return null;
+    }
     public T OpenUI<T>() where T: UIWindowBase
     {
         UIWindowBase ui =  UIManager.OpenUIWindow<T>();

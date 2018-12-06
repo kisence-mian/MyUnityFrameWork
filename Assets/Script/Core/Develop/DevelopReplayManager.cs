@@ -53,6 +53,13 @@ public class DevelopReplayManager
 
     public static void Init(bool isQuickLunch)
     {
+
+#if UNITY_EDITOR
+        phonePath = Application.dataPath.Replace("Assets", "Logs") + "/";
+#else
+        phonePath = "/storage/emulated/0/" + Application.productName + "/";
+#endif
+
         if (isQuickLunch)
         {
             //复盘模式可以手动开关
@@ -104,7 +111,7 @@ public class DevelopReplayManager
                 //记录随机数列
                 RandomService.OnRandomCreat += OnGetRandomCallBack;
                 InputManager.OnEveryEventDispatch += OnEveryEventCallBack; //记录输入
-                OpenWriteFileStream(GetLogFileName()); //开启文件流
+                OpenWriteFileStream(GetReplayFileName()); //开启文件流
             }
         }
 
@@ -273,7 +280,7 @@ public class DevelopReplayManager
     #region GUI
 
     static int margin = 3;
-    static Rect consoleRect = new Rect(margin, margin, Screen.width * 0.5f - margin, Screen.height - 2 * margin);
+    static Rect consoleRect = new Rect(margin, margin, Screen.width * 0.2f - margin, Screen.height - 2 * margin);
 
     #region Develop Menu
 
@@ -416,7 +423,13 @@ public class DevelopReplayManager
 
     static string showContent = "";
     static string LogPath = "";
-
+    static string LogName = "";
+    //#if UNITY_EDITOR
+    //    static string phonePath =  Application.dataPath.Replace("Assets","Logs") + "/";
+    //#else
+    //    static  string phonePath = "/storage/emulated/0/" + Application.productName + "/";
+    //#endif
+    static string phonePath;
     static void ShowLogList()
     {
         scrollPos = GUILayout.BeginScrollView(scrollPos);
@@ -429,10 +442,25 @@ public class DevelopReplayManager
                 scrollPos = Vector2.zero;
                 showContent = LogOutPutThread.LoadLogContent(FileNameList[i]);
                 LogPath = LogOutPutThread.GetPath(FileNameList[i]);
+                LogName = FileNameList[i];
             }
         }
 
         GUILayout.EndScrollView();
+        if (GUILayout.Button("复制到设备"))
+        {
+            for (int i = 0; i < FileNameList.Length; i++)
+            {
+               string name = FileNameList[i];
+                string path = phonePath + name + ".txt";
+              string  LogPath = LogOutPutThread.GetPath(name);
+
+                FileTool.CreatFilePath(path);
+                File.Copy(LogPath, path, true);
+                
+            }
+            GUIUtil.ShowTips("复制成功");
+        }
 
         if (GUILayout.Button("清除日志"))
         {
@@ -477,6 +505,24 @@ public class DevelopReplayManager
             GUILayout.Label("上传日志需要在 URLConfig -> LogUpLoadURL 配置上传目录");
         }
 
+#if UNITY_ANDROID
+        if (GUILayout.Button("导出到设备"))
+        {
+            try
+            {
+                string path = phonePath+ LogName + ".txt";
+                FileTool.CreatFilePath(path);
+                File.Copy(LogPath, path,true);
+                GUIUtil.ShowTips("复制成功");
+            }
+            catch (Exception e)
+            {
+                GUIUtil.ShowTips(e.ToString());
+            }
+
+        }
+#endif
+
         if (GUILayout.Button("复制到剪贴板"))
         {
             TextEditor tx = new TextEditor();
@@ -491,9 +537,9 @@ public class DevelopReplayManager
         }
     }
 
-    #endregion
+#endregion
 
-    #region PersistentFileGUI
+#region PersistentFileGUI
 
     static bool isShowPersistentFile = false;
     static void PersistentFileGUI()
@@ -601,9 +647,9 @@ public class DevelopReplayManager
         }
     }
 
-    #endregion
+#endregion
 
-    #region WarnPanel
+#region WarnPanel
 
     static Rect s_warnPanelRect = new Rect(Screen.width * 0.1f, Screen.height * 0.25f, Screen.width * 0.8f, Screen.height * 0.5f);
 
@@ -640,11 +686,11 @@ public class DevelopReplayManager
         }
     }
 
-    #endregion
+#endregion
 
-    #endregion
+#endregion
 
-    #region ProfileGUI
+#region ProfileGUI
 
     static void SwitchProfileGUI()
     {
@@ -716,9 +762,9 @@ public class DevelopReplayManager
         }
     }
 
-        #endregion
+#endregion
 
-    #region RecordMode
+#region RecordMode
     static void RecordModeGUI()
     {
         GUILayout.Window(2, consoleRect, RecordModeGUIWindow, "Develop Control Panel");
@@ -743,9 +789,9 @@ public class DevelopReplayManager
         }
     }
 
-    #endregion
+#endregion
 
-    #region ReplayMode
+#region ReplayMode
 
     /// <summary>
     /// 回放模式的GUI
@@ -834,11 +880,11 @@ public class DevelopReplayManager
 #endif
     }
 
-    #endregion
+#endregion
 
-    #endregion
+#endregion
 
-    #region Update
+#region Update
 
     static float s_currentTime = 0;
 
@@ -893,10 +939,10 @@ public class DevelopReplayManager
         return relpayFileNames.ToArray() ?? new string[0];
     }
 
-    static string GetLogFileName()
+    static string GetReplayFileName()
     {
         DateTime now = System.DateTime.Now;
-        string logName = string.Format("Replay{0}-{1}-{2}#{3}-{4}-{5}",
+        string logName = string.Format("Replay{0}-{1:D2}-{2:D2}#{3:D2}-{4:D2}-{5:D2}",
             now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
 
         return logName;

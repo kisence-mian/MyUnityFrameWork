@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class HeartBeatBase
 {
     #region 属性
-    private float m_heatBeatSendSpaceTime = 15f;
+    private float m_heatBeatSendSpaceTime = 3f;
 
     private float m_sendHeatBeatTimer;
     private float m_receviceHeatBeatTimer;
@@ -35,6 +35,9 @@ public abstract class HeartBeatBase
     {
         HeatBeatSendSpaceTime = spaceTime;
 
+        ResetReceviceTimer();
+        ResetSendTimer();
+
         InputManager.AddListener<InputNetworkMessageEvent>("HB",ReceviceMessage);
         InputManager.AddListener<InputNetworkConnectStatusEvent>(ReceviceConnectStatus);
     }
@@ -59,6 +62,7 @@ public abstract class HeartBeatBase
     {
         if(e.m_MessgaeType == "HB")
         {
+            Debug.Log("Recevice HB");
             ResetReceviceTimer();
         }
     }
@@ -81,6 +85,9 @@ public abstract class HeartBeatBase
         m_sendHeatBeatTimer -= Time.unscaledDeltaTime;
         m_receviceHeatBeatTimer -= Time.unscaledDeltaTime;
 
+        //Debug.Log("m_receviceHeatBeatTimer " + m_receviceHeatBeatTimer);
+        //Debug.Log("m_sendHeatBeatTimer " + m_sendHeatBeatTimer);
+
         //定时发送心跳包
         if (m_sendHeatBeatTimer <= 0)
         {
@@ -91,6 +98,7 @@ public abstract class HeartBeatBase
         //长期没收到服务器返回认为断线
         if (m_receviceHeatBeatTimer <= 0)
         {
+            Debug.Log("HeartBeat Break connect");
             NetworkManager.DisConnect();
         }
     }

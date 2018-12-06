@@ -99,7 +99,7 @@ public class InputDispatcher<Event> : IInputDispatcher where Event : IInputEvent
             }
             catch (Exception e)
             {
-                Debug.LogError(e.ToString());
+                Debug.LogError("DispatchSingleEvent Name: " + typeof(Event).ToString() + " key: " + inputEvent.EventKey + " Exception: " + e.ToString());
             }
         }
     }

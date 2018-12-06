@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -44,7 +43,10 @@ public class HotUpdateManager
         Init();
 
         //检查Streaming版本和Persistent版本哪一个更新
-        CheckLocalVersion();
+        if(!CheckLocalVersion())
+        {
+            return;
+        }
         
         //开始热更新
         ApplicationManager.Instance.StartCoroutine(HotUpdateProgress());
@@ -59,34 +61,69 @@ public class HotUpdateManager
         yield return CheckVersion();
     }
 
-    static void CheckLocalVersion()
+    static bool CheckLocalVersion()
     {
-        if (ApplicationManager.Instance.m_useAssetsBundle)
+        try
         {
-            AssetBundle ab = AssetBundle.LoadFromFile(PathTool.GetAbsolutePath(ResLoadLocation.Streaming,
-            c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName));
-            TextAsset text = (TextAsset)ab.mainAsset;
-            string StreamVersionContent = text.text;
-            ab.Unload(true);
-
-            //stream版本
-            Dictionary<string, object> StreamVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(StreamVersionContent);
-
-            //Streaming版本如果比Persistent版本还要新，则更新Persistent版本
-            if ((GetInt(StreamVersion[c_largeVersionKey]) > GetInt(m_versionConfig[c_largeVersionKey])) ||
-                (GetInt(StreamVersion[c_smallVersonKey]) > GetInt(m_versionConfig[c_smallVersonKey]))
-                )
+            if (ApplicationManager.Instance.m_useAssetsBundle)
             {
-                RecordManager.CleanRecord(c_HotUpdateRecordName);
-                Init();
+                string path = PathTool.GetAbsolutePath(ResLoadLocation.Streaming,
+                c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName);
+
+#if UNITY_EDITOR 
+                //判断本地文件是否存在
+                if (!File.Exists(path))
+                {
+                    Debug.LogError("本地 Version 文件不存在，请先创建本地文件！");
+                    UpdateDateCallBack(HotUpdateStatusEnum.UpdateFail, 1);
+                    return false;
+                }
+#endif 
+
+                AssetBundle ab = AssetBundle.LoadFromFile(path);
+
+                TextAsset text = (TextAsset)ab.mainAsset;
+                string StreamVersionContent = text.text;
+                ab.Unload(true);
+
+                //stream版本
+                Dictionary<string, object> StreamVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(StreamVersionContent);
+
+                //Streaming版本如果比Persistent版本还要新，则更新Persistent版本
+                if ((GetInt(StreamVersion[c_largeVersionKey]) > GetInt(m_versionConfig[c_largeVersionKey])) ||
+                    (GetInt(StreamVersion[c_smallVersonKey]) > GetInt(m_versionConfig[c_smallVersonKey]))
+                    )
+                {
+                    RecordManager.CleanRecord(c_HotUpdateRecordName);
+                    Init();
+                }
+                return true;
             }
+            else
+            {
+                UpdateDateCallBack(HotUpdateStatusEnum.NoUpdate, 0);
+                return false;
+            }
+        }
+        catch(Exception e)
+        {
+            Debug.LogError(e.ToString());
+            UpdateDateCallBack(HotUpdateStatusEnum.UpdateFail, 0);
+        }
+
+        return false;
+    }
+
+    public static string GetHotUpdateVersion()
+    {
+        if(m_versionConfig == null)
+        {
+            return "0.0";
         }
         else
         {
-
+            return GetInt(m_versionConfig[c_largeVersionKey]) + "." + GetInt(m_versionConfig[c_smallVersonKey]);
         }
-
-       
     }
 
     static IEnumerator CheckVersion()
@@ -129,6 +166,14 @@ public class HotUpdateManager
         {
             Debug.Log("需要更新整包");
             UpdateDateCallBack(HotUpdateStatusEnum.NeedUpdateApplication, GetHotUpdateProgress(true, false, 0));
+        }
+        //服务器大版本比较小，无需更新
+        else if (GetInt(m_versionConfig[c_largeVersionKey])
+                > GetInt(ServiceVersion[c_largeVersionKey]))
+        {
+            //Debug.Log("无需更新，直接进入游戏");
+            UpdateDateCallBack(HotUpdateStatusEnum.NoUpdate, 1);
+            yield break;
         }
         //服务器小版本比较大，更新文件
         else if (GetInt(m_versionConfig[c_smallVersonKey]) 
@@ -258,7 +303,7 @@ public class HotUpdateManager
                 {
                     Debug.Log("下载成功！ " + downloadPath);
 
-                    ResourceIOTool.CreateFile(Application.persistentDataPath + "/" + s_downLoadList[i].path +"." + AssetsBundleManager.c_AssetsBundlesExpandName, www.bytes);
+                    ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath() + "/" + s_downLoadList[i].path +"." + AssetsBundleManager.c_AssetsBundlesExpandName, www.bytes);
                     RecordManager.SaveRecord(c_HotUpdateRecordName, s_downLoadList[i].name, s_downLoadList[i].md5);
 
                     UpdateDateCallBack(HotUpdateStatusEnum.Updating, GetHotUpdateProgress(true, true, GetDownLoadFileProgress(i)));
@@ -268,8 +313,8 @@ public class HotUpdateManager
 
         //保存版本信息
         //保存文件信息
-        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, HotUpdateManager.c_versionFileName + "." + ConfigManager.c_expandName), m_versionFileCache);
-        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(ResLoadLocation.Persistent, ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName), m_Md5FileCache);
+        ResourceIOTool.WriteStringByFile(PathTool.GetAssetsBundlePersistentPath()+ HotUpdateManager.c_versionFileName + "." + ConfigManager.c_expandName, m_versionFileCache);
+        ResourceIOTool.WriteStringByFile(PathTool.GetAssetsBundlePersistentPath() + ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName, m_Md5FileCache);
 
         //从stream读取配置
         RecordManager.SaveRecord(c_HotUpdateRecordName, c_useHotUpdateRecordKey, true);
@@ -378,10 +423,8 @@ public class HotUpdateManager
             if (RecordManager.GetData(c_HotUpdateRecordName).GetRecord(c_useHotUpdateRecordKey, false))
             {
                 type = ResLoadLocation.Persistent;
-                dataJson = ResourceIOTool.ReadStringByFile(
-                    PathTool.GetAbsolutePath(
-                         type,
-                         c_versionFileName + "." + ConfigManager.c_expandName));
+                string persistentPath = PathTool.GetAssetsBundlePersistentPath() + c_versionFileName + "." + ConfigManager.c_expandName;
+                dataJson = ResourceIOTool.ReadStringByFile(persistentPath);
             }
             else
             {
@@ -435,7 +478,6 @@ public struct HotUpdateStatusInfo
         {
             s_info.isFailed = false;
         }
-
 
         s_info.m_loadState.progress = progress;
 

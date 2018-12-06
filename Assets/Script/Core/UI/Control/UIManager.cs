@@ -29,6 +29,8 @@ public class UIManager : MonoBehaviour
     {
         if(!isInit)
         {
+            isInit = true;
+
             GameObject instance = GameObject.Find("UIManager");
 
             if (instance == null)
@@ -238,24 +240,24 @@ public class UIManager : MonoBehaviour
     public static UIWindowBase CreateUIWindow(string UIName)
     {
         GameObject UItmp = GameObjectManager.CreateGameObject(UIName, UIManagerGo);
-        UIWindowBase UIbase = UItmp.GetComponent<UIWindowBase>();
-        UISystemEvent.Dispatch(UIbase, UIEvent.OnInit);  //派发OnInit事件
+        UIWindowBase UIWIndowBase = UItmp.GetComponent<UIWindowBase>();
+        UISystemEvent.Dispatch(UIWIndowBase, UIEvent.OnInit);  //派发OnInit事件
 
-        UIbase.windowStatus = UIWindowBase.WindowStatus.Create;
+        UIWIndowBase.windowStatus = UIWindowBase.WindowStatus.Create;
 
         try
         {
-            UIbase.Init(GetUIID(UIName));
+            UIWIndowBase.InitWindow(GetUIID(UIName));
         }
         catch(Exception e)
         {
-            Debug.LogError("OnInit Exception: " + e.ToString());}
+            Debug.LogError(UIName + "OnInit Exception: " + e.ToString());}
 
-        AddHideUI(UIbase);
+        AddHideUI(UIWIndowBase);
 
-        UILayerManager.SetLayer(UIbase);      //设置层级
+        UILayerManager.SetLayer(UIWIndowBase);      //设置层级
 
-        return UIbase;
+        return UIWIndowBase;
     }
 
     /// <summary>
@@ -292,6 +294,7 @@ public class UIManager : MonoBehaviour
             Debug.LogError(UIName + " OnOpen Exception: " + e.ToString());
         }
 
+        UISystemEvent.Dispatch(UIbase, UIEvent.OnOpened);  //派发OnOpened事件
 
         UIAnimManager.StartEnterAnim(UIbase, callback, objs); //播放动画
         return UIbase;
@@ -348,6 +351,8 @@ public class UIManager : MonoBehaviour
 
         UIStackManager.OnUIClose(UI);
         AddHideUI(UI);
+
+        UISystemEvent.Dispatch(UI, UIEvent.OnClosed);  //派发OnOpened事件
     }
     public static void CloseUIWindow(string UIname, bool isPlayAnim = true, UICallBack callback = null, params object[] objs)
     {
@@ -510,7 +515,7 @@ public class UIManager : MonoBehaviour
         UISystemEvent.Dispatch(UI, UIEvent.OnDestroy);  //派发OnDestroy事件
         try
         {
-            UI.DestroyUI();
+            UI.Dispose();
         }
         catch(Exception e)
         {
@@ -541,7 +546,7 @@ public class UIManager : MonoBehaviour
                 UISystemEvent.Dispatch(uis[i], UIEvent.OnDestroy);  //派发OnDestroy事件
                 try
                 {
-                    uis[i].DestroyUI();
+                    uis[i].Dispose();
                 }
                 catch (Exception e)
                 {
@@ -658,7 +663,7 @@ public class UIManager : MonoBehaviour
     {
         if (UI == null)
         {
-            throw new Exception("UIManager: RemoveUI error l_UI is null: !");
+            throw new Exception("UIManager: RemoveUI error UI is null: !");
         }
 
         if (!s_UIs.ContainsKey(UI.name))
@@ -720,7 +725,7 @@ public class UIManager : MonoBehaviour
                 UISystemEvent.Dispatch(uis[i], UIEvent.OnDestroy);  //派发OnDestroy事件
                 try
                 {
-                    uis[i].DestroyUI();
+                    uis[i].Dispose();
                 }
                 catch (Exception e)
                 {
@@ -836,7 +841,11 @@ public class UIManager : MonoBehaviour
     public enum UIEvent
     {
         OnOpen,
+        OnOpened,
+
         OnClose,
+        OnClosed,
+
         OnHide,
         OnShow,
 

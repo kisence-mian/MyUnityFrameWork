@@ -27,7 +27,7 @@ public class Audio2DPlayer : AudioPlayerBase
         }
     }
 
-    public void PlayMusic(int channel, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f)
+    public void PlayMusic(int channel, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f, string flag = "")
     {
         AudioAsset au;
 
@@ -37,10 +37,11 @@ public class Audio2DPlayer : AudioPlayerBase
         }
         else
         {
-            au = CreateAudioAsset(mono.gameObject, false, true);
+            au = CreateAudioAssetByPool(mono.gameObject, false,  AudioSourceType.Music);
             bgMusicDic.Add(channel, au);
         }
-        PlayMusicControl(au, audioName, isLoop, volumeScale, delay, fadeTime);
+
+        PlayMusicControl(au, audioName, isLoop, volumeScale, delay, fadeTime, flag);
     }
     public void PauseMusic(int channel, bool isPause, float fadeTime = 0.5f)
     {
@@ -76,10 +77,11 @@ public class Audio2DPlayer : AudioPlayerBase
         }
     }
 
-    public void PlaySFX(string name, float volumeScale = 1f, float delay = 0f)
+    public void PlaySFX(string name, float volumeScale = 1f, float delay = 0f, float pitch = 1, string flag = "")
     {
         AudioAsset au = GetEmptyAudioAssetFromSFXList();
-        PlayClip(au, name, false, volumeScale, delay);
+        au.flag = flag;
+        PlayClip(au, name, false, volumeScale, delay, pitch);
 
     }
     public void PauseSFXAll(bool isPause)
@@ -88,12 +90,10 @@ public class Audio2DPlayer : AudioPlayerBase
         {
             if (isPause)
             {
-                if (sfxList[i].PlayState == AudioPlayState.Playing)
                     sfxList[i].Pause();
             }
             else
             {
-                if (sfxList[i].PlayState == AudioPlayState.Pause)
                     sfxList[i].Play();
             }
         }
@@ -102,21 +102,9 @@ public class Audio2DPlayer : AudioPlayerBase
     private AudioAsset GetEmptyAudioAssetFromSFXList()
     {
         AudioAsset au = null;
-        if (sfxList.Count > 0)
-        {
-            for (int i = 0; i < sfxList.Count; i++)
-            {
-                sfxList[i].CheckState();
-                if (sfxList[i].PlayState == AudioPlayState.Stop)
-                {
-                    au = sfxList[i];
-                    break;
-                }
-            }
-        }
         if (au == null)
         {
-            au = CreateAudioAsset(mono.gameObject, false, false);
+            au = CreateAudioAssetByPool(mono.gameObject, false,  AudioSourceType.SFX);
             sfxList.Add(au);
         }
         return au;
@@ -125,27 +113,22 @@ public class Audio2DPlayer : AudioPlayerBase
     private List<AudioAsset> clearList = new List<AudioAsset>();
     public void ClearMoreAudioAsset()
     {
-        if (sfxList.Count > maxSFXAudioAssetNum)
+        for (int i = 0; i < sfxList.Count; i++)
         {
-
-            for (int i = 0; i < sfxList.Count; i++)
+            sfxList[i].CheckState();
+            if (sfxList[i].PlayState == AudioPlayState.Stop)
             {
-                sfxList[i].CheckState();
-                if (sfxList[i].PlayState == AudioPlayState.Stop)
-                {
-                    clearList.Add(sfxList[i]);
-                }
+                clearList.Add(sfxList[i]);
             }
-
-            for (int i = 0; i < clearList.Count; i++)
-            {
-                if (sfxList.Count <= maxSFXAudioAssetNum)
-                    break;
-                Object.Destroy(clearList[i].audioSource);
-                sfxList.Remove(clearList[i]);
-            }
-            clearList.Clear();
         }
+
+        for (int i = 0; i < clearList.Count; i++)
+        {
+            DestroyAudioAssetByPool(clearList[i]);
+            sfxList.Remove(clearList[i]);
+        }
+        clearList.Clear();
+
     }
 
 }

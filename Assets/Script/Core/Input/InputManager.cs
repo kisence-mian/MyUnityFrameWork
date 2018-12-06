@@ -53,7 +53,10 @@ public class InputManager
         }
 
         Type typeArgument = Type.GetType(DispatcherName);
-
+        if (typeArgument == null)
+        {
+            throw new Exception(DispatcherName + " is not dont have class!");
+        }
         if (typeArgument.IsSubclassOf(typeof(IInputDispatcher)))
         {
             throw new Exception(DispatcherName + " is not IInputDispatcher subclass!");

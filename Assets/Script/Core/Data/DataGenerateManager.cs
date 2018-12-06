@@ -7,6 +7,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
 {
     //static T s_dataCatch;
     static Dictionary<string, T> s_dict = new Dictionary<string, T>();
+    static List<T> s_ListData = new List<T>();
 
     static bool s_isInit = false;
 
@@ -33,6 +34,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
             T data = new T();
             data.LoadData(key);
             s_dict.Add(key,data);
+            s_ListData.Add(data);
             return data;
         }
     }
@@ -55,6 +57,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
         for (int i = 0; i < data.TableIDs.Count; i++)
         {
             GetData(data.TableIDs[i]);
+            
         }
     }
 
@@ -63,6 +66,12 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
         CleanCache();
         PreLoad();
         return s_dict;
+    }
+    public static List<T> GetAllDataList()
+    {
+        CleanCache();
+        PreLoad();
+        return s_ListData;
     }
     public static DataTable GetDataTable()
     {
@@ -75,6 +84,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
     public static void CleanCache(params object[] objs)
     {
         s_dict.Clear();
+        s_ListData.Clear();
     }
 }
 

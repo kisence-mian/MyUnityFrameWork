@@ -111,18 +111,24 @@ public static class ResourcesConfigManager
         else
         {
             ResLoadLocation type = ResLoadLocation.Streaming;
-
+           
             if (RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(HotUpdateManager.c_useHotUpdateRecordKey, false))
             {
-                type = ResLoadLocation.Persistent;
+                Debug.Log("读取沙盒路径");
 
-                dataJson = ResourceIOTool.ReadStringByFile(
-                PathTool.GetAbsolutePath(
-                     type,
-                     c_ManifestFileName + "." + ConfigManager.c_expandName));
+                type = ResLoadLocation.Persistent;
+                //更新资源存放在Application.persistentDataPath+"/Resources/"目录下
+                string persistentPath = PathTool.GetAssetsBundlePersistentPath() + c_ManifestFileName + "." + ConfigManager.c_expandName;
+                dataJson = ResourceIOTool.ReadStringByFile(persistentPath);
             }
             else
             {
+                Debug.Log("读取stream路径");
+
+                string path = PathTool.GetAbsolutePath(
+                     type,
+                     c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName);
+
                 AssetBundle ab = AssetBundle.LoadFromFile(PathTool.GetAbsolutePath(
                      type,
                      c_ManifestFileName + "." +  AssetsBundleManager.c_AssetsBundlesExpandName));

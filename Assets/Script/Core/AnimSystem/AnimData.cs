@@ -24,6 +24,10 @@ public class AnimData
     public float m_totalTime = 0;
     public int m_repeatCount = -1;
 
+    //Q4
+    public Quaternion m_fromQ4;
+    public Quaternion m_toQ4;
+
     //V3
     public Vector4 m_fromV4;
     public Vector4 m_toV4;
@@ -73,12 +77,13 @@ public class AnimData
     //缓存变量
     RectTransform m_rectRransform;
     Transform m_transform;
+    string gameObjectName;
 
     #endregion
 
     #region 核心函数
 
-    public void executeUpdate()
+    public bool ExecuteUpdate()
     {
         if (m_delayTime <= 0)
         {
@@ -123,6 +128,8 @@ public class AnimData
                 case AnimType.LocalScale: LocalScale(); break;
                 case AnimType.LocalRotate: LocalRotate(); break;
                 case AnimType.Rotate: Rotate(); break;
+                case AnimType.LocalRotation:LocalRotation();break;
+                case AnimType.Rotation:Rotation();break;
 
                 case AnimType.Color: UpdateColor(); break;
                 case AnimType.Alpha: UpdateAlpha(); break;
@@ -137,8 +144,10 @@ public class AnimData
         }
         catch (Exception e)
         {
-            Debug.LogError("AnimSystem Error Exception: " + e.ToString());
+            Debug.LogError("AnimSystem Error ! GameObjectName: " + gameObjectName + " Exception: " + e.ToString());
+            return true;
         }
+        return false;
     }
 
     //动画播放完毕执行回调
@@ -228,6 +237,16 @@ public class AnimData
 
     public void Init()
     {
+        if (m_animGameObejct != null)
+        {
+            gameObjectName = m_animGameObejct.name;
+        }
+        else
+        {
+            gameObjectName = "customMethod";
+        }
+
+
         switch (m_animType)
         {
             case AnimType.UGUI_Color: UguiColorInit(m_isChild); break;
@@ -243,6 +262,9 @@ public class AnimData
             case AnimType.LocalScale: TransfromInit(); break;
             case AnimType.LocalRotate: TransfromInit(); break;
             case AnimType.Rotate: TransfromInit(); break;
+            case AnimType.LocalRotation: TransfromInit(); break;
+            case AnimType.Rotation: TransfromInit(); break;
+
         }
 
         if (m_pathType != PathType.Line)
@@ -383,50 +405,44 @@ public class AnimData
 
     #region UGUI_Color
 
-    List<Image> m_animObjectList_Image = new List<Image>();
-    List<Text> m_animObjectList_Text = new List<Text>();
+    List<Graphic> m_graphicList_Image = new List<Graphic>();
+    //List<RawImage> m_rawImageList_Text = new List<RawImage>();
+    //List<Text> m_animObjectList_Text = new List<Text>();
 
     #region ALpha
 
     public void UguiAlphaInit(bool isChild)
     {
-        m_animObjectList_Image.Clear();
-        m_animObjectList_Text.Clear();
+        m_graphicList_Image.Clear();
         m_oldColor.Clear();
 
         if (isChild)
         {
-            Image[] images = m_animGameObejct.GetComponentsInChildren<Image>(true);
+            Graphic[] images = m_animGameObejct.GetComponentsInChildren<Graphic>(true);
             for (int i = 0; i < images.Length; i++)
             {
                 if (images[i].transform.GetComponent<Mask>() == null)
                 {
-                    m_animObjectList_Image.Add(images[i]);
+                    m_graphicList_Image.Add(images[i]);
                     m_oldColor.Add(images[i].color);
                 }
             }
 
-            Text[] texts = m_animGameObejct.GetComponentsInChildren<Text>(true);
+            //Text[] texts = m_animGameObejct.GetComponentsInChildren<Text>(true);
 
-            for (int i = 0; i < texts.Length; i++)
-            {
-                m_animObjectList_Text.Add(texts[i]);
-                m_oldColor.Add(texts[i].color);
-            }
+            //for (int i = 0; i < texts.Length; i++)
+            //{
+            //    m_animObjectList_Text.Add(texts[i]);
+            //    m_oldColor.Add(texts[i].color);
+            //}
         }
         else
         {
-            Image image = m_animGameObejct.GetComponent<Image>();
-            Text text = m_animGameObejct.GetComponent<Text>();
-            if (image != null)
+            Graphic gra = m_animGameObejct.GetComponent<Graphic>();
+            if (gra != null)
             {
-                m_animObjectList_Image.Add(image);
-                m_oldColor.Add(image.color);
-            }
-            if (text != null)
-            {
-                m_animObjectList_Text.Add(text);
-                m_oldColor.Add(text.color);
+                m_graphicList_Image.Add(gra);
+                m_oldColor.Add(gra.color);
             }
         }
 
@@ -444,23 +460,23 @@ public class AnimData
         Color newColor = colTmp;
 
         int index = 0;
-        for (int i = 0; i < m_animObjectList_Image.Count; i++)
+        for (int i = 0; i < m_graphicList_Image.Count; i++)
         {
             newColor = m_oldColor[index];
             newColor.a = a;
-            m_animObjectList_Image[i].color = newColor;
+            m_graphicList_Image[i].color = newColor;
 
             index++;
         }
 
-        for (int i = 0; i < m_animObjectList_Text.Count; i++)
-        {
-            newColor = m_oldColor[index];
-            newColor.a = a;
-            m_animObjectList_Text[i].color = newColor;
+        //for (int i = 0; i < m_graphicList_Image.Count; i++)
+        //{
+        //    newColor = m_oldColor[index];
+        //    newColor.a = a;
+        //    m_graphicList_Image[i].color = newColor;
 
-            index++;
-        }
+        //    index++;
+        //}
     }
 
     #endregion
@@ -474,29 +490,29 @@ public class AnimData
 
     public void UguiColorInit(bool isChild)
     {
-        m_animObjectList_Image.Clear();
-        m_animObjectList_Text.Clear();
+        m_graphicList_Image.Clear();
+        //m_animObjectList_Text.Clear();
 
         if (isChild)
         {
-            Image[] images = m_animGameObejct.GetComponentsInChildren<Image>();
+            Graphic[] images = m_animGameObejct.GetComponentsInChildren<Graphic>();
             for (int i = 0; i < images.Length; i++)
             {
                 if (images[i].transform.GetComponent<Mask>() == null)
                 {
-                    m_animObjectList_Image.Add(images[i]);
+                    m_graphicList_Image.Add(images[i]);
                 }
                 else
                 {
                     //Debug.LogError("name:" + images[i].gameObject.name);
                 }
             }
-            Text[] texts = m_animGameObejct.GetComponentsInChildren<Text>();
+            //Text[] texts = m_animGameObejct.GetComponentsInChildren<Text>();
 
-            for (int i = 0; i < texts.Length; i++)
-            {
-                m_animObjectList_Text.Add(texts[i]);
-            }
+            //for (int i = 0; i < texts.Length; i++)
+            //{
+            //    m_graphicList_Image.Add(texts[i]);
+            //}
         }
         else
         {
@@ -504,27 +520,27 @@ public class AnimData
             Text text = m_animGameObejct.GetComponent<Text>();
             if (image != null)
             {
-                m_animObjectList_Image.Add(image);
+                m_graphicList_Image.Add(image);
             }
-            if (text != null)
-            {
-                m_animObjectList_Text.Add(text);
-            }
+            //if (text != null)
+            //{
+            //    m_animObjectList_Text.Add(text);
+            //}
         }
         SetUGUIColor(m_fromColor);
     }
 
     void SetUGUIColor(Color color)
     {
-        for (int i = 0; i < m_animObjectList_Image.Count; i++)
+        for (int i = 0; i < m_graphicList_Image.Count; i++)
         {
-            m_animObjectList_Image[i].color = color;
+            m_graphicList_Image[i].color = color;
         }
 
-        for (int i = 0; i < m_animObjectList_Text.Count; i++)
-        {
-            m_animObjectList_Text[i].color = color;
-        }
+        //for (int i = 0; i < m_graphicList_Image.Count; i++)
+        //{
+        //    m_graphicList_Image[i].color = color;
+        //}
     }
 
 
@@ -540,7 +556,7 @@ public class AnimData
             Debug.LogError(m_transform.name + "缺少RectTransform组件，不能进行sizeDelta变换！！");
             return;
         }
-        m_rectRransform.sizeDelta = GetInterpolationV3(m_fromV2, m_toV2);
+        m_rectRransform.sizeDelta = GetInterpolationV2(m_fromV2, m_toV2);
     }
 
     #endregion
@@ -556,6 +572,7 @@ public class AnimData
     {
         m_rectRransform.anchoredPosition3D = GetInterpolationV3(m_fromV3, m_toV3);
     }
+
 
     #endregion
 
@@ -590,11 +607,23 @@ public class AnimData
         m_transform.localEulerAngles = GetInterpolationV3(m_fromV3, m_toV3);
     }
 
+
+    void LocalRotation()
+    {
+        m_transform.localRotation = GetInterpolationQ4(m_fromQ4, m_toQ4);
+
+    }
+
     void Rotate()
     {
         m_transform.eulerAngles = GetInterpolationV3(m_fromV3, m_toV3);
     }
 
+    void Rotation()
+    {
+        m_transform.rotation = GetInterpolationQ4(m_fromQ4, m_toQ4);
+
+    }
     void LocalScale()
     {
         m_transform.localScale = GetInterpolationV3(m_fromV3, m_toV3);
@@ -811,6 +840,25 @@ public class AnimData
         return result;
     }
 
+    Vector3 GetInterpolationV2(Vector2 oldValue, Vector2 aimValue)
+    {
+        Vector2 result = Vector2.zero;
+
+        if (m_pathType == PathType.Line)
+        {
+            result = new Vector2(
+                GetInterpolation(oldValue.x, aimValue.x),
+                GetInterpolation(oldValue.y, aimValue.y)
+            );
+        }
+        else
+        {
+            result = GetBezierInterpolationV3(oldValue, aimValue);
+        }
+
+        return result;
+    }
+
     Vector3 GetInterpolationV3(Vector3 oldValue, Vector3 aimValue)
     {
         Vector3 result = Vector3.zero;
@@ -826,6 +874,28 @@ public class AnimData
         else
         {
             result = GetBezierInterpolationV3(oldValue, aimValue);
+        }
+
+        return result;
+    }
+
+
+    Quaternion GetInterpolationQ4(Quaternion oldValue, Quaternion aimValue)
+    {
+        Quaternion result = Quaternion.Euler(Vector3.zero);
+
+        if (m_pathType == PathType.Line)
+        {
+            result = new Quaternion(
+                GetInterpolation(oldValue.x, aimValue.x),
+                GetInterpolation(oldValue.y, aimValue.y),
+                GetInterpolation(oldValue.z, aimValue.z),
+                GetInterpolation(oldValue.w, aimValue.w)
+            );
+        }
+        else
+        {
+            //result = GetBezierInterpolationV3(oldValue, aimValue);
         }
 
         return result;
@@ -857,7 +927,7 @@ public class AnimData
         float c = to - b;
 
         t = t / d - 1;
-
+        //Debug.LogWarning(c * (t * t * ((s + 1) * t + s) + 1) + b);
         return c * (t * t * ((s + 1) * t + s) + 1) + b;
 
     }

@@ -22,7 +22,7 @@ public class UGUITool
         return false;
     }
     
-    static public void set_icon(Image img,string name,bool is_nativesize = true)
+    static public void SetImageSprite(Image img,string name,bool is_nativesize = false)
     {
         if(name == null)
         {
@@ -36,36 +36,40 @@ public class UGUITool
             return;
         }
 
-        try
-        {
-            Sprite sp = ResourceManager.Load<Sprite>(name);
-            img.overrideSprite = sp;// Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);
-            img.sprite = img.overrideSprite;
-
-            if (is_nativesize)
-                img.SetNativeSize();
-        }
-        catch (System.Exception e)
-        {
-            Debug.LogError("set_icon Exception:" + e.ToString());           
-        }
+            Sprite sp = ResourceManager.Load<Sprite>(name);// LoadSprite(name);
+            if (sp != null)
+            {
+                img.overrideSprite = sp;// Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);
+                img.sprite = img.overrideSprite;
+               
+                if (is_nativesize)
+                    img.SetNativeSize();
+            }
+            else
+            {
+                Debug.LogError("SetImageSprite 加载失败，查看资源是否存在，图片格式是否正确:" + name);
+            }
+       
     }
 
-    static public void set_SpriteRender(GameObject go , string name)
+    static public void SetSpriteRender(GameObject go, string name)
     {
-        try {
-            Texture2D tex = ResourceManager.Load<Texture2D>(name);
-            SpriteRenderer sprite = go.GetComponent<SpriteRenderer>();
-            sprite.sprite = CreateSprite(tex);
-        }
-        catch
-        {
-
-        }
+        SpriteRenderer sprite = go.GetComponent<SpriteRenderer>();
+        sprite.sprite = LoadSprite(name);
     }
 
-    static public Sprite CreateSprite(Texture2D texture)
+    public static Sprite LoadSprite(string resName)
     {
-        return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector3.one * 0.5f);
+        Texture2D texture = ResourceManager.Load<Texture2D>(resName);
+        if (texture)
+        {
+            return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+        }
+        else
+        {
+            Debug.LogError("加载图片失败：" + resName);
+            return null;
+        }
     }
+   
 }

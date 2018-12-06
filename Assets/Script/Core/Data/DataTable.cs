@@ -248,7 +248,7 @@ public class DataTable : Dictionary<string, SingleData>
 
         //type
         List<string> type = new List<string>(data.m_tableTypes.Keys);
-        Debug.Log("type count " + type.Count);
+        //Debug.Log("type count " + type.Count);
         build.Append(c_fieldTypeTableTitle);
 
         if (type.Count > 0)
@@ -378,7 +378,7 @@ public class DataTable : Dictionary<string, SingleData>
         }
 
         //value
-        foreach (string k in data.Keys)
+        foreach (string k in data.TableIDs)
         {
             SingleData dataTmp = data[k];
             for (int i = 0; i < data.TableKeys.Count; i++)

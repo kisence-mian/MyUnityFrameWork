@@ -6,8 +6,9 @@ using UnityEngine.UI;
 public class LanguageComponent : MonoBehaviour
 {
     public string languageKey = "";
-
-    public Text m_text;
+    [System.NonSerialized]
+   public Text m_text;
+  
 
     public void Start()
     {
@@ -28,7 +29,7 @@ public class LanguageComponent : MonoBehaviour
     {
         if (string.IsNullOrEmpty(languageKey))
             return;
-        m_text.text = LanguageManager.GetContentByKey(languageKey);
+        m_text.text = LanguageManager.GetContentByKey(languageKey).ToString();
     }
 
     void ReceviceLanguageChange(params object[] objs)

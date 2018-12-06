@@ -135,8 +135,9 @@ public class RecordEditorWindow : EditorWindow
             {
                 if (EditorUtility.DisplayDialog("警告", "确定要删除该数据吗！", "是", "取消"))
                 {
-                    File.Delete(Application.dataPath + "/Resources/" + RecordManager.c_directoryName + "/" + m_currentRecordName + ".json");
+                    File.Delete(Application.persistentDataPath + "/" + RecordManager.c_directoryName + "/" + m_currentRecordName + ".json");
                     AssetDatabase.Refresh();
+                    FindAllRecordName();
                 }
             }
         }

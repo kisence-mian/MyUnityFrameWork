@@ -57,6 +57,9 @@ public class FileTool
         for (int i = 0; i < files.Length; i++)
         {
             string pathTmp = files[i];
+
+            Debug.Log(pathTmp);
+
             if (File.Exists(pathTmp))
             {
                 File.Delete(pathTmp);
@@ -177,21 +180,26 @@ public class FileTool
     //移除拓展名
     public static string RemoveExpandName(string name)
     {
-        int dirIndex = name.LastIndexOf(".");
+        if (Path.HasExtension(name))
+            name = Path.ChangeExtension(name, null);
+        return name;
 
-        if (dirIndex != -1)
-        {
-            return name.Remove(dirIndex);
-        }
-        else
-        {
-            return name;
-        }
+
+        //int dirIndex = name.LastIndexOf(".");
+
+        //if (dirIndex != -1)
+        //{
+        //    return name.Remove(dirIndex);
+        //}
+        //else
+        //{
+        //    return name;
+         //}
     }
 
     public static string GetExpandName(string name)
     {
-        return name.Substring(name.LastIndexOf(".") + 1, (name.Length - name.LastIndexOf(".") - 1));
+        return Path.GetExtension(name);
     }
 
     //取出一个路径下的文件名

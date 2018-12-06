@@ -47,7 +47,7 @@ public class TimerEvent
     {
         CallBackTimer();
         
-        if(m_repeatCount>0)
+        if(m_repeatCount > 0)
         {
             m_currentRepeat++;
         }

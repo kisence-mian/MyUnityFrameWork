@@ -50,18 +50,78 @@ public class GUIUtil
         }
     }
 
+    //const int maxContent = 15000;
+    //public static void SafeTextArea(string content)
+    //{
+    //    if(content.Length > maxContent)
+    //    {
+    //        GUILayout.TextArea(content.Substring(0, maxContent));
+    //        SafeTextArea(content.Substring(maxContent+ 1,content.Length - maxContent - 1));
+    //    }
+    //    else
+    //    {
+    //        GUILayout.TextArea(content);
+    //    }
+    //}
+
     const int maxContent = 15000;
+
+    static string[] log;
+    static int page;
+
     public static void SafeTextArea(string content)
     {
-        if(content.Length > maxContent)
+        int startIndex = page * maxContent;
+
+        if(startIndex > content.Length)
         {
-            GUILayout.TextArea(content.Substring(0, maxContent));
-            SafeTextArea(content.Substring(maxContent+ 1,content.Length - maxContent - 1));
+            page = 0;
+            startIndex = page * maxContent;
         }
-        else
+
+        int length = maxContent;
+        if (startIndex + length > content.Length)
         {
-            GUILayout.TextArea(content);
+            length = content.Length - startIndex;
         }
+
+        //Debug.Log("startIndex " + startIndex + " length " + length + " content " + content.Length);
+
+        string contentTmp = content.Substring(startIndex, length);
+
+        GUILayout.TextArea(contentTmp);
+
+        GUILayout.Label("第" + (page + 1)  + "页 共" + Mathf.Ceil(content.Length / (float)maxContent) + "页");
+
+        GUILayout.BeginHorizontal();
+
+        if (page > 0)
+        {
+            if (GUILayout.Button("上一页"))
+            {
+                page--;
+            }
+        }
+
+        if(content.Length > ((page + 1) * maxContent))
+        {
+            if (GUILayout.Button("下一页"))
+            {
+                page++;
+            }
+        }
+
+        if (GUILayout.Button("首页"))
+        {
+            page = 0;
+        }
+
+        if (GUILayout.Button("末页"))
+        {
+            page = content.Length/maxContent;
+        }
+
+        GUILayout.EndHorizontal();
     }
 
     #region Tips

@@ -2,122 +2,138 @@
 using System.Collections;
 using System.Collections.Generic;
 
-    public enum AudioPlayState
+public enum AudioPlayState
+{
+    Playing,
+    Pause,
+    Stoping,
+    Stop,
+}
+/// <summary>
+/// 音乐资源类型，音乐还是音效
+/// </summary>
+public enum AudioSourceType
+{
+    Music,
+    SFX,
+}
+public class AudioAsset
+{
+    public AudioSource audioSource;
+    public AudioSourceType sourceType;
+    public string flag = "";
+    public string assetName = "";
+    private float totleVolume = 1;
+    /// <summary>
+    /// 总音量
+    /// </summary>
+    public float TotleVolume
     {
-        Playing,
-        Pause,
-        Stop,
-    }
-    public class AudioAsset
-    {
-        public AudioSource audioSource;
-
-        public string assetName = "";
-        private float totleVolume = 1;
-        /// <summary>
-        /// 总音量
-        /// </summary>
-        public float TotleVolume
+        get
         {
-            get
-            {
-                return totleVolume;
-            }
-
-            set
-            {
-
-                totleVolume = value;
-                Volume = TotleVolume * volumeScale;
-            }
+            return totleVolume;
         }
-        /// <summary>
-        /// 当前AudioSource 实际音量
-        /// </summary>
-        public float Volume
+
+        set
         {
-            get { return audioSource.volume; }
-            set { audioSource.volume = value; }
-        }
-        /// <summary>
-        /// 实际音量恢复到当前的最大
-        /// </summary>
-        public void ResetVolume()
-        {
+
+            totleVolume = value;
             Volume = TotleVolume * volumeScale;
         }
-        public float GetMaxRealVolume()
+    }
+    /// <summary>
+    /// 当前AudioSource 实际音量
+    /// </summary>
+    public float Volume
+    {
+        get { return audioSource.volume; }
+        set { audioSource.volume = value; }
+    }
+    /// <summary>
+    /// 实际音量恢复到当前的最大
+    /// </summary>
+    public void ResetVolume()
+    {
+        Volume = TotleVolume * volumeScale;
+    }
+    public float GetMaxRealVolume()
+    {
+        return TotleVolume * volumeScale;
+    }
+    /// <summary>
+    /// 相对于总音量当前当前AudioSource的音量缩放 Volume=TotleVolume * volumeScale
+    /// </summary>
+    private float volumeScale = 1f;
+    public float VolumeScale
+    {
+        get { return volumeScale; }
+        set
         {
-            return TotleVolume * volumeScale;
+            volumeScale = Mathf.Clamp01(value);
+            ResetVolume();
         }
-        /// <summary>
-        /// 相对于总音量当前当前AudioSource的音量缩放 Volume=TotleVolume * volumeScale
-        /// </summary>
-        private float volumeScale = 1f;
-        public float VolumeScale
+    }
+    public bool IsPlay
+    {
+        get { return audioSource.isPlaying; }
+    }
+
+    private AudioPlayState playState = AudioPlayState.Stop;
+    public AudioPlayState PlayState
+    {
+        get
         {
-            get { return volumeScale; }
-            set
-            {
-                volumeScale = Mathf.Clamp01(value);
-                ResetVolume();
-            }
-        }
-        public bool IsPlay
-        {
-            get { return audioSource.isPlaying; }
+            return playState;
         }
 
-        private AudioPlayState playState = AudioPlayState.Stop;
-        public AudioPlayState PlayState
-        {
-            get
-            {
-                //if (audioSource == null || (!audioSource.isPlaying && playState != AudioPlayState.Pause))
-                //    playState = AudioPlayState.Stop;
-
-                return playState;
-            }
-
-        }
+    }
 
 
 
-        public void SetPlayState(AudioPlayState state)
-        {
-            playState = state;
-        }
+    public void SetPlayState(AudioPlayState state)
+    {
+        playState = state;
+    }
     public void CheckState()
     {
         if (audioSource == null || (!audioSource.isPlaying && playState != AudioPlayState.Pause))
-            playState = AudioPlayState.Stop;
+            Stop();
 
     }
 
     public void Play(float delay = 0f)
+    {
+        if (audioSource != null && audioSource.clip != null)
         {
-            if (audioSource != null && audioSource.clip != null)
-            {
-                audioSource.PlayDelayed(delay);
-                playState = AudioPlayState.Playing;
+            audioSource.PlayDelayed(delay);
+            playState = AudioPlayState.Playing;
 
-            }
-        }
-        public void Pause()
-        {
-            if (audioSource != null && audioSource.clip != null && audioSource.isPlaying)
-            {
-                audioSource.Pause();
-                playState = AudioPlayState.Pause;
-            }
-        }
-        public void Stop()
-        {
-            if (audioSource)
-                audioSource.Stop();
-            playState = AudioPlayState.Stop;
         }
     }
+    public void Pause()
+    {
+        if (audioSource != null && audioSource.clip != null && audioSource.isPlaying)
+        {
+            audioSource.Pause();
+            playState = AudioPlayState.Pause;
+        }
+    }
+    public void Stop()
+    {
+        if (audioSource)
+            audioSource.Stop();
+        playState = AudioPlayState.Stop;
+    }
+
+    /// <summary>
+    /// 重置某些参数，防止回收后再使用参数不对
+    /// </summary>
+    public void ResetData()
+    {
+        audioSource.pitch = 1;
+        flag = "";
+    }
+}
 
     public class VolumeFadeData
     {

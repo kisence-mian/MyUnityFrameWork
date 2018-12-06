@@ -26,16 +26,8 @@ public class ReusingScrollRect : ScrollRectInput
 
     #region 公共方法
 
-    public  void Init(string UIEventKey,string itemName)
+    public void SetItem(string itemName)
     {
-        if (content == null)
-        {
-            throw new Exception("SetItemDisplay Exception: content is null !");
-        }
-
-
-        base.Init(UIEventKey);
-
         m_ItemName = itemName;
         //m_rectTransform = GetComponent<RectTransform>();
 
@@ -313,7 +305,7 @@ public class ReusingScrollRect : ScrollRectInput
         }
 
         result = GameObjectManager.CreateGameObjectByPool(m_itemPrefab).GetComponent<ReusingScrollItemBase>();
-        result.Init(m_items.Count);
+        result.Init(m_UIEventKey, m_items.Count);
         m_items.Add(result);
 
         return result;

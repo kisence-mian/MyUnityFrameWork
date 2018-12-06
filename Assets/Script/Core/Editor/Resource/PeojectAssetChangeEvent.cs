@@ -22,7 +22,7 @@ public class PeojectAssetChangeEvent  {
         //List<string> paths = new List<string>();
         //paths.AddRange(t);
         //UpdateAsset(paths);
-        Debug.Log("OnSaveAssetsCallBack");
+        //Debug.Log("OnSaveAssetsCallBack");
         //GlobalEvent.DispatchEvent(EditorGlobalEventEnum.OnSaveAssets, t);
     }
 
@@ -32,7 +32,7 @@ public class PeojectAssetChangeEvent  {
         paths.Add(t1);
         paths.Add(t2);
         //UpdateAsset(paths);
-        Debug.Log("OnMoveAssetCallBack");
+        //Debug.Log("OnMoveAssetCallBack");
         //GlobalEvent.DispatchEvent(EditorGlobalEventEnum.OnMoveAsset, t,t1,t2);
     }
 
@@ -41,7 +41,7 @@ public class PeojectAssetChangeEvent  {
         List<string> paths = new List<string>();
         paths.Add(t1);
         //UpdateAsset(paths);
-        Debug.Log("OnDeleteAssetCallBack");
+        //Debug.Log("OnDeleteAssetCallBack");
         //GlobalEvent.DispatchEvent(EditorGlobalEventEnum.OnDeleteAsset, t, t1, t2);
     }
 
@@ -50,7 +50,7 @@ public class PeojectAssetChangeEvent  {
         List<string> paths = new List<string>();
         paths.Add(t);
         //UpdateAsset(paths);
-        Debug.Log("OnCreateAssetCallBack");
+        //Debug.Log("OnCreateAssetCallBack");
         //GlobalEvent.DispatchEvent(EditorGlobalEventEnum.OnCreateAsset, t);
     }
 

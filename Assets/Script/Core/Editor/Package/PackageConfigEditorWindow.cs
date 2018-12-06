@@ -3,7 +3,7 @@ using System.Collections;
 using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
-
+ 
 public class BundleConfigEditorWindow : EditorWindow
 {
     public const string c_configFileName = "BundleConfigEditor";
@@ -129,14 +129,10 @@ public class BundleConfigEditorWindow : EditorWindow
             CheckPackage();
         }
 
-        //if (GUILayout.Button("重新添加资源文件并保存"))
-        //{
-        //    AddAllResourceBundle();  //添加资源文件
-        //    ArrangeBundlesByLayer(); //整理资源路径
-
-        //    CreatPackageFile();                 //保存编辑器文件
-        //    CheckAndCreatBundelPackageConfig(); //生成资源路径文件
-        //}
+        if (GUILayout.Button("生成MD5"))
+        {
+            CheckAndCreatBundelPackageConfig(); //生成资源路径文件
+        }
 
         if (GUILayout.Button("保存游戏资源路径文件"))
         {
@@ -159,11 +155,6 @@ public class BundleConfigEditorWindow : EditorWindow
             }
         }
 
-        if (GUILayout.Button("生成MD5"))
-        {
-            CheckAndCreatBundelPackageConfig();
-        }
-
         GUILayout.BeginHorizontal();
 
         VersionService.LargeVersion = EditorGUILayout.IntField("large", VersionService.LargeVersion);
@@ -175,6 +166,11 @@ public class BundleConfigEditorWindow : EditorWindow
         }
 
         GUILayout.EndHorizontal();
+
+        //if (GUILayout.Button("重打包增量文件并将差异文件导出到 diff 文件夹"))
+        //{
+        //    ExportDifferenceFile();
+        //}
 
         if (isContent)
         {
@@ -995,7 +991,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
     public string GetExportPath(string path, string name)
     {
-        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(FileTool.RemoveExpandName(path)) + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
+        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(path) + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
     }
 
     #endregion
@@ -1060,21 +1056,23 @@ public class BundleConfigEditorWindow : EditorWindow
         for (int i = 0; i < files.Length; i++)
         {
             string relativePath = files[i].Substring(direIndex);
-
-            if (relativePath.EndsWith(".prefab")
-                || relativePath.EndsWith(".png")
-                || relativePath.EndsWith(".jpg")
-                || relativePath.EndsWith(".mp3")
-                || relativePath.EndsWith(".wav")
-                || relativePath.EndsWith(".txt")
-                || relativePath.EndsWith(".proto")
-                || relativePath.EndsWith(".json")
-                || relativePath.EndsWith(".xml")
-                || relativePath.EndsWith(".csv")
-                || relativePath.EndsWith(".tga")
-                || relativePath.EndsWith(".shader")
-                || relativePath.EndsWith(".mat")
-                )
+            if (relativePath.EndsWith(".meta"))
+                continue;
+            //if (relativePath.EndsWith(".prefab")
+            //    || relativePath.EndsWith(".png")
+            //    || relativePath.EndsWith(".jpg")
+            //    || relativePath.EndsWith(".mp3")
+            //    || relativePath.EndsWith(".wav")
+            //    || relativePath.EndsWith(".txt")
+            //    || relativePath.EndsWith(".proto")
+            //    || relativePath.EndsWith(".json")
+            //    || relativePath.EndsWith(".xml")
+            //    || relativePath.EndsWith(".csv")
+            //    || relativePath.EndsWith(".tga")
+            //    || relativePath.EndsWith(".shader")
+            //    || relativePath.EndsWith(".mat")
+            //    )
+            else
             {
                 relativePath = FileTool.RemoveExpandName(relativePath);
                 Object tmp = Resources.Load(relativePath);
@@ -1622,6 +1620,9 @@ public class BundleConfigEditorWindow : EditorWindow
         VersionService.CreateVersionFile();
 
         EditorCoroutineRunner.StartEditorCoroutine(PackageService.Package(relyPackages, bundles, ProessCallback));
+
+        
+
     }
 
 #pragma warning disable
@@ -1631,12 +1632,18 @@ public class BundleConfigEditorWindow : EditorWindow
     void EndPackage()
     {
         EditorCoroutineRunner.StopAllEditorCoroutine();
+        BuildPipeline.PopAssetDependencies(); //移除依赖
         isPacking = false;
         EndProgress();
     }
 
     void PackageRelyPackage(EditPackageConfig package)
     {
+        var relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
+            | BuildAssetBundleOptions.CollectDependencies   //收集依赖
+            | BuildAssetBundleOptions.CompleteAssets;      //完整资源
+        //| BuildAssetBundleOptions.UncompressedAssetBundle //不压缩
+
         if (package.objects.Count == 0)
         {
             Debug.LogError(package.name + " 没有资源！");
@@ -1658,6 +1665,11 @@ public class BundleConfigEditorWindow : EditorWindow
 
     void PackageBundle(EditPackageConfig package)
     {
+        var buildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
+        | BuildAssetBundleOptions.CollectDependencies   //收集依赖
+        | BuildAssetBundleOptions.CompleteAssets;      //完整资源
+        //| BuildAssetBundleOptions.UncompressedAssetBundle; //不压缩
+
         //Debug.Log("PackageBundle " + package.name);
         //导入资源包
         BuildPipeline.PushAssetDependencies();
@@ -1674,17 +1686,15 @@ public class BundleConfigEditorWindow : EditorWindow
 
         FileTool.CreatFilePath(path);
 
-        BuildPipeline.BuildAssetBundle(package.mainObject.obj, res, path, relyBuildOption, getTargetPlatform);
+        //Debug.Log(package.mainObject.obj);
+
+        BuildPipeline.BuildAssetBundle(package.mainObject.obj, res, path, buildOption, getTargetPlatform);
 
         BuildPipeline.PopAssetDependencies();
     }
 
     void RePackageBundle(EditPackageConfig package)
     {
-        relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
-       | BuildAssetBundleOptions.CollectDependencies   //收集依赖
-       | BuildAssetBundleOptions.CompleteAssets;      //完整资源
-        //| BuildAssetBundleOptions.UncompressedAssetBundle //不压缩
 
         BuildPipeline.PushAssetDependencies();
 
@@ -1701,6 +1711,31 @@ public class BundleConfigEditorWindow : EditorWindow
         BuildPipeline.PopAssetDependencies();
     }
     #endregion
+
+    //#region 导出差异文件
+
+    //void ExportDifferenceFile()
+    //{
+    //    //创建并清空 Diff 文件夹
+    //    string diffPath = Application.dataPath + "/.Diff/";
+    //    FileTool.CreatPath(diffPath);
+    //    FileTool.DeleteDirectory(diffPath);
+
+    //    //读取本地清单文件
+    //    string streamPath = Application.dataPath + "/StreamingAssets/";
+
+    //    //比较差异
+    //    //导出版本文件
+    //    File.Copy(streamPath +HotUpdateManager.c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName
+    //        , diffPath + HotUpdateManager.c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName);
+
+
+    //    //导出清单文件
+    //    File.Copy(streamPath + ResourcesConfigManager.c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName
+    //        , diffPath + ResourcesConfigManager.c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName);
+    //}
+
+    //#endregion
 
     #region 生成游戏中使用的配置文件
 
@@ -1773,14 +1808,10 @@ public class BundleConfigEditorWindow : EditorWindow
         //保存游戏中读取的配置文件
         //ConfigManager.SaveData(ResourcesConfigManager.c_configFileName, gameConfig);
 
-        float time = Time.realtimeSinceStartup;
-
         EditorUtil.WriteStringByFile(
             PathTool.GetAbsolutePath(ResLoadLocation.Resource,
             ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName)
             , FrameWork.Json.Serialize(data));
-
-        Debug.Log("保存完毕 序列化时间: " + (Time.realtimeSinceStartup - time));
 
         AssetDatabase.Refresh();
     }

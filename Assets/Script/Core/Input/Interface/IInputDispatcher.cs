@@ -23,7 +23,7 @@ public abstract class IInputDispatcher
             }
             catch (Exception e)
             {
-                Debug.LogError(e.ToString());
+                Debug.LogError("AllEventDispatch name: " + eventName + " key: " +inputEvent.EventKey  + " Exception:" + e.ToString());
             }
         }
     }

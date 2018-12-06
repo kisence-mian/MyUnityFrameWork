@@ -36,7 +36,7 @@ public class ObjectSelectorWindow : EditorWindow
 
     private static ObjectSelectorWindow win;
     private List<string> allFilePath = new List<string>();
-    private string assetName;
+    //private string assetName;
     CallBack<string, UnityEngine.Object> selectFileCallBack;
     private string searchName;
     private ObjectAssets selectAsset;
@@ -62,7 +62,7 @@ public class ObjectSelectorWindow : EditorWindow
     private void Init(EditorWindow otherWindow, string assetName, string[] paths, Type assetType, CallBack<string, UnityEngine.Object> selectFileCallBack)
     {
         this.otherWindow = otherWindow;
-        this.assetName = assetName;
+        //this.assetName = assetName;
         this.selectFileCallBack = selectFileCallBack;
 
         allFilePath.Clear();

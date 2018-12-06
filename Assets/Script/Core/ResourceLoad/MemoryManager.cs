@@ -17,12 +17,12 @@ public class MemoryManager
     /// <summary>
     /// 最大允许的内存使用量
     /// </summary>
-    public static int s_MaxMemoryUse = 170;
+    public static int s_MaxMemoryUse = 200;
 
     /// <summary>
     /// 最大允许的堆内存使用量
     /// </summary>
-    public static int s_MaxHeapMemoryUse = 50;
+    public static int s_MaxHeapMemoryUse = 70;
 
     public static void Init()
     {
@@ -37,19 +37,16 @@ public class MemoryManager
         //资源加载
         LoadResources();
 
-#if !UNITY_EDITOR
         //内存管理
         MonitorMemorySize();
-#else
 
     #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.F3))
+        if (Input.GetKeyDown(KeyCode.F12))
         {
             FreeHeapMemory();
         }
     #endif
 
-#endif
     }
 
     static void GUI()
@@ -214,7 +211,10 @@ public class MemoryManager
                 {
                     s_isFreeMemory2 = true;
                     FreeMemory();
+
+#if !UNITY_EDITOR
                     Debug.LogError("总内存超标告警 ！当前总内存使用量： " + ByteToM(Profiler.GetTotalAllocatedMemory()) + "M");
+#endif
                 }
             }
             else
@@ -239,7 +239,9 @@ public class MemoryManager
                 if (!s_isFreeHeapMemory2)
                 {
                     s_isFreeHeapMemory2 = true;
+#if !UNITY_EDITOR
                     Debug.LogError("堆内存超标告警 ！当前堆内存使用量： " + ByteToM( Profiler.GetMonoUsedSize()) + "M");
+#endif
                 }
             }
             else
@@ -253,7 +255,7 @@ public class MemoryManager
         }
     }
 
-    #endregion
+#endregion
 
     static float ByteToM(uint byteCount)
     {

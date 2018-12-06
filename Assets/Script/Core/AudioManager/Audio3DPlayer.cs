@@ -35,7 +35,7 @@ public class Audio3DPlayer : AudioPlayerBase
         }
     }
 
-    public void PlayMusic(GameObject owner, string audioName, int channel = 0, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f)
+    public void PlayMusic(GameObject owner, string audioName, int channel = 0, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f, string flag = "")
     {
         if (owner == null)
         {
@@ -59,11 +59,11 @@ public class Audio3DPlayer : AudioPlayerBase
         }
         else
         {
-            au = CreateAudioAsset(owner, true, true);
+            au = CreateAudioAssetByPool(owner, true,  AudioSourceType.Music);
             tempDic.Add(channel, au);
         }
 
-        PlayMusicControl(au, audioName, isLoop, volumeScale, delay, fadeTime);
+        PlayMusicControl(au, audioName, isLoop, volumeScale, delay, fadeTime,flag);
     }
     public void PauseMusic(GameObject owner, int channel, bool isPause, float fadeTime = 0.5f)
     {
@@ -175,12 +175,10 @@ public class Audio3DPlayer : AudioPlayerBase
             {
                 if (isPause)
                 {
-                    if (sfxList[i].PlayState == AudioPlayState.Playing)
                         sfxList[i].Pause();
                 }
                 else
                 {
-                    if (sfxList[i].PlayState == AudioPlayState.Pause)
                         sfxList[i].Play();
                 }
             }
@@ -215,20 +213,6 @@ public class Audio3DPlayer : AudioPlayerBase
         if (sfxDic.ContainsKey(owner))
         {
             sfxList = sfxDic[owner];
-            if (sfxList.Count > 0)
-            {
-                for (int i = 0; i < sfxList.Count; i++)
-                {
-                    sfxList[i].CheckState();
-                    if (sfxList[i].PlayState == AudioPlayState.Stop)
-                    {
-                        au = sfxList[i];
-                        break;
-                    }
-                }
-
-            }
-
         }
         else
         {
@@ -238,7 +222,7 @@ public class Audio3DPlayer : AudioPlayerBase
         }
         if (au == null)
         {
-            au = CreateAudioAsset(owner, true, false);
+            au = CreateAudioAssetByPool(owner, true,  AudioSourceType.SFX);
             sfxList.Add(au);
         }
 
@@ -251,8 +235,7 @@ public class Audio3DPlayer : AudioPlayerBase
         if (sfxDic.ContainsKey(owner))
         {
             List<AudioAsset> sfxList = sfxDic[owner];
-            if (sfxList.Count > maxSFXAudioAssetNum)
-            {
+           
                 for (int i = 0; i < sfxList.Count; i++)
                 {
                     sfxList[i].CheckState();
@@ -264,13 +247,13 @@ public class Audio3DPlayer : AudioPlayerBase
 
                 for (int i = 0; i < tempClearList.Count; i++)
                 {
-                    if (sfxList.Count <= maxSFXAudioAssetNum)
-                        break;
-                    Object.Destroy(tempClearList[i].audioSource);
-                    sfxList.Remove(tempClearList[i]);
+                    AudioAsset asset = tempClearList[i];
+                    Object.Destroy(asset.audioSource);
+                    DestroyAudioAssetByPool(asset);
+                    sfxList.Remove(asset);
                 }
                 tempClearList.Clear();
-            }
+            
         }
     }
 

@@ -387,7 +387,11 @@ public static class AssetsBundleManager
             bundleTmp.bundle.name = bundleName;
             bundleTmp.mainAsset = bundleTmp.bundle.mainAsset;
             bundleTmp.allAsset = bundleTmp.bundle.LoadAllAssets();
-            bundleTmp.bundle.Unload(false);
+
+            //延迟卸载资源，因为unity的资源卸载有时会异步
+            Timer.DelayCallBack(5, (obj) => {
+                bundleTmp.bundle.Unload(false);
+            });
 
             //如果有缓存起来的回调这里一起回调
             if( LoadAsyncDict.ContainsKey(bundleName))
@@ -452,6 +456,7 @@ public static class AssetsBundleManager
         if (isLoadByPersistent)
         {
             loadType = ResLoadLocation.Persistent;
+            return PathTool.GetAssetsBundlePersistentPath() + config.path + "." + c_AssetsBundlesExpandName;
         }
 
         return PathTool.GetAbsolutePath(loadType, config.path + "." + c_AssetsBundlesExpandName);
@@ -486,7 +491,7 @@ public class Bundle
             }
         }
 
-        throw new Exception("Bundle Load Exception : not find by " + typeof(T).Name  + " ");
+        throw new Exception("Bundle Load Exception : not find by " + typeof(T).Name  + " " + mainAsset.name + "->" + mainAsset.GetType().Name);
     }
 }
 

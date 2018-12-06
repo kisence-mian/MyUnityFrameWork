@@ -107,6 +107,8 @@ public class JsonNetworkService : INetworkInterface
         {
             if(s != null && s != "")
             {
+                Debug.Log("JsonNetworkService ->" + s);
+
                 NetWorkMessage msg = new NetWorkMessage();
 
                 s = WWW.UnEscapeURL(s);
@@ -115,6 +117,11 @@ public class JsonNetworkService : INetworkInterface
 
                 msg.m_data = data;
                 msg.m_MessageType = data["MT"].ToString();
+
+                if(data.ContainsKey("MsgCode"))
+                {
+                    msg.m_MsgCode = (int)data["MsgCode"];
+                }
 
                 m_messageCallBack(msg);
             }

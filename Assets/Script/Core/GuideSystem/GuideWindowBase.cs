@@ -74,7 +74,7 @@ namespace FrameWork.GuideSystem
 
         public void ShowGuideUIByItem(string uiName, UIWindowBase ui, string itemName, Vector3 offset, bool isFollow)
         {
-            GameObject aimUI = ui.GetItem(itemName);
+            GameObject aimUI = ui.GetGuideDynamicCreateItem(itemName);
 
             ShowGuideUI(GetRectTransform(uiName), aimUI, offset, isFollow);
         }

@@ -12,7 +12,7 @@ public class UILayerManager : MonoBehaviour
         {
             UICameraData data = UICameraList[i];
 
-            data.m_root.transform.localPosition = new Vector3(0, 0, i * -2000);
+            //data.m_root.transform.localPosition = new Vector3(0, 0, i * -2000);
 
             if (data.m_root == null)
             {
@@ -88,6 +88,12 @@ public class UILayerManager : MonoBehaviour
             rt.transform.localPosition = Vector3.zero;
             rt.anchoredPosition = Vector3.zero;
             rt.SetAsLastSibling();
+        }
+        else
+        {
+            Vector3 lp = rt.transform.localPosition;
+            lp.z = 0;
+            rt.transform.localPosition = lp;
         }
     }
 

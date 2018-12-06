@@ -531,9 +531,9 @@ public class EditorDrawGUIUtil
         GUILayout.EndVertical();
         return obj;
     }
-    public static object DrawList(string name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null)
+    public static object DrawList(string name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null, CallBackR<string, object> itemTitleName = null)
     {
-        return DrawList(new GUIContent(name), data, addCustomData, ItemChnageCallBack, customDrawItem);
+        return DrawList(new GUIContent(name), data, addCustomData, ItemChnageCallBack, customDrawItem, itemTitleName);
     }
     /// <summary>
     /// 绘制List泛型
@@ -543,8 +543,9 @@ public class EditorDrawGUIUtil
     /// <param name="addCustomData">自定义添加新的Item</param>
     /// <param name="ItemChnageCallBack">当Item添加或删除时回调</param>
     /// <param name="customDrawItem">自定义绘制Item</param>
+    /// <param name="itemTitleName">自定义绘制Itemm名称 当customDrawItem==null时起作用</param>
     /// <returns></returns>
-    public static object DrawList(GUIContent name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null)
+    public static object DrawList(GUIContent name, object data, CallBackR<object> addCustomData = null, CallBack<bool, object> ItemChnageCallBack = null, CallBackR<object, object> customDrawItem = null,CallBackR<string,object> itemTitleName=null)
     {
         if (data == null)
         {
@@ -602,7 +603,11 @@ public class EditorDrawGUIUtil
                 }
                 else
                 {
-                    da = DrawBaseValue("" + i, da);
+                    string itemTitle = "" + i;
+                    if (itemTitleName != null)
+                        itemTitle=itemTitleName(da);
+
+                    da = DrawBaseValue(itemTitle, da);
                 }
                 GUILayout.EndVertical();
                 methodInfo1.Invoke(data, new object[] { i, da });
@@ -640,7 +645,7 @@ public class EditorDrawGUIUtil
         return data;
     }
     /// <summary>
-    /// 绘制List泛型
+    /// 绘制多页显示List数据
     /// </summary>
     /// <param name="name"></param>
     /// <param name="data"></param>
@@ -677,6 +682,7 @@ public class EditorDrawGUIUtil
             index--;
            
         }
+        index = EditorGUILayout.IntField(index, GUILayout.Width(40));
         GUILayout.Label(index + "/" + (count - 1));
         if (GUILayout.Button(">", GUILayout.Width(60)))
         {

@@ -26,7 +26,7 @@ public class Timer
             {
                 e.CompleteTimer();
 
-                if (e.m_repeatCount == 0)
+                if (e.m_isDone)
                 {
                     m_timers.Remove(e);
                 }
@@ -141,7 +141,7 @@ public class Timer
     /// <returns></returns>
     public static TimerEvent CallBackOfIntervalTimer(float spaceTime, int callBackCount, TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(spaceTime, false, -1, null, callBack, objs);
+        return AddTimer(spaceTime, false, callBackCount, null, callBack, objs);
     }
 
     /// <summary>
@@ -155,7 +155,7 @@ public class Timer
     /// <returns></returns>
     public static TimerEvent CallBackOfIntervalTimer(float spaceTime, bool isIgnoreTimeScale, int callBackCount, TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(spaceTime, isIgnoreTimeScale, -1, null,callBack, objs); ;
+        return AddTimer(spaceTime, isIgnoreTimeScale, callBackCount, null,callBack, objs); ;
     }
 
     /// <summary>
@@ -170,7 +170,7 @@ public class Timer
     /// <returns></returns>
     public static TimerEvent CallBackOfIntervalTimer(float spaceTime, bool isIgnoreTimeScale, int callBackCount, string timerName, TimerCallBack callBack, params object[] objs)
     {
-        return AddTimer(spaceTime, isIgnoreTimeScale, -1, timerName, callBack, objs);
+        return AddTimer(spaceTime, isIgnoreTimeScale, callBackCount, timerName, callBack, objs);
     }
 
     /// <summary>

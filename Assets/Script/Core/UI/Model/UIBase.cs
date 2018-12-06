@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
 
-public class UIBase : MonoBehaviour
+public class UIBase : MonoBehaviour , UILifeCycleInterface
 {
     public Canvas m_canvas;
 
@@ -14,18 +14,13 @@ public class UIBase : MonoBehaviour
     {
     }
 
-    public void DestroyUI()
-    {
-        ClearGuideModel();
-        RemoveAllListener();
-        CleanItem();
-        OnUIDestroy();
-    }
-
     protected virtual void OnUIDestroy()
     {
 
     }
+
+
+
 
     #endregion
 
@@ -40,7 +35,7 @@ public class UIBase : MonoBehaviour
 
     public string UIEventKey
     {
-        get { return UIName + m_UIID; }
+        get { return UIName + "@" + m_UIID; }
         //set { m_UIID = value; }
     }
 
@@ -62,19 +57,37 @@ public class UIBase : MonoBehaviour
         }
     }
 
-    public void Init(int id)
+    public void Init(string UIEventKey, int id)
     {
+        if(UIEventKey != null)
+        {
+            UIName = null;
+            UIName = UIEventKey + "_" + UIName;
+        }
+
         m_UIID = id;
         m_canvas = GetComponent<Canvas>();
-        m_UIName = null;
         CreateObjectTable();
         OnInit();
     }
 
-    //public void Destroy()
-    //{
-    //    OnDestroy();
-    //}
+    public void Dispose()
+    {
+        ClearGuideModel();
+        RemoveAllListener();
+        CleanItem();
+        CleanModelShowCameraList();
+        try
+        {
+            OnUIDestroy();
+        }
+        catch(Exception e)
+        {
+            Debug.LogError("UIBase Dispose Exception -> UIEventKey: " + UIEventKey + " Exception: " + e.ToString());
+        }
+
+        DisposeLifeComponent();
+    }
 
     #region 获取对象
 
@@ -105,7 +118,6 @@ public class UIBase : MonoBehaviour
         {
             if (m_objectList[i] != null)
             {
-                //Debug.Log("===>"+m_objectList[i].name);
                 if (m_objects.ContainsKey(m_objectList[i].name))
                 {
                     Debug.LogError("CreateObjectTable ContainsKey ->" + m_objectList[i].name + "<-");
@@ -113,6 +125,7 @@ public class UIBase : MonoBehaviour
                 else
                 {
                     m_objects.Add(m_objectList[i].name, m_objectList[i]);
+
                 }
             }
             else
@@ -624,14 +637,6 @@ public class UIBase : MonoBehaviour
         InputEventRegisterInfo<InputUILongPressEvent> info = InputUIEventProxy.GetLongPressListener(GetLongPressComp(compName), UIEventKey, compName, parm, callback);
         info.AddListener();
         m_LongPressEvents.Add(info);
-
-    }
-
-    public void AddDragListener(string compName, InputEventHandle<InputUIOnDragEvent> callback, string parm = null)
-    {
-        InputEventRegisterInfo<InputUIOnDragEvent> info = InputUIEventProxy.GetOnDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
-        info.AddListener();
-        m_DragEvents.Add(info);
     }
 
     public void AddBeginDragListener(string compName, InputEventHandle<InputUIOnBeginDragEvent> callback, string parm = null)
@@ -688,6 +693,29 @@ public class UIBase : MonoBehaviour
         info.RemoveListener();
     }
 
+    public void RemoveLongPressListener(string compName, InputEventHandle<InputUILongPressEvent> callback, string parm = null)
+    {
+        InputEventRegisterInfo<InputUILongPressEvent> info = GetLongPressRegisterInfo(compName, callback, parm);
+        m_LongPressEvents.Remove(info);
+        info.RemoveListener();
+    }
+
+    public InputEventRegisterInfo<InputUILongPressEvent> GetLongPressRegisterInfo(string compName, InputEventHandle<InputUILongPressEvent> callback, string parm)
+    {
+        string eventKey = InputUILongPressEvent.GetEventKey(UIName, compName, parm);
+        for (int i = 0; i < m_LongPressEvents.Count; i++)
+        {
+            InputEventRegisterInfo<InputUILongPressEvent> info = (InputEventRegisterInfo<InputUILongPressEvent>)m_LongPressEvents[i];
+            if (info.eventKey == eventKey
+                && info.callBack == callback)
+            {
+                return info;
+            }
+        }
+
+        throw new Exception("GetLongPressRegisterInfo Exception not find RegisterInfo by " + compName + " parm " + parm);
+    }
+
     #endregion
 
     #endregion
@@ -709,8 +737,7 @@ public class UIBase : MonoBehaviour
             throw new Exception("CreateItem Error : ->" + itemName + "<- don't have UIBase Component!");
         }
 
-        UIItem.Init(m_childUIIndex++);
-        UIItem.UIName = UIEventKey + "_" + UIItem.UIName;
+        UIItem.Init(UIEventKey,m_childUIIndex++);
 
         m_ChildList.Add(UIItem);
 
@@ -729,7 +756,7 @@ public class UIBase : MonoBehaviour
             throw new Exception("CreateItem Error : ->" + itemObj.name + "<- don't have UIBase Component!");
         }
 
-        UIItem.Init(m_childUIIndex++);
+        UIItem.Init(UIEventKey, m_childUIIndex++);
         UIItem.UIName = UIEventKey + "_" + UIItem.UIName;
 
         m_ChildList.Add(UIItem);
@@ -753,8 +780,7 @@ public class UIBase : MonoBehaviour
         if (m_ChildList.Contains(item))
         {
             m_ChildList.Remove(item);
-            item.RemoveAllListener();
-            item.OnUIDestroy();
+            item.Dispose();
             GameObjectManager.DestroyGameObjectByPool(item.gameObject, isActive);
         }
     }
@@ -764,8 +790,7 @@ public class UIBase : MonoBehaviour
         if (m_ChildList.Contains(item))
         {
             m_ChildList.Remove(item);
-            item.RemoveAllListener();
-            item.OnUIDestroy();
+            item.Dispose();
             GameObjectManager.DestroyGameObjectByPool(item.gameObject, t);
         }
     }
@@ -779,131 +804,21 @@ public class UIBase : MonoBehaviour
     {
         for (int i = 0; i < m_ChildList.Count; i++)
         {
-            m_ChildList[i].RemoveAllListener();
-            m_ChildList[i].OnUIDestroy();
-            GameObjectManager.DestroyGameObjectByPool(m_ChildList[i].gameObject, isActive);
+            try
+            {
+                m_ChildList[i].Dispose();
+                GameObjectManager.DestroyGameObjectByPool(m_ChildList[i].gameObject, isActive);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("CleanItem Error! UIName " + UIName + " Exception :" + e);
+            }
         }
 
         m_ChildList.Clear();
         m_childUIIndex = 0;
     }
-
-    public GameObject GetItem(string itemName)
-    {
-        //Debug.Log("GetItem  v0 " + m_ChildList.Count);
-        if (!itemName.Contains("."))
-        {
-            //Debug.Log("GetItem  v1 " + m_ChildList.Count);
-            int index = 0;
-            if (itemName.Contains("["))
-            {
-                index = int.Parse(itemName.Substring(itemName.IndexOf("[") + 1, 1));
-            }
-            int rd_index = 0;
-            for (int i = 0; i < m_ChildList.Count; i++)
-            {
-                if (m_ChildList[i].name == itemName)
-                {
-                    if (index == rd_index)
-                    {
-                        return m_ChildList[i].gameObject;
-                    }
-                    else
-                    {
-                        rd_index = rd_index + 1;
-                    }
-
-                }
-            }
-        }
-        else
-        {
-            //Debug.Log("GetItem  v2 ");
-            string[] itemNames = itemName.Split('.');
-            //Debug.Log("itemNames.Length " + itemNames.Length);
-
-            List<Transform> Comp_list = new List<Transform>();
-
-            //for (int i = 0; i < m_ChildList.Count; i++)
-            //{
-            //    Comp_list.Add(m_ChildList[i].transform);
-            //}
-
-            for (int j = 0; j < itemNames.Length; j++)
-            {
-
-                int index = 0;
-                string t_itemName = itemNames[j];
-
-                if (t_itemName.Contains("["))
-                {
-                    index = int.Parse(t_itemName.Substring(t_itemName.IndexOf("[") + 1, 1));
-                }
-                t_itemName = t_itemName.Substring(0, t_itemName.Length - 3);
-                if (j == 0)
-                {
-                    //Debug.Log("===tsss=>"+ t_itemName);
-                    //Transform tss = GetGameObject(t_itemName).transform;
-
-                    //Debug.Log("===t=>"+ tss.name,tss);
-                    //Debug.Log("==child" + tss.GetChild(0), tss.GetChild(0));
-
-
-                    //int len = tss.childCount;
-                    //Debug.Log(len);
-                    //for (int i = 0; i < len; i++)
-                    //{
-                    //    Transform itemts = tss.GetChild(i);
-                    //    Debug.Log("===item>" + itemts.name);
-                    //}
-
-                    Transform[] aa = GetGameObject(t_itemName).GetComponentsInChildren<Transform>();
-                    //for (int i = 0; i < aa.Length; i++)
-                    //{
-                    //    Debug.Log("bbbbb " + aa[i].name);
-                    //}
-                    //Debug.Log("aaaaaaaa " + t_itemName + " " + aa.Length);
-                    Comp_list = new List<Transform>(aa);
-                }
-                else
-                {
-
-
-                    //Debug.Log("t_itemNameA " + t_itemName + " " + index + " " + Comp_list.Count);
-                    int rd_index = 0;
-                    for (int i = 0; i < Comp_list.Count; i++)
-                    {
-                        //Debug.Log("Comp_list[i].name " + Comp_list[i].name);
-                        if (Comp_list[i].name == t_itemName)
-                        {
-                            if (index == rd_index)
-                            {
-                                if (j == itemNames.Length - 1)
-                                {
-                                    //Debug.Log("GetItem  v4 ");
-                                    return Comp_list[i].gameObject;
-                                }
-                                else
-                                {
-                                    //Debug.Log("GetItem  v3 ");
-                                    Transform[] aa = Comp_list[i].GetComponentsInChildren<Transform>();
-                                    Comp_list = new List<Transform>(aa);
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                rd_index = rd_index + 1;
-                            }
-
-                        }
-                    }
-                }
-            }
-        }
-
-        throw new Exception(UIName + " GetItem Exception Dont find Item: " + itemName);
-    }
+  
 
     public UIBase GetItemByIndex(string itemName, int index)
     {
@@ -964,6 +879,11 @@ public class UIBase : MonoBehaviour
     public void SetImageColor(string ImageID, Color color)
     {
         GetImage(ImageID).color = color;
+    }
+
+    public void SetImageFillAmount(string ImageID, float value)
+    {
+        GetImage(ImageID).fillAmount = value;
     }
 
     public void SetTextColor(string TextID, Color color)
@@ -1057,19 +977,204 @@ public class UIBase : MonoBehaviour
 
     #endregion
 
-    #region 新手引导使用
+    #region RawImageCamera
 
-    protected List<GameObject> m_GuideList = new List<GameObject>();
-    protected Dictionary<GameObject, GuideChangeData> m_CreateCanvasDict = new Dictionary<GameObject, GuideChangeData>(); //保存Canvas的创建状态
+    List<UIModelShowTool.UIModelShowData> modelList = new List<UIModelShowTool.UIModelShowData>();
 
-    public void SetGuideMode(string objName, int order = 1)
+    public UIModelShowTool.UIModelShowData SetRawImageByModelShowCamera(string rawimageName, string modelName,
+        string layerName = null,
+        bool? orthographic = null,
+        float? orthographicSize = null,
+        Color? backgroundColor = null,
+        Vector3? localPosition = null ,
+        Vector3? localScale = null,
+        Vector3? eulerAngles = null ,
+        Vector3? texSize = null,
+        bool isPutPool = false,
+        float? nearClippingPlane = null,
+        float? farClippingPlane = null)
     {
-        SetGuideMode(GetGameObject(objName), order);
+        var model = CreateModelShow(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, localScale, eulerAngles, texSize, isPutPool, nearClippingPlane, farClippingPlane);
+
+        GetRawImage(rawimageName).texture = model.renderTexture;
+
+        return model;
     }
 
+    public void CleanModelShowCameraList()
+    {
+        for (int i = 0; i < modelList.Count; i++)
+        {
+            UIModelShowTool.DisposeModelShow(modelList[i]);
+        }
+
+        modelList.Clear();
+    }
+
+    public UIModelShowTool.UIModelShowData CreateModelShow(string modelName,
+        string layerName = null,
+        bool? orthographic = null,
+        float? orthographicSize = null,
+        Color? backgroundColor = null,
+        Vector3? localPosition = null,
+        Vector3? localScale = null,
+        Vector3? eulerAngles = null,
+        Vector3? texSize = null,
+        bool isPutPool = false,
+        float? nearClippingPlane = null,
+        float? farClippingPlane = null)
+    {
+        var model = UIModelShowTool.CreateModelData(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, eulerAngles, localScale, texSize, isPutPool, nearClippingPlane, farClippingPlane);
+        modelList.Add(model);
+
+        return model;
+    }
+
+    public void RemoveModelShowCamera(UIModelShowTool.UIModelShowData data)
+    {
+        modelList.Remove(data);
+        UIModelShowTool.DisposeModelShow(data);
+    }
+
+    #endregion
+
+    #region 生命周期管理 
+
+    protected List<UILifeCycleInterface> m_lifeComponent = new List<UILifeCycleInterface>();
+
+    public void AddLifeCycleComponent(UILifeCycleInterface comp)
+    {
+        comp.Init(UIEventKey, m_lifeComponent.Count);
+        m_lifeComponent.Add(comp);
+    }
+
+    void DisposeLifeComponent()
+    {
+        for (int i = 0; i < m_lifeComponent.Count; i++)
+        {
+            try
+            {
+                m_lifeComponent[i].Dispose();
+            }
+            catch( Exception e)
+            {
+                Debug.LogError("UIBase DisposeLifeComponent Exception -> UIEventKey: " + UIEventKey + " Exception: " + e.ToString());
+            }
+
+        }
+
+        m_lifeComponent.Clear();
+    }
+
+    #endregion
+
+    #region 新手引导使用
+
+
+    protected Dictionary<GameObject, GuideHeightLightComponent> m_CreateCanvasDict = new Dictionary<GameObject, GuideHeightLightComponent>(); //保存Canvas的创建状态
+
+    public List<GameObject> GetHeightLightObjects()
+    {
+        return new List<GameObject>(m_CreateCanvasDict.Keys);
+    }
+    public void SetGuideMode(string objName, int order = 1)
+    {
+        SetGuideMode(GetGuideFixGameObject(objName), order);
+    }
+    /// <summary>
+    /// 获取新手引导的固定GameObject（当找固定Item里子节点时使用格式 PetItem1.Use）
+    /// </summary>
+    /// <param name="objName"></param>
+    /// <returns></returns>
+    public GameObject GetGuideFixGameObject(string objName)
+    {
+        GameObject obj = null;
+        if (objName.Contains("."))
+        {
+            string[] names = objName.Split('.');
+            UIBase item = GetGameObject(names[0]).GetComponent<UIBase>();
+            for (int i = 1; i < names.Length; i++)
+            {
+                string temp = names[i];
+                GameObject tempObj = item.GetGameObject(temp);
+                if (i == names.Length - 1)
+                    obj = tempObj;
+                else
+                item = tempObj.GetComponent<UIBase>();
+            }
+        }
+        else
+        {
+            obj = GetGameObject(objName);
+        }
+        return obj;
+    }
+    /// <summary>
+    /// 新手引导获得动态创建Item  格式为：PetItem[0].Use（PetItem的Item上挂有UIBase脚本， [0] 第几个Item，Use：拖到PetItem上的GameObject）
+    /// </summary>
+    /// <param name="itemName"></param>
+    /// <returns></returns>
+    public GameObject GetGuideDynamicCreateItem(string itemName)
+    {
+        string firstName = "";
+        string[] strArr = itemName.Split('.');
+        //Debug.Log("itemName :" + itemName);
+        string childName = "";
+        GameObject obj = null;
+        if (strArr.Length > 0)
+        {
+            UIBase uIBase = null;
+            firstName = strArr[0];
+
+
+            int index = int.Parse(firstName.SplitExtend("[", "]")[0]);
+            int tempIndex0 = firstName.IndexOf("[");
+            firstName = firstName.Replace(firstName.Substring(tempIndex0), "");
+            //Debug.Log("UIBase : Index :" + index + "  firstName :" + firstName + " m_ChildList:"+ m_ChildList.Count);
+            int tempIndex = 0;
+            for (int i = 0; i < m_ChildList.Count; i++)
+            {
+                UIBase cItem = m_ChildList[i];
+                //Debug.Log("Item:" + cItem.name);
+                if (cItem.name == firstName)
+                {
+                    
+                    if (index == tempIndex)
+                    {
+                        uIBase = cItem;
+                        obj = uIBase.gameObject;
+                        break;
+                    }
+                    tempIndex++;
+                }
+            }
+
+            if (strArr.Length > 1)
+            {
+                childName = strArr[1];
+                if (childName.Contains("["))
+                {
+                    childName = itemName.Replace(firstName + ".", "");
+
+                    obj = uIBase.GetGuideDynamicCreateItem(childName);
+                }
+                else
+                {
+                    obj= uIBase.GetGameObject(childName);
+                }
+            }
+        }
+
+        if(obj == null)
+        {
+            Debug.LogError("GetGuideDynamicCreateItem error :UIEventKey " + UIEventKey + "itemName " + itemName);
+        }
+
+        return obj;
+    }
     public void SetItemGuideMode(string itemName, int order = 1)
     {
-        SetGuideMode(GetItem(itemName), order);
+        SetGuideMode(GetGuideDynamicCreateItem(itemName), order);
     }
 
     public void SetItemGuideModeByIndex(string itemName, int index, int order = 1)
@@ -1082,57 +1187,17 @@ public class UIBase : MonoBehaviour
         SetGuideMode(gameObject, order);
     }
 
-    public void SetGuideMode(GameObject go, int order = 1)
+    public GuideHeightLightComponent SetGuideMode(GameObject go, int order = 1)
     {
-        Canvas canvas = go.GetComponent<Canvas>();
-        GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
-
-        GuideChangeData status = new GuideChangeData();
-
-        if (canvas == null)
-        {
-            canvas = go.AddComponent<Canvas>();
-
-            status.isCreateCanvas = true;
-        }
-
-        if (graphic == null)
-        {
-            graphic = go.AddComponent<GraphicRaycaster>();
-
-            status.isCreateGraphic = true;
-        }
-
-        status.OldOverrideSorting = canvas.overrideSorting;
-        status.OldSortingOrder = canvas.sortingOrder;
-        status.oldSortingLayerName = canvas.sortingLayerName;
-
-        //如果检测到目标对象
-        bool oldActive = go.activeSelf;
-        if (!oldActive)
-        {
-            go.SetActive(true);
-        }
-
-        canvas.overrideSorting = true;
-        canvas.sortingOrder = order;
-        canvas.sortingLayerName = "Guide";
-
-
-        if (!oldActive)
-        {
-            go.SetActive(false);
-        }
-
+        GuideHeightLightComponent guideHeightLight = null;
         if (!m_CreateCanvasDict.ContainsKey(go))
         {
-            m_CreateCanvasDict.Add(go, status);
-            m_GuideList.Add(go);
+             guideHeightLight = go.AddComponent<GuideHeightLightComponent>();
+            guideHeightLight.order = order;
+            m_CreateCanvasDict.Add(go, guideHeightLight);
         }
-        else
-        {
-            Debug.LogError("m_CreateCanvasDict " + go);
-        }
+
+        return guideHeightLight;
     }
 
     public void CancelGuideModel(GameObject go)
@@ -1143,50 +1208,21 @@ public class UIBase : MonoBehaviour
             return;
         }
 
-        Canvas canvas = go.GetComponent<Canvas>();
-        GraphicRaycaster graphic = go.GetComponent<GraphicRaycaster>();
-
         if (m_CreateCanvasDict.ContainsKey(go))
         {
-            GuideChangeData status = m_CreateCanvasDict[go];
-
-            if (graphic != null && status.isCreateGraphic)
-            {
-                DestroyImmediate(graphic);
-            }
-
-            if (canvas != null && status.isCreateCanvas)
-            {
-                DestroyImmediate(canvas);
-            }
-            else
-            {
-                if (canvas != null)
-                {
-                    canvas.overrideSorting = status.OldOverrideSorting;
-                    canvas.sortingOrder = status.OldSortingOrder;
-                    canvas.sortingLayerName = status.oldSortingLayerName;
-                }
-            }
-        }
-        else
-        {
-            Debug.LogError("m_CreateCanvasDict.ContainsKey(go) is error");
+            GuideHeightLightComponent guideHeightLight = m_CreateCanvasDict[go];
+            guideHeightLight.ClearGuide();
+            Destroy(guideHeightLight);
+            m_CreateCanvasDict.Remove(go);
+            Debug.Log("ClearGuide______________");
         }
     }
 
-    protected struct GuideChangeData
-    {
-        public bool isCreateCanvas;
-        public bool isCreateGraphic;
-
-        public string oldSortingLayerName;
-        public int OldSortingOrder;
-        public bool OldOverrideSorting;
-    }
+ 
 
     public void ClearGuideModel()
     {
+        List<GameObject> m_GuideList = new List<GameObject>(m_CreateCanvasDict.Keys);
         for (int i = 0; i < m_GuideList.Count; i++)
         {
             CancelGuideModel(m_GuideList[i]);
@@ -1226,6 +1262,24 @@ public class UIBase : MonoBehaviour
 
         m_objectList = ls;
     }
+
+
+    //将世界坐标转换为 UI 坐标系中的位置
+    public Vector3 WorldPosToUIPos(Vector3 worldPos, string cameraKey)
+    {
+        Vector3 scale = UIManager.UILayerManager.GetUICameraDataByKey(cameraKey).m_root.GetComponent<RectTransform>().localScale;
+        Vector3 UIPos = new Vector3(worldPos.x / scale.x, worldPos.y / scale.y, worldPos.z / scale.z);
+        return UIPos;
+    }
+
+    //将 UI 坐标系中的位置 转换为 世界坐标
+    public Vector3 UIPosToWorldPos(Vector3 UIPos, string cameraKey)
+    {
+        Vector3 scale = UIManager.UILayerManager.GetUICameraDataByKey(cameraKey).m_root.GetComponent<RectTransform>().localScale;
+        Vector3 worldPos = new Vector3(UIPos.x * scale.x, UIPos.y * scale.y, UIPos.z * scale.z);
+        return worldPos;
+    }
+
 
     #endregion
 }

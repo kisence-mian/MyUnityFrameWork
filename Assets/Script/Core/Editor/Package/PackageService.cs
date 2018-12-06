@@ -8,7 +8,7 @@ public class PackageService
 {
     static BuildAssetBundleOptions relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle    //每次二进制一致  //依赖包打包设置      
                                                     | BuildAssetBundleOptions.CollectDependencies;         //完整资源     
-                                                                                                       // | BuildAssetBundleOptions.ChunkBasedCompression;   //块压缩 
+                                                                                                           // | BuildAssetBundleOptions.ChunkBasedCompression;   //块压缩 
 
     static BuildAssetBundleOptions bundleBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle  //每次二进制一致  //Bundle打包设置
                                                        | BuildAssetBundleOptions.CollectDependencies     //收集依赖
@@ -71,7 +71,6 @@ public class PackageService
 
             yield return 0;
         }
-
 
         BuildPipeline.PopAssetDependencies();
 

@@ -376,7 +376,7 @@ public class ConfigEditorWindow : EditorWindow
     }
     public static Dictionary<string, object> GetEditorConfigData(string ConfigName)
     {
-        UnityEditor.AssetDatabase.Refresh();
+      //  UnityEditor.AssetDatabase.Refresh();
 
         string dataJson = ResourceIOTool.ReadStringByFile(PathTool.GetEditorPath(ConfigManager.c_directoryName, ConfigName, ConfigManager.c_expandName));
 

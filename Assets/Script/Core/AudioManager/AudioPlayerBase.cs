@@ -8,8 +8,8 @@ using UnityEngine;
 public class AudioPlayerBase
 {
     protected MonoBehaviour mono;
-    protected int maxSFXAudioAssetNum = 10;
     private float musicVolume = 1f;
+    private Queue<AudioAsset> audioAssetsPool = new Queue<AudioAsset>();
     public float MusicVolume
     {
         get
@@ -30,11 +30,6 @@ public class AudioPlayerBase
     public AudioPlayerBase(MonoBehaviour mono)
     {
         this.mono = mono;
-    }
-
-    public void SetMaxSFXAudioAssetNum(int max)
-    {
-        maxSFXAudioAssetNum = Mathf.Clamp(max, 5, 100);
     }
     public virtual void SetMusicVolume(float volume)
     {
@@ -57,43 +52,60 @@ public class AudioPlayerBase
         return null;
     }
 
-    public AudioAsset CreateAudioAsset(GameObject gameObject, bool is3D, bool isMusic)
+    public AudioAsset CreateAudioAssetByPool(GameObject gameObject, bool is3D, AudioSourceType  sourceType)
     {
+        
         AudioAsset au = new AudioAsset();
-        au.audioSource = gameObject.AddComponent<AudioSource>();
+        if (audioAssetsPool.Count > 0)
+        {
+            au = audioAssetsPool.Dequeue();
+            au.ResetData();
+        }
+        else
+        {
+            au = new AudioAsset();
+            au.audioSource = gameObject.AddComponent<AudioSource>();
+        }
+       
         au.audioSource.spatialBlend = is3D ? 1 : 0;
-        if (isMusic)
+        au.sourceType = sourceType;
+
+        if (sourceType== AudioSourceType.Music)
             au.TotleVolume = musicVolume;
         else
             au.TotleVolume = sfxVolume;
         return au;
     }
-    protected void PlayClip(AudioAsset au, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f)
+    public void DestroyAudioAssetByPool(AudioAsset asset)
+    {
+        audioAssetsPool.Enqueue(asset);
+    }
+    protected void PlayClip(AudioAsset au, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f,float pitch =1)
     {
         au.assetName = audioName;
         AudioClip ac = GetAudioClip(au.assetName);
         au.audioSource.clip = ac;
         au.audioSource.loop = isLoop;
-        au.Play(delay);
+        au.audioSource.pitch = pitch;
         au.VolumeScale = volumeScale;
+        au.Play(delay);
+        
     }
 
-    protected void PlayMusicControl(AudioAsset au, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f)
+    protected void PlayMusicControl(AudioAsset au, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f, string flag = "")
     {
+        au.flag = flag;
         if (au.assetName == audioName)
         {
             if (au.PlayState != AudioPlayState.Playing)
             {
-                au.SetPlayState(AudioPlayState.Playing);
                 AddFade(au, VolumeFadeType.FadeIn, fadeTime, delay, null, null);
                 au.Play();
             }
         }
         else
         {
-            AudioPlayState state = au.PlayState;
-            au.SetPlayState(AudioPlayState.Playing);
-            if (state == AudioPlayState.Playing)
+            if (au.PlayState == AudioPlayState.Playing)
             {
                 AddFade(au, VolumeFadeType.FadeOut2In, fadeTime, delay, null, (value) =>
                 {
@@ -130,12 +142,8 @@ public class AudioPlayerBase
             //Debug.Log("PauseMusicControl play : "+ au.PlayState);
             if (au.PlayState == AudioPlayState.Pause)
             {
-                //Debug.Log("PauseMusicControl play");
-                au.SetPlayState(AudioPlayState.Playing);
-                AddFade(au, VolumeFadeType.FadeIn, fadeTime, 0, null, null);
                 au.Play();
-
-
+                AddFade(au, VolumeFadeType.FadeIn, fadeTime, 0, null, null);
             }
         }
     }
@@ -143,7 +151,7 @@ public class AudioPlayerBase
     {
         if (au.PlayState != AudioPlayState.Stop)
         {
-            au.SetPlayState(AudioPlayState.Stop);
+            au.SetPlayState(AudioPlayState.Stoping);
             Debug.Log("StopMusicControl Stop");
             AddFade(au, VolumeFadeType.FadeOut, fadeTime, 0, (value) =>
             {

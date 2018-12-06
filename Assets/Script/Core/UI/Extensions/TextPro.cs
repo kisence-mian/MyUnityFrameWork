@@ -6,39 +6,19 @@ using UnityEngine.UI;
 
 [AddComponentMenu("UI/Extensions/TextPro")]
 /// <summary>
-/// 扩展Text
+/// 扩展Text 这几个标签不要在同一行使用多个
 /// 1.增强RichText 支持<align="right">Right <align="center">Center  <align="left"> Left
 /// </summary>
 public class TextPro : Text
 {
-
     protected override void OnPopulateMesh(VertexHelper toFill)
     {
         RichTextAlignDataSupport(toFill);
     }
 
-    private void RichTextAlignDataSupport(VertexHelper toFill)
+    private void RemoveSameAlignData(List<AlignData> alignDatas)
     {
-        if (!supportRichText)
-        {
-            base.OnPopulateMesh(toFill);
-            return;
-        }
-
-        string changedText = "";
-        var orignText = m_Text;
-        m_Text = DealWithTextContent(m_Text);
-        changedText = m_Text;
-        base.OnPopulateMesh(toFill);
-        m_Text = orignText;
-
         IList<UILineInfo> lines = cachedTextGenerator.lines;
-        IList<UICharInfo> characters = cachedTextGenerator.characters;
-        Rect rectExtents = cachedTextGenerator.rectExtents;
-        //Debug.Log("cachedTextGenerator.characterCountVisible :"+cachedTextGenerator.characterCountVisible);
-        List<UIVertex> stream = new List<UIVertex>();
-        toFill.GetUIVertexStream(stream);
-
         List<AlignData> removeAlignDatas = new List<AlignData>();
 
         for (int i = 0; i < alignDatas.Count; i++)
@@ -73,6 +53,7 @@ public class TextPro : Text
             alignDatas[i] = alignData;
 
         }
+
         List<int> lineList = new List<int>();
 
         for (int i = 0; i < alignDatas.Count; i++)
@@ -93,7 +74,35 @@ public class TextPro : Text
         {
             alignDatas.Remove(removeAlignDatas[i]);
         }
-        //Debug.Log("alignDatas :" + alignDatas.Count);
+    }
+    private void RichTextAlignDataSupport(VertexHelper toFill)
+    {
+        if (!supportRichText)
+        {
+            base.OnPopulateMesh(toFill);
+            return;
+        }
+        List<AlignData> alignDatas=new List<AlignData>();
+        //string changedText = "";
+        var orignText = m_Text;
+        m_Text = DealWithTextContent(m_Text,ref alignDatas);
+        //changedText = m_Text;
+        base.OnPopulateMesh(toFill);
+        m_Text = orignText;
+
+        RectTransform rectTransform = GetComponent<RectTransform>();
+        float rangeWith =rectTransform.sizeDelta.x;
+
+        
+        IList<UICharInfo> characters = cachedTextGenerator.characters;
+        Rect rectExtents = cachedTextGenerator.rectExtents;
+
+        List<UIVertex> stream = new List<UIVertex>();
+        toFill.GetUIVertexStream(stream);
+        toFill.Clear();
+
+
+        RemoveSameAlignData(alignDatas);
 
         for (int i = 0; i < alignDatas.Count; i++)
         {
@@ -107,42 +116,41 @@ public class TextPro : Text
                 continue;
             if (alignData.lineStartCharIndex * 6 >= stream.Count)
                 continue;
+
+            int indexEnd = alignData.lineEndCharIndex * 6 - 3;
+            int indexStart = alignData.lineStartCharIndex * 6;
             if (alignData.alignType == AlignType.Right)
             {
-                UICharInfo uiChar = characters[alignData.lineEndCharIndex];
-                float detaMove = rectExtents.width / 2 - uiChar.cursorPos.x - uiChar.charWidth;
-
+                float detaMove = rangeWith / 2 - stream[indexEnd].position.x;
                 for (int v = alignData.lineStartCharIndex * 6; v < alignData.lineEndCharIndex * 6; v++)
                 {
                     UIVertex ver = stream[v];
+                    //if (v >= ((alignData.lineEndCharIndex - 1) * 6) && v <= (alignData.lineEndCharIndex * 6))
+                        //Debug.Log("Pos :" + ver.position);
                     ver.position += new Vector3(detaMove, 0, 0);
-                    //ver.color = Color.red;
-                    stream[v] = ver;
+                   
+                      //  ver.color = Color.red;
+                        stream[v] = ver;
                 }
             }
             else if (alignData.alignType == AlignType.Left)
             {
-                UICharInfo uiChar = characters[alignData.lineStartCharIndex];
-                float detaMove = (-rectExtents.width / 2) - uiChar.cursorPos.x;
+                float detaMove = (-rangeWith / 2) - stream[indexStart].position.x;
                 //Debug.Log("LLeft alignData.lineStartCharIndex：" + alignData.lineStartCharIndex + "  alignData.lineEndCharIndex:" + alignData.lineEndCharIndex);
                 for (int v = alignData.lineStartCharIndex * 6; v < alignData.lineEndCharIndex * 6; v++)
                 {
                     UIVertex ver = stream[v];
                     ver.position += new Vector3(detaMove, 0, 0);
+                    //if(v== (alignData.lineEndCharIndex * 6-1))
                     //ver.color = Color.green;
                     stream[v] = ver;
                 }
             }
             else if (alignData.alignType == AlignType.Center)
             {
-                float lineCharLenth = 0;
-                for (int j = alignData.lineStartCharIndex; j < alignData.lineEndCharIndex; j++)
-                {
-                    lineCharLenth += characters[j].charWidth;
-                }
-
-
-                float detaMove = -lineCharLenth / 2 - characters[alignData.lineStartCharIndex].cursorPos.x;
+                
+                float lineCharLenth = Mathf.Abs(stream[indexEnd].position.x) + Mathf.Abs(stream[indexStart].position.x);
+                float detaMove = (lineCharLenth) / 2 - stream[indexEnd].position.x;
 
                 for (int v = alignData.lineStartCharIndex * 6; v < alignData.lineEndCharIndex * 6; v++)
                 {
@@ -155,9 +163,10 @@ public class TextPro : Text
         }
         toFill.AddUIVertexTriangleStream(stream);
     }
-    List<AlignData> alignDatas = new List<AlignData>();
-    private string DealWithTextContent(string content)
+    private string DealWithTextContent(string content,ref List<AlignData> alignDatas)
     {
+        if (alignDatas == null)
+            alignDatas = new List<AlignData>();
         alignDatas.Clear();
 
         var temp = content;

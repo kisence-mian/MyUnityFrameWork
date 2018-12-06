@@ -35,11 +35,13 @@ public class LanguageDataEditorWindow : EditorWindow
     public static LanguageDataEditorWindow ShowWindow()
     {
          win= EditorWindow.GetWindow<LanguageDataEditorWindow>();
+        win.Init();
         return win;
     }
     FolderTreeView treeView;
     TreeViewState treeViewState = null;
-    void OnEnable()
+
+    private void Init()
     {
         win = this;
         ResourcesConfigManager.Initialize();
@@ -60,6 +62,10 @@ public class LanguageDataEditorWindow : EditorWindow
         treeView.dblclickItemCallBack = ModuleFileDblclickItemCallBack;
         treeView.selectCallBack = ModuleFileFolderSelectCallBack;
     }
+    void OnEnable()
+    {
+        Init();
+    }
 
    
 
@@ -71,12 +77,13 @@ public class LanguageDataEditorWindow : EditorWindow
     }
     public int toolbarOption = 0;
     private string[] toolbarTexts = {"模块文件", "语言内容编辑", "语言设置" };
+    private bool richText = false;
     void OnGUI()
     {
         titleContent.text = "多语言编辑器";
-        //GUI.skin.label.fontSize = 11;
         if (!Application.isPlaying)
         {
+          richText=  (bool)EditorDrawGUIUtil.DrawBaseValue("使用富文本：" , richText);
             SelectLanguageGUI();
             DefaultLanguageGUI();
             SelectEditorModuleGUI();
@@ -329,7 +336,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
         selectItemFullName = t.fullPath.Replace("/","_");
     }
-    Vector2 pos_editorField = Vector2.zero;
+    //Vector2 pos_editorField = Vector2.zero;
     private string selectItemFullName="";
     void EditorLanguageModuleFileGUI()
     {
@@ -465,23 +472,49 @@ public class LanguageDataEditorWindow : EditorWindow
             return true;
         }, (value) =>
          {
-             selectEditorModuleName = value.ToString();
-             s_languageKeyDict.Add(value.ToString(), new List<string>());
-
-             DataTable data = new DataTable();
-             data.TableKeys.Add(LanguageManager.c_mainKey);
-             data.TableKeys.Add(LanguageManager.c_valueKey);
-             data.SetDefault(LanguageManager.c_valueKey, "NoValue");
-
-             m_langeuageDataDict.Add(selectEditorModuleName, data);
-
-             SaveData();
-             OnEnable();
+             CreateNewFile(value.ToString(), null);
          });
 
     }
+    /// <summary>
+    /// 新建多语言文件
+    /// </summary>
+    /// <param name="fileName"></param>
+    /// <param name="contentDic"></param>
+    /// <returns>返回每个key对应的多语言访问key</returns>
+    public Dictionary<string,string> CreateNewFile(string fileName,Dictionary<string,string> contentDic)
+    {
+        selectEditorModuleName = fileName;
+        Dictionary<string, string> keyPaths = new Dictionary<string, string>();
+        string tempContent = fileName.Replace('_', '/');
 
-   
+        s_languageKeyDict.Add(fileName, new List<string>());
+
+        DataTable data = new DataTable();
+        data.TableKeys.Add(LanguageManager.c_mainKey);
+        data.TableKeys.Add(LanguageManager.c_valueKey);
+        data.SetDefault(LanguageManager.c_valueKey, "NoValue");
+        if (contentDic != null)
+        {
+            foreach (var item in contentDic)
+            {
+                SingleData sd = new SingleData();
+                sd.Add(LanguageManager.c_mainKey, item.Key);
+                sd.Add(LanguageManager.c_valueKey, item.Value);
+                data.AddData(sd);
+                s_languageKeyDict[fileName].Add(item.Key);
+                keyPaths.Add(item.Key, tempContent + "/" + item.Key);
+            }
+           
+        }
+
+        m_langeuageDataDict.Add(selectEditorModuleName, data);
+
+        SaveData();
+        OnEnable();
+
+        return keyPaths;
+    }
 
     void EditorLanguageFieldGUI( )
     {
@@ -553,8 +586,10 @@ public class LanguageDataEditorWindow : EditorWindow
                  }
 
                  EditorGUILayout.EndHorizontal();
-
-                 content = EditorGUILayout.TextArea(content);
+                 GUIStyle style = "TextArea";
+                 style.wordWrap = true;
+                 style.richText = richText;
+                 content = EditorGUILayout.TextArea(content, style);
                  if (data != null)
                  {
                      data[key][LanguageManager.c_valueKey] = content;
@@ -635,6 +670,7 @@ public class LanguageDataEditorWindow : EditorWindow
         if (GUILayout.Button("保存"))
         {
             SaveData();
+            ShowNotification(new GUIContent("已保存"));
         }
     }
 
