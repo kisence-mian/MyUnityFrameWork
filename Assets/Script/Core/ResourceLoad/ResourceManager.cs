@@ -45,91 +45,61 @@ public static class ResourceManager
         }
     }
 
-    ////保存一个文本
-    //public static void WriteTextFile(string path,string content ,ResLoadLocation type)
-    //{
-    //    #if UNITY_EDITOR
-    //        ResourceIOTool.WriteStringByFile(PathTool.GetAbsolutePath(type, path), content);
-    //    #else
-            
-    //    #endif
-    //}
-
     public static object Load(string name)
     {
-        ResourcesConfig packData  = ResourcesConfigManager.GetBundleConfig(name);
-
-        if(packData == null)
-        {
-            throw new Exception("Load Exception not find " + name);
-        }
+        string path = ResourcesConfigManager.GetResourcePath(name);
 
         if (m_gameLoadType == ResLoadLocation.Resource)
         {
-            return Resources.Load(packData.path);
+            return Resources.Load(path);
         }
         else
         {
-            return AssetsBundleManager.Load(name);
+            return AssetsBundleManager.Load(path);
         }
     }
 
     public static T Load<T>(string name) where T: UnityEngine.Object
     {
-        ResourcesConfig packData = ResourcesConfigManager.GetBundleConfig(name);
-
-        if (packData == null)
-        {
-            throw new Exception("Load Exception not find " + name);
-        }
+        string path = ResourcesConfigManager.GetResourcePath(name);
 
         if (m_gameLoadType == ResLoadLocation.Resource)
         {
-            return Resources.Load<T>(packData.path);
+            return Resources.Load<T>(path.Replace("/","\\"));
         }
         else
         {
-            return AssetsBundleManager.Load<T>(name);
+            return AssetsBundleManager.Load<T>(path);
         }
     }
 
     public static void LoadAsync(string name,LoadCallBack callBack)
     {
-        ResourcesConfig packData  = ResourcesConfigManager.GetBundleConfig(name);
-
-        if (packData == null)
-        {
-            return ;
-        }
+        string path = ResourcesConfigManager.GetResourcePath(name);
 
         if (m_gameLoadType == ResLoadLocation.Resource)
         {
-            ResourceIOTool.ResourceLoadAsync(packData.path, callBack);
+            ResourceIOTool.ResourceLoadAsync(path, callBack);
         }
         else
         {
-            AssetsBundleManager.LoadAsync(name,callBack);
+            AssetsBundleManager.LoadAsync(path, callBack);
         }
     }
 
     public static void UnLoad(string name)
     {
+        string path = ResourcesConfigManager.GetResourcePath(name);
+
         if (m_gameLoadType == ResLoadLocation.Resource)
         {
 
         }
         else
         {
-            AssetsBundleManager.UnLoadBundle(name);
+            AssetsBundleManager.UnLoadBundle(path);
         }
     }
-
-    //public static T GetResource<T>(string path)
-    //{
-    //    T resouce = new T();
-
-    //    return resouce;
-    //}
 }
 
 public enum ResLoadLocation

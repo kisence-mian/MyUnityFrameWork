@@ -460,8 +460,11 @@ public class EditorDrawGUIUtil
     /// <param name="displayedOptions"></param>
     /// <param name="selectChangeCallBack"></param>
     /// <returns></returns>
-    public static string DrawPopup(string name, string selectedStr, List<string> displayedOptions, CallBack<string> selectChangeCallBack = null)
+    public static T DrawPopup<T>(string name, T selectedStr, List<T> displayedOptions, CallBack<T> selectChangeCallBack = null)
     {
+        if (displayedOptions==null || (displayedOptions.Count == 0))
+            return default(T);
+
         int selectedIndex = -1;
         if (displayedOptions.Contains(selectedStr))
         {
@@ -472,12 +475,14 @@ public class EditorDrawGUIUtil
             selectedIndex = 0;
         GUIStyle style = new GUIStyle("Popup");
         style.richText = true;
-        selectedIndex = EditorGUILayout.Popup(name, selectedIndex, displayedOptions.ToArray(), style);
+        List<string> tempListStr = new List<string>();
+        foreach (var item in displayedOptions)
+        {
+            tempListStr.Add(item.ToString());
+        }
+        selectedIndex = EditorGUILayout.Popup(name, selectedIndex, tempListStr.ToArray(), style);
 
-        if (displayedOptions.Count == 0)
-            return "";
-        else
-            selectedStr = displayedOptions[selectedIndex];
+         selectedStr = displayedOptions[selectedIndex];
         if (selectedIndex != recode)
         {
             if (selectChangeCallBack != null)

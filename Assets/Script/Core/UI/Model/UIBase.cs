@@ -917,6 +917,11 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         GetText(textID).text = LanguageManager.GetContent(moduleName, contentID, objs);
     }
 
+    public void SetTextByLanguagePath(string textID, string languagePath, params object[] objs)
+    {
+        GetText(textID).text = LanguageManager.GetContentByKey(languagePath, objs);
+    }
+
     public void SetSlider(string sliderID, float value)
     {
         GetSlider(sliderID).value = value;
@@ -1116,9 +1121,14 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     /// <returns></returns>
     public GameObject GetGuideDynamicCreateItem(string itemName)
     {
+        if(string.IsNullOrEmpty(itemName))
+        {
+            Debug.LogError("GetGuideDynamicCreateItem itemName is Null!! ");
+            return null;
+        }
         string firstName = "";
         string[] strArr = itemName.Split('.');
-        //Debug.Log("itemName :" + itemName);
+        Debug.Log("GetGuideDynamicCreateItem.itemName :" + itemName);
         string childName = "";
         GameObject obj = null;
         if (strArr.Length > 0)
@@ -1130,12 +1140,12 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
             int index = int.Parse(firstName.SplitExtend("[", "]")[0]);
             int tempIndex0 = firstName.IndexOf("[");
             firstName = firstName.Replace(firstName.Substring(tempIndex0), "");
-            //Debug.Log("UIBase : Index :" + index + "  firstName :" + firstName + " m_ChildList:"+ m_ChildList.Count);
+            Debug.Log("UIBase : Index :" + index + "  firstName :" + firstName + " m_ChildList:"+ m_ChildList.Count);
             int tempIndex = 0;
             for (int i = 0; i < m_ChildList.Count; i++)
             {
                 UIBase cItem = m_ChildList[i];
-                //Debug.Log("Item:" + cItem.name);
+                Debug.Log("Item:" + cItem);
                 if (cItem.name == firstName)
                 {
                     
@@ -1214,7 +1224,7 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
             guideHeightLight.ClearGuide();
             Destroy(guideHeightLight);
             m_CreateCanvasDict.Remove(go);
-            Debug.Log("ClearGuide______________");
+            //Debug.Log("ClearGuide______________");
         }
     }
 

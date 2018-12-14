@@ -125,6 +125,9 @@ namespace HDJ.Framework.Utils
         /// <returns></returns>
         public static Type GetTypeByTypeFullName(string typeFullName,bool isShowErrorLog=true)
         {
+            if (string.IsNullOrEmpty(typeFullName))
+                return null;
+
             Type type = Type.GetType(typeFullName);
             Assembly ass = Assembly.GetExecutingAssembly();
             type = ass.GetType(typeFullName);

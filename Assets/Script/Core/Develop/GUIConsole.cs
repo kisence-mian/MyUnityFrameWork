@@ -71,12 +71,15 @@ public class GUIConsole
 
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationOnGUI += OnGUI;
-        Application.logMessageReceived += HandleLog;
+
+        Application.logMessageReceivedThreaded += HandleLog;
+        //Application.logMessageReceived += HandleLog;
     }
 
     ~GUIConsole()
     {
-        Application.logMessageReceived -= HandleLog;
+        Application.logMessageReceivedThreaded -= HandleLog;
+        //Application.logMessageReceived -= HandleLog;
     }
 
     static void Update()

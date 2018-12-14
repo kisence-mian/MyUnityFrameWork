@@ -20,7 +20,7 @@ public class ImageLoadComponentEditor : Editor
             return;
         }
 
-        ResourcesConfigManager.Initialize();
+        //ResourcesConfigManager.Initialize();
         if (!ResourcesConfigManager.GetIsExitRes(component.iconName))
         {
             EditorGUILayout.HelpBox("没有资源!!!", MessageType.Error);

@@ -491,8 +491,6 @@ public class AnimData
     public void UguiColorInit(bool isChild)
     {
         m_graphicList_Image.Clear();
-        //m_animObjectList_Text.Clear();
-
         if (isChild)
         {
             Graphic[] images = m_animGameObejct.GetComponentsInChildren<Graphic>();
@@ -502,30 +500,18 @@ public class AnimData
                 {
                     m_graphicList_Image.Add(images[i]);
                 }
-                else
-                {
-                    //Debug.LogError("name:" + images[i].gameObject.name);
-                }
             }
-            //Text[] texts = m_animGameObejct.GetComponentsInChildren<Text>();
-
-            //for (int i = 0; i < texts.Length; i++)
-            //{
-            //    m_graphicList_Image.Add(texts[i]);
-            //}
         }
         else
         {
-            Image image = m_animGameObejct.GetComponent<Image>();
-            Text text = m_animGameObejct.GetComponent<Text>();
-            if (image != null)
+            Graphic[] images = m_animGameObejct.GetComponents<Graphic>();
+            for (int i = 0; i < images.Length; i++)
             {
-                m_graphicList_Image.Add(image);
+                if (images[i].transform.GetComponent<Mask>() == null)
+                {
+                    m_graphicList_Image.Add(images[i]);
+                }
             }
-            //if (text != null)
-            //{
-            //    m_animObjectList_Text.Add(text);
-            //}
         }
         SetUGUIColor(m_fromColor);
     }

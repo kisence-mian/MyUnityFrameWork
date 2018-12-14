@@ -58,8 +58,6 @@ public class FileTool
         {
             string pathTmp = files[i];
 
-            Debug.Log(pathTmp);
-
             if (File.Exists(pathTmp))
             {
                 File.Delete(pathTmp);

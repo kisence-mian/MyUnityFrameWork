@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public class SDKInterfaceBase 
+public abstract class SDKInterfaceBase 
 {
     [HideInInspector]
     public string m_SDKName;

@@ -29,7 +29,7 @@ public class LanguageComponmentEditor : Editor
             }
         }
         if (m_languageList == null)
-            m_languageList = LanguageDataEditorUtils.GetLanguageLayersKeyList();
+            m_languageList = LanguageDataEditorUtils.GetLanguageAllFunKeyList();
         GUILayout.Space(6);
         m_lc.languageKey = EditorDrawGUIUtil.DrawBaseValue("多语言key", m_lc.languageKey).ToString();
         GUILayout.Space(6);
@@ -38,7 +38,7 @@ public class LanguageComponmentEditor : Editor
         GUILayout.Space(8);
         if (GUILayout.Button("刷新多语言key"))
         {
-            m_languageList = LanguageDataEditorUtils.GetLanguageLayersKeyList();
+            m_languageList = LanguageDataEditorUtils.GetLanguageAllFunKeyList();
         }
   
     }

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System;
 using System.Reflection;
 using System.IO;
+using FrameWork.SDKManager;
 
 public class SDKEditorWindow : EditorWindow
 {
@@ -29,7 +30,7 @@ public class SDKEditorWindow : EditorWindow
 
     void OnEnable()
     {
-        ResourcesConfigManager.Initialize();
+        //ResourcesConfigManager.Initialize();
         EditorGUIStyleData.Init();
         SchemeDataService.ReloadEditorSchemeData();
         m_currentSchemeData = SDKManager.LoadGameSchemeConfig();
@@ -141,6 +142,7 @@ public class SDKEditorWindow : EditorWindow
     {
         m_currentSchemeData = SchemeDataService.CreateSchemeData(
                 m_currentSchemeData.SchemeName,
+                m_currentSchemeData.UseNewSDKManager,
             m_LoginScheme,
             m_ADScheme,
             m_PayScheme,
@@ -193,10 +195,14 @@ public class SDKEditorWindow : EditorWindow
 
     int GetCurrentSelectIndex()
     {
+        Debug.Log("GetCurrentSelectIndex " + m_currentSchemeData );
+
         if(m_currentSchemeData == null)
         {
             return 0;
         }
+
+        Debug.Log("m_currentSchemeData.SchemeName " + m_currentSchemeData.SchemeName);
 
         for (int i = 0; i < SchemeDataService.ConfigNameList.Count; i++)
         {
@@ -207,6 +213,16 @@ public class SDKEditorWindow : EditorWindow
         }
 
         return 0;
+    }
+
+    bool GetUseNewSDKManager()
+    {
+        if (m_currentSchemeData == null)
+        {
+            return false;
+        }
+
+        return m_currentSchemeData.UseNewSDKManager;
     }
 
     #endregion
@@ -264,21 +280,26 @@ public class SDKEditorWindow : EditorWindow
     {
         if (m_currentSchemeData != null)
         {
-            m_isFoldSDKGUI = EditorGUILayout.Foldout(m_isFoldSDKGUI, "配置插件类型和参数：");
+            m_currentSchemeData.UseNewSDKManager = GUILayout.Toggle(m_currentSchemeData.UseNewSDKManager, "使用新版本SDKManager");
 
-            if (m_isFoldSDKGUI)
+            if(!m_currentSchemeData.UseNewSDKManager)
             {
-                EditorGUI.indentLevel++;
-                m_pos = EditorGUILayout.BeginScrollView(m_pos);
+                m_isFoldSDKGUI = EditorGUILayout.Foldout(m_isFoldSDKGUI, "配置插件类型和参数：");
 
-                EditorSDKListGUI(ref m_isFoldlogin, ref selectLoginIndex, m_loginFoldList, typeof(LoginInterface)   , m_LoginScheme, "登陆SDK");
-                EditorSDKListGUI(ref m_isFoldAd   , ref selectADIndex   , m_AdFoldList   , typeof(ADInterface)      , m_ADScheme  , "广告SDK");
-                EditorSDKListGUI(ref m_isFoldPay  , ref selectPayIndex  , m_PayFoldList  , typeof(PayInterface)     , m_PayScheme  , "支付SDK");
-                EditorSDKListGUI(ref m_isFoldLog  , ref selectLogIndex  , m_LogFoldList  , typeof(LogInterface)     , m_LogScheme  , "事件上报SDK");
-                EditorSDKListGUI(ref m_isFoldOther, ref selectOtherIndex, m_OtherFoldList, typeof(OtherSDKInterface), m_otherScheme, "其他SDK");
+                if (m_isFoldSDKGUI)
+                {
+                    EditorGUI.indentLevel++;
+                    m_pos = EditorGUILayout.BeginScrollView(m_pos);
 
-                EditorGUILayout.EndScrollView();
-                EditorGUI.indentLevel--;
+                    EditorSDKListGUI(ref m_isFoldlogin, ref selectLoginIndex, m_loginFoldList, typeof(LoginInterface), m_LoginScheme, "登陆SDK");
+                    EditorSDKListGUI(ref m_isFoldAd, ref selectADIndex, m_AdFoldList, typeof(ADInterface), m_ADScheme, "广告SDK");
+                    EditorSDKListGUI(ref m_isFoldPay, ref selectPayIndex, m_PayFoldList, typeof(PayInterface), m_PayScheme, "支付SDK");
+                    EditorSDKListGUI(ref m_isFoldLog, ref selectLogIndex, m_LogFoldList, typeof(LogInterface), m_LogScheme, "事件上报SDK");
+                    EditorSDKListGUI(ref m_isFoldOther, ref selectOtherIndex, m_OtherFoldList, typeof(OtherSDKInterface), m_otherScheme, "其他SDK");
+
+                    EditorGUILayout.EndScrollView();
+                    EditorGUI.indentLevel--;
+                }
             }
         }
         else
@@ -306,7 +327,7 @@ public class SDKEditorWindow : EditorWindow
             for (int i = 0; i < list.Count; i++)
             {
                 bool foldTmp = foldList[i];
-                list[i] = SelectSDKInterfaceGUI(ref foldTmp, SDKType, list[i], list[i].GetType().Name);
+                list[i] = SelectSDKInterfaceGUI(ref foldTmp, SDKType, list[i], list[i].m_SDKName);
                 foldList[i] = foldTmp;
 
                 if (foldTmp)
@@ -340,7 +361,9 @@ public class SDKEditorWindow : EditorWindow
 
                 if (type != null)
                 {
-                    list.Add((T)Activator.CreateInstance(type));
+                    T service = (T)Activator.CreateInstance(type);
+                    service.m_SDKName = service.GetType().Name;
+                    list.Add(service);
                     foldList.Add(true);
                 }
                 else
@@ -366,7 +389,7 @@ public class SDKEditorWindow : EditorWindow
         if (isFold)
         {
             EditorGUI.indentLevel++;
-            EditorGUILayout.LabelField("接口类型：" + SDKType.Name);
+            sdk.m_SDKName = EditorGUILayout.TextField( "SDK名称：", sdk.m_SDKName);
             string[] mask = GetSDKNameList(SDKType);
 
             int currentIndex = GetNameListIndex(mask,sdk);
@@ -385,7 +408,6 @@ public class SDKEditorWindow : EditorWindow
             }
 
             //显示界面
-
             EditorUtilGUI.DrawClassData(sdk);
 
             EditorGUI.indentLevel--;

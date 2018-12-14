@@ -174,7 +174,11 @@ public class NetworkManager
     {
         if(message.m_MessageType != null)
         {
-            s_messageList.Add(message);
+            lock (s_messageList)
+            {
+                s_messageList.Add(message);
+            }
+
             msgCount++;
         }
         else
@@ -187,6 +191,7 @@ public class NetworkManager
     {
         try
         {
+
             InputNetworkEventProxy.DispatchMessageEvent(msg.m_MessageType, msg.m_data);
         }
         catch (Exception e)
@@ -202,7 +207,10 @@ public class NetworkManager
 
     static void ConnectStatusChange(NetworkState status)
     {
-        s_statusList.Add(status);
+        lock (s_statusList)
+        {
+            s_statusList.Add(status);
+        }
     }
 
     static void Dispatch(NetworkState status)
@@ -223,22 +231,28 @@ public class NetworkManager
     {
         if (s_messageList.Count > 0)
         {
-            for (int i = 0; i < s_messageList.Count; i++)
+            lock (s_messageList)
             {
-                Dispatch(s_messageList[i]);
+                for (int i = 0; i < s_messageList.Count; i++)
+                {
+                    Dispatch(s_messageList[i]);
 
-                s_messageList.RemoveAt(i);
-                i--;
+                    s_messageList.RemoveAt(i);
+                    i--;
+                }
             }
         }
 
-        if (s_statusList.Count > 0)
+        lock (s_statusList)
         {
-            for (int i = 0; i < s_statusList.Count; i++)
+            if (s_statusList.Count > 0)
             {
-                Dispatch(s_statusList[i]);
+                for (int i = 0; i < s_statusList.Count; i++)
+                {
+                    Dispatch(s_statusList[i]);
+                }
+                s_statusList.Clear();
             }
-            s_statusList.Clear();
         }
 
         if (s_network != null)

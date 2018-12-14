@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace FrameWork.SDKInterface
+namespace FrameWork.SDKManager
 {
     public static class SDKManagerNew
     {
@@ -70,9 +70,15 @@ namespace FrameWork.SDKInterface
         /// <summary>
         /// 登陆
         /// </summary>
-        public static void Login(string SDKName)
+        public static void Login(string SDKName,string tag)
         {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Login);
+            data.Add(SDKInterfaceDefine.Login_ParameterName_Device, Application.identifier);
+            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            data.Add(SDKInterfaceDefine.Tag, tag);
 
+            Call(data);
         }
 
         #endregion
@@ -82,7 +88,7 @@ namespace FrameWork.SDKInterface
         /// <summary>
         /// 支付,默认访问第一个接口
         /// </summary>
-        public static void Pay(string goodsID, GoodsType goodsType = GoodsType.NORMAL,string orderID = null)
+        public static void Pay(string goodsID, string tag,GoodsType goodsType = GoodsType.NORMAL,string orderID = null)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Pay); //支付不传FunctionName
@@ -90,6 +96,24 @@ namespace FrameWork.SDKInterface
             data.Add(SDKInterfaceDefine.Pay_ParameterName_GoodsID, goodsID);
             data.Add(SDKInterfaceDefine.Pay_ParameterName_GoodsType, goodsType.ToString());
             data.Add(SDKInterfaceDefine.Pay_ParameterName_CpOrderID, orderID);
+            data.Add(SDKInterfaceDefine.Tag, tag);
+
+            Call(data);
+        }
+
+        /// <summary>
+        /// 支付,默认访问第一个接口
+        /// </summary>
+        public static void Pay(string SDKName,string goodsID,string tag, GoodsType goodsType = GoodsType.NORMAL, string orderID = null)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Pay); //支付不传FunctionName
+
+            data.Add(SDKInterfaceDefine.Pay_ParameterName_GoodsID, goodsID);
+            data.Add(SDKInterfaceDefine.Pay_ParameterName_GoodsType, goodsType.ToString());
+            data.Add(SDKInterfaceDefine.Pay_ParameterName_CpOrderID, orderID);
+            data.Add(SDKInterfaceDefine.Tag, tag);
 
             Call(data);
         }
@@ -107,12 +131,29 @@ namespace FrameWork.SDKInterface
         }
 
         /// <summary>
+        /// 加载广告,默认访问第一个接口
+        /// </summary>
+        public static void LoadAD(string SDKName,ADType adType, string tag = "")
+        {
+
+        }
+
+        /// <summary>
         /// 显示广告
         /// </summary>
         public static void PlayAD(ADType adType, string tag = "")
         {
 
         }
+
+        /// <summary>
+        /// 显示广告
+        /// </summary>
+        public static void PlayAD(string SDKName, ADType adType, string tag = "")
+        {
+
+        }
+
         /// <summary>
         /// 隐藏广告
         /// </summary>
@@ -130,7 +171,6 @@ namespace FrameWork.SDKInterface
         {
 
         }
-
         /// <summary>
         /// 隐藏广告
         /// </summary>

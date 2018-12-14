@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -15,13 +16,19 @@ public class PeojectAssetChangeEvent  {
         PeojectAssetWillModificationEvent.OnDeleteAssetCallBack += OnDeleteAssetCallBack;
         PeojectAssetWillModificationEvent.OnMoveAssetCallBack += OnMoveAssetCallBack;
         PeojectAssetWillModificationEvent.OnSaveAssetsCallBack += OnSaveAssetsCallBack;
+        EditorApplication.projectWindowChanged += OnProjectWindowChanged;
+    }
+
+    private static void OnProjectWindowChanged()
+    {
+        UpdateAsset(null);
     }
 
     private static void OnSaveAssetsCallBack(string[] t)
     {
-        //List<string> paths = new List<string>();
-        //paths.AddRange(t);
-        //UpdateAsset(paths);
+        List<string> paths = new List<string>();
+        paths.AddRange(t);
+        UpdateAsset(paths);
         //Debug.Log("OnSaveAssetsCallBack");
         //GlobalEvent.DispatchEvent(EditorGlobalEventEnum.OnSaveAssets, t);
     }
@@ -31,7 +38,7 @@ public class PeojectAssetChangeEvent  {
         List<string> paths = new List<string>();
         paths.Add(t1);
         paths.Add(t2);
-        //UpdateAsset(paths);
+        UpdateAsset(paths);
         //Debug.Log("OnMoveAssetCallBack");
         //GlobalEvent.DispatchEvent(EditorGlobalEventEnum.OnMoveAsset, t,t1,t2);
     }
@@ -40,16 +47,18 @@ public class PeojectAssetChangeEvent  {
     {
         List<string> paths = new List<string>();
         paths.Add(t1);
-        //UpdateAsset(paths);
+        UpdateAsset(paths);
         //Debug.Log("OnDeleteAssetCallBack");
         //GlobalEvent.DispatchEvent(EditorGlobalEventEnum.OnDeleteAsset, t, t1, t2);
+
+       
     }
 
     private static void OnCreateAssetCallBack(string t)
     {
         List<string> paths = new List<string>();
         paths.Add(t);
-        //UpdateAsset(paths);
+        UpdateAsset(paths);
         //Debug.Log("OnCreateAssetCallBack");
         //GlobalEvent.DispatchEvent(EditorGlobalEventEnum.OnCreateAsset, t);
     }
@@ -57,19 +66,23 @@ public class PeojectAssetChangeEvent  {
     private static void UpdateAsset(List<string> paths)
     {
         bool isUpdate = false;
-        foreach (var item in paths)
+        if (paths == null)
+            isUpdate = true;
+        else
         {
-            if (item.Contains("Assets/Resources"))
+            foreach (var item in paths)
             {
-                isUpdate = true;
-                break;
+                if (item.Contains("Assets/Resources"))
+                {
+                    isUpdate = true;
+                    break;
+                }
             }
         }
         if (isUpdate)
         {
-            BundleConfigEditorWindow win= EditorWindow.GetWindow<BundleConfigEditorWindow>();
-            win.AddResEndSave();
-            win.Close();
+            ResourcesConfigManager.CreateResourcesConfig();
+            AssetDatabase.Refresh();
             Debug.Log("创建资源路径文件");
         }
     }

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace FrameWork.SDKInterface
+namespace FrameWork.SDKManager
 {
     public class SDKInterfaceDefine
     {
@@ -11,6 +11,7 @@ namespace FrameWork.SDKInterface
 
         public const string SDKName  = "SDKName";
         public const string SDKIndex = "SDKIndex";
+        public const string Tag = "Tag";
 
         public const string ParameterName_IsSuccess = "IsSuccess";
         public const string ParameterName_Error     = "Error";

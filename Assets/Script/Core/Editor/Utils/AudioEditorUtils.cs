@@ -706,7 +706,7 @@ public static class AudioEditorUtils
         return type;
     }
 
-    public static AudioType GetPlatformConversionType(AudioType inType, BuildTargetGroup targetGroup, AudioImporterFormat format)
+    public static AudioType GetPlatformConversionType(AudioType inType, BuildTargetGroup targetGroup, AudioCompressionFormat format)
     {
         Assembly unityEditorAssembly = typeof(AudioImporter).Assembly;
         Type audioUtilClass = unityEditorAssembly.GetType("UnityEditor.AudioUtil");

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using FrameWork.SDKManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,7 +12,7 @@ public class LoginInterface : SDKInterfaceBase
     {
         base.Init();
     }
-    public virtual void Login()
+    public virtual void Login(string tage)
     {
 
     }

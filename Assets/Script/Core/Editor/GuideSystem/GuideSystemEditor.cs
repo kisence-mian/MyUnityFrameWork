@@ -156,7 +156,7 @@ public class GuideSystemEditor
         data.SetNote(GuideSystemBase.c_MaskAlphaKey, "遮罩Alpha");
         data.SetFieldType(GuideSystemBase.c_MaskAlphaKey, FieldType.Float, null);
 
-        DataEditorWindow.SaveData(GuideSystemBase.c_guideDataName, data);
+        TableDataEditor.SaveData(GuideSystemBase.c_guideDataName, data);
     }
 
     static void CreateGuideWindowScript()

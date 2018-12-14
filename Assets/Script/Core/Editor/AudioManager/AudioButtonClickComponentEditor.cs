@@ -20,7 +20,7 @@ public class AudioButtonClickComponentEditor : Editor
             return;
         }
 
-        ResourcesConfigManager.Initialize();
+        //ResourcesConfigManager.Initialize();
         if (!ResourcesConfigManager.GetIsExitRes(component.audioName))
         {
             EditorGUILayout.HelpBox("没有资源!!!", MessageType.Error);

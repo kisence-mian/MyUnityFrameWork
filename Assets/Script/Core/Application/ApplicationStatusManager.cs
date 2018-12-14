@@ -53,13 +53,18 @@ public class ApplicationStatusManager
     public static void ForceEnterStatus<T>(bool isFade = true) where T : IApplicationStatus
     {
         string statusName = typeof(T).Name;
-        EnterStatus(statusName, isFade);
+        EnterStatusLogic(statusName, isFade);
     }
 
-    public static void EnterStatus(string statusName,bool isFade = true)
+    public static void EnterStatus(string statusName, bool isFade = true)
     {
         if (s_currentAppStatusName == statusName)
             return;
+        EnterStatusLogic(statusName, isFade);
+    }
+    private  static void EnterStatusLogic(string statusName,bool isFade = true)
+    {
+       
 
         if (!isFade)
         {
@@ -104,12 +109,12 @@ public class ApplicationStatusManager
         {
             if (s_currentAppStatus != null)
             {
-                Debug.Log("Change ");
+                //Debug.Log("Change ");
 
                 UIManager.SetEventSystemEnable(false);
                 CameraFade.FadeInToOut(s_fadeInTime, s_afterInDelayTime, s_fadeOutTime, () =>
                 {
-                    Debug.Log("Change call back ");
+                    //Debug.Log("Change call back ");
 
                     UIManager.SetEventSystemEnable(true);
                     s_currentAppStatus.CloseAllUI(false);

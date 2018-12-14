@@ -24,17 +24,19 @@ public class HotUpdateManager
 
 #if !UNITY_WEBGL
 
-    static Dictionary<string, object> m_versionConfig;
-    static Dictionary<string, SingleField> m_hotUpdateConfig;
+    static Dictionary<string, object> s_versionConfig;
+    static Dictionary<string, SingleField> s_hotUpdateConfig;
 
     static string s_versionFileDownLoadPath;
-    static string s_Md5FileDownLoadPath;
+    static string s_ManifestFileDownLoadPath;
     static string s_resourcesFileDownLoadPath;
 
     static HotUpdateCallBack s_UpdateCallBack;
 
-    static string m_versionFileCache;
-    static string m_Md5FileCache;
+    static string s_versionFileCache;
+
+    static AssetBundleManifest s_ManifestCache;
+    static byte[] s_ManifestByteCache;
 
     public static void StartHotUpdate(HotUpdateCallBack CallBack)
     {
@@ -67,8 +69,7 @@ public class HotUpdateManager
         {
             if (ApplicationManager.Instance.m_useAssetsBundle)
             {
-                string path = PathTool.GetAbsolutePath(ResLoadLocation.Streaming,
-                c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName);
+                string path = PathTool.GetAbsolutePath(ResLoadLocation.Streaming,c_versionFileName.ToLower());
 
 #if UNITY_EDITOR 
                 //判断本地文件是否存在
@@ -82,18 +83,21 @@ public class HotUpdateManager
 
                 AssetBundle ab = AssetBundle.LoadFromFile(path);
 
-                TextAsset text = (TextAsset)ab.mainAsset;
+                TextAsset text = ab.LoadAsset<TextAsset>(c_versionFileName);
                 string StreamVersionContent = text.text;
+
                 ab.Unload(true);
 
                 //stream版本
                 Dictionary<string, object> StreamVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(StreamVersionContent);
 
                 //Streaming版本如果比Persistent版本还要新，则更新Persistent版本
-                if ((GetInt(StreamVersion[c_largeVersionKey]) > GetInt(m_versionConfig[c_largeVersionKey])) ||
-                    (GetInt(StreamVersion[c_smallVersonKey]) > GetInt(m_versionConfig[c_smallVersonKey]))
+                if ((GetInt(StreamVersion[c_largeVersionKey]) > GetInt(s_versionConfig[c_largeVersionKey])) ||
+                    (GetInt(StreamVersion[c_smallVersonKey]) > GetInt(s_versionConfig[c_smallVersonKey]))
                     )
                 {
+                    Debug.Log("Streaming版本比Persistent版本还要新");
+
                     RecordManager.CleanRecord(c_HotUpdateRecordName);
                     Init();
                 }
@@ -116,13 +120,13 @@ public class HotUpdateManager
 
     public static string GetHotUpdateVersion()
     {
-        if(m_versionConfig == null)
+        if(s_versionConfig == null)
         {
             return "0.0";
         }
         else
         {
-            return GetInt(m_versionConfig[c_largeVersionKey]) + "." + GetInt(m_versionConfig[c_smallVersonKey]);
+            return GetInt(s_versionConfig[c_largeVersionKey]) + "." + GetInt(s_versionConfig[c_smallVersonKey]);
         }
     }
 
@@ -150,7 +154,7 @@ public class HotUpdateManager
             yield break;
         }
 
-        m_versionFileCache = ((TextAsset)www.assetBundle.mainAsset).text;
+        s_versionFileCache = www.assetBundle.LoadAsset<TextAsset>(c_versionFileName).text;
 
         www.assetBundle.Unload(true);
 
@@ -158,25 +162,28 @@ public class HotUpdateManager
 
         //Debug.Log("Version File :text: " + m_versionFileCatch);
 
-        Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(m_versionFileCache);
+        Debug.Log("Service Version File :text: " + s_versionFileCache);
+        Debug.Log("local Version  : " + GetInt(s_versionConfig[c_largeVersionKey]) + " " + GetInt(s_versionConfig[c_smallVersonKey]));
+
+        Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(s_versionFileCache);
 
         //服务器大版本比较大，需要整包更新
-        if ( GetInt(m_versionConfig[c_largeVersionKey])
+        if ( GetInt(s_versionConfig[c_largeVersionKey])
             < GetInt(ServiceVersion[c_largeVersionKey]))
         {
             Debug.Log("需要更新整包");
             UpdateDateCallBack(HotUpdateStatusEnum.NeedUpdateApplication, GetHotUpdateProgress(true, false, 0));
         }
         //服务器大版本比较小，无需更新
-        else if (GetInt(m_versionConfig[c_largeVersionKey])
+        else if (GetInt(s_versionConfig[c_largeVersionKey])
                 > GetInt(ServiceVersion[c_largeVersionKey]))
         {
-            //Debug.Log("无需更新，直接进入游戏");
+            Debug.Log("服务器大版本比较小，无需更新，直接进入游戏");
             UpdateDateCallBack(HotUpdateStatusEnum.NoUpdate, 1);
             yield break;
         }
         //服务器小版本比较大，更新文件
-        else if (GetInt(m_versionConfig[c_smallVersonKey]) 
+        else if (GetInt(s_versionConfig[c_smallVersonKey]) 
             < GetInt(ServiceVersion[c_smallVersonKey]) )
         {
             Debug.Log("服务器小版本比较大，更新文件");
@@ -188,7 +195,7 @@ public class HotUpdateManager
         //服务器小版本比较小，无需更新
         else
         {
-            //Debug.Log("无需更新，直接进入游戏");
+            Debug.Log("服务器小版本比较小或者相同，无需更新，直接进入游戏");
             UpdateDateCallBack(HotUpdateStatusEnum.NoUpdate, 1);
             yield break;
         }
@@ -205,15 +212,15 @@ public class HotUpdateManager
     /// <returns></returns>
     static IEnumerator DownLoadFile()
     {
-        UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingMd5File, GetHotUpdateProgress(true, false, 0));
+        UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingManifestFile, GetHotUpdateProgress(true, false, 0));
         //取得服务器版本文件
-        WWW www = new WWW(s_Md5FileDownLoadPath);
-        Debug.Log("服务器获取MD5文件 ：" + s_Md5FileDownLoadPath);
+        WWW www = new WWW(s_ManifestFileDownLoadPath);
+        Debug.Log("服务器获取清单文件 ：" + s_ManifestFileDownLoadPath);
         //yield return www;
 
         while (!www.isDone)
         {
-            UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingMd5File, GetHotUpdateProgress(true, false, www.progress));
+            UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingManifestFile, GetHotUpdateProgress(true, false, www.progress));
             yield return new WaitForEndOfFrame();
         } 
 
@@ -226,46 +233,46 @@ public class HotUpdateManager
             yield break;
         }
 
-        m_Md5FileCache = ((TextAsset)www.assetBundle.mainAsset).text;
+        yield return new WaitForEndOfFrame();
+        yield return new WaitForEndOfFrame();
 
-        www.assetBundle.Unload(true);
+        s_ManifestCache = www.assetBundle.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
+        s_ManifestByteCache = www.bytes;
+        www.assetBundle.Unload(false);
 
-        UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingMd5File, GetHotUpdateProgress(true, false, 1));
+        UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingManifestFile, GetHotUpdateProgress(true, false, 1));
 
-        ResourcesConfigStruct serviceFileConfig = ResourcesConfigManager.AnalysisResourcesConfig2Struct(m_Md5FileCache);
-        ResourcesConfigStruct localFileConfig   = ResourcesConfigManager.AnalysisResourcesConfig2Struct(ResourcesConfigManager.ReadResourceConfigContent());
+        s_downLoadList = new List<DownLoadData>();
 
-        s_downLoadList = new List<ResourcesConfig>();
-
-        CheckBundleList(serviceFileConfig.relyList, localFileConfig.relyList);
-        CheckBundleList(serviceFileConfig.bundleList, localFileConfig.bundleList);
+        CheckBundleList(s_ManifestCache, AssetsManifestManager.GetManifest());
 
         yield return StartDownLoad();
     }
 
-    static void CheckBundleList(Dictionary<string, ResourcesConfig> serviceDict, Dictionary<string, ResourcesConfig> localDict)
+    static void CheckBundleList(AssetBundleManifest service, AssetBundleManifest local)
     {
-        foreach(ResourcesConfig item in serviceDict.Values )
+        string[] allServiceBundle = service.GetAllAssetBundles();
+
+        for (int i = 0; i < allServiceBundle.Length; i++)
         {
-            ResourcesConfig Tmp = item;
+            Hash128 sHash = service.GetAssetBundleHash(allServiceBundle[i]);
+            Hash128 lHash = local.GetAssetBundleHash(allServiceBundle[i]);
 
-            if (localDict.ContainsKey(Tmp.name))
+            if (!sHash.Equals(lHash))
             {
-                ResourcesConfig localTmp = localDict[Tmp.name];
+                //Debug.Log("sHash" + sHash);
+                //Debug.Log("lHash" + lHash);
 
-                if (!Tmp.md5.Equals(localTmp.md5))
-                {
-                    s_downLoadList.Add(Tmp);
-                }
-            }
-            else
-            {
-                s_downLoadList.Add(Tmp);
+                DownLoadData data = new DownLoadData();
+                data.name = allServiceBundle[i];
+                data.md5 = sHash;
+
+                s_downLoadList.Add(data);
             }
         }
     }
 
-    static List<ResourcesConfig> s_downLoadList = new List<ResourcesConfig>();
+    static List<DownLoadData> s_downLoadList = new List<DownLoadData>();
     //static List<ResourcesConfig> s_deleteList = new List<ResourcesConfig>();
 
     static IEnumerator StartDownLoad()
@@ -275,19 +282,20 @@ public class HotUpdateManager
         UpdateDateCallBack(HotUpdateStatusEnum.Updating, GetHotUpdateProgress(true, true,  GetDownLoadFileProgress(0)));
 
         RecordTable hotupdateData = RecordManager.GetData(c_HotUpdateRecordName);
-        
+
         for (int i = 0; i < s_downLoadList.Count; i++)
         {
-            string md5Tmp = hotupdateData.GetRecord(s_downLoadList[i].name, "null");
+            Hash128 md5Tmp = Hash128.Parse( hotupdateData.GetRecord(s_downLoadList[i].name, "null"));
 
-            if (md5Tmp == s_downLoadList[i].md5)
+            if (md5Tmp.Equals(s_downLoadList[i].md5))
             {
+                Debug.Log("文件已更新完毕 " + s_downLoadList[i].name);
                 //该文件已更新完毕
                 UpdateDateCallBack(HotUpdateStatusEnum.Updating, GetHotUpdateProgress(true, true, GetDownLoadFileProgress(i)));
             }
             else
             {
-                string downloadPath = s_resourcesFileDownLoadPath + s_downLoadList[i].path + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
+                string downloadPath = s_resourcesFileDownLoadPath + s_downLoadList[i].name;
 
                 WWW www = new WWW(downloadPath);
                 yield return www;
@@ -303,8 +311,8 @@ public class HotUpdateManager
                 {
                     Debug.Log("下载成功！ " + downloadPath);
 
-                    ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath() + "/" + s_downLoadList[i].path +"." + AssetsBundleManager.c_AssetsBundlesExpandName, www.bytes);
-                    RecordManager.SaveRecord(c_HotUpdateRecordName, s_downLoadList[i].name, s_downLoadList[i].md5);
+                    ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath() + "/" + s_downLoadList[i].name , www.bytes);
+                    RecordManager.SaveRecord(c_HotUpdateRecordName, s_downLoadList[i].name, s_downLoadList[i].md5.ToString());
 
                     UpdateDateCallBack(HotUpdateStatusEnum.Updating, GetHotUpdateProgress(true, true, GetDownLoadFileProgress(i)));
                 }
@@ -313,8 +321,8 @@ public class HotUpdateManager
 
         //保存版本信息
         //保存文件信息
-        ResourceIOTool.WriteStringByFile(PathTool.GetAssetsBundlePersistentPath()+ HotUpdateManager.c_versionFileName + "." + ConfigManager.c_expandName, m_versionFileCache);
-        ResourceIOTool.WriteStringByFile(PathTool.GetAssetsBundlePersistentPath() + ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName, m_Md5FileCache);
+        //ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath()+ c_versionFileName , s_versionByteCache);
+        ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath() + AssetsManifestManager.c_ManifestFileName, s_ManifestByteCache);
 
         //从stream读取配置
         RecordManager.SaveRecord(c_HotUpdateRecordName, c_useHotUpdateRecordKey, true);
@@ -322,32 +330,33 @@ public class HotUpdateManager
         UpdateDateCallBack(HotUpdateStatusEnum.UpdateSuccess, 1);
 
         //重新生成资源配置
-        ResourcesConfigManager.Initialize();
+        ResourcesConfigManager.LoadResourceConfig();
+        AssetsManifestManager.LoadAssetsManifest();
     }
 
     static void Init()
     {
-        m_versionConfig   = (Dictionary<string,object>) FrameWork.Json.Deserialize(ReadVersionContent());
-        m_hotUpdateConfig = ConfigManager.GetData(c_HotUpdateConfigName);
+        s_versionConfig   = (Dictionary<string,object>) FrameWork.Json.Deserialize(ReadVersionContent());
+        s_hotUpdateConfig = ConfigManager.GetData(c_HotUpdateConfigName);
 
         string downLoadServicePath = null;
-        bool isTest = m_hotUpdateConfig[c_UseTestDownLoadPathKey].GetBool();
+        bool isTest = s_hotUpdateConfig[c_UseTestDownLoadPathKey].GetBool();
 
         //使用测试下载地址
         if(isTest)
         {
-            downLoadServicePath = m_hotUpdateConfig[c_testDownLoadPathKey].GetString();
+            downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
         }
         else
         {
-            downLoadServicePath = m_hotUpdateConfig[c_downLoadPathKey].GetString();
+            downLoadServicePath = s_hotUpdateConfig[c_downLoadPathKey].GetString();
         }
 
         string downLoadPath = downLoadServicePath + "/" + platform + "/" + Application.version + "/";
         Debug.Log("=====>"+downLoadPath);
 
-        s_versionFileDownLoadPath   = downLoadPath + HotUpdateManager.c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
-        s_Md5FileDownLoadPath       = downLoadPath + ResourcesConfigManager.c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
+        s_versionFileDownLoadPath   = downLoadPath + c_versionFileName.ToLower() ;
+        s_ManifestFileDownLoadPath  = downLoadPath + AssetsManifestManager.c_ManifestFileName;
         s_resourcesFileDownLoadPath = downLoadPath;
     }
 
@@ -423,21 +432,29 @@ public class HotUpdateManager
             if (RecordManager.GetData(c_HotUpdateRecordName).GetRecord(c_useHotUpdateRecordKey, false))
             {
                 type = ResLoadLocation.Persistent;
-                string persistentPath = PathTool.GetAssetsBundlePersistentPath() + c_versionFileName + "." + ConfigManager.c_expandName;
-                dataJson = ResourceIOTool.ReadStringByFile(persistentPath);
+                string persistentPath = PathTool.GetAssetsBundlePersistentPath() + c_versionFileName;
+
+                AssetBundle ab = AssetBundle.LoadFromFile(persistentPath);
+                TextAsset text = ab.LoadAsset<TextAsset>(c_versionFileName);
+                dataJson = text.text;
+                ab.Unload(true);
             }
             else
             {
-                AssetBundle ab = AssetBundle.LoadFromFile(PathTool.GetAbsolutePath(
-                  type,
-                  c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName));
-                    TextAsset text = (TextAsset)ab.mainAsset;
+                AssetBundle ab = AssetBundle.LoadFromFile(PathTool.GetAbsolutePath(type,c_versionFileName.ToLower()));
+                    TextAsset text = ab.LoadAsset<TextAsset>(c_versionFileName);
                     dataJson = text.text;
                     ab.Unload(true);
             }
         }
 
         return dataJson;
+    }
+
+    public struct DownLoadData
+    {
+        public string name;
+        public Hash128 md5;
     }
 }
 
@@ -498,7 +515,7 @@ public enum HotUpdateStatusEnum
     UpdateSuccess,           //更新成功
 
     DownLoadingVersionFile,  //下载版本文件中
-    DownLoadingMd5File,      //下载Md5文件中
+    DownLoadingManifestFile,      //下载清单文件中
     Updating,                //更新中
 }
 

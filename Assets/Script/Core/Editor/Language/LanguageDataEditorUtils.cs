@@ -1,49 +1,63 @@
-﻿using System;
+﻿using HDJ.Framework.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using UnityEngine;
 
 public class LanguageDataEditorUtils
 {
-   public static Dictionary<string, List<string>> LoadEditorConfig(string c_EditorConfigName, ref List<string> s_languageKeyList)
+   
+
+    #region 加载/保存编辑器设置
+ 
+    public static void SaveData(SystemLanguage langeuageName, string fullkeyFileName, DataTable data)
     {
+        if (data == null)
+            return;
+        string path = LanguageDataUtils.SavePathDir + langeuageName + "/" + LanguageManager.GetLanguageDataName(langeuageName, fullkeyFileName) + ".txt";
 
-        Dictionary<string, List<string>> s_languageKeyDict =new Dictionary<string, List<string>>();
+        string text = DataTable.Serialize(data);
 
-        Dictionary<string, object> config = ConfigEditorWindow.GetEditorConfigData(c_EditorConfigName);
+        FileUtils.CreateTextFile(path, text);
+        UnityEditor.AssetDatabase.Refresh();
+    }
+  
+    /// <summary>
+    /// 加载所有某种语言的所有多语言文件，并转换成带"/"路径的数据
+    /// </summary>
+    /// <param name="language"></param>
+    /// <returns></returns>
+    public static List<string> LoadLangusgeAllFileNames(SystemLanguage language)
+    {
+        List<string> datas = new List<string>();
 
-        if (config == null)
+        string pathDir = LanguageDataUtils.SavePathDir + language;
+        string[] fileNames = PathUtils.GetDirectoryFileNames(pathDir, new string[] { ".txt" });
+        foreach (var item in fileNames)
         {
-            config = new Dictionary<string, object>();
+            string temp = item.Replace(LanguageManager.c_DataFilePrefix + language + "_", "").Replace("_", "/");
+            if (string.IsNullOrEmpty(temp))
+                continue;
+            datas.Add(temp);
         }
-
-        foreach (var item in config)
-        {
-            List<string> list = new List<string>();
-            List<object> ObjList = (List<object>)item.Value;
-            for (int i = 0; i < ObjList.Count; i++)
-            {
-                list.Add(ObjList[i].ToString());
-
-                s_languageKeyList.Add(item.Key + "/" + ObjList[i].ToString());
-            }
-
-            s_languageKeyDict.Add(item.Key, list);
-        }
-
-        return s_languageKeyDict;
+        return datas;
     }
 
-    public static List<string> GetLanguageLayersKeyList()
+    #endregion
+
+    public static List<string> GetLanguageAllFunKeyList()
     {
         List<string> list = new List<string>();
-        LoadEditorConfig(LanguageDataEditorWindow.c_EditorConfigName, ref list);
-        for (int i = 0; i < list.Count; i++)
+        LanguageSettingConfig config = LanguageDataUtils.LoadEditorConfig();
+        List<string> allFilePath = LoadLangusgeAllFileNames(config.defaultLanguage);
+        foreach (var item in allFilePath)
         {
-            string[] ss = list[i].Split('/');
-
-            list[i] = ss[0].Replace('_', '/') + "/" + ss[1];
+            DataTable data = LanguageDataUtils.LoadFileData(config.defaultLanguage, item);
+            foreach (var key in data.TableIDs)
+            {
+                list.Add(item + "/" + key);
+            }
         }
         return list;
     }

@@ -9,14 +9,12 @@ public class MouseDownUp : MonoBehaviour
     private string m_UIEventKey;
 
     InputEventRegisterInfo<InputUIOnMouseEvent> inputUIOnMouseEventDown;
-
     InputEventRegisterInfo<InputUIOnMouseEvent> inputUIOnMouseEventUp;
     public virtual void InitEvent(string UIEventKey)
     {
         m_UIEventKey = UIEventKey;
-        inputUIOnMouseEventDown = InputUIEventProxy.GetOnMouseListener(m_UIEventKey, name, name, true, OnMouseDownEvent);
-        inputUIOnMouseEventUp = InputUIEventProxy.GetOnMouseListener(m_UIEventKey, name, name, false, OnMouseUpEvent);
-
+        InputUIEventProxy.GetOnMouseListener(m_UIEventKey, name, name, true, OnMouseDownEvent);
+        InputUIEventProxy.GetOnMouseListener(m_UIEventKey, name, name, false, OnMouseUpEvent);
     }
 
     public virtual void OnMouseDownEvent(InputUIOnMouseEvent inputEvent)
@@ -30,8 +28,11 @@ public class MouseDownUp : MonoBehaviour
 
     public void DisposeEvent()
     {
-        InputManager.RemoveListener<InputUIOnMouseEvent>(OnMouseUpEvent);
-        InputManager.RemoveListener<InputUIOnMouseEvent>(OnMouseDownEvent);
+        inputUIOnMouseEventDown.RemoveListener();
+        inputUIOnMouseEventUp.RemoveListener();
+
+        inputUIOnMouseEventDown = null;
+        inputUIOnMouseEventUp = null;
     }
 
     private void OnMouseDown()

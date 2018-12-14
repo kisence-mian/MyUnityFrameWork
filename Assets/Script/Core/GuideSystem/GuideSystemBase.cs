@@ -102,7 +102,7 @@ namespace FrameWork.GuideSystem
         public void Start(string guideKey = null)
         {
             SingleData guideData;
-            //Debug.Log("Guide Start!!!");
+            // Debug.Log("Guide Start!!!");
             if (!string.IsNullOrEmpty( guideKey ))
             {
                 guideData = GetGuideDataByName(guideKey);
@@ -374,6 +374,8 @@ namespace FrameWork.GuideSystem
 
         void ReceviceClickEvent(InputUIOnClickEvent e)
         {
+            Debug.Log(" ReceviceClickEvent ");
+
             if (IsStart && GetClickToNext(m_currentGuideData) && GuideClickFilter(e))
             {
                 NextGuide();
@@ -449,10 +451,11 @@ namespace FrameWork.GuideSystem
 
         void StartGuide(SingleData guideData)
         {
+           
             m_isStart = true;
 
             m_startGuideKey = guideData.m_SingleDataKey;
-
+            Debug.Log(" 启动新手引导 : " + m_startGuideKey);
             SetCurrent(guideData);
 
             m_guideWindowBase = OpenGuideWindow();
@@ -463,6 +466,7 @@ namespace FrameWork.GuideSystem
 
             if(!m_isRegister)
             {
+               // Debug.Log("StartGuide");
                 m_isRegister = true;
                 InputManager.AddAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
                 UISystemEvent.RegisterAllUIEvent(UIEvent.OnOpened, ReceviceUIOpenEvent);
@@ -477,15 +481,17 @@ namespace FrameWork.GuideSystem
         {
             Debug.Log("EndGuide ");
 
+            CloseGuideWindow(m_guideWindowBase);
+
             m_isStart = false;
             m_isOperationUI = false;
-
-             CloseGuideWindow(m_guideWindowBase);
 
             m_guideWindowBase = null;
 
             if (m_isRegister)
             {
+                Debug.Log("RemoveAllEventListener");
+
                 m_isRegister = false;
                 InputManager.RemoveAllEventListener<InputUIOnClickEvent>(ReceviceClickEvent);
                 UISystemEvent.RemoveAllUIEvent(UIEvent.OnOpened, ReceviceUIOpenEvent);
@@ -494,6 +500,7 @@ namespace FrameWork.GuideSystem
 
                 ApplicationManager.s_OnApplicationUpdate -= Update;
             }
+
             OnCloseGuide();
         }
         protected virtual void CloseGuideWindow( GuideWindowBase m_guideWindowBase)

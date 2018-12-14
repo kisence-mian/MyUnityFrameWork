@@ -140,19 +140,9 @@ public class BundleConfigEditorWindow : EditorWindow
             CheckAndCreatBundelPackageConfig(); //生成资源路径文件
         }
 
-        if(!isPacking)
+        if (GUILayout.Button("5.0 打包"))
         {
-            if (GUILayout.Button("打包"))
-            {
-                CheckAndPackage();
-            }
-        }
-        else
-        {
-            if (GUILayout.Button("终止打包"))
-            {
-                EndPackage();
-            }
+            NewPackage();
         }
 
         GUILayout.BeginHorizontal();
@@ -166,11 +156,6 @@ public class BundleConfigEditorWindow : EditorWindow
         }
 
         GUILayout.EndHorizontal();
-
-        //if (GUILayout.Button("重打包增量文件并将差异文件导出到 diff 文件夹"))
-        //{
-        //    ExportDifferenceFile();
-        //}
 
         if (isContent)
         {
@@ -529,8 +514,6 @@ public class BundleConfigEditorWindow : EditorWindow
         }
     }
 
-
-
     //显示到界面上
     private void ShowBundlesByFolder(PathPoint pathPoint, int n_level)
     {
@@ -662,7 +645,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
             if (GUILayout.Button("重新打包", GUILayout.Width(ButtonWidth)))
             {
-                RePackageBundle(bundles[i]);
+                PackageService.PackageBundle(bundles[i]);
             }
 
             //删除视图
@@ -708,7 +691,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
         if (GUILayout.Button("重新打包", GUILayout.Width(ButtonWidth)))
         {
-            RePackageBundle(bundle);
+            PackageService.PackageBundle(bundle);
         }
         EditorGUILayout.EndHorizontal();
 
@@ -739,24 +722,6 @@ public class BundleConfigEditorWindow : EditorWindow
     #endregion
 
     #region 工具函数
-
-    static BuildTarget getTargetPlatform
-    {
-        get
-        {
-            BuildTarget target = BuildTarget.StandaloneWindows;
-
-#if UNITY_ANDROID //安卓
-            target = BuildTarget.Android;
-#elif UNITY_IOS //iPhone
-                target = BuildTarget.iOS;
-#elif UNITY_WEBGL //WebGL
-            target = BuildTarget.WebGL;
-#endif
-
-            return target;
-        }
-    }
 
     void UpdateRelyPackageNames()
     {
@@ -991,19 +956,19 @@ public class BundleConfigEditorWindow : EditorWindow
 
     public string GetExportPath(string path, string name)
     {
-        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(path) + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
+        return Application.dataPath + "/StreamingAssets/" + GetRelativePath(path).ToLower();
     }
 
     #endregion
 
     #region 添加菜单按钮
 
-    //[MenuItem("Tool/显示选中对象所有相关资源")]
-    //public static void ShowAllCorrelationResource()
-    //{
-    //    Object[] roots = Selection.GetFiltered(typeof(Object), SelectionMode.Unfiltered);
-    //    Selection.objects = EditorUtility.CollectDependencies(roots);
-    //}
+    [MenuItem("Tool/显示选中对象所有相关资源")]
+    public static void ShowAllCorrelationResource()
+    {
+        Object[] roots = Selection.GetFiltered(typeof(Object), SelectionMode.Unfiltered);
+        Selection.objects = EditorUtility.CollectDependencies(roots);
+    }
 
     [MenuItem("Window/打包设置编辑器 &1")]
 
@@ -1569,29 +1534,6 @@ public class BundleConfigEditorWindow : EditorWindow
 
     #region 打包
 
-    BuildAssetBundleOptions relyBuildOption; //依赖包打包设置
-
-    void CheckAndPackage()
-    {
-        CheckPackage();
-
-        if (errorCount == 0)
-        {
-            //EditorCoroutineRunner.StartEditorCoroutine(PackacgeService.Package(relyPackages,bundles,ProessCallback));
-
-            Package();
-        }
-        else
-        {
-            if (EditorUtility.DisplayDialog("失败", "打包设置有错误，请先修复错误！", "好的", "仍要打包") == false)
-            {
-                //EditorCoroutineRunner.StartEditorCoroutine(PackacgeService.Package(relyPackages, bundles, ProessCallback));
-
-                Package();
-            }
-        }
-    }
-
     void ProessCallback(float progress,string content)
     {
         ShowProgress(progress, content);
@@ -1603,141 +1545,112 @@ public class BundleConfigEditorWindow : EditorWindow
             CreatBundelPackageConfig();
             Repaint();
 
-            isPacking = false;
-
             EndProgress();
         }
     }
 
-    void Package()
+    void NewPackage()
     {
-        isPacking = true;
         //自动保存设置文件
         CreatePackageFile();
+
+        //生成资源路径文件
+        ResourcesConfigManager.CreateResourcesConfig();
 
         //自动增加小版本号
         VersionService.SmallVersion++;
         VersionService.CreateVersionFile();
 
-        EditorCoroutineRunner.StartEditorCoroutine(PackageService.Package(relyPackages, bundles, ProessCallback));
+        //清除旧打包信息
+        ClearAssetBundlesName();
+        //自动设置打包信息
+        SetAssetsInfo();
 
-        
-
-    }
-
-#pragma warning disable
-
-    bool isPacking = false;
-
-    void EndPackage()
-    {
-        EditorCoroutineRunner.StopAllEditorCoroutine();
-        BuildPipeline.PopAssetDependencies(); //移除依赖
-        isPacking = false;
-        EndProgress();
-    }
-
-    void PackageRelyPackage(EditPackageConfig package)
-    {
-        var relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
-            | BuildAssetBundleOptions.CollectDependencies   //收集依赖
-            | BuildAssetBundleOptions.CompleteAssets;      //完整资源
-        //| BuildAssetBundleOptions.UncompressedAssetBundle //不压缩
-
-        if (package.objects.Count == 0)
+        //删除streaming下所有旧资源
+        if (Directory.Exists(Application.dataPath + "/StreamingAssets"))
         {
-            Debug.LogError(package.name + " 没有资源！");
+            FileTool.DeleteDirectory(Application.dataPath + "/StreamingAssets");
         }
 
-        Object[] res = new Object[package.objects.Count];
+        BuildPipeline.BuildAssetBundles(Application.dataPath + "/StreamingAssets/", BuildAssetBundleOptions.None, PackageService.GetTargetPlatform);
 
-        for (int i = 0; i < package.objects.Count; i++)
-        {
-            res[i] = package.objects[i].obj;
-        }
+        //删除所有manifest文件
+        DeleteManifestFile(Application.dataPath + "/StreamingAssets/");
 
-        string path = GetExportPath(package.path, package.name);
-
-        FileTool.CreatFilePath(path);
-
-        BuildPipeline.BuildAssetBundle(null, res, path, relyBuildOption, getTargetPlatform);
+        //清除旧打包信息
+        ClearAssetBundlesName();
     }
 
-    void PackageBundle(EditPackageConfig package)
+    void DeleteManifestFile(string path)
     {
-        var buildOption = BuildAssetBundleOptions.DeterministicAssetBundle //每次二进制一致
-        | BuildAssetBundleOptions.CollectDependencies   //收集依赖
-        | BuildAssetBundleOptions.CompleteAssets;      //完整资源
-        //| BuildAssetBundleOptions.UncompressedAssetBundle; //不压缩
+        string[] dires = Directory.GetDirectories(path);
 
-        //Debug.Log("PackageBundle " + package.name);
-        //导入资源包
-        BuildPipeline.PushAssetDependencies();
-
-        //打包
-        Object[] res = new Object[package.objects.Count];
-
-        for (int i = 0; i < package.objects.Count; i++)
+        for (int i = 0; i < dires.Length; i++)
         {
-            res[i] = package.objects[i].obj;
+            DeleteManifestFile(dires[i]);
         }
 
-        string path = GetExportPath(package.path, package.name);
+        string[] files = Directory.GetFiles(path);
 
-        FileTool.CreatFilePath(path);
-
-        //Debug.Log(package.mainObject.obj);
-
-        BuildPipeline.BuildAssetBundle(package.mainObject.obj, res, path, buildOption, getTargetPlatform);
-
-        BuildPipeline.PopAssetDependencies();
+        for (int i = 0; i < files.Length; i++)
+        {
+            if (files[i].EndsWith(".manifest") 
+                || files[i].EndsWith(".meta"))
+            {
+                File.Delete(files[i]);
+            }
+        }
     }
 
-    void RePackageBundle(EditPackageConfig package)
+    void ClearAssetBundlesName()
     {
-
-        BuildPipeline.PushAssetDependencies();
-
-        List<EditPackageConfig> tmp = GetRelyPackListByMask(package.relyPackagesMask);
-        //先打依赖包
-        for (int i = 0; i < tmp.Count; i++)
+        int length = AssetDatabase.GetAllAssetBundleNames().Length;
+        Debug.Log("清除前 bundle数目 " + length);
+        string[] oldAssetBundleNames = new string[length];
+        for (int i = 0; i < length; i++)
         {
-            PackageRelyPackage(relyPackages[i]);
+            oldAssetBundleNames[i] = AssetDatabase.GetAllAssetBundleNames()[i];
         }
 
-        //再打普通包
-        PackageBundle(package);
-
-        BuildPipeline.PopAssetDependencies();
+        for (int j = 0; j < oldAssetBundleNames.Length; j++)
+        {
+            AssetDatabase.RemoveAssetBundleName(oldAssetBundleNames[j], true);
+        }
+        length = AssetDatabase.GetAllAssetBundleNames().Length;
+        Debug.Log("清除后 bundle数目 " + length);
     }
-    #endregion
 
-    //#region 导出差异文件
+    void SetAssetsInfo()
+    {
+        for (int i = 0; i < relyPackages.Count; i++)
+        {
+            for (int j = 0; j < relyPackages[i].objects.Count; j++)
+            {
+                AssetImporter assetImporter = AssetImporter.GetAtPath(relyPackages[i].objects[j].path);
+                if(assetImporter != null)
+                {
+                    assetImporter.assetBundleName = c_relyAssetsBundlePath + "/" + relyPackages[i].name;
+                }
+                else
+                {
+                    Debug.LogError("SetAssetsInfo relyPackages error :->" + relyPackages[i].objects[j].path);
+                }
+            }
+        }
 
-    //void ExportDifferenceFile()
-    //{
-    //    //创建并清空 Diff 文件夹
-    //    string diffPath = Application.dataPath + "/.Diff/";
-    //    FileTool.CreatPath(diffPath);
-    //    FileTool.DeleteDirectory(diffPath);
-
-    //    //读取本地清单文件
-    //    string streamPath = Application.dataPath + "/StreamingAssets/";
-
-    //    //比较差异
-    //    //导出版本文件
-    //    File.Copy(streamPath +HotUpdateManager.c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName
-    //        , diffPath + HotUpdateManager.c_versionFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName);
-
-
-    //    //导出清单文件
-    //    File.Copy(streamPath + ResourcesConfigManager.c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName
-    //        , diffPath + ResourcesConfigManager.c_ManifestFileName + "." + AssetsBundleManager.c_AssetsBundlesExpandName);
-    //}
-
-    //#endregion
-
-    #region 生成游戏中使用的配置文件
+        for (int i = 0; i < bundles.Count; i++)
+        {
+            AssetImporter assetImporter = AssetImporter.GetAtPath(bundles[i].mainObject.path);
+            if(assetImporter != null)
+            {
+                assetImporter.assetBundleName = bundles[i].path;
+            }
+            else
+            {
+                Debug.LogError("SetAssetsInfo bundles error :->" + bundles[i].mainObject.path);
+            }
+        }
+    }
 
     void CheckAndCreatBundelPackageConfig()
     {
@@ -1759,61 +1672,7 @@ public class BundleConfigEditorWindow : EditorWindow
     //生成游戏中使用的配置文件
     public void CreatBundelPackageConfig()
     {
-        Dictionary<string, object> data = new Dictionary<string, object>();
-
-        Dictionary<string, object> gameRelyBundles = new Dictionary<string, object>();
-        for (int i = 0; i < relyPackages.Count; i++)
-        {
-            //生成游戏中使用的依赖包数据
-            Dictionary<string, object> pack = new Dictionary<string, object>();
-            pack.Add("name", relyPackages[i].name);
-            pack.Add("path", relyPackages[i].path);
-            pack.Add("relyPackages", new string[0]);
-            pack.Add("md5", MD5Tool.GetFileMD5(GetExportPath(relyPackages[i].path, relyPackages[i].name))); //获取bundle包的md5
-
-            if(gameRelyBundles.ContainsKey(relyPackages[i].name))
-            {
-                Debug.LogError("依赖包重名 ! " + relyPackages[i].name);
-            }
-            else
-            {
-                gameRelyBundles.Add(relyPackages[i].name, pack);
-            }
-        }
-
-        Dictionary<string, object> gameAssetsBundles = new Dictionary<string, object>();
-        for (int i = 0; i < bundles.Count; i++)
-        {
-            //生成游戏中使用的bundle包数据
-            Dictionary<string, object> pack = new Dictionary<string, object>();
-            pack.Add("name", bundles[i].name);
-            pack.Add("path", bundles[i].path);
-            pack.Add("relyPackages", GetRelyPackNames(bundles[i].relyPackagesMask)); //获取依赖包的名字
-            pack.Add("md5", MD5Tool.GetFileMD5(GetExportPath(bundles[i].path, bundles[i].name))); //获取bundle包的md5
-            //pack.loadType      = ResLoadType.Streaming;  //默认放在沙盒路径下
-
-            if (gameAssetsBundles.ContainsKey(bundles[i].name))
-            {
-                Debug.LogError("资源包重名 ! " + bundles[i].name);
-            }
-            else
-            {
-                gameAssetsBundles.Add(bundles[i].name, pack);
-            }
-        }
-
-        data.Add(ResourcesConfigManager.c_relyBundleKey, gameRelyBundles);
-        data.Add(ResourcesConfigManager.c_bundlesKey, gameAssetsBundles);
-
-        //保存游戏中读取的配置文件
-        //ConfigManager.SaveData(ResourcesConfigManager.c_configFileName, gameConfig);
-
-        EditorUtil.WriteStringByFile(
-            PathTool.GetAbsolutePath(ResLoadLocation.Resource,
-            ResourcesConfigManager.c_ManifestFileName + "." + ConfigManager.c_expandName)
-            , FrameWork.Json.Serialize(data));
-
-        AssetDatabase.Refresh();
+        ResourcesConfigManager.CreateResourcesConfig();
     }
 
     #endregion
@@ -1866,7 +1725,6 @@ public class EditorObject
     public Object obj;
     public string path;
 }
-
 
 public class PathPoint
 {

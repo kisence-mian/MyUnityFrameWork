@@ -88,7 +88,7 @@ public class ApplicationManager : MonoBehaviour
     {
         DontDestroyOnLoad(gameObject);
         SetResourceLoadType();               //设置资源加载类型
-        ResourcesConfigManager.Initialize(); //资源路径管理器启动
+        //ResourcesConfigManager.Initialize(); //资源路径管理器启动
         AudioPlayManager.Init();
         MemoryManager.Init();                //内存管理初始化
         Timer.Init();                        //计时器启动

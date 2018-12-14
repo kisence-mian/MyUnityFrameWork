@@ -6,15 +6,17 @@ using UnityEngine;
 #pragma warning disable
 public class PackageService
 {
-    static BuildAssetBundleOptions relyBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle    //每次二进制一致  //依赖包打包设置      
-                                                    | BuildAssetBundleOptions.CollectDependencies;         //完整资源     
-                                                                                                           // | BuildAssetBundleOptions.ChunkBasedCompression;   //块压缩 
+    static BuildAssetBundleOptions relyBuildOption = BuildAssetBundleOptions.AppendHashToAssetBundleName;    //每次二进制一致  //依赖包打包设置   
+                                                    // | BuildAssetBundleOptions.ForceRebuildAssetBundle;
+                                                    // | BuildAssetBundleOptions.CollectDependencies;   //收集依赖
+                                                    // | BuildAssetBundleOptions.CompleteAssets;         //完整资源    
+                                                    // | BuildAssetBundleOptions.ChunkBasedCompression;   //块压缩 
 
     static BuildAssetBundleOptions bundleBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle  //每次二进制一致  //Bundle打包设置
                                                        | BuildAssetBundleOptions.CollectDependencies     //收集依赖
                                                        | BuildAssetBundleOptions.CompleteAssets;         //完整资源
                                                        //| BuildAssetBundleOptions.ChunkBasedCompression; //块压缩
-    static BuildTarget GetTargetPlatform
+    public static BuildTarget GetTargetPlatform
     {
         get
         {
@@ -144,7 +146,7 @@ public class PackageService
         }
     }
 
-    static void PackageBundle(EditPackageConfig package)
+    public static void PackageBundle(EditPackageConfig package)
     {
         //导入资源包
         BuildPipeline.PushAssetDependencies();
@@ -168,7 +170,7 @@ public class PackageService
 
     static string GetExportPath(string path, string name)
     {
-        return Application.dataPath + "/StreamingAssets/" + BundleConfigEditorWindow. GetRelativePath(FileTool.RemoveExpandName(path)) + "." + AssetsBundleManager.c_AssetsBundlesExpandName;
+        return Application.dataPath + "/StreamingAssets/" + BundleConfigEditorWindow. GetRelativePath(FileTool.RemoveExpandName(path));
     }
 
     static void CopyFile(string fileName)

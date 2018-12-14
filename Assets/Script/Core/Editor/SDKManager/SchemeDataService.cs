@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using FrameWork.SDKManager;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -102,13 +103,14 @@ public class SchemeDataService
     /// <param name="schemeData"></param>
     public static void SaveGameSchemeConfig(SchemeData schemeData)
     {
-        Debug.Log("SaveGameSchemeConfig " + schemeData.LoginScheme.Count);
+        Debug.Log("SaveGameSchemeConfig " + schemeData.LoginScheme.Count + " " + schemeData.SchemeName);
 
         if(schemeData != null)
         {
             Dictionary<string, SingleField> config = new Dictionary<string, SingleField>();
             config.Add(SDKManager.c_KeyName, new SingleField(JsonUtility.ToJson(schemeData)));
             ConfigEditorWindow.SaveData(SDKManager.c_ConfigName, config);
+            ConfigManager.CleanCache();
         }
         else
         {
@@ -119,6 +121,7 @@ public class SchemeDataService
     public static SchemeData CreateSchemeData(
 
     string schemeName,
+    bool useNewSDKManager,
     List<LoginInterface> loginScheme,
     List<ADInterface> ADScheme,
     List<PayInterface> payScheme,
@@ -128,6 +131,7 @@ public class SchemeDataService
         SchemeData schemeData = new SchemeData();
 
         schemeData.SchemeName = schemeName;
+        schemeData.UseNewSDKManager = useNewSDKManager;
 
         for (int i = 0; i < loginScheme.Count; i++)
         {
@@ -189,6 +193,8 @@ public class SchemeDataService
         SchemeData data = SDKManager.LoadGameSchemeConfig();
         string oldSchemeName = "None";
 
+        Debug.Log("ChangeScheme " + SchemeName);
+
         if (!IsExitsSchemeName(SchemeName))
         {
             Debug.Log("->" + SchemeName + "<- 方案不存在！ ");
@@ -208,39 +214,6 @@ public class SchemeDataService
 
         //重新生成游戏内使用的配置
         SaveGameSchemeConfig(GetSchemeData(SchemeName));
-
-        if (IsExitsSchemeName(SchemeName))
-        {
-            Debug.Log("Index: " + GetSchemeIndex(SchemeName));
-
-            //替换文件夹
-            if (oldSchemeName != "None")
-            {
-                UnloadPluginFile(oldSchemeName);
-                UnloadSchemeFile(oldSchemeName);
-            }
-            LoadPluginFile(SchemeName);
-            LoadSchemeFile(SchemeName);
-
-            //调整宏定义
-            EditorExpand.ChangeDefine(new string[] { SchemeName }, new string[] { oldSchemeName });
-        }
-        else
-        {
-            //这部分代码实际上不会执行
-
-            Debug.Log("不存在的方案名！ " + SchemeName);
-            if (oldSchemeName != "None")
-            {
-                //把当前方案收起来
-                UnloadPluginFile(oldSchemeName);
-                UnloadSchemeFile(oldSchemeName);
-
-                //移除宏定义
-                EditorExpand.ChangeDefine(new string[] {}, new string[] { oldSchemeName });
-            }
-        }
-
         AssetDatabase.Refresh();
     }
 

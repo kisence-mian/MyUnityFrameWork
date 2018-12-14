@@ -12,7 +12,7 @@ namespace Framework
         public void BundleConfigExistTest()
         {
             //只要初始化成功则通过
-            ResourcesConfigManager.Initialize();
+            //ResourcesConfigManager.Initialize();
 
             Assert.AreEqual(true, true);
         }
@@ -20,7 +20,7 @@ namespace Framework
         [Test(Description = "资源字段验证")]
         public void ResourcesFieldTest()
         {
-            ResourcesConfigManager.Initialize();
+            //ResourcesConfigManager.Initialize();
 
             Type[] types = Assembly.Load("Assembly-CSharp").GetTypes();
 
