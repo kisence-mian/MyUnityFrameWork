@@ -279,7 +279,7 @@ namespace FrameWork.SDKManager
 
         #endregion
 
-        #region SDK接口
+      #region SDK接口
 
         #if UNITY_ANDROID
 
@@ -413,6 +413,8 @@ namespace FrameWork.SDKManager
         public bool isSuccess;
         public string goodsId;
         public GoodsType goodsType;
+        public StoreName storeName;
+        public string receipt;
     }
 
     public struct OnLoginInfo

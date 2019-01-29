@@ -167,6 +167,11 @@ namespace HDJ.Framework.Utils
         {
 
             List<string> pathList = new List<string>();
+            if (!Directory.Exists(path))
+            {
+                Debug.LogError("不存在目录：" + path);
+                return new string[0];
+            }
 
             if (isIncludeChildFolder)
             {

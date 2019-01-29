@@ -11,6 +11,7 @@ using HDJ.Framework.Utils;
 public class TableDataEditor 
 {
     private const string FontPlayerPrefKey = "DataEditorWindow.FontKey";
+
     List<String> configFileNames = new List<string>();
 
     DataTable m_currentData;
@@ -26,7 +27,11 @@ public class TableDataEditor
 
         configFileNames.Clear();
         string m_directoryPath = Application.dataPath + "/Resources/" + DataManager.c_directoryName;
-        configFileNames.AddRange(PathUtils.GetDirectoryFileNames(m_directoryPath, new string[] { ".txt" }, false, false));
+
+        if(Directory.Exists(m_directoryPath))
+        {
+            configFileNames.AddRange(PathUtils.GetDirectoryFileNames(m_directoryPath, new string[] { ".txt" }, false, false));
+        }
 
         if (!string.IsNullOrEmpty(chooseFileName) && configFileNames.Contains(chooseFileName))
             LoadData(chooseFileName);
@@ -82,7 +87,8 @@ public class TableDataEditor
                 File.Delete(Application.dataPath + "/Resources/" + DataManager.c_directoryName + "/" + chooseFileName + ".txt");
                 AssetDatabase.Refresh();
                 m_currentData = null;
-                Init(null);
+                GlobalEvent.DispatchEvent(EditorEvent.LanguageDataEditorChange);
+                // Init(null);
                 return;
             }
         }
@@ -127,10 +133,11 @@ public class TableDataEditor
             {
                 DataTable data = new DataTable();
                 string keyName = GeneralDataModificationWindow.otherParameter.ToString();
+                chooseFileName = value.ToString();
                 data.TableKeys.Add(keyName);
-                SaveData(value.ToString(), data);
-                Init(null);
-                LoadData(value.ToString());
+                SaveData(chooseFileName, data);
+                GlobalEvent.DispatchEvent(EditorEvent.LanguageDataEditorChange);
+                LoadData(chooseFileName);
                 AssetDatabase.Refresh();
             });
         }
@@ -949,9 +956,12 @@ public class TableDataEditor
     private object DrawLocalizedLanguageField(string text, object value)
     {
         value = EditorDrawGUIUtil.DrawBaseValue(text, value);
+       
         if ("null" != value.ToString())
         {
             value = EditorDrawGUIUtil.DrawPopup(text, value.ToString(), langKeys);
+            if (value==null)
+                value = "null";
             GUILayout.Space(6);
             GUILayout.Label("多语言字段[" + value + "] : " + LanguageManager.GetContentByKey(value.ToString()));
             GUILayout.Space(8);

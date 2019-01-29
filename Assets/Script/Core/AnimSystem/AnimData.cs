@@ -360,7 +360,11 @@ public class AnimData
         if (m_fromV3.z == m_toV3.z)
         {
             m_v3Contral[0].z = m_fromV3.z;
-            m_v3Contral[1].z = m_toV3.z;
+            if (m_v3Contral.Length > 1)
+            {
+                m_v3Contral[1].z = m_toV3.z;
+            }
+
         }
     }
     /// <summary>
@@ -768,28 +772,36 @@ public class AnimData
         {
             case InterpType.Default:
             case InterpType.Linear: return Mathf.Lerp(oldValue, aimValue, m_currentTime / m_totalTime);
+
             case InterpType.InBack: return InBack(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutBack: return OutBack(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.InOutBack: return InOutBack(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutInBack: return OutInBack(oldValue, aimValue, m_currentTime, m_totalTime);
+
             case InterpType.InQuad: return InQuad(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutQuad: return OutQuad(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.InoutQuad: return InoutQuad(oldValue, aimValue, m_currentTime, m_totalTime);
+
             case InterpType.InCubic: return InCubic(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutCubic: return OutCubic(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.InoutCubic: return InoutCubic(oldValue, aimValue, m_currentTime, m_totalTime);
+            case InterpType.OutInCubic: return OutinCubic(oldValue, aimValue, m_currentTime, m_totalTime);
+
             case InterpType.InQuart: return InQuart(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutQuart: return OutQuart(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.InOutQuart: return InOutQuart(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutInQuart: return OutInQuart(oldValue, aimValue, m_currentTime, m_totalTime);
+
             case InterpType.InQuint: return InQuint(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutQuint: return OutQuint(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.InOutQuint: return InOutQuint(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutInQuint: return OutInQuint(oldValue, aimValue, m_currentTime, m_totalTime);
+
             case InterpType.InSine: return InSine(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutSine: return OutSine(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.InOutSine: return InOutSine(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutInSine: return OutInSine(oldValue, aimValue, m_currentTime, m_totalTime);
+
             case InterpType.InExpo: return InExpo(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.OutExpo: return OutExpo(oldValue, aimValue, m_currentTime, m_totalTime);
             case InterpType.InOutExpo: return InOutExpo(oldValue, aimValue, m_currentTime, m_totalTime);
@@ -1013,6 +1025,21 @@ public class AnimData
             return c / 2 * (t * t * t + 2) + b;
         }
     }
+
+    public float OutinCubic(float b, float to, float t, float d)
+    {
+        float c = to - b;
+
+        if (t < d / 2)
+        {
+            return OutCubic( b, b + c / 2, t * 2, d);
+        }
+        else
+        {
+            return InCubic( b + c / 2, to, (t * 2) - d, d);
+        }
+    }
+
     public float InQuart(float b, float to, float t, float d)
     {
         float c = to - b;

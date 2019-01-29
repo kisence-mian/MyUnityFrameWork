@@ -14,6 +14,7 @@ public static class AssetsBundleManager
     static Dictionary<string, Bundle> s_bundles        = new Dictionary<string, Bundle>();//所有包
 
 #if !UNITY_WEBGL
+
     /// <summary>
     /// 同步加载一个bundles
     /// </summary>
@@ -27,12 +28,18 @@ public static class AssetsBundleManager
         //加载依赖包
         for (int i = 0;i< AllDependencies.Length;i++ )
         {
-            //Debug.Log("" + AllDependencies[i] + " -> " + bundleName);
-
             LoadRelyBundle(AllDependencies[i]);
         }
-
-        return AddBundle(bundleName,AssetBundle.LoadFromFile(path));
+        
+        if(!AssetsManifestManager.GetIsDependencies(bundleName))
+        {
+            return AddBundle(bundleName, AssetBundle.LoadFromFile(path));
+        }
+        //如果这个包被别人依赖，则当做依赖包处理
+        else
+        {
+            return LoadRelyBundle(bundleName);
+        }
     }
 
     //加载一个依赖包
@@ -53,6 +60,7 @@ public static class AssetsBundleManager
 
         return tmp;
     }
+
 #endif
 
     /// <summary>
@@ -167,24 +175,31 @@ public static class AssetsBundleManager
     /// <returns>目标资源</returns>
     public static object Load(string name)
     {
-        if(s_bundles.ContainsKey(name))
+        try
         {
-            return s_bundles[name].Load(name);
-        }
-        else
-        {
-#if !UNITY_WEBGL
-            if (MemoryManager.s_allowDynamicLoad)
+            if (s_bundles.ContainsKey(name))
             {
-                return LoadBundle(name).Load(name);
+                return s_bundles[name].Load(name);
             }
             else
             {
-                throw new Exception("已禁止资源动态加载，请检查静态资源加载列表 ->" + name + "<-");
-            }
+#if !UNITY_WEBGL
+                if (MemoryManager.s_allowDynamicLoad)
+                {
+                    return LoadBundle(name).Load(name);
+                }
+                else
+                {
+                    throw new Exception("已禁止资源动态加载，请检查静态资源加载列表 ->" + name + "<-");
+                }
 #else
             throw new Exception("WEBGL 不能同步加载Bundle，请先异步加载对应资源！ ->" + name + "<-");
 #endif
+            }
+        }
+        catch(Exception e)
+        {
+            throw new Exception("AssetsBundleManager Load Exception ->" + name + "<- " + e.ToString());
         }
     }
 
@@ -218,7 +233,7 @@ public static class AssetsBundleManager
     /// </summary>
     /// <param name="name">>资源Key，必须在资源表中</param>
     /// <param name="callBack">回调，返回加载进度和目标资源</param>
-    public static void LoadAsync(string name, LoadCallBack callBack)
+    public static void LoadAsync(string name,Type type, LoadCallBack callBack)
     {
         try
         {
@@ -228,7 +243,7 @@ public static class AssetsBundleManager
                 //如果没有加载完,就缓存起来,等到加载完了一起回调
                 if (s_bundles[name] != null)
                 {
-                    callBack(LoadState.CompleteState, s_bundles[name].GetAeests());
+                    callBack(LoadState.CompleteState, s_bundles[name].GetAeests(type));
                 }
                 else
                 {
@@ -252,7 +267,7 @@ public static class AssetsBundleManager
                 {
                     if (state.isDone)
                     {
-                        callBack(state, bundlle.GetAeests());
+                        callBack(state, bundlle.GetAeests(type));
                     }
                     else
                     {
@@ -396,7 +411,7 @@ public static class AssetsBundleManager
             {
                 try
                 {
-                    LoadAsyncDict[bundleName](LoadState.CompleteState,bundleTmp.GetAeests());
+                    LoadAsyncDict[bundleName](LoadState.CompleteState,bundleTmp.GetAeests(null));
                 }
                 catch(Exception e)
                 {
@@ -459,6 +474,7 @@ public static class AssetsBundleManager
         }
         else
         {
+            loadType = ResLoadLocation.Streaming;
             return PathTool.GetAbsolutePath(loadType, bundleName);
         }
 
@@ -507,12 +523,26 @@ public class Bundle
         throw new Exception("Bundle Load Exception : not find by " + name + " ");
     }
 
-    public object GetAeests()
+    public object GetAeests(Type type)
     {
-        if (allAsset.Length > 0)
+        if(type == null)
         {
-            return allAsset[0];
+            if (allAsset.Length > 0)
+            {
+                return allAsset[0];
+            }
         }
+        else
+        {
+            for (int i = 0; i < allAsset.Length; i++)
+            {
+                if(allAsset[i].GetType() == type)
+                {
+                    return allAsset[i];
+                }
+            }
+        }
+
 
         throw new Exception("GetAeests Exception : Asset length is 0 ");
     }

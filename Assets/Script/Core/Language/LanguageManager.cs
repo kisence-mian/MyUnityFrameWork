@@ -40,8 +40,10 @@ public class LanguageManager
     }
 
     public static void SetLanguage(SystemLanguage lang)
-    {
+    {  
         SystemLanguage oldLan = s_currentLanguage;
+        if (config == null)
+            return;
         if (config.gameExistLanguages.Contains(lang))
         {
             s_currentLanguage = lang;
@@ -94,6 +96,8 @@ public class LanguageManager
         if (string.IsNullOrEmpty(fullKeyName))
             return "Error : key is null";
         int indexEnd = fullKeyName.LastIndexOf("/");
+        if (indexEnd < 0)
+            return "Error : Format is error";
         string key = fullKeyName.Substring(indexEnd + 1);
         string fullFileName = fullKeyName.Remove(indexEnd);
         if (string.IsNullOrEmpty(fullFileName) || string.IsNullOrEmpty(key))

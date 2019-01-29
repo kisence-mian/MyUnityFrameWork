@@ -10,18 +10,28 @@ public class LanguageDataUtils
     public const string SavePathDir = "Assets/Resources/Data/Language/";
     public static LanguageSettingConfig LoadEditorConfig()
     {
-        LanguageSettingConfig config;
-        string json = FileUtils.LoadTextFileByPath(SavePathDir + LanguageManager.c_configFileName + ".txt");
-        if (!string.IsNullOrEmpty(json))
-            config = JsonUtils.FromJson<LanguageSettingConfig>(json);
+
+        if(ResourceManager.GetResourceIsExist(LanguageManager.c_configFileName))
+        {
+            LanguageSettingConfig config;
+
+            string json = ResourceManager.ReadTextFile(LanguageManager.c_configFileName);
+
+            if (!string.IsNullOrEmpty(json))
+                config = JsonUtils.FromJson<LanguageSettingConfig>(json);
+            else
+            {
+                config = null;
+
+                //config.defaultLanguage = SystemLanguage.ChineseSimplified;
+                //config.gameExistLanguages.Add(SystemLanguage.ChineseSimplified);
+            }
+            return config;
+        }
         else
         {
-            config = new LanguageSettingConfig();
-
-            //config.defaultLanguage = SystemLanguage.ChineseSimplified;
-            //config.gameExistLanguages.Add(SystemLanguage.ChineseSimplified);
+            return null;
         }
-        return config;
     }
     public static void SaveEditorConfig(LanguageSettingConfig config)
     {

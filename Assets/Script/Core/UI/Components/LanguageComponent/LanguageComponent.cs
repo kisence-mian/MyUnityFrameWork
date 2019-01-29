@@ -29,7 +29,10 @@ public class LanguageComponent : MonoBehaviour
     {
         if (string.IsNullOrEmpty(languageKey))
             return;
-        m_text.text = LanguageManager.GetContentByKey(languageKey).ToString();
+
+        string value = LanguageManager.GetContentByKey(languageKey).ToString();
+        value = value.Replace("\\n", "\n");
+        m_text.text = value;
     }
 
     void ReceviceLanguageChange(params object[] objs)

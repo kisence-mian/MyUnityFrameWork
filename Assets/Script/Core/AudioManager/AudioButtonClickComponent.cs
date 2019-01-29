@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FrameWork.SDKManager;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,6 +21,4 @@ public class AudioButtonClickComponent : MonoBehaviour {
     {
         AudioPlayManager.PlaySFX2D(audioName, volume);
     }
-
-
 }

@@ -51,7 +51,7 @@ public class PeojectAssetChangeEvent  {
         //Debug.Log("OnDeleteAssetCallBack");
         //GlobalEvent.DispatchEvent(EditorGlobalEventEnum.OnDeleteAsset, t, t1, t2);
 
-       
+
     }
 
     private static void OnCreateAssetCallBack(string t)
@@ -81,9 +81,13 @@ public class PeojectAssetChangeEvent  {
         }
         if (isUpdate)
         {
-            ResourcesConfigManager.CreateResourcesConfig();
-            AssetDatabase.Refresh();
-            Debug.Log("创建资源路径文件");
+            if(ResourcesConfigManager.GetIsExistResources())
+            {
+                ResourcesConfigManager.CreateResourcesConfig();
+                ResourcesConfigManager.ClearConfig();
+                AssetDatabase.Refresh();
+                Debug.Log("创建资源路径文件");
+            }
         }
     }
 }

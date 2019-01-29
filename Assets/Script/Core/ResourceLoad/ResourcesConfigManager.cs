@@ -32,6 +32,14 @@ public static class ResourcesConfigManager
             Initialize();
         }
 
+#if UNITY_EDITOR
+        //重新加载路径文件
+        if (!s_config.ContainsKey(resName))
+        {
+            Initialize();
+        }
+#endif
+
         return s_config.ContainsKey(resName);
     }
 
@@ -44,7 +52,15 @@ public static class ResourcesConfigManager
             Initialize();
         }
 
+#if UNITY_EDITOR
+        //重新加载路径文件
         if(!s_config.ContainsKey(bundleName))
+        {
+            Initialize();
+        }
+#endif
+
+        if (!s_config.ContainsKey(bundleName))
         {
             throw new Exception("RecourcesConfigManager can't find ->" + bundleName + "<-");
         }
@@ -107,6 +123,12 @@ public static class ResourcesConfigManager
     public const string c_ResourceParentPath = "/Resources/";
     public const string c_MainKey = "Res";
     static int direIndex = 0;
+
+    public static bool GetIsExistResources()
+    {
+        string resourcePath = Application.dataPath + c_ResourceParentPath;
+        return Directory.Exists(resourcePath);
+    }
 
     public static void CreateResourcesConfig()
     {

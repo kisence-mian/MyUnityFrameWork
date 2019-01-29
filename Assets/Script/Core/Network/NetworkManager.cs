@@ -4,8 +4,9 @@ using System;
 using System.Collections.Generic;
 using FrameWork;
 using System.Net.Sockets;
+using System.Net;
 
-public class NetworkManager 
+public class NetworkManager
 {
     static INetworkInterface s_network;
     static HeartBeatBase s_heatBeat;
@@ -13,7 +14,7 @@ public class NetworkManager
     public static bool IsConnect
     {
         get {
-            if(s_network == null)
+            if (s_network == null)
             {
                 return false;
             }
@@ -47,16 +48,16 @@ public class NetworkManager
     /// <typeparam name="TProtocol">协议处理类</typeparam>
     /// <typeparam name="TSocket">Socket类</typeparam>
     /// <param name="protocolType">通讯协议</param>
-    public static void Init<TProtocol,TSocket>(ProtocolType protocolType = ProtocolType.Tcp) where TProtocol : INetworkInterface,new () where TSocket : SocketBase,new()
+    public static void Init<TProtocol, TSocket>(ProtocolType protocolType = ProtocolType.Tcp) where TProtocol : INetworkInterface, new() where TSocket : SocketBase, new()
     {
-        
+
         s_network = new TProtocol();
         s_network.m_socketService = new TSocket();
 
         NetInit();
     }
 
-    public static void Init(string networkInterfaceName,string socketName)
+    public static void Init(string networkInterfaceName, string socketName)
     {
         Type type = Type.GetType(networkInterfaceName);
 
@@ -84,7 +85,7 @@ public class NetworkManager
         ApplicationManager.s_OnApplicationQuit += DisConnect;
     }
 
-    public static void InitHeartBeat<T>(int spaceTime = 15) where T:HeartBeatBase,new()
+    public static void InitHeartBeat<T>(int spaceTime = 15) where T : HeartBeatBase, new()
     {
         s_heatBeat = new T();
         s_heatBeat.Init(spaceTime);
@@ -110,8 +111,26 @@ public class NetworkManager
 
     public static void SetServer(string IP, int port)
     {
-        s_network.SetIPAddress(IP, port);
+        IPAddress address;
+        if (IPAddress.TryParse(IP, out address))
+        {
+            s_network.SetIPAddress(IP, port);
+        }
+        else
+        {
+            SetDomain(IP, port);
+        }
     }
+
+
+    public static void SetDomain(string url,int port)
+    {
+        IPHostEntry IPinfo = Dns.GetHostEntry(url);
+        IPAddress[] ipList = IPinfo.AddressList;
+
+        s_network.SetIPAddress(ipList[0].ToString(), port);
+    }
+
     public static void Connect()
     {
         s_network.Connect();

@@ -13,6 +13,7 @@ public class ApplicationManager : MonoBehaviour
             if (instance == null)
             {
               instance =  FindObjectOfType<ApplicationManager>();
+
             }
             return ApplicationManager.instance; }
         set { ApplicationManager.instance = value; }

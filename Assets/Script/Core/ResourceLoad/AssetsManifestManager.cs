@@ -9,6 +9,9 @@ public class AssetsManifestManager
     static bool s_isInit = false;
     static AssetBundleManifest s_manifest;
 
+
+    static Dictionary<string, bool> s_relayData = new Dictionary<string, bool>();
+
     static void Initialize()
     {
         if (!s_isInit)
@@ -41,6 +44,32 @@ public class AssetsManifestManager
         AssetBundle ab = AssetBundle.LoadFromFile(path);
         s_manifest = ab.LoadAsset<AssetBundleManifest>("AssetBundleManifest");
         ab.Unload(false);
+
+        InitRelayData();
+    }
+
+    static void InitRelayData()
+    {
+        s_relayData = new Dictionary<string, bool>();
+
+        string[] allBundles = s_manifest.GetAllAssetBundles();
+        for (int i = 0; i < allBundles.Length; i++)
+        {
+            string bundleName = allBundles[i];
+            string[] allDependencies = s_manifest.GetAllDependencies(bundleName);
+            for (int j = 0; j < allDependencies.Length; j++)
+            {
+                if(!s_relayData.ContainsKey(allDependencies[j]))
+                {
+                    s_relayData.Add(allDependencies[j], true);
+                }
+            }
+        }
+    }
+
+    public static bool GetIsDependencies(string bundleName)
+    {
+        return s_relayData.ContainsKey(bundleName);
     }
 
     public static Hash128 GetHash(string bundleName)

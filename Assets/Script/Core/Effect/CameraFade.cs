@@ -3,20 +3,24 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 
-public class CameraFade : MonoBehaviour {
+public class CameraFade : MonoBehaviour
+{
     private static CameraFade instance = null;
     public static CameraFade Instance
     {
-        get {
+        get
+        {
             if (instance == null)
             {
                 GameObject obj = new GameObject("[CameraFade]");
                 instance = obj.AddComponent<CameraFade>();
                 instance.Init();
             }
-            return CameraFade.instance; }
-        
+            return CameraFade.instance;
+        }
+
     }
+    public static CallBack FadeCompleteCallBack;
     private static bool isFading = false;
     public static bool IsFading
     {
@@ -30,7 +34,7 @@ public class CameraFade : MonoBehaviour {
     {
         alpha = 0;
         tempColor = GUI.color;
-       // GUI.depth = 100;
+        // GUI.depth = 100;
         if (crossfadeTexture == null)
         {
             crossfadeTexture = new Texture2D(1, 1, TextureFormat.RGB24, false);
@@ -41,10 +45,10 @@ public class CameraFade : MonoBehaviour {
 
     #region 外部调用
     //淡入
-    public static  void FadeIn(float fadeTime, CallBack completeCallBack=null, bool isForceAlpha=false, float delay=0)
+    public static void FadeIn(float fadeTime, CallBack completeCallBack = null, bool isForceAlpha = false, float delay = 0)
     {
         CameraFadeData data = GetCameraFadeData(CameraFadeType.FadeIn, isForceAlpha, delay, fadeTime, completeCallBack);
-        Instance. StartFadeFunc(data);
+        Instance.StartFadeFunc(data);
     }
     //淡出
     public static void FadeOut(float fadeTime, CallBack completeCallBack = null, bool isForceAlpha = false, float delay = 0)
@@ -53,11 +57,11 @@ public class CameraFade : MonoBehaviour {
         Instance.StartFadeFunc(data);
     }
     //从淡入到淡出
-    public static void FadeInToOut(float _fadeInTime, float afterInDelayTime, float _fadeOutTime, CallBack afterFadeInCallback=null, CallBack afterFadeOutCallback = null, float delay = 0, bool isForceAlpha = false)
+    public static void FadeInToOut(float _fadeInTime, float afterInDelayTime, float _fadeOutTime, CallBack afterFadeInCallback = null, CallBack afterFadeOutCallback = null, float delay = 0, bool isForceAlpha = false)
     {
         CameraFadeData data = GetCameraFadeData(CameraFadeType.FadeIn, isForceAlpha, delay, _fadeInTime, afterFadeInCallback);
         CameraFadeData data2 = GetCameraFadeData(CameraFadeType.FadeOut, isForceAlpha, afterInDelayTime, _fadeOutTime, afterFadeOutCallback);
-        Instance.StartFadeFunc(data,data2);
+        Instance.StartFadeFunc(data, data2);
     }
     #endregion
 
@@ -81,7 +85,7 @@ public class CameraFade : MonoBehaviour {
             currentFadeDatas.Add(paras[i]);
         }
 
-        CameraFadeData data= paras[0];
+        CameraFadeData data = paras[0];
         if (data.isForceAlpha)
         {
             if (data.fadeType == CameraFadeType.FadeIn)
@@ -95,16 +99,16 @@ public class CameraFade : MonoBehaviour {
         }
         else
         {
-            if(isFading)
+            if (isFading)
             {
                 data.delay = 0;
             }
         }
         isFading = true;
 
-        float tempTime = data.fadeTime * alpha ;
+        float tempTime = data.fadeTime * alpha;
         data.tempFadeCaculateTime = tempTime;
-       
+
     }
 
     // Update is called once per frame
@@ -124,7 +128,7 @@ public class CameraFade : MonoBehaviour {
             return;
         }
 
-        if(data.fadeType== CameraFadeType.FadeIn)
+        if (data.fadeType == CameraFadeType.FadeIn)
         {
             if (data.tempFadeCaculateTime >= data.fadeTime)
             {
@@ -145,12 +149,12 @@ public class CameraFade : MonoBehaviour {
                 return;
             }
 
-           
+
             data.tempFadeCaculateTime -= Time.deltaTime;
         }
         alpha = data.tempFadeCaculateTime / data.fadeTime;
 
-       
+
     }
 
     private void RunComplete(CameraFadeData data)
@@ -164,13 +168,17 @@ public class CameraFade : MonoBehaviour {
             currentFadeDatas.Remove(data);
             cacheData.Add(data);
         }
+        if (FadeCompleteCallBack != null)
+        {
+            FadeCompleteCallBack();
+        }
     }
-         
+
     float alpha = 0;
     private Texture2D crossfadeTexture;
-    Color tempColor ;
+    Color tempColor;
     void OnGUI()
-    {           
+    {
         tempColor.a = alpha;
         GUI.color = tempColor;
         if (crossfadeTexture != null)
@@ -180,10 +188,10 @@ public class CameraFade : MonoBehaviour {
     }
 
     private static List<CameraFadeData> cacheData = new List<CameraFadeData>();
-    private static CameraFadeData  GetCameraFadeData(CameraFadeType fadeType, bool isForceAlpha, float delay, float fadeTime, CallBack completeCallBack)
+    private static CameraFadeData GetCameraFadeData(CameraFadeType fadeType, bool isForceAlpha, float delay, float fadeTime, CallBack completeCallBack)
     {
         CameraFadeData data = null;
-        if (cacheData.Count>0)
+        if (cacheData.Count > 0)
         {
             data = cacheData[0];
             cacheData.RemoveAt(0);
@@ -209,7 +217,7 @@ public class CameraFade : MonoBehaviour {
         public float tempFadeCaculateTime;
 
         public CameraFadeData() { }
-      public CameraFadeData(CameraFadeType fadeType, bool isForceAlpha, float delay, float fadeTime, CallBack completeCallBack)
+        public CameraFadeData(CameraFadeType fadeType, bool isForceAlpha, float delay, float fadeTime, CallBack completeCallBack)
         {
             SetCameraFadeData(fadeType, isForceAlpha, delay, fadeTime, completeCallBack);
         }

@@ -7,14 +7,17 @@ namespace FrameWork.SDKManager
     public abstract class PayInterface : SDKInterfaceBase
     {
         public PayCallBack m_PayResultCallBack;
-        public PayCallBack m_ConfirmCallBack;
+        /// <summary>
+        /// 验证回调，参数：string（商店名）,string（订单凭据，base64加密串）
+        /// </summary>
+        public CallBack<StoreName, string> m_ConfirmCallBack;
 
         virtual public void Pay(string goodsID, string tag, GoodsType goodsType = GoodsType.NORMAL, string orderID = null)
         {
 
         }
 
-        virtual public void ConfirmPay(string orderID, string tag)
+        virtual public void ConfirmPay(string goodsID, string tag)
         {
 
         }

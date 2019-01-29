@@ -103,7 +103,7 @@ public class EditorDrawGUIUtil
             return data;
 
         Type type = data.GetType();
-        content.text = richTextSupport ? GetFormatName(content.text, type, "yellow", data) : GetFormatName(content.text, type, "", data);
+        content.text = richTextSupport ? GetFormatName(content.text, type, "green", data) : GetFormatName(content.text, type, "", data);
 
         object obj = data;
         if (CanEdit)
@@ -455,12 +455,14 @@ public class EditorDrawGUIUtil
     /// <summary>
     /// 绘制弹出菜单
     /// </summary>
+    /// <typeparam name="T"></typeparam>
     /// <param name="name"></param>
     /// <param name="selectedStr"></param>
     /// <param name="displayedOptions"></param>
     /// <param name="selectChangeCallBack"></param>
+    /// <param name="customShowItemTextCallBack">自定义显示的Item的选项内容</param>
     /// <returns></returns>
-    public static T DrawPopup<T>(string name, T selectedStr, List<T> displayedOptions, CallBack<T> selectChangeCallBack = null)
+    public static T DrawPopup<T>(string name, T selectedStr, List<T> displayedOptions, CallBack<T> selectChangeCallBack = null,CallBackR<string,T> customShowItemTextCallBack=null)
     {
         if (displayedOptions==null || (displayedOptions.Count == 0))
             return default(T);
@@ -478,7 +480,12 @@ public class EditorDrawGUIUtil
         List<string> tempListStr = new List<string>();
         foreach (var item in displayedOptions)
         {
-            tempListStr.Add(item.ToString());
+            if (customShowItemTextCallBack != null)
+            {
+                tempListStr.Add(customShowItemTextCallBack(item));
+            }
+            else
+                tempListStr.Add(item.ToString());
         }
         selectedIndex = EditorGUILayout.Popup(name, selectedIndex, tempListStr.ToArray(), style);
 

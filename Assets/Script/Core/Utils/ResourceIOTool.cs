@@ -133,31 +133,48 @@ public class ResourceIOTool :MonoBehaviour
     //    }
     //}
 
-    public static void ResourceLoadAsync(string path,LoadCallBack callback)
+    public static void ResourceLoadAsync(string path, Type resType,LoadCallBack callback)
     {
-        GetInstance().MonoLoadMethod(path, callback);
+        GetInstance().MonoLoadMethod(path,resType, callback);
     }
 
-    public void MonoLoadMethod(string path, LoadCallBack callback)
+    public void MonoLoadMethod(string path, Type resType, LoadCallBack callback)
     {
-        StartCoroutine(MonoLoadByResourcesAsync(path, callback));
+        StartCoroutine(MonoLoadByResourcesAsync(path,resType, callback));
     }
 
-    LoadState m_loadState = new LoadState(); 
-    public IEnumerator MonoLoadByResourcesAsync(string path, LoadCallBack callback)
+    LoadState m_loadState = new LoadState();
+    public IEnumerator MonoLoadByResourcesAsync(string path, Type resType, LoadCallBack callback)
     {
-        ResourceRequest status = Resources.LoadAsync(path);
-        
+        ResourceRequest status = null;
+
+        try
+        {
+            if (resType == null)
+                status = Resources.LoadAsync(path);
+            else
+                status = Resources.LoadAsync(path, resType);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+            m_loadState.isDone = true;
+            m_loadState.progress = 1;
+            callback(m_loadState, null);
+            yield break;
+        }
+
         while (!status.isDone)
         {
             m_loadState.UpdateProgress(status);
-            callback(m_loadState,null);
+            callback(m_loadState, null);
 
             yield return 0;
         }
 
         m_loadState.UpdateProgress(status);
         callback(m_loadState, status.asset);
+
     }
 
     /// <summary>
@@ -202,7 +219,7 @@ public class ResourceIOTool :MonoBehaviour
         while (!www.isDone)
         {
             loadState.UpdateProgress(www);
-            callback(loadState, null);
+            callback(loadState,resType, null);
 
             yield return 0;
         }
@@ -212,7 +229,7 @@ public class ResourceIOTool :MonoBehaviour
         }
 
         loadState.UpdateProgress(www);
-        callback(loadState, www.assetBundle);
+        callback(loadState,resType, www.assetBundle);
 #endif
     }
 

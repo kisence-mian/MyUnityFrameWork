@@ -8,7 +8,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityObject = UnityEngine.Object;
 
-
+/// <summary>
+/// 绘制文件数状目录
+/// </summary>
 public class FolderTreeView : TreeView
 {
     /// <summary>
@@ -87,7 +89,7 @@ public class FolderTreeView : TreeView
     protected override TreeViewItem BuildRoot()
     {
         FolderTreeViewItem root = new FolderTreeViewItem { id = 0, depth = -1, displayName = "Root" };
-
+        root.children = new List<TreeViewItem>();
         var rows = GetFolderRows();
         if (allPath == null)
             return root;

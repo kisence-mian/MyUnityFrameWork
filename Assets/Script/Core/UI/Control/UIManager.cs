@@ -239,7 +239,7 @@ public class UIManager : MonoBehaviour
 
     public static UIWindowBase CreateUIWindow(string UIName)
     {
-        GameObject UItmp = GameObjectManager.CreateGameObject(UIName, UIManagerGo);
+        GameObject UItmp = GameObjectManager.CreateGameObjectByPool(UIName, UIManagerGo);
         UIWindowBase UIWIndowBase = UItmp.GetComponent<UIWindowBase>();
         UISystemEvent.Dispatch(UIWIndowBase, UIEvent.OnInit);  //派发OnInit事件
 
@@ -267,7 +267,7 @@ public class UIManager : MonoBehaviour
     /// <param name="callback">动画播放完毕回调</param>
     /// <param name="objs">回调传参</param>`
     /// <returns>返回打开的UI</returns>
-    public static UIWindowBase OpenUIWindow(string UIName, UICallBack callback = null, params object[] objs)
+    public static UIWindowBase OpenUIWindow(string UIName, UICallBack callback = null, params object[] objs)  
     {
         UIWindowBase UIbase = GetHideUI(UIName);
 

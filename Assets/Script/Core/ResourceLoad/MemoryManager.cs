@@ -43,7 +43,7 @@ public class MemoryManager
     #if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.F12))
         {
-            FreeHeapMemory();
+            FreeMemory();
         }
     #endif
 
@@ -81,8 +81,6 @@ public class MemoryManager
     /// </summary>
     public static void FreeHeapMemory()
     {
-        GlobalEvent.DispatchEvent(MemoryEvent.FreeHeapMemory);
-
         DataManager.CleanCache();
         ConfigManager.CleanCache();
         RecordManager.CleanCache();

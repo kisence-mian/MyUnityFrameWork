@@ -1,6 +1,7 @@
 ﻿using HDJ.Framework.Utils;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -8,7 +9,6 @@ using UnityEngine;
 public class LanguageDataEditorUtils
 {
    
-
     #region 加载/保存编辑器设置
  
     public static void SaveData(SystemLanguage langeuageName, string fullkeyFileName, DataTable data)
@@ -33,13 +33,16 @@ public class LanguageDataEditorUtils
         List<string> datas = new List<string>();
 
         string pathDir = LanguageDataUtils.SavePathDir + language;
-        string[] fileNames = PathUtils.GetDirectoryFileNames(pathDir, new string[] { ".txt" });
-        foreach (var item in fileNames)
+        if (Directory.Exists(pathDir))
         {
-            string temp = item.Replace(LanguageManager.c_DataFilePrefix + language + "_", "").Replace("_", "/");
-            if (string.IsNullOrEmpty(temp))
-                continue;
-            datas.Add(temp);
+            string[] fileNames = PathUtils.GetDirectoryFileNames(pathDir, new string[] { ".txt" });
+            foreach (var item in fileNames)
+            {
+                string temp = item.Replace(LanguageManager.c_DataFilePrefix + language + "_", "").Replace("_", "/");
+                if (string.IsNullOrEmpty(temp))
+                    continue;
+                datas.Add(temp);
+            }
         }
         return datas;
     }
@@ -50,15 +53,21 @@ public class LanguageDataEditorUtils
     {
         List<string> list = new List<string>();
         LanguageSettingConfig config = LanguageDataUtils.LoadEditorConfig();
-        List<string> allFilePath = LoadLangusgeAllFileNames(config.defaultLanguage);
-        foreach (var item in allFilePath)
+
+        if(config != null)
         {
-            DataTable data = LanguageDataUtils.LoadFileData(config.defaultLanguage, item);
-            foreach (var key in data.TableIDs)
+            List<string> allFilePath = LoadLangusgeAllFileNames(config.defaultLanguage);
+            foreach (var item in allFilePath)
             {
-                list.Add(item + "/" + key);
+                DataTable data = LanguageDataUtils.LoadFileData(config.defaultLanguage, item);
+                foreach (var key in data.TableIDs)
+                {
+                    list.Add(item + "/" + key);
+                }
             }
         }
+
+
         return list;
     }
 }

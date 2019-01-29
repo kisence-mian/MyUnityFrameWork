@@ -33,6 +33,14 @@ public class LanguageDataEditorWindow : EditorWindow
     {
         win = this;
        config= LanguageDataUtils.LoadEditorConfig();
+
+        if(config == null)
+        {
+            return;
+            config = new LanguageSettingConfig();
+            config.defaultLanguage = SystemLanguage.ChineseSimplified;
+        }
+
         if (!config.gameExistLanguages.Contains(currentLanguage))
         {
             currentLanguage = config.defaultLanguage;
@@ -61,6 +69,11 @@ public class LanguageDataEditorWindow : EditorWindow
     void OnGUI()
     {
         titleContent.text = "多语言编辑器";
+        if (config == null)
+        {
+            AddLanguageGUI();
+            return;
+        }
         richText = (bool)EditorDrawGUIUtil.DrawBaseValue("使用富文本：", richText);
         SelectLanguageGUI();
         DefaultLanguageGUI();
@@ -248,7 +261,7 @@ public class LanguageDataEditorWindow : EditorWindow
                         string path = LanguageDataUtils.GetLanguageSavePath(lan, selectItemFullName);
                         FileUtils.DeleteFile(path);
                     }
-                    SaveData();
+                   // SaveData();
                     AssetDatabase.Refresh();
                     selectItemFullName = "";
                     OnEnable();
@@ -288,7 +301,7 @@ public class LanguageDataEditorWindow : EditorWindow
              CreateNewFile(fileName, null);
              string tempContent = fileName.Replace('_', '/');
              selectFullFileName = tempContent;
-             SaveData();
+             //SaveData();
              Init();
          });
 
@@ -478,7 +491,7 @@ public class LanguageDataEditorWindow : EditorWindow
                  SystemLanguage lan = (SystemLanguage)value;
                  lan = (SystemLanguage)EditorDrawGUIUtil.DrawBaseValue("语言：", lan);
 
-                 if (config.gameExistLanguages.Contains(lan))
+                 if (config!=null&& config.gameExistLanguages.Contains(lan))
                  {
                      EditorGUILayout.HelpBox("已存在", MessageType.Error);
                  }
@@ -490,7 +503,7 @@ public class LanguageDataEditorWindow : EditorWindow
              }, (value) =>
              {
                  SystemLanguage lan = (SystemLanguage)value;
-                 if (config.gameExistLanguages.Contains(lan))
+                 if (config != null && config.gameExistLanguages.Contains(lan))
                  {
                      return false;
                  }
@@ -498,6 +511,7 @@ public class LanguageDataEditorWindow : EditorWindow
              }, (value) =>
              {
                  SystemLanguage lan = (SystemLanguage)value;
+                
                  CreateNewLangusge(lan);
 
              }
@@ -507,9 +521,14 @@ public class LanguageDataEditorWindow : EditorWindow
 
     private void CreateNewLangusge(SystemLanguage lan)
     {
+        if (config == null)
+        {
+            config = new LanguageSettingConfig();
+        }
         if (config.defaultLanguage == SystemLanguage.Unknown)
         {
             config.defaultLanguage = lan;
+            config.gameExistLanguages.Add(lan);
             currentLanguage = lan;
         }
         else
@@ -525,6 +544,9 @@ public class LanguageDataEditorWindow : EditorWindow
                 CreateLanguageNewFile(lan, item, dic);
             }
         }
+        SaveData();
+        AssetDatabase.Refresh();
+        Init();
     }
 
 

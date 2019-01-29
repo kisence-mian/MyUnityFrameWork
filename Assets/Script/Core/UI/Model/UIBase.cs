@@ -96,6 +96,10 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     //生成对象表，便于快速获取对象，并忽略层级
     void CreateObjectTable()
     {
+        if (m_objects == null)
+        {
+            m_objects = new Dictionary<string, GameObject>();
+        }
         m_objects.Clear();
 
         m_images.Clear();
@@ -137,7 +141,7 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
     Dictionary<string, UIBase> m_uiBases = new Dictionary<string, UIBase>();
 
-    Dictionary<string, GameObject> m_objects = new Dictionary<string, GameObject>();
+    Dictionary<string, GameObject> m_objects = null;
     Dictionary<string, Image> m_images = new Dictionary<string, Image>();
     Dictionary<string, Sprite> m_Sprites = new Dictionary<string, Sprite>();
     Dictionary<string, Text> m_texts = new Dictionary<string, Text>();
@@ -724,36 +728,35 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
     List<UIBase> m_ChildList = new List<UIBase>();
     int m_childUIIndex = 0;
+    public UIBase CreateItem(string itemName, GameObject parent, bool isActive)
+    {
+        GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, parent, isActive);
+
+        return SetItem(item);
+    }
     public UIBase CreateItem(string itemName, string prantName, bool isActive)
     {
-        GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, GetGameObject(prantName), isActive);
-
-        item.transform.localScale = Vector3.one;
-        item.transform.localPosition = Vector3.zero;
-        UIBase UIItem = item.GetComponent<UIBase>();
-
-        if (UIItem == null)
-        {
-            throw new Exception("CreateItem Error : ->" + itemName + "<- don't have UIBase Component!");
-        }
-
-        UIItem.Init(UIEventKey,m_childUIIndex++);
-
-        m_ChildList.Add(UIItem);
-
-        return UIItem;
+        GameObject parent = GetGameObject(prantName);
+        return CreateItem(itemName,parent,isActive);
     }
     public UIBase CreateItem(GameObject itemObj, GameObject parent, bool isActive)
     {
         GameObject item = GameObjectManager.CreateGameObjectByPool(itemObj, parent, isActive);
-
+        return SetItem(item);
+    }
+    public UIBase CreateItem(string itemName, string prantName)
+    {
+        return CreateItem(itemName, prantName, true);
+    }
+    private UIBase SetItem(GameObject item)
+    {
         item.transform.localScale = Vector3.one;
         item.transform.localPosition = Vector3.zero;
         UIBase UIItem = item.GetComponent<UIBase>();
 
         if (UIItem == null)
         {
-            throw new Exception("CreateItem Error : ->" + itemObj.name + "<- don't have UIBase Component!");
+            throw new Exception("CreateItem Error : ->" + item.name + "<- don't have UIBase Component!");
         }
 
         UIItem.Init(UIEventKey, m_childUIIndex++);
@@ -763,13 +766,6 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
         return UIItem;
     }
-
-    public UIBase CreateItem(string itemName, string prantName)
-    {
-        return CreateItem(itemName, prantName, true);
-    }
-
-
     public void DestroyItem(UIBase item)
     {
         DestroyItem(item, true);

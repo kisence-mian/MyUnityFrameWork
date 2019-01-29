@@ -121,6 +121,25 @@ namespace FrameWork.GuideSystem
                 StartGuide(guideData);
             }
         }
+        /// <summary>
+        /// 检查是否满足启动引导的条件
+        /// </summary>
+        /// <param name="guideKey"></param>
+        /// <returns></returns>
+        public bool CanStartGuide(string guideKey)
+        {
+            if (string.IsNullOrEmpty(guideKey))
+                return false;
+           SingleData guideData = GetGuideDataByName(guideKey);
+            if (!IsStart
+                && guideData != null
+                && GuideStartCondition(guideKey, guideData)
+                && GetGuideSwitch())
+            {
+                return true;
+            }
+            return false;
+        }
 
         #endregion
 
@@ -374,7 +393,7 @@ namespace FrameWork.GuideSystem
 
         void ReceviceClickEvent(InputUIOnClickEvent e)
         {
-            Debug.Log(" ReceviceClickEvent ");
+            //Debug.Log(" ReceviceClickEvent ");
 
             if (IsStart && GetClickToNext(m_currentGuideData) && GuideClickFilter(e))
             {
@@ -477,10 +496,19 @@ namespace FrameWork.GuideSystem
             }
         }
 
-        void EndGuide()
+      protected  void EndGuide()
         {
             Debug.Log("EndGuide ");
 
+            CloseGuide();
+
+            OnCloseGuide();
+        }
+        /// <summary>
+        /// 关闭引导逻辑，不调用OnCloseGuide
+        /// </summary>
+        protected void CloseGuide()
+        {
             CloseGuideWindow(m_guideWindowBase);
 
             m_isStart = false;
@@ -500,8 +528,6 @@ namespace FrameWork.GuideSystem
 
                 ApplicationManager.s_OnApplicationUpdate -= Update;
             }
-
-            OnCloseGuide();
         }
         protected virtual void CloseGuideWindow( GuideWindowBase m_guideWindowBase)
         {
@@ -587,7 +613,7 @@ namespace FrameWork.GuideSystem
             }
         }
 
-        void ClearGuideLogic()
+      protected  void ClearGuideLogic()
         {
             if(m_currentOperationWindow != null)
             {

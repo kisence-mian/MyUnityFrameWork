@@ -170,7 +170,7 @@ public class PackageService
 
     static string GetExportPath(string path, string name)
     {
-        return Application.dataPath + "/StreamingAssets/" + BundleConfigEditorWindow. GetRelativePath(FileTool.RemoveExpandName(path));
+        return Application.dataPath + "/StreamingAssets/" + BundleConfigEditorWindow. GetRelativePath(FileTool.RemoveExpandName(path)).ToLower();
     }
 
     static void CopyFile(string fileName)

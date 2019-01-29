@@ -20,7 +20,6 @@ namespace FrameWork.SDKManager
 
         private static LoginCallBack s_loginCallBack;
         private static PayCallBack s_payCallBack;
-        private static PayCallBack s_payConfimCallBack;
 
         static bool s_useNewSDKManager = false; //是否使用新版本SDKManager
 
@@ -49,19 +48,6 @@ namespace FrameWork.SDKManager
             set
             {
                 s_payCallBack = value;
-            }
-        }
-
-        public static PayCallBack PayConfimCallBack
-        {
-            get
-            {
-                return s_payConfimCallBack;
-            }
-
-            set
-            {
-                s_payConfimCallBack = value;
             }
         }
 
@@ -118,6 +104,11 @@ namespace FrameWork.SDKManager
 
         public static LoginInterface GetLoginService(int index)
         {
+            if (s_loginServiceList.Count <= index)
+            {
+                throw new Exception("GetLoginService error index->" + index + " count->" + s_loginServiceList.Count);
+            }
+
             return s_loginServiceList[index];
         }
 
@@ -133,6 +124,11 @@ namespace FrameWork.SDKManager
 
         public static PayInterface GetPayService(int index)
         {
+            if(s_payServiceList.Count <= index)
+            {
+                throw new Exception("GetPayService error index->" + index + " count->" + s_payServiceList.Count);
+            }
+
             return s_payServiceList[index];
         }
 
@@ -148,6 +144,11 @@ namespace FrameWork.SDKManager
 
         public static ADInterface GetADService(int index)
         {
+            if (s_ADServiceList.Count <= index)
+            {
+                throw new Exception("GetADService error index->" + index + " count->" + s_ADServiceList.Count);
+            }
+
             return s_ADServiceList[index];
         }
 
@@ -163,6 +164,11 @@ namespace FrameWork.SDKManager
 
         public static LogInterface GetLogService(int index)
         {
+            if (s_logServiceList.Count <= index)
+            {
+                throw new Exception("GetLogService error index->" + index + " count->" + s_logServiceList.Count);
+            }
+
             return s_logServiceList[index];
         }
 
@@ -178,6 +184,11 @@ namespace FrameWork.SDKManager
 
         public static OtherSDKInterface GetOtherService(int index)
         {
+            if (s_otherServiceList.Count <= index)
+            {
+                throw new Exception("GetOtherService error index->" + index + " count->" + s_otherServiceList.Count);
+            }
+
             return s_otherServiceList[index];
         }
 
@@ -227,7 +238,7 @@ namespace FrameWork.SDKManager
         /// <summary>
         /// 登陆
         /// </summary>
-        public static void Login(string SDKName,string tag = "")
+        public static void LoginBySDKName(string SDKName,string tag = "")
         {
             if (s_useNewSDKManager)
             {
@@ -258,8 +269,8 @@ namespace FrameWork.SDKManager
                 {
                     list[i].m_SDKName = list[i].GetType().Name;
                     list[i].Init();
-                    s_payCallBack += list[i].m_PayResultCallBack;
-                    s_payConfimCallBack = list[i].m_ConfirmCallBack;
+                      list[i].m_PayResultCallBack= s_payCallBack;
+                    Debug.Log("初始化支付回调");
                 }
                 catch (Exception e)
                 {
@@ -315,7 +326,7 @@ namespace FrameWork.SDKManager
         /// <summary>
         /// 支付,默认访问第一个接口
         /// </summary>
-        public static void ConfirmPay(string orderID,string tag = "")
+        public static void ConfirmPay(string orderID, string tag = "")
         {
             try
             {

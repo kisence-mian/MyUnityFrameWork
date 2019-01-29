@@ -27,12 +27,22 @@ public static class ResourceManager
 
     public static bool GetResourceIsExist(string name)
     {
+        if (name == null)
+        {
+            throw new Exception("ResourceManager GetResourceIsExist -> name is null !");
+        }
+
         return  ResourcesConfigManager.GetIsExitRes(name);
     }
 
     //读取一个文本
     public static string ReadTextFile(string textName)
     {
+        if (textName == null)
+        {
+            throw new Exception("ResourceManager ReadTextFile -> textName is null !");
+        }
+
         TextAsset text = Load<TextAsset>(textName);
 
         if (text == null)
@@ -47,6 +57,11 @@ public static class ResourceManager
 
     public static object Load(string name)
     {
+        if(name == null)
+        {
+            throw new Exception("ResourceManager Load -> name is null !");
+        }
+
         string path = ResourcesConfigManager.GetResourcePath(name);
 
         if (m_gameLoadType == ResLoadLocation.Resource)
@@ -61,6 +76,11 @@ public static class ResourceManager
 
     public static T Load<T>(string name) where T: UnityEngine.Object
     {
+        if (name == null)
+        {
+            throw new Exception("ResourceManager Load<T> -> name is null !");
+        }
+
         string path = ResourcesConfigManager.GetResourcePath(name);
 
         if (m_gameLoadType == ResLoadLocation.Resource)
@@ -75,20 +95,46 @@ public static class ResourceManager
 
     public static void LoadAsync(string name,LoadCallBack callBack)
     {
+        if (name == null)
+        {
+            throw new Exception("ResourceManager LoadAsync -> name is null !");
+        }
+       string path = ResourcesConfigManager.GetResourcePath(name);
+
+        if (m_gameLoadType == ResLoadLocation.Resource)
+        {
+            ResourceIOTool.ResourceLoadAsync(path,null, callBack);
+        }
+        else
+        {
+            AssetsBundleManager.LoadAsync(path,null, callBack);
+        }
+    }
+    public static void LoadAsync(string name,Type resType, LoadCallBack callBack)
+    {
+        if (name == null)
+        {
+            throw new Exception("ResourceManager LoadAsync -> name is null !");
+        }
         string path = ResourcesConfigManager.GetResourcePath(name);
 
         if (m_gameLoadType == ResLoadLocation.Resource)
         {
-            ResourceIOTool.ResourceLoadAsync(path, callBack);
+            ResourceIOTool.ResourceLoadAsync(path,resType, callBack);
         }
         else
         {
-            AssetsBundleManager.LoadAsync(path, callBack);
+            AssetsBundleManager.LoadAsync(path,resType, callBack);
         }
     }
 
     public static void UnLoad(string name)
     {
+        if (name == null)
+        {
+            throw new Exception("ResourceManager UnLoad -> name is null !");
+        }
+
         string path = ResourcesConfigManager.GetResourcePath(name);
 
         if (m_gameLoadType == ResLoadLocation.Resource)

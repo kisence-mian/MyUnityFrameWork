@@ -52,18 +52,6 @@ namespace HDJ.Framework.Utils
                 return "";
             }
            return  File.ReadAllText(path);
-            //StreamReader sr = File.OpenText(path);
-            //StringBuilder line = new StringBuilder();
-            //string tmp = "";
-            //while ((tmp = sr.ReadLine()) != null)
-            //{
-            //    line.Append(tmp+"/n");
-            //}
-
-            //sr.Close();
-            //sr.Dispose();
-
-            //return line.ToString();
 
         }
         public static byte[] LoadByteFileByPath(string path)

@@ -4,7 +4,6 @@ using System.Text;
 
 public class PathTool
 {
-
     public static string GetPath(ResLoadLocation loadType)
     {
         StringBuilder path = new StringBuilder();

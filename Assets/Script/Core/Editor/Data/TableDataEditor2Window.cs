@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -23,6 +24,7 @@ public class TableDataEditor2Window : EditorWindow
 
         GlobalEvent.AddEvent(EditorEvent.LanguageDataEditorChange, Refresh);
     }
+
 
     private void OnGUI()
     {

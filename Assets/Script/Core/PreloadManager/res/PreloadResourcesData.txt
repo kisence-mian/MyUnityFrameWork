@@ -1,0 +1,4 @@
+resName	instantiateNum	description	createInstanceActive	ResType
+type	Int	String	Bool	String
+note	实例化数量，当然只支持预制	资源简单介绍	预加载放在对象池的实例是否是激活状态	资源类型
+default	0	null	FALSE	UnityEngine.GameObject
