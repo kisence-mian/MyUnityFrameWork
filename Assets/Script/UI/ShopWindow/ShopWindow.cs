@@ -11,6 +11,7 @@ public class ShopWindow : UIWindowBase
     {
         m_ShopItem = GetReusingScrollRect("Items");
 
+        m_ShopItem.SetItem("ShopWindow_Item");
         m_ShopItem.Init(UIEventKey,0);
 
         m_ShopItem.SetData(GetShopData());

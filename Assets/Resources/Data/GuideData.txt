@@ -1,8 +1,8 @@
-GuideID	StartPoint	EndPoint	Premise	NextGuide	CallToNext	ClickToNext	GuideWindowName	GuideObjectName	GuideItemName	TipContent	TipContentPos	MaskAlpha
-type	Bool	Bool	String	String	Bool	Bool	String	StringArray	StringArray	String	Vector3	Float
-note	引导开始点	引导结束点	前提条件	下一步引导,如果为空,则为下一条记录	是否接收调用去下一步引导	是否接收点击去下一步引导	引导的界面名字	高亮显示的对象名字	高亮的Item名字	提示文本内容	提示文本位置	遮罩Alpha
-default	FALSE	FALSE	Null	Null	FALSE	FALSE	Null	Null	Null	Null	0,0,0	0.75
-1	True					True	GuideWindow			Click to continue		
-2		FALSE				TRUE	MainWindow	Button_Shop		Click to Open Shop		
-3						TRUE	ShopWindow	Button_Close		Click to Close shop		
-4		TRUE				TRUE	MainWindow	Button_Start		Click to start Game		
+GuideID	StartPoint	EndPoint	ClosePoint	Premise	NextGuide	ClickToNext	CallToNext	CustomEvent	ConditionToNextKey	GuideWindowName	GuideObjectName	GuideItemName	TipContent	TipContentPos	MaskAlpha
+type	Bool	Bool	Bool	String	String	Bool	Bool	StringArray	Bool	String	StringArray	StringArray	String	Vector3	Float
+note	引导开始点	引导关闭点		前提条件	下一步引导,如果为空,则为下一条记录	是否接收点击去下一步引导	是否接收调用去下一步引导	自定义事件名称	是否自动判断条件去下一步引导	引导的界面名字	高亮显示的对象名字	高亮的Item名字	提示文本内容	提示文本位置	遮罩Alpha
+default	FALSE	FALSE		Null	Null	FALSE	FALSE	Null	FALSE	Null	Null	Null	Null	0,0,0	0.75
+1	TRUE					TRUE				GuideWindow			Click to continue		
+2		FALSE				TRUE				MainWindow	Button_Shop		Click to Open Shop		
+3						TRUE				ShopWindow	Button_Close		Click to Close shop		
+4		TRUE				TRUE				MainWindow	Button_Start		Click to start Game		

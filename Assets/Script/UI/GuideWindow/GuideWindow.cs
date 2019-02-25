@@ -4,7 +4,6 @@ using FrameWork.GuideSystem;
 
 public class GuideWindow : GuideWindowBase
 {
-
     public override void OnInit()
     {
         AddOnClickListener("mask", OnClickMask);
@@ -12,7 +11,7 @@ public class GuideWindow : GuideWindowBase
 
     void OnClickMask(InputUIOnClickEvent e)
     {
-
+        Debug.Log("clickMask");
     }
 
     public override void ShowTips(string content, Vector3 pos)

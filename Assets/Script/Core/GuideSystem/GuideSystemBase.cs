@@ -393,7 +393,7 @@ namespace FrameWork.GuideSystem
 
         void ReceviceClickEvent(InputUIOnClickEvent e)
         {
-            //Debug.Log(" ReceviceClickEvent ");
+            Debug.Log(" ReceviceClickEvent ");
 
             if (IsStart && GetClickToNext(m_currentGuideData) && GuideClickFilter(e))
             {

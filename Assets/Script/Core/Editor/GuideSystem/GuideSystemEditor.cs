@@ -117,9 +117,9 @@ public class GuideSystemEditor
         data.SetFieldType(GuideSystemBase.c_CallToNextKey, FieldType.Bool, null);
 
         data.TableKeys.Add(GuideSystemBase.c_CustomEventKey);
-        data.SetDefault(GuideSystemBase.c_CallToNextKey, "Null");
-        data.SetNote(GuideSystemBase.c_CallToNextKey, "自定义事件名称");
-        data.SetFieldType(GuideSystemBase.c_CallToNextKey, FieldType.StringArray, null);
+        data.SetDefault(GuideSystemBase.c_CustomEventKey, "Null");
+        data.SetNote(GuideSystemBase.c_CustomEventKey, "自定义事件名称");
+        data.SetFieldType(GuideSystemBase.c_CustomEventKey, FieldType.StringArray, null);
 
         data.TableKeys.Add(GuideSystemBase.c_ConditionToNextKey);
         data.SetDefault(GuideSystemBase.c_ConditionToNextKey, "False");

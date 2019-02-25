@@ -1,0 +1,67 @@
+Res	Path
+type	String
+note
+default	资源相对路径
+111	config/111
+bundleconfig	config/bundleconfig
+bundleconfig.json	config/bundleconfig.json
+hotupdateconfig	config/hotupdateconfig
+luaconfig	config/luaconfig
+qeqweqwe	config/qeqweqwe
+resourcesconfig	config/resourcesconfig
+sdkconfig	config/sdkconfig
+langdata_afrikaans	data/language/langdata_afrikaans
+langdata_arabic	data/language/langdata_arabic
+langdata_chinesesimplified	data/language/langdata_chinesesimplified
+guidedata	data/guidedata
+item	data/item
+testdata	data/testdata
+gameobject 1	prefab/gameobject 1
+gameobject 2	prefab/gameobject 2
+gameobject	prefab/gameobject
+gogo	prefab/gogo
+uitest 1	prefab/uitest 1
+uitest 2	prefab/uitest 2
+uitest 3	prefab/uitest 3
+uitest 4	prefab/uitest 4
+uitest 5	prefab/uitest 5
+uitest 6	prefab/uitest 6
+uitest	prefab/uitest
+dl_01	sprite/dl_01
+dl_01.png	sprite/dl_01.png
+dl_02	sprite/dl_02
+dl_02.png	sprite/dl_02.png
+dl_03	sprite/dl_03
+dl_03.png	sprite/dl_03.png
+dl_04	sprite/dl_04
+dl_04.png	sprite/dl_04.png
+dl_05	sprite/dl_05
+dl_05.png	sprite/dl_05.png
+dl_07	sprite/dl_07
+dl_07.png	sprite/dl_07.png
+dl_08	sprite/dl_08
+dl_08.png	sprite/dl_08.png
+dl_09	sprite/dl_09
+dl_09.png	sprite/dl_09.png
+aaawindow	ui/aaawindow/aaawindow
+gamewindow	ui/gamewindow/gamewindow
+guidewindow	ui/guidewindow/guidewindow
+luatestwindow	ui/luatestwindow/luatestwindow
+mainwindow	ui/mainwindow/mainwindow
+shopwindow	ui/shopwindow/shopwindow
+shopwindow_item	ui/shopwindow/shopwindow_item
+test01window	ui/test01window/test01window
+test02window	ui/test02window/test02window
+test2window	ui/test2window/test2window
+image_item	ui/testwindow/image_item
+testwindow	ui/testwindow/testwindow
+uimanager	ui/uimanager
+gameobject_adasd	gameobject_adasd
+new material 2	new material 2
+new material 3	new material 3
+new material 4	new material 4
+new material 5	new material 5
+new material 6	new material 6
+new material	new material
+resourcesmanifest	resourcesmanifest
+version	version
