@@ -83,7 +83,7 @@ public class LuaExportList
             _GT(typeof(DataManager)),
             _GT(typeof(ConfigManager)),
             _GT(typeof(RecordManager)),
-            _GT(typeof(AudioManager)),
+            _GT(typeof(AudioPlayManager)),
 
         #endregion
 

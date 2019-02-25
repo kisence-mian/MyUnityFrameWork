@@ -11,7 +11,7 @@ public class ShopWindow : UIWindowBase
     {
         m_ShopItem = GetReusingScrollRect("Items");
 
-        m_ShopItem.Init(UIEventKey, "ShopWindow_Item");
+        m_ShopItem.Init(UIEventKey,0);
 
         m_ShopItem.SetData(GetShopData());
 
@@ -58,10 +58,9 @@ public class ShopWindow : UIWindowBase
 
         for (int i = 0; i < itemData.TableIDs.Count; i++)
         {
-            SingleData singleData = itemData.GetLineFromKey(itemData.TableIDs[i]);
-
-            string itemName = singleData.GetString("ItemName");
-            int cost = singleData.GetInt("Cost");
+            //SingleData singleData = itemData.GetLineFromKey(itemData.TableIDs[i]);
+            //string itemName = singleData.GetString("ItemName");
+            //int cost = singleData.GetInt("Cost");
 
             Dictionary<string, object> tmp = new Dictionary<string, object>();
 

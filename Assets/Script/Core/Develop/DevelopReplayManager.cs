@@ -436,13 +436,13 @@ public class DevelopReplayManager
 
         for (int i = 0; i < FileNameList.Length; i++)
         {
-            if (GUILayout.Button(FileNameList[i]))
+            LogName = FileNameList[i];
+            if (GUILayout.Button(LogName))
             {
                 isShowLog = true;
                 scrollPos = Vector2.zero;
                 showContent = LogOutPutThread.LoadLogContent(FileNameList[i]);
                 LogPath = LogOutPutThread.GetPath(FileNameList[i]);
-                LogName = FileNameList[i];
             }
         }
 

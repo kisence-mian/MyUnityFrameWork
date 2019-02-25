@@ -37,8 +37,6 @@ public class LanguageDataEditorWindow : EditorWindow
         if(config == null)
         {
             return;
-            config = new LanguageSettingConfig();
-            config.defaultLanguage = SystemLanguage.ChineseSimplified;
         }
 
         if (!config.gameExistLanguages.Contains(currentLanguage))
@@ -282,6 +280,7 @@ public class LanguageDataEditorWindow : EditorWindow
         {
             value = EditorDrawGUIUtil.DrawBaseValue("模块名", value);
             string tempName = value.ToString();
+            EditorGUILayout.HelpBox("下划线分割文件夹，如：AA_BB_CC", MessageType.Info);
             if (string.IsNullOrEmpty(tempName))
                 EditorGUILayout.HelpBox("名字不能为空", MessageType.Error);
             if (s_languageFullKeyFileNameList.Contains(tempName.Replace('_','/')))

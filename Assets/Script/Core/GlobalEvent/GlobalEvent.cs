@@ -50,6 +50,11 @@ public class GlobalEvent
         }
     }
 
+    internal static void AddTypeEvent<T>(string v)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// 移除某类事件的一个回调
     /// </summary>

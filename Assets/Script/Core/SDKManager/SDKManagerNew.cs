@@ -291,9 +291,10 @@ namespace FrameWork.SDKManager
 
         static void Call(Dictionary<string, string> data)
         {
-            string content = Serializer.Serialize(data);
 
-            #if UNITY_ANDROID
+        #if UNITY_ANDROID
+
+            string content = Serializer.Serialize(data);
 
             if (androidInterface == null)
             {
@@ -301,9 +302,9 @@ namespace FrameWork.SDKManager
             }
             androidInterface.CallStatic("UnityRequestFunction", content);
 
-            #elif UNITY_IOS
+#elif UNITY_IOS
 
-            #endif
+#endif
         }
 
         #endregion

@@ -48,6 +48,11 @@ public class TableDataEditor
    public  string OnGUI( string _chooseFileName)
     {
         this.chooseFileName = _chooseFileName;
+        if (!string.IsNullOrEmpty(resetChooseFileName))
+        {
+            chooseFileName = resetChooseFileName;
+            resetChooseFileName = "";
+        }
         if (buttonStyle == null || helpBoxStyle == null)
         {
             buttonStyle = "Button";
@@ -75,16 +80,21 @@ public class TableDataEditor
         return chooseFileName;
     }
     private string chooseFileName = "";
-
+    private string resetChooseFileName = "";
     void ChooseFile()
     {
         GUILayout.BeginHorizontal();
         chooseFileName = EditorDrawGUIUtil.DrawPopup("选择文件", chooseFileName, configFileNames, LoadData);
-        if (GUILayout.Button("删除", GUILayout.Width(60)))
+        if (!string.IsNullOrEmpty(chooseFileName) && GUILayout.Button("删除", GUILayout.Width(60)))
         {
             if (EditorUtility.DisplayDialog("警告", "是否删除文件[" + chooseFileName + "]", "确定", "取消"))
             {
                 File.Delete(Application.dataPath + "/Resources/" + DataManager.c_directoryName + "/" + chooseFileName + ".txt");
+                string classPath = Application.dataPath + "/Script/DataClassGenerate/" + chooseFileName + "Generate.cs";
+               if(File.Exists(classPath))
+                {
+                    File.Delete(classPath);
+                }
                 AssetDatabase.Refresh();
                 m_currentData = null;
                 GlobalEvent.DispatchEvent(EditorEvent.LanguageDataEditorChange);
@@ -92,10 +102,10 @@ public class TableDataEditor
                 return;
             }
         }
-        if (GUILayout.Button("添加", GUILayout.Width(60)))
+        if (GUILayout.Button("新建", GUILayout.Width(60)))
         {
             GeneralDataModificationWindow.otherParameter = "";
-            GeneralDataModificationWindow.OpenWindow(editorWindow, "添加新配置文件", "", (value) =>
+            GeneralDataModificationWindow.OpenWindow(editorWindow, "新建配置文件", "", (value) =>
             {
                 value = EditorDrawGUIUtil.DrawBaseValue("新建配置文件:", value);
                 GeneralDataModificationWindow.otherParameter = EditorDrawGUIUtil.DrawBaseValue("主键名:", GeneralDataModificationWindow.otherParameter);
@@ -135,13 +145,14 @@ public class TableDataEditor
                 string keyName = GeneralDataModificationWindow.otherParameter.ToString();
                 chooseFileName = value.ToString();
                 data.TableKeys.Add(keyName);
+                resetChooseFileName = chooseFileName;
                 SaveData(chooseFileName, data);
                 GlobalEvent.DispatchEvent(EditorEvent.LanguageDataEditorChange);
                 LoadData(chooseFileName);
                 AssetDatabase.Refresh();
             });
         }
-        if (GUILayout.Button("加载上一次保存", GUILayout.Width(90)))
+        if (!string.IsNullOrEmpty(chooseFileName) && GUILayout.Button("加载上一次保存", GUILayout.Width(90)))
         {
             DataManager.CleanCache();
             LoadData(chooseFileName);
@@ -815,6 +826,18 @@ public class TableDataEditor
             else
             {
                 t = EditorDrawGUIUtil.DrawBaseValue(text, t);
+                if(fieldValueType== FieldType.Enum)
+                {
+                  string v =  EditorDrawGUIUtil.DrawBaseValue(text, t.ToString()).ToString();
+                    if(v != t.ToString())
+                    {
+                        List<string> list = new List<string>(Enum.GetNames(t.GetType()));
+                        if (list.Contains(v))
+                        {
+                            t = Enum.Parse(t.GetType(), v);
+                        }
+                    }
+                }
             }
         }
 

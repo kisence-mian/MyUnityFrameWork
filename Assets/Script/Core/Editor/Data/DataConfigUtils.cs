@@ -231,7 +231,7 @@ public static class DataConfigUtils
         //type
         List<string> type = new List<string>(data.m_tableTypes.Keys);
 
-        Debug.Log("type count: " + type.Count);
+        //Debug.Log("type count: " + type.Count);
 
         if (type.Count > 0)
         {

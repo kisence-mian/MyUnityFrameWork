@@ -12,7 +12,7 @@ public class LoginInterface : SDKInterfaceBase
     {
         base.Init();
     }
-    public virtual void Login(string tage)
+    public virtual void Login(string tag)
     {
 
     }

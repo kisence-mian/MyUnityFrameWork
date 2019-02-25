@@ -13,7 +13,7 @@ public class testWindow : UIWindowBase
         AddOnClickListener("Button_open", open);
         AddOnClickListener("Button_close", close);
 
-        GetReusingScrollRect("ScrollRect").Init(UIEventKey,"Image_item");
+        GetReusingScrollRect("ScrollRect").Init(UIEventKey,0);
 
         List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
 
