@@ -62,21 +62,15 @@ public class TableDataEditor
         EditorDrawGUIUtil.RichTextSupport = true;
         GUILayout.Space(8);
         ChooseFile();
-        GUILayout.Space(5);
-        if (string.IsNullOrEmpty(chooseFileName))
-            return chooseFileName;
-        if (m_currentData == null)
+        GUILayout.Space(9);
+
+        if (!string.IsNullOrEmpty(chooseFileName))
         {
-            LoadData(chooseFileName);
+            GridTopFunctionGUI();
+            GUILayout.Space(5);
 
-            return chooseFileName;
+            DrawTableDataGUI();
         }
-        GridTopFunctionGUI();
-        GUILayout.Space(5);
-
-        DrawTableDataGUI();
-        GUILayout.FlexibleSpace();
-
         return chooseFileName;
     }
     private string chooseFileName = "";
@@ -85,6 +79,12 @@ public class TableDataEditor
     {
         GUILayout.BeginHorizontal();
         chooseFileName = EditorDrawGUIUtil.DrawPopup("选择文件", chooseFileName, configFileNames, LoadData);
+
+        if (m_currentData == null)
+        {
+            LoadData(chooseFileName);
+        }
+
         if (!string.IsNullOrEmpty(chooseFileName) && GUILayout.Button("删除", GUILayout.Width(60)))
         {
             if (EditorUtility.DisplayDialog("警告", "是否删除文件[" + chooseFileName + "]", "确定", "取消"))
@@ -440,7 +440,7 @@ public class TableDataEditor
     private string searchValue = "";
     private void GridTopFunctionGUI()
     {
-        GUILayout.Space(4);
+       
         GUILayout.BeginHorizontal();
         if (GUILayout.Button("添加一行数据", GUILayout.Width(90)))
         {

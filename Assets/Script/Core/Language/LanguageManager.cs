@@ -127,6 +127,8 @@ public class LanguageManager
             for (int i = 0; i < contentParams.Length; i++)
             {
                 string replaceTmp = "{" + i + "}";
+                if (contentParams[i] == null)
+                    continue;
                 content = content.Replace(replaceTmp, contentParams[i].ToString());
             }
         }
