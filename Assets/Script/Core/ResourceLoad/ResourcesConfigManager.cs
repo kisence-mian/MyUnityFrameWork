@@ -181,7 +181,7 @@ public static class ResourcesConfigManager
         {
             string fileName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(files[i]));
             string relativePath = files[i].Substring(direIndex);
-            if (relativePath.EndsWith(".meta"))
+            if (relativePath.EndsWith(".meta") || relativePath.EndsWith(".DS_Store"))
                 continue;
             else
             {
