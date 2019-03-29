@@ -35,7 +35,7 @@ public class LanguageManager
 
             Debug.Log("当前语言: " + Application.systemLanguage);
             config = LanguageDataUtils.LoadEditorConfig();
-            SetLanguage(Application.systemLanguage);
+            SetLanguage(ApplicationManager.Langguage);
         }
     }
 

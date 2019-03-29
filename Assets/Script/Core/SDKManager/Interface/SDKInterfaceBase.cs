@@ -12,4 +12,12 @@ public abstract class SDKInterfaceBase
     {
 
     }
+
+    /// <summary>
+    /// 额外初始化，当SDK需要特殊的初始化时机时使用
+    /// </summary>
+    public virtual void ExtraInit()
+    {
+
+    }
 }

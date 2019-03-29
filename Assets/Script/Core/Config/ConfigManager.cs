@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using FrameWork;
 using System.Text;
 using System;
-using LuaInterface;
 
 /// <summary>
 /// 配置管理器，只读

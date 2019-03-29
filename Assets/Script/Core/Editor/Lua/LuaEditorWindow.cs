@@ -23,7 +23,9 @@ public class LuaEditorWindow : EditorWindow
     void OnEnable()
     {
         EditorGUIStyleData.Init();
+#if USE_LUA
         LoadLuaConfig();
+#endif
     }
 
     #region GUI
@@ -37,9 +39,12 @@ public class LuaEditorWindow : EditorWindow
         }
         else
         {
+#if USE_LUA
             LuaFileGUI();
             LuaWarpFileGUI();
             AutoLuaConfigGUI();
+#endif
+
         }
 
         EditorGUILayout.Space();
@@ -51,20 +56,26 @@ public class LuaEditorWindow : EditorWindow
 
     bool GetIsInit()
     {
-    #if USE_LUA
+#if USE_LUA
         return true;
-    #else
+#else
         return false;
-    #endif
+#endif
     }
 
     void InitLuaGUI()
     {
         if (GUILayout.Button("Lua 项目初始化"))
         {
-            InitLua();
+            //InitLua();
         }
     }
+
+#if !USE_LUA
+}
+#endif
+
+#if USE_LUA
 
     void InitLua()
     {
@@ -151,11 +162,12 @@ public class LuaEditorWindow : EditorWindow
 
         EditorUtil.WriteStringByFile(filePath, sb.ToString());
     }
-
+#endif
 #endregion
+#if USE_LUA
 
-    #region 读取Lua配置
-    void LoadLuaConfig()
+#region 读取Lua配置
+void LoadLuaConfig()
     {
         if (ConfigManager.GetIsExistConfig(LuaManager.c_LuaConfigName))
         {
@@ -187,7 +199,7 @@ public class LuaEditorWindow : EditorWindow
     }
 #endregion
 
-    #region Lua信息检视
+#region Lua信息检视
 
     bool m_isFold = false;
     bool m_isFoldLib = false;
@@ -236,7 +248,7 @@ public class LuaEditorWindow : EditorWindow
 
 #endregion
 
-    #region ULua原生功能
+#region ULua原生功能
 
     void LuaWarpFileGUI()
     {
@@ -281,7 +293,7 @@ public class LuaEditorWindow : EditorWindow
 
 #endregion
 
-    #region 自动生成Lua设置
+#region 自动生成Lua设置
 
     void AutoLuaConfigGUI()
     {
@@ -386,3 +398,5 @@ public class LuaEditorWindow : EditorWindow
 
 #endregion
 }
+
+#endif

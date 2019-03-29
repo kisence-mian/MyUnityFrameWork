@@ -169,8 +169,6 @@ namespace HDJ.Framework.Utils
 
                 if (ReflectionUtils.IsDelegate(f.FieldType))
                     continue;
-
-
                 if (CheckHaveNotJsonSerializedAttribute(f))
                     continue;
                 try
@@ -193,23 +191,19 @@ namespace HDJ.Framework.Utils
             for (int i = 0; i < propertys.Length; i++)
             {
                 PropertyInfo p = propertys[i];
-                if (p.CanRead && p.CanWrite)
+                if (CheckPropertyInfo(p))
                 {
-                    if (ReflectionUtils.IsDelegate(p.PropertyType))
-                        continue;
-                    if (CheckHaveNotJsonSerializedAttribute(p))
-                        continue;
                     try
                     {
-
                         object v = p.GetValue(data, null);
                         if (v == null)
                             continue;
                         v = ChangeObjectToJsonObject(v);
                         dic.Add(p.Name, v);
                     }
-                    catch
+                    catch(Exception e)
                     {
+                        Debug.LogError("property :" + p.Name + "\n" + e);
                         continue;
                     }
                 }
@@ -250,11 +244,19 @@ namespace HDJ.Framework.Utils
                 }
                 else
                 {
-                    PropertyInfo property = type.GetProperty(key, flags);
-                    if (property != null && property.CanRead && property.CanWrite)
+                    PropertyInfo p = type.GetProperty(key, flags);
+                    if (CheckPropertyInfo(p))
                     {
-                        value = ChangeJsonDataToObjectByType(property.PropertyType, value);
-                        property.SetValue(instance, value, null);
+                        try
+                        {
+                            value = ChangeJsonDataToObjectByType(p.PropertyType, value);
+                            p.SetValue(instance, value, null);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError("property :" + p.Name + "\n" + e);
+                            continue;
+                        }
                     }
                 }
             }
@@ -431,6 +433,28 @@ namespace HDJ.Framework.Utils
                 }
             }
             return isSerialized;
+        }
+        /// <summary>
+        /// 检查属性是否能用于序列化
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        private static bool CheckPropertyInfo(PropertyInfo property)
+        {
+            if (property == null)
+                return false;
+            if (!(property.CanRead && property.CanWrite))
+                return false;
+            //索引器
+            if (property.GetIndexParameters().Length>0)
+            {
+                return false;
+            }
+            if (ReflectionUtils.IsDelegate(property.PropertyType))
+                return false;
+          
+
+            return true;
         }
         private static object ChangeObjectToJsonObject(object data)
         {

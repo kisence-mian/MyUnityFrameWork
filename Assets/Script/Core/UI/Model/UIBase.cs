@@ -731,7 +731,6 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     public UIBase CreateItem(string itemName, GameObject parent, bool isActive)
     {
         GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, parent, isActive);
-
         return SetItem(item);
     }
     public UIBase CreateItem(string itemName, string prantName, bool isActive)
@@ -906,6 +905,11 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     public void SetTextByLangeage(string textID, string contentID, params object[] objs)
     {
         GetText(textID).text = LanguageManager.GetContent(LanguageManager.c_defaultModuleKey, contentID, objs);
+    }
+
+    void SetTextStyle(string textID, string work)
+    {
+
     }
 
     public void SetTextByLangeage(string textID, string moduleName, string contentID, params object[] objs)

@@ -23,6 +23,8 @@ public class ApplicationManager : MonoBehaviour
 
     public bool m_useAssetsBundle = false;
 
+
+
     public static AppMode AppMode
     {
         get
@@ -36,7 +38,7 @@ public class ApplicationManager : MonoBehaviour
 #else
             return instance.m_AppMode;
 #endif
-        }
+        } 
     }
 
     public bool UseAssetsBundle
@@ -59,6 +61,19 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
+    public static SystemLanguage Langguage
+    {
+        get
+        {
+            return instance.langguage;
+        }
+
+        set
+        {
+            instance.langguage = value;
+        }
+    }
+
     [Tooltip("是否记录输入到本地")]
     public bool m_recordInput = true;
 
@@ -72,6 +87,11 @@ public class ApplicationManager : MonoBehaviour
     public List<string> m_globalLogic;
     [HideInInspector]
     public string currentStatus;
+
+    /// <summary>
+    /// 语言
+    /// </summary>
+    public SystemLanguage langguage = SystemLanguage.ChineseSimplified;
     /// <summary>
     /// 显示括号标识多语言转换的字段
     /// </summary>

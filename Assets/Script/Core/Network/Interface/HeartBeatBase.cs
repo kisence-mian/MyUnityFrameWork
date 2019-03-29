@@ -62,7 +62,7 @@ public abstract class HeartBeatBase
     {
         if(e.m_MessgaeType == "HB")
         {
-            Debug.Log("Recevice HB");
+            //Debug.Log("Recevice HB");
             ResetReceviceTimer();
         }
     }

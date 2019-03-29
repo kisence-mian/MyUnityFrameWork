@@ -20,7 +20,7 @@ public class LanguageDataEditorUtils
         string text = DataTable.Serialize(data);
 
         FileUtils.CreateTextFile(path, text);
-        UnityEditor.AssetDatabase.Refresh();
+       
     }
   
     /// <summary>

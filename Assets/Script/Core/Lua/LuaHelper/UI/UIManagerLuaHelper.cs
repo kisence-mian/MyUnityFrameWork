@@ -1,8 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class UILuaEventCallBackHelper 
+public class UILuaEventCallBackHelper
 {
+
+#if USE_LUA
     public static void CallOnUIInit(UIWindowBase UI)
     {
         LuaManager.LuaState.GetFunction("LuaUIManager.UIOnInit").Call(UI);
@@ -46,4 +48,5 @@ public class UILuaEventCallBackHelper
     {
         LuaManager.LuaState.GetFunction("LuaUIManager.UIOnDestroy").Call(UI);
     }
+#endif
 }

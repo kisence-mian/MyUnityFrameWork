@@ -69,6 +69,7 @@ public class GeneralDataModificationWindow : EditorWindow
          });
 
         GUILayout.FlexibleSpace();
+        bool isClose = false;
         EditorDrawGUIUtil.DrawHorizontalCenter(() =>
         {
             if (GUILayout.Button("OK",GUILayout.Width( position.width/4)))
@@ -84,14 +85,17 @@ public class GeneralDataModificationWindow : EditorWindow
                 }
                 if (otherWindow)
                     otherWindow.Repaint();
-                Close();
+                isClose = true;
             }
 
             if (GUILayout.Button("Cancel", GUILayout.Width(position.width / 4)))
             {
-                Close();
+                isClose = true;
             }
         });
         GUILayout.Space(6);
+
+        if (isClose)
+            Close();
     }
 }

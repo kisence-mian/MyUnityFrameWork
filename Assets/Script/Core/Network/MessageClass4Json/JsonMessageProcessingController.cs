@@ -28,7 +28,7 @@ public class JsonMessageProcessingController
         }
 
         if (ApplicationManager.Instance.m_AppMode != AppMode.Release)
-            Debug.Log("MessageReceiveCallBack ;" + JsonUtils.ToJson(inputEvent));
+            Debug.Log("MessageReceiveCallBack;" + JsonUtils.ToJson(inputEvent));
 
         Type type = Type.GetType(inputEvent.m_MessgaeType);
 

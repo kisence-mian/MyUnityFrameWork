@@ -3,6 +3,7 @@ using System.Collections;
 
 public class UIEventCallBackHelper 
 {
+#if USE_LUA
     public static void CallOnUIInit(UIWindowBase UI)
     {
         LuaManager.LuaState.GetFunction("LuaUIManager.UIOnInit").Call(UI);
@@ -56,4 +57,6 @@ public class UIEventCallBackHelper
     {
         LuaManager.LuaState.GetFunction("LuaUIManager.UIOnDestroy").Call(UI);
     }
+
+#endif
 }

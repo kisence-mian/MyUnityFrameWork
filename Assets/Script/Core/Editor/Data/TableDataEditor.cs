@@ -723,8 +723,16 @@ public class TableDataEditor
 
     private FieldType GetFieldType(int index, string field)
     {
-        FieldType fieldValueType = index == 0 ? FieldType.String : m_currentData.m_tableTypes[field];
-        return fieldValueType;
+        try
+        {
+            FieldType fieldValueType = index == 0 ? FieldType.String : m_currentData.m_tableTypes[field];
+            return fieldValueType;
+        }
+        catch(Exception e)
+        {
+            Debug.Log("field " + field + " exception " + e.ToString());
+            return FieldType.String;
+        }
     }
     private string GetEnumType(FieldType fieldValueType,  string field)
     {

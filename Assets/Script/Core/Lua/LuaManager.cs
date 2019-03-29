@@ -1,10 +1,20 @@
-﻿using UnityEngine;
-using LuaInterface;
+﻿
+
+using UnityEngine;
 using System;
 using System.Collections.Generic;
+#if USE_LUA
+using LuaInterface;
+#endif
 
 public class LuaManager
 {
+    public const string c_LuaConfigName = "LuaConfig";
+    public const string c_LuaLibraryListKey = "LuaLibList";
+    public const string c_LuaListKey = "LuaList";
+
+#if USE_LUA
+
     private static LuaState s_state = new LuaState();
 
     public static LuaState LuaState
@@ -12,9 +22,7 @@ public class LuaManager
         get { return s_state; }
     }
 
-    public const string c_LuaConfigName = "LuaConfig";
-    public const string c_LuaLibraryListKey = "LuaLibList";
-    public const string c_LuaListKey = "LuaList";
+
 
     public static bool s_isUpdate = false;
 
@@ -23,7 +31,7 @@ public class LuaManager
     /// </summary>
     public static void Init()
     {
-#if USE_LUA
+
         try
         {
             s_state.Start();
@@ -34,9 +42,7 @@ public class LuaManager
         {
             Debug.LogError("Lua Init Execption " + e.ToString());
         }
-#else
-       // throw new Exception("USE_LUA not Define ! ");
-#endif
+
     }
 
     /// <summary>
@@ -117,4 +123,6 @@ public class LuaManager
         string content = ResourceManager.ReadTextFile(fileName);
         s_state.DoString(content, fileName);
     }
+#endif
 }
+

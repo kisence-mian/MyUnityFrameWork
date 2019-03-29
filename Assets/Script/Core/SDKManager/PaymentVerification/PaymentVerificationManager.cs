@@ -22,11 +22,22 @@ public class PaymentVerificationManager
 
     private static void PayCallBack(OnPayInfo info)
     {
-        verificationInterface.CheckRecipe( info);
+        if (info.isSuccess)
+        {
+            verificationInterface.CheckRecipe(info);
+        }
+        else
+        {
+            OnVerificationResult(info.isSuccess, info.goodsId);
+        }
     }
 
     public static void OnVerificationResult(bool t,string goodID)
     {
+        if (onVerificationResultCallBack != null)
+        {
+            onVerificationResultCallBack(t, goodID);
+        }
         //验证成功
         if (!t)
         {
@@ -35,10 +46,7 @@ public class PaymentVerificationManager
             return;
         }
         SDKManager.ConfirmPay(goodID);
-        if (onVerificationResultCallBack!=null)
-        {
-            onVerificationResultCallBack(t, goodID);
-        }
+       
     }
 }
 

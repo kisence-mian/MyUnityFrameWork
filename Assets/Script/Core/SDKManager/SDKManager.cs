@@ -88,6 +88,60 @@ namespace FrameWork.SDKManager
             }
         }
 
+        /// <summary>
+        /// 额外初始化，SDKName == null时初始化全体
+        /// </summary>
+        public static void ExtraInit(SDKType type,string sdkName = null)
+        {
+            if(sdkName != null)
+            {
+                switch (type)
+                {
+                    case SDKType.AD:
+                        GetADService(sdkName).ExtraInit(); break;
+                    case SDKType.Log:
+                        GetLogService(sdkName).ExtraInit(); break;
+                    case SDKType.Login:
+                        GetLoginService(sdkName).ExtraInit(); break;
+                    case SDKType.Other:
+                        GetOtherService(sdkName).ExtraInit(); break;
+                    case SDKType.Pay:
+                        GetPayService(sdkName).ExtraInit(); break;
+                }
+            }
+            else
+            {
+                switch (type)
+                {
+                    case SDKType.AD:
+                        AllExtraInit(s_ADServiceList); break;
+                    case SDKType.Log:
+                        AllExtraInit(s_logServiceList); break;
+                    case SDKType.Login:
+                        AllExtraInit(s_loginServiceList); break;
+                    case SDKType.Other:
+                        AllExtraInit(s_otherServiceList); break;
+                    case SDKType.Pay:
+                        AllExtraInit(s_payServiceList); break;
+                }
+            }
+        }
+
+        static void AllExtraInit<T>(List<T> list) where T : SDKInterfaceBase
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                try
+                {
+                    list[i].ExtraInit();
+                }
+                catch(Exception e)
+                {
+                    Debug.LogError("AllExtraInit Exception " + list[i].m_SDKName + " " + e.ToString());
+                }
+            }
+        }
+
         #endregion
 
         #region 获取SDKInterface
@@ -351,6 +405,60 @@ namespace FrameWork.SDKManager
             {
                 Debug.LogError("SDKManager Pay Exception: " + e.ToString());
             }
+        }
+
+        public static LocalizedGoodsInfo GetGoodsInfo(string goodsID, string tag = "")
+        {
+            try
+            {
+                return GetPayService(0).GetGoodsInfo(goodsID);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+            }
+            return null;
+        }
+
+        public static LocalizedGoodsInfo GetGoodsInfo(string SDKName, string goodsID, string tag = "")
+        {
+            try
+            {
+                return GetPayService(SDKName).GetGoodsInfo(goodsID);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+            }
+
+            return null;
+        }
+
+        public static List<LocalizedGoodsInfo> GetAllGoodsInfo( string tag = "")
+        {
+            try
+            {
+                return GetPayService(0).GetAllGoodsInfo();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+            }
+            return null;
+        }
+
+        public static List<LocalizedGoodsInfo> GetAllGoodsInfo(string SDKName, string tag = "")
+        {
+            try
+            {
+                return GetPayService(SDKName).GetAllGoodsInfo();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+            }
+
+            return null;
         }
 
         #endregion
@@ -717,6 +825,15 @@ namespace FrameWork.SDKManager
     {
         public string SDKName;
         public string SDKContent;
+    }
+
+    public enum SDKType
+    {
+        Log,
+        Login,
+        AD,
+        Pay,
+        Other,
     }
 
     #endregion

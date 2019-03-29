@@ -119,8 +119,10 @@ public class JsonNetworkService : INetworkInterface
 
                 NetWorkMessage msg = new NetWorkMessage();
 
-                s = WWW.UnEscapeURL(s);
-                s = s.Replace(c_endCharReplaceString, c_endChar.ToString()); 
+                //s = WWW.UnEscapeURL(s);
+                //Debug.Log("MessageReceive0 ->" + s);
+                s = s.Replace(c_endCharReplaceString, c_endChar.ToString());
+                //Debug.Log("MessageReceive1 ->" + s);
                 Dictionary<string, object> data = Json.Deserialize(s) as Dictionary<string, object>;
 
                 msg.m_data = data;
