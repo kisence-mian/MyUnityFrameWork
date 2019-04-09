@@ -127,7 +127,7 @@ public class NetworkManager
     {
         IPHostEntry IPinfo = Dns.GetHostEntry(url);
         IPAddress[] ipList = IPinfo.AddressList;
-
+        Debug.Log("解析域名：" + ipList[0].ToString());
         s_network.SetIPAddress(ipList[0].ToString(), port);
     }
 

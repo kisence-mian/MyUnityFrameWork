@@ -11,6 +11,21 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
 
     static bool s_isInit = false;
 
+    static string s_dataName = null;
+
+    public static string DataName
+    {
+        get
+        {
+            if(s_dataName ==  null)
+            {
+                s_dataName = typeof(T).Name.Replace("Generate", "");
+            }
+
+            return s_dataName;
+        }
+    }
+
     public static T GetData(string key) 
     {
         if (key == null)
@@ -39,6 +54,10 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
         }
     }
 
+    public static bool GetExistKey(string key)
+    {
+        return DataManager.GetData(DataName).ContainsKey(key);
+    }
 
     /// <summary>
     /// 全查表
@@ -52,12 +71,10 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
             GlobalEvent.AddEvent(MemoryEvent.FreeHeapMemory, CleanCache);
         }
 
-       
         DataTable data = GetDataTable();
         for (int i = 0; i < data.TableIDs.Count; i++)
         {
             GetData(data.TableIDs[i]);
-            
         }
     }
 
@@ -75,10 +92,7 @@ public class DataGenerateManager<T> where T : DataGenerateBase, new()
     }
     public static DataTable GetDataTable()
     {
-        string dataName = typeof(T).Name.Replace("Generate", "");
-
-        return DataManager.GetData(dataName);
-
+        return DataManager.GetData(DataName);
     }
 
     public static void CleanCache(params object[] objs)

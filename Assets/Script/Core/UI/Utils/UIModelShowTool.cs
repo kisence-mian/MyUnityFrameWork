@@ -18,7 +18,7 @@ public static class UIModelShowTool
     const float c_defaultOrthographicSize = 0.72f;
     const float c_defaultFOV = 60;
     static Color s_defaultBackgroundColor = new Color(0, 0, 0, 0 / 255f);
-    static Vector3 s_StartPosition = new Vector3(0, 0, 5000);
+    static Vector3 s_StartPosition = new Vector3(5000, 5000, 5000);
     static Vector3 s_defaultLocationPosition = new Vector3(0, 0, 10);
     static Vector3 s_defaultEulerAngles = new Vector3(0, 180, 0);
     static Vector3 s_defaultLocalScale = Vector3.one;
