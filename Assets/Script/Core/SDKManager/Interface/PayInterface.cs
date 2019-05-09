@@ -1,4 +1,5 @@
 ﻿using FrameWork.SDKManager;
+using HDJ.Framework.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,11 +7,27 @@ namespace FrameWork.SDKManager
 {
     public abstract class PayInterface : SDKInterfaceBase
     {
-        public PayCallBack m_PayResultCallBack;
         /// <summary>
         /// 验证回调，参数：string（商店名）,string（订单凭据，base64加密串）
         /// </summary>
-        public CallBack<StoreName, string> m_ConfirmCallBack;
+        //public CallBack<StoreName, string> m_ConfirmCallBack;
+        protected List<PayProductDefinition> productDefinitions = new List<PayProductDefinition>();
+        public virtual StoreName GetStoreName()
+        {
+            return StoreName.None;
+        }
+        public override void ExtraInit(string tag)
+        {
+            if (!string.IsNullOrEmpty(tag))
+            {
+                productDefinitions = JsonUtils.FromJson<List<PayProductDefinition>>(tag);
+            }
+            ExtraInit();
+        }
+        protected virtual void ExtraInit()
+        {
+
+        }
 
         virtual public void Pay(string goodsID, string tag, GoodsType goodsType = GoodsType.NORMAL, string orderID = null)
         {
@@ -35,6 +52,13 @@ namespace FrameWork.SDKManager
         public override void Init()
         {
 
+        }
+
+        protected void PayCallBack(OnPayInfo info)
+        {
+            info.storeName = GetStoreName();
+            if (SDKManager.PayCallBack != null)
+                SDKManager.PayCallBack(info);
         }
     }
     /// <summary>
@@ -71,5 +95,20 @@ namespace FrameWork.SDKManager
         /// 价格
         /// </summary>
         public decimal localizedPrice;
+    }
+    public class PayProductDefinition
+    {
+        public PayProductDefinition()
+        {
+        }
+        public PayProductDefinition(string goodsID, GoodsType type)
+        {
+            this.goodsID = goodsID;
+            this.type = type;
+        }
+
+        public string goodsID;
+        public GoodsType type;
+
     }
 }

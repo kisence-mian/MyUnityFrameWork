@@ -16,8 +16,11 @@ public class JsonMessageProcessingController
     public static void Init()
     {
         InputManager.AddAllEventListener<InputNetworkMessageEvent>(MessageReceiveCallBack);
+ 
     }
-   // static Deserializer deserializer = new Deserializer();
+
+
+    // static Deserializer deserializer = new Deserializer();
 
     private static void MessageReceiveCallBack(InputNetworkMessageEvent inputEvent)
     {
@@ -53,12 +56,18 @@ public class JsonMessageProcessingController
     static Dictionary<string, object> mesDic = new Dictionary<string, object>();
     public static void SendMessage<T>(T data) 
     {
-        mesDic.Clear();
         string mt = typeof(T).Name;
-        string content = JsonUtils.ToJson(data); //Serializer.Serialize(data);
+        string content = JsonUtils.ToJson(data); 
+        SendMessage(mt, content);
+    }
+    public static void SendMessage(string mt, string content)
+    {
+        mesDic.Clear();
         Debug.Log("SendMessage : MT:" + mt + " msg :" + content);
         mesDic.Add("Content", content);
         NetworkManager.SendMessage(mt, mesDic);
     }
+
+  
 }
 

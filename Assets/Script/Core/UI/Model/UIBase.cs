@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class UIBase : MonoBehaviour , UILifeCycleInterface
 {
+    [HideInInspector]
     public Canvas m_canvas;
 
     #region 重载方法

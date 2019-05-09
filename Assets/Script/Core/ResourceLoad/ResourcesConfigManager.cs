@@ -32,14 +32,6 @@ public static class ResourcesConfigManager
             Initialize();
         }
 
-#if UNITY_EDITOR
-        //重新加载路径文件
-        if (!s_config.ContainsKey(resName))
-        {
-            Initialize();
-        }
-#endif
-
         return s_config.ContainsKey(resName);
     }
 
@@ -51,14 +43,6 @@ public static class ResourcesConfigManager
         {
             Initialize();
         }
-
-#if UNITY_EDITOR
-        //重新加载路径文件
-        if(!s_config.ContainsKey(bundleName))
-        {
-            Initialize();
-        }
-#endif
 
         if (!s_config.ContainsKey(bundleName))
         {
@@ -96,7 +80,7 @@ public static class ResourcesConfigManager
             }
             else
             {
-                Debug.Log("LoadResourceConfig 读取stream路径");
+                //Debug.Log("LoadResourceConfig 读取stream路径");
 
                 string path = PathTool.GetAbsolutePath(type, c_ManifestFileName.ToLower());
 

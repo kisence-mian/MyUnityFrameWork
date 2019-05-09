@@ -9,6 +9,10 @@ using System.Text;
 public enum LoginPlatform
 {
     /// <summary>
+    /// 账号登录
+    /// </summary>
+    AccountLogin,
+    /// <summary>
     /// 游客
     /// </summary>
     Tourist,

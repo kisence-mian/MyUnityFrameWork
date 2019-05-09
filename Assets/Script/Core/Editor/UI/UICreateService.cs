@@ -45,7 +45,7 @@ public class UICreateService
         //UIcamera
         GameObject cameraGo = new GameObject("UICamera");
         cameraGo.transform.SetParent(canvas.transform);
-        cameraGo.transform.localPosition = new Vector3(0, 0, -1000);
+        cameraGo.transform.localPosition = new Vector3(0, 0, -5000);
         Camera camera = cameraGo.AddComponent<Camera>();
         camera.cullingMask = LayerMask.GetMask("UI");
         camera.orthographic = true;

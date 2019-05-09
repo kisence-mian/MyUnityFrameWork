@@ -65,7 +65,10 @@ public class ApplicationManager : MonoBehaviour
     {
         get
         {
-            return instance.langguage;
+            if (Application.isPlaying)
+                return instance.langguage;
+            else
+                return Application.systemLanguage;
         }
 
         set

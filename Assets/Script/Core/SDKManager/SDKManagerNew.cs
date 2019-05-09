@@ -422,6 +422,14 @@ namespace FrameWork.SDKManager
     {
         public bool isSuccess;
         public string accountId;
+        public string nickName;
+        public string headPortrait;
+        /// <summary>
+        /// 账号登录使用的密码
+        /// </summary>
+        public string pw;
+        public LoginPlatform loginPlatform;
+        public LoginErrorEnum error;
     }
 
     public enum GoodsType
@@ -429,6 +437,16 @@ namespace FrameWork.SDKManager
         NORMAL,    //可以反复购买的商品
         ONCE_ONLY, //只能购买一次的商品
         RIGHTS,    //购买持续一段时间的商品，例如会员
+    }
+
+    public enum LoginErrorEnum
+    {
+        None,
+        GameCenterNotOpen,
+        /// <summary>
+        /// 没有安装相应的app
+        /// </summary>
+        NoInstallApp,
     }
 
     #endregion

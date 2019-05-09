@@ -30,31 +30,31 @@ public class UITextStyleManagerWindow : EditorWindow {
         oldData = UITextStyleManager.GetTextStyleDataFromText(text);
     }
 
-    private string name="";
+    private string tmpName="";
     private SystemLanguage language;
     private void OnGUI()
     {
         EditorGUILayout.ObjectField(text,typeof(Text),true);
         GUILayout.Space(5);
-        name = EditorDrawGUIUtil.DrawBaseValue("Name",name).ToString();
+        tmpName = EditorDrawGUIUtil.DrawBaseValue("Name",tmpName).ToString();
         language = (SystemLanguage)EditorDrawGUIUtil.DrawBaseValue("Language", language);
         if (GUILayout.Button("添加"))
         {
-            if (string.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(tmpName))
                 return;
-            if (UITextStyleManager.ContainsData(name, language))
+            if (UITextStyleManager.ContainsData(tmpName, language))
                 return;
             else
             {
                 Dictionary<SystemLanguage, TextStyleData> data=null;
-                if (styleDataDic.ContainsKey(name))
+                if (styleDataDic.ContainsKey(tmpName))
                 {
-                    data = styleDataDic[name];
+                    data = styleDataDic[tmpName];
                 }
                 else
                 {
                     data = new Dictionary<SystemLanguage, TextStyleData>();
-                    styleDataDic.Add(name, data);
+                    styleDataDic.Add(tmpName, data);
                 }
                 TextStyleData sd = UITextStyleManager.GetTextStyleDataFromText(text);
                 data.Add(language, sd);

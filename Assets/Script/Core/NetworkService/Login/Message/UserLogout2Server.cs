@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 
 
-public class AdmiLogin2Server
+public class UserLogout2Server
 {
-    public String typeKey;
-    public String pw;
 }
 

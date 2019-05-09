@@ -45,11 +45,11 @@ public class HotUpdateManager
         Init();
 
         //检查Streaming版本和Persistent版本哪一个更新
-        if(!CheckLocalVersion())
+        if (!CheckLocalVersion())
         {
             return;
         }
-        
+
         //开始热更新
         ApplicationManager.Instance.StartCoroutine(HotUpdateProgress());
     }
@@ -105,6 +105,7 @@ public class HotUpdateManager
             }
             else
             {
+                Debug.Log("没有使用Bundle 无需更新");
                 UpdateDateCallBack(HotUpdateStatusEnum.NoUpdate, 0);
                 return false;
             }
@@ -136,7 +137,7 @@ public class HotUpdateManager
         //取得服务器版本文件
         WWW www = new WWW(s_versionFileDownLoadPath);
 
-        //Debug.Log("服务器获取版本文件 ：" + s_versionFileDownLoadPath);
+        Debug.Log("服务器获取版本文件 ：" + s_versionFileDownLoadPath);
         //yield return www;
 
         while (!www.isDone)
@@ -148,7 +149,7 @@ public class HotUpdateManager
         if (www.error != null && www.error != "")
         {
             //下载失败
-            //Debug.LogError("Version File DownLoad Error URL:" + s_versionFileDownLoadPath + " error:" + www.error);
+            Debug.LogError("Version File DownLoad Error URL:" + s_versionFileDownLoadPath + " error:" + www.error);
 
             UpdateDateCallBack(HotUpdateStatusEnum.VersionFileDownLoadFail, 0);
             yield break;
@@ -162,8 +163,8 @@ public class HotUpdateManager
 
         //Debug.Log("Version File :text: " + m_versionFileCatch);
 
-        Debug.Log("Service Version File :text: " + s_versionFileCache);
-        Debug.Log("local Version  : " + GetInt(s_versionConfig[c_largeVersionKey]) + " " + GetInt(s_versionConfig[c_smallVersonKey]));
+        //Debug.Log("Service Version File :text: " + s_versionFileCache);
+        //Debug.Log("local Version  : " + GetInt(s_versionConfig[c_largeVersionKey]) + " " + GetInt(s_versionConfig[c_smallVersonKey]));
 
         Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(s_versionFileCache);
 
@@ -353,11 +354,13 @@ public class HotUpdateManager
         }
 
         string downLoadPath = downLoadServicePath + "/" + platform + "/" + Application.version + "/";
-        Debug.Log("=====>"+downLoadPath);
+        
 
         s_versionFileDownLoadPath   = downLoadPath + c_versionFileName.ToLower() ;
         s_ManifestFileDownLoadPath  = downLoadPath + AssetsManifestManager.c_ManifestFileName;
         s_resourcesFileDownLoadPath = downLoadPath;
+
+        Debug.Log("=====>" + s_versionFileDownLoadPath);
     }
 
     static void UpdateDateCallBack(HotUpdateStatusEnum status, float progress)

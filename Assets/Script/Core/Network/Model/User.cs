@@ -11,4 +11,6 @@ public class User
     //头像
     public String portrait;
 
+    public LoginPlatform loginType;
+
 }

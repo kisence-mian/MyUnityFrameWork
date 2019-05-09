@@ -68,7 +68,9 @@ public class RandomString : MonoBehaviour {
                 result += l_addChar[i];
             }
 
+            
         }
+        Debug.LogWarning(result);
         return result;
     }
 

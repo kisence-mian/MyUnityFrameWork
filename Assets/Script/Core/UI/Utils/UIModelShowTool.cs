@@ -34,6 +34,7 @@ public static class UIModelShowTool
             modelShowList[i].top.transform.position = s_StartPosition + i * s_ShowSpace;
         }
     }
+     
 
     public static void DisposeModelShow(UIModelShowData data)
     {

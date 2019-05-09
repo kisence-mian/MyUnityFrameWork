@@ -28,25 +28,30 @@ public class PaymentVerificationManager
         }
         else
         {
-            OnVerificationResult(info.isSuccess, info.goodsId);
+            OnVerificationResult(info.isSuccess, info.goodsId,false);
         }
     }
-
-    public static void OnVerificationResult(bool t,string goodID)
+    /// <summary>
+    /// 验证结果调用
+    /// </summary>
+    /// <param name="isSucess">是否成功</param>
+    /// <param name="goodID">物品ID</param>
+    /// <param name="repeatReceipt">是否是重复的订单凭据</param>
+    public static void OnVerificationResult(bool isSucess,string goodID, bool repeatReceipt)
     {
         if (onVerificationResultCallBack != null)
         {
-            onVerificationResultCallBack(t, goodID);
+
+            onVerificationResultCallBack(isSucess, goodID);
         }
-        //验证成功
-        if (!t)
-        {
-         
-            Debug.LogError("凭据验证失败！ goodID:" + goodID);
-            return;
-        }
-        SDKManager.ConfirmPay(goodID);
        
+        if (isSucess || repeatReceipt)
+            SDKManager.ConfirmPay(goodID);
+        //验证成功
+        if (!isSucess)
+        {
+            Debug.LogError("凭据验证失败！ goodID:" + goodID);
+        }
     }
 }
 

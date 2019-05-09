@@ -85,8 +85,8 @@ public class UILayerManager : MonoBehaviour
             rt.anchorMax = Vector3.one;
 
             rt.sizeDelta = Vector2.zero;
-            rt.transform.localPosition = Vector3.zero;
-            rt.anchoredPosition = Vector3.zero;
+            rt.transform.localPosition = new Vector3(0, 0, ui.m_PosZ);
+            rt.anchoredPosition3D = new Vector3(0, 0, ui.m_PosZ);
             rt.SetAsLastSibling();
         }
         else

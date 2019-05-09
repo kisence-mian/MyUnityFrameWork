@@ -33,7 +33,6 @@ public class LanguageManager
         {
             isInit = true;
 
-            Debug.Log("当前语言: " + Application.systemLanguage);
             config = LanguageDataUtils.LoadEditorConfig();
             SetLanguage(ApplicationManager.Langguage);
         }

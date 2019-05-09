@@ -19,4 +19,5 @@ public enum StoreName
     WinRT = 8,
     TizenStore = 9,
     FacebookStore = 10,
+    WX = 11,
 }

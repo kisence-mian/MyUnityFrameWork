@@ -9,7 +9,14 @@ namespace FrameWork.SDKManager
 {
     public static class SDKManager
     {
+#if UNITY_ANDROID
+        public const string c_ConfigName = "SDKConfig_Android";
+#elif UNITY_IOS
+        public const string c_ConfigName = "SDKConfig_IOS";
+#else
         public const string c_ConfigName = "SDKConfig";
+#endif
+
         public const string c_KeyName = "SDKInfo";
 
         static List<LoginInterface> s_loginServiceList = null;
@@ -23,7 +30,7 @@ namespace FrameWork.SDKManager
 
         static bool s_useNewSDKManager = false; //是否使用新版本SDKManager
 
-        #region 属性
+#region 属性
 
         public static LoginCallBack LoginCallBack
         {
@@ -51,11 +58,11 @@ namespace FrameWork.SDKManager
             }
         }
 
-        #endregion
+#endregion
 
-        #region 外部调用
+#region 外部调用
 
-        #region 初始化
+#region 初始化
 
         /// <summary>
         /// 初始化
@@ -76,6 +83,8 @@ namespace FrameWork.SDKManager
                     }
                     else
                     {
+                        Debug.Log("SDKManager Init");
+
                         LoadService(data);
 
                         InitSDK();
@@ -91,22 +100,22 @@ namespace FrameWork.SDKManager
         /// <summary>
         /// 额外初始化，SDKName == null时初始化全体
         /// </summary>
-        public static void ExtraInit(SDKType type,string sdkName = null)
+        public static void ExtraInit(SDKType type,string sdkName = null,string tag = null)
         {
             if(sdkName != null)
             {
                 switch (type)
                 {
                     case SDKType.AD:
-                        GetADService(sdkName).ExtraInit(); break;
+                        GetADService(sdkName).ExtraInit(tag); break;
                     case SDKType.Log:
-                        GetLogService(sdkName).ExtraInit(); break;
+                        GetLogService(sdkName).ExtraInit(tag); break;
                     case SDKType.Login:
-                        GetLoginService(sdkName).ExtraInit(); break;
+                        GetLoginService(sdkName).ExtraInit(tag); break;
                     case SDKType.Other:
-                        GetOtherService(sdkName).ExtraInit(); break;
+                        GetOtherService(sdkName).ExtraInit(tag); break;
                     case SDKType.Pay:
-                        GetPayService(sdkName).ExtraInit(); break;
+                        GetPayService(sdkName).ExtraInit(tag); break;
                 }
             }
             else
@@ -114,26 +123,26 @@ namespace FrameWork.SDKManager
                 switch (type)
                 {
                     case SDKType.AD:
-                        AllExtraInit(s_ADServiceList); break;
+                        AllExtraInit(s_ADServiceList, tag); break;
                     case SDKType.Log:
-                        AllExtraInit(s_logServiceList); break;
+                        AllExtraInit(s_logServiceList, tag); break;
                     case SDKType.Login:
-                        AllExtraInit(s_loginServiceList); break;
+                        AllExtraInit(s_loginServiceList, tag); break;
                     case SDKType.Other:
-                        AllExtraInit(s_otherServiceList); break;
+                        AllExtraInit(s_otherServiceList, tag); break;
                     case SDKType.Pay:
-                        AllExtraInit(s_payServiceList); break;
+                        AllExtraInit(s_payServiceList, tag); break;
                 }
             }
         }
 
-        static void AllExtraInit<T>(List<T> list) where T : SDKInterfaceBase
+        static void AllExtraInit<T>(List<T> list,string tag = null) where T : SDKInterfaceBase
         {
             for (int i = 0; i < list.Count; i++)
             {
                 try
                 {
-                    list[i].ExtraInit();
+                    list[i].ExtraInit(tag);
                 }
                 catch(Exception e)
                 {
@@ -142,9 +151,9 @@ namespace FrameWork.SDKManager
             }
         }
 
-        #endregion
+#endregion
 
-        #region 获取SDKInterface
+#region 获取SDKInterface
 
         public static LoginInterface GetLoginService<T>() where T : LoginInterface
         {
@@ -246,9 +255,9 @@ namespace FrameWork.SDKManager
             return s_otherServiceList[index];
         }
 
-        #endregion
+#endregion
 
-        #region 登录
+#region 登录
 
         static void InitLogin(List<LoginInterface> list)
         {
@@ -258,7 +267,7 @@ namespace FrameWork.SDKManager
                 {
                     list[i].m_SDKName = list[i].GetType().Name;
                     list[i].Init();
-                    s_loginCallBack += list[i].m_callBack;
+                    //s_loginCallBack += list[i].m_callBack;
                 }
                 catch (Exception e)
                 {
@@ -306,14 +315,49 @@ namespace FrameWork.SDKManager
                 }
                 catch (Exception e)
                 {
+                    Debug.LogError("SDKManager Login Exception: " + SDKName + "===" + e.ToString());
+                }
+            }
+        }
+        /// <summary>
+        /// 登陆
+        /// </summary>
+        public static void LoginByPlatform(LoginPlatform  loginPlatform, string tag = "")
+        {
+            if (s_useNewSDKManager)
+            {
+                //SDKManagerNew.Login(SDKName, tag);
+                Debug.LogError("SDKManager Login Exception: no implement in NewSDKManager");
+            }
+            else
+            {
+                try
+                {
+                    bool isHvae = false;
+                    foreach(var item in s_loginServiceList)
+                    {
+                        if(item.GetPlatform()== Application.platform && item.GetLoginPlatform() == loginPlatform)
+                        {
+                            item.Login(tag);
+                            isHvae = true;
+
+                        }
+                    }
+                    if (!isHvae)
+                    {
+                        Debug.LogError("SDKManager Login dont find class by platform:" + Application.platform + " loginPlatform:" + loginPlatform);
+                    }
+                }
+                catch (Exception e)
+                {
                     Debug.LogError("SDKManager Login Exception: " + e.ToString());
                 }
             }
         }
 
-        #endregion
+#endregion
 
-        #region 支付
+#region 支付
 
         static void InitPay(List<PayInterface> list)
         {
@@ -323,7 +367,7 @@ namespace FrameWork.SDKManager
                 {
                     list[i].m_SDKName = list[i].GetType().Name;
                     list[i].Init();
-                      list[i].m_PayResultCallBack= s_payCallBack;
+                      //list[i].m_PayResultCallBack= s_payCallBack;
                     Debug.Log("初始化支付回调");
                 }
                 catch (Exception e)
@@ -461,9 +505,9 @@ namespace FrameWork.SDKManager
             return null;
         }
 
-        #endregion
+#endregion
 
-        #region 广告
+#region 广告
 
         /// <summary>
         /// 加载广告,默认访问第一个接口
@@ -599,9 +643,9 @@ namespace FrameWork.SDKManager
             }
         }
 
-        #endregion
+#endregion
 
-        #region 数据上报
+#region 数据上报
 
         /// <summary>
         /// 数据上报
@@ -647,11 +691,11 @@ namespace FrameWork.SDKManager
 
             Log(eventID, send_info);
         }
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-        #region 加载SDK设置
+#region 加载SDK设置
 
         /// <summary>
         /// 读取当前游戏内的SDK配置
@@ -660,12 +704,12 @@ namespace FrameWork.SDKManager
         /// <returns></returns>
         public static SchemeData LoadGameSchemeConfig()
         {
-            if (ConfigManager.GetIsExistConfig(SDKManager.c_ConfigName))
+            if (ConfigManager.GetIsExistConfig(c_ConfigName))
             {
                 Debug.Log("LoadGameSchemeConfig");
 
-                Dictionary<string, SingleField> configData = ConfigManager.GetData(SDKManager.c_ConfigName);
-                return JsonUtility.FromJson<SchemeData>(configData[SDKManager.c_KeyName].GetString());
+                Dictionary<string, SingleField> configData = ConfigManager.GetData(c_ConfigName);
+                return JsonUtility.FromJson<SchemeData>(configData[c_KeyName].GetString());
             }
             else
             {
@@ -739,9 +783,9 @@ namespace FrameWork.SDKManager
             }
         }
 
-        #endregion
+#endregion
 
-        #region 初始化SDK
+#region 初始化SDK
 
         static void LoadService(SchemeData data)
         {
@@ -766,9 +810,9 @@ namespace FrameWork.SDKManager
             //Debug.Log("s_loginServiceList: " + s_loginServiceList.Count);
         }
 
-        #endregion
+#endregion
 
-        #region 功能函数
+#region 功能函数
 
         static T GetSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
         {
@@ -800,10 +844,10 @@ namespace FrameWork.SDKManager
             }
         }
 
-        #endregion
+#endregion
     }
 
-    #region 声明
+#region 声明
 
     public delegate void LoginCallBack(OnLoginInfo info);
     public delegate void PayCallBack(OnPayInfo info);
@@ -836,5 +880,5 @@ namespace FrameWork.SDKManager
         Other,
     }
 
-    #endregion
+#endregion
 }

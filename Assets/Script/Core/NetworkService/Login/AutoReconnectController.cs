@@ -91,7 +91,7 @@ public class AutoReconnectController
             {
                 isBreakConenct = true;
 
-                Debug.LogError("OnNetworkConenctStatus :" + msg.m_status + " " + isBreakConenct);
+                Debug.LogWarning("OnNetworkConenctStatus :" + msg.m_status + " " + isBreakConenct);
                 startReconenct = true;
 
                 if(Open && StartReconnect != null)
@@ -101,7 +101,7 @@ public class AutoReconnectController
             }
             else
             {
-                Debug.LogError("OnNetworkConenctStatus :" + msg.m_status + " " + isBreakConenct);
+                Debug.LogWarning("OnNetworkConenctStatus :" + msg.m_status + " " + isBreakConenct);
             }
 
             //断线

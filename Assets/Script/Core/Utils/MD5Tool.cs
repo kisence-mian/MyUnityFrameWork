@@ -3,6 +3,7 @@ using System.Collections;
 using System.IO;
 using System;
 using System.Security.Cryptography;
+using System.Text;
 
 public static class MD5Tool
 {
@@ -45,6 +46,14 @@ public static class MD5Tool
         return GetHashMD5(System.Text.Encoding.Default.GetBytes(content));
     }
 
+    public static string GetMD5FromString(string value)
+    {
+        MD5 md5 = new MD5CryptoServiceProvider();
+        byte[] output = md5.ComputeHash(Encoding.UTF8.GetBytes(value));
+
+        string sign = BitConverter.ToString(output).Replace("-", "");
+        return sign;
+    }
 
     public static string GetMD5(byte[] data)
     {

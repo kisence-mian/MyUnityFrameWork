@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 
 
-public class AdmiLogin2Client : CodeMessageBase
+public class ConfirmMergeExistAccount2Client : CodeMessageBase
 {
+
     public override void DispatchMessage()
     {
         GlobalEvent.DispatchTypeEvent(this);
     }
 }
-

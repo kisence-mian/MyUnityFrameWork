@@ -54,6 +54,10 @@ public class NetworkManager
         s_network = new TProtocol();
         s_network.m_socketService = new TSocket();
 
+        Debug.Log("protocolType " + s_network.m_socketService.m_protocolType);
+
+        s_network.m_socketService.m_protocolType = protocolType;
+
         NetInit();
     }
 
@@ -65,6 +69,7 @@ public class NetworkManager
 
         Type socketType = Type.GetType(networkInterfaceName);
         s_network.m_socketService = Activator.CreateInstance(socketType) as SocketBase;
+        s_network.m_socketService.m_protocolType = ProtocolType.Tcp;
 
         NetInit();
     }
