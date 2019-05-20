@@ -9,9 +9,9 @@ public class WXPayClass : PayInterface
 {
 
     GameObject androidListener;
-    public override RuntimePlatform GetPlatform()
+    public override List<RuntimePlatform> GetPlatform()
     {
-        return  RuntimePlatform.Android;
+        return new List<RuntimePlatform>() { RuntimePlatform.Android, RuntimePlatform.WindowsEditor};
     }
     public override StoreName GetStoreName()
     {
@@ -91,14 +91,19 @@ public class WXPayClass : PayInterface
     {
         Debug.LogWarning("wxPay Result======" + result);
 
+        
+
         OnPayInfo payInfo = new OnPayInfo();
         payInfo.isSuccess = (result == "0");
         payInfo.goodsId = goodID;
-        //payInfo.goodsType = DataGenerateManager<StoreDataGenerate>.GetData(goodID).m_ProductType;
+        payInfo.goodsType = GetGoodType(goodID);
         payInfo.receipt = Mch_orderID;
         payInfo.storeName = StoreName.WX;
 
         PayCallBack(payInfo);
         
     }
+
+
+
 }

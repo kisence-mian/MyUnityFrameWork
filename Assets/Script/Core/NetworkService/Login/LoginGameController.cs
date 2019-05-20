@@ -65,7 +65,9 @@ public class LoginGameController
     #region 消息返回
     private static void OnUserLogoutEvent(UserLogout2Client e, object[] args)
     {
-        if(OnUserLogout!=null)
+        ResendMessageManager.startResend = false;
+        loginMsg = null;
+        if (OnUserLogout!=null)
         {
             OnUserLogout(e);
         }

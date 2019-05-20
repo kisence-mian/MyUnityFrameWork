@@ -418,6 +418,12 @@ namespace FrameWork.SDKManager
         public string receipt;
     }
 
+    public struct OnADInfo
+    {
+        public ADType aDType;
+        public string tag;
+    }
+
     public struct OnLoginInfo
     {
         public bool isSuccess;

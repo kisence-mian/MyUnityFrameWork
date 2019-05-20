@@ -28,7 +28,10 @@ public class ADInterface  : SDKInterfaceBase
 
     }
 
-
+    public virtual bool IsLoaded(ADType adType, string tag = "")
+    {
+        return true;
+    }
 }
 
 public enum ADType

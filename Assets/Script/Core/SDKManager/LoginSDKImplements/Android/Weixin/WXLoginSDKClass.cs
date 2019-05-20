@@ -26,9 +26,9 @@ public class WXLoginSDKClass : LoginInterface
     {
         return  LoginPlatform.WeiXin;
     }
-    public override RuntimePlatform GetPlatform()
+    public override List<RuntimePlatform> GetPlatform()
     {
-        return RuntimePlatform.Android;
+        return new List<RuntimePlatform>() { RuntimePlatform.Android, RuntimePlatform.WindowsEditor };
     }
     public override void Init()
     {
@@ -42,7 +42,7 @@ public class WXLoginSDKClass : LoginInterface
 
     public static AndroidJavaObject GetCurrentAndroidJavaObject()                //要有这个AndroidJavaObject才能Call
     {
-        AndroidJavaClass jc = new AndroidJavaClass("com.catplanethistory.com.wxapi.WXEntryActivity");
+        AndroidJavaClass jc = new AndroidJavaClass( Application.identifier +".wxapi.WXEntryActivity");
         jc.CallStatic("Text");
         //return jc.GetStatic<AndroidJavaObject>("currentActivity");
         return jc.CallStatic<AndroidJavaObject>("GetInstance");

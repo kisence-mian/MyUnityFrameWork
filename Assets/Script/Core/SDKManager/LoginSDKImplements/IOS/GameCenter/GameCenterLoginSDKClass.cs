@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class GameCenterLoginSDKClass : LoginInterface
 {
-    public override RuntimePlatform GetPlatform()
+    public override List<RuntimePlatform> GetPlatform()
     {
-        return  RuntimePlatform.IPhonePlayer;
+        return new List<RuntimePlatform>() { RuntimePlatform.IPhonePlayer, RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor };
     }
     public override LoginPlatform GetLoginPlatform()
     {

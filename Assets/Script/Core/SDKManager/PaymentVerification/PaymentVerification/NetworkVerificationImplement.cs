@@ -27,8 +27,8 @@ public class NetworkVerificationImplement : PaymentVerificationInterface
 
     public void Init()
     {
-       // GlobalEvent.AddTypeEvent<StoreBuyGoods2Client>(OnUserPaymentVerification);
-        Debug.Log(" 当前游戏服务器验证 .Init");
+        // GlobalEvent.AddTypeEvent<StoreBuyGoods2Client>(OnUserPaymentVerification);
+        //Debug.Log(" 当前游戏服务器验证 .Init");
     }
 
     //private void OnUserPaymentVerification(StoreBuyGoods2Client e, object[] args)

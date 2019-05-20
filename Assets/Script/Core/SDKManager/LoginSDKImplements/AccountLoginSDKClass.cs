@@ -11,10 +11,7 @@ public   class AccountLoginSDKClass: LoginInterface
     {
         return  LoginPlatform.AccountLogin;
     }
-    public override RuntimePlatform GetPlatform()
-    {
-        return base.GetPlatform();
-    }
+
 
     public override void Login(string tag)
     {

@@ -108,7 +108,7 @@ public class ResendMessageManager
         string content = JsonUtils.ToJson(data); //Serializer.Serialize(data);
         ResendMessage msg = new ResendMessage(removeMT, mt, content,callBack);
         msgs.Add(msg);
-        JsonMessageProcessingController.SendMessage(mt, content);
+       // JsonMessageProcessingController.SendMessage(mt, content);
         //indexCode++;
     }
 

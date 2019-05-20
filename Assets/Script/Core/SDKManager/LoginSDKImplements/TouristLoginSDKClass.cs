@@ -5,10 +5,6 @@ using UnityEngine;
 
 public class TouristLoginSDKClass : LoginInterface
 {
-    public override RuntimePlatform GetPlatform()
-    {
-        return  Application.platform;
-    }
     public override LoginPlatform GetLoginPlatform()
     {
         return  LoginPlatform.Tourist;

@@ -60,6 +60,27 @@ namespace FrameWork.SDKManager
             if (SDKManager.PayCallBack != null)
                 SDKManager.PayCallBack(info);
         }
+        /// <summary>
+        /// 获取商品类型
+        /// </summary>
+        /// <param name="goodID"></param>
+        /// <returns></returns>
+        public GoodsType GetGoodType(string goodID)
+        {
+
+            for (int i = 0; i < productDefinitions.Count; i++)
+            {
+                if (productDefinitions[i].goodsID == goodID)
+                {
+                    return productDefinitions[i].type;
+                }
+            }
+
+            Debug.LogError(" pay productDefinitions goodID is not found" + "id: " + goodID + " count: " + productDefinitions.Count);
+
+            return GoodsType.NORMAL;
+
+        }
     }
     /// <summary>
     /// 本地化商品信息，来自SDK平台的后台，如：

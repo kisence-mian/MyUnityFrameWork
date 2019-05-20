@@ -3,12 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
- public   class AccountMergeInfo2Client : MessageClassInterface
+ public   class AccountMergeInfo2Client : CodeMessageBase
 {
-    /// <summary>
-    /// 该账户已绑定
-    /// </summary>
-    public bool accountBind = false;
     /// <summary>
     /// 要绑定账户是否已存在一个单独账户
     /// </summary>
@@ -19,7 +15,7 @@ using System.Text;
     public User mergeAccount;
   
    
-    public  void DispatchMessage()
+    public override  void DispatchMessage()
     {
         GlobalEvent.DispatchTypeEvent(this);
     }

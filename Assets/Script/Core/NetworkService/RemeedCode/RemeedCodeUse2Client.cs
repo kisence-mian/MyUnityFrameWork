@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 
 
-public class ConfirmMergeExistAccount2Client : CodeMessageBase
+ public   class RemeedCodeUse2Client : CodeMessageBase
 {
-    public LoginPlatform loginType;
-
+    public List<GameRewardData> rewardDatas = new List<GameRewardData>();
     public override void DispatchMessage()
     {
         GlobalEvent.DispatchTypeEvent(this);

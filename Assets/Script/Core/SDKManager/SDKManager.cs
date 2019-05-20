@@ -27,6 +27,7 @@ namespace FrameWork.SDKManager
 
         private static LoginCallBack s_loginCallBack;
         private static PayCallBack s_payCallBack;
+        private static ADCallBack s_adCallBack;
 
         static bool s_useNewSDKManager = false; //是否使用新版本SDKManager
 
@@ -57,12 +58,24 @@ namespace FrameWork.SDKManager
                 s_payCallBack = value;
             }
         }
+        public static ADCallBack ADCallBack
+        {
+            get
+            {
+                return s_adCallBack;
+            }
 
-#endregion
+            set
+            {
+                s_adCallBack = value;
+            }
+        }
 
-#region 外部调用
+        #endregion
 
-#region 初始化
+        #region 外部调用
+
+        #region 初始化
 
         /// <summary>
         /// 初始化
@@ -336,7 +349,7 @@ namespace FrameWork.SDKManager
                     bool isHvae = false;
                     foreach(var item in s_loginServiceList)
                     {
-                        if(item.GetPlatform()== Application.platform && item.GetLoginPlatform() == loginPlatform)
+                        if(item.GetPlatform().Contains( Application.platform) && item.GetLoginPlatform() == loginPlatform)
                         {
                             item.Login(tag);
                             isHvae = true;
@@ -354,10 +367,42 @@ namespace FrameWork.SDKManager
                 }
             }
         }
+        public static List<LoginPlatform> GetSupportLoginPlatform()
+        {
+            List<LoginPlatform> platforms = new List<LoginPlatform>();
+            if (s_useNewSDKManager)
+            {
+                //SDKManagerNew.Login(SDKName, tag);
+                Debug.LogError("SDKManager Login Exception: no implement in NewSDKManager");
+            }
+            else
+            {
+                try
+                {
 
-#endregion
+                    foreach (var item in s_loginServiceList)
+                    {
+                        if (item.GetPlatform().Contains( Application.platform))
+                        {
+                            platforms.Add(item.GetLoginPlatform());
+                        }
+                    }
+                    if (platforms.Count == 0)
+                    {
+                        Debug.LogError("SDKManager Login dont find class by platform:" + Application.platform + " please check config");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager Login Exception: " + e.ToString());
+                }
+            }
+            return platforms;
+        }
 
-#region 支付
+        #endregion
+
+        #region 支付
 
         static void InitPay(List<PayInterface> list)
         {
@@ -549,6 +594,53 @@ namespace FrameWork.SDKManager
                 catch (Exception e)
                 {
                     Debug.LogError("SDKManager LoadAD Exception: " + e.ToString());
+                }
+            }
+        }
+
+        /// <summary>
+        /// 广告已加载成功,默认访问第一个接口
+        /// </summary>
+        public static bool ADIsLoaded(ADType adType, string tag = "")
+        {
+            if (s_useNewSDKManager)
+            {
+                return true;
+            }
+            else
+            {
+                try
+                {
+                   return GetADService(0).IsLoaded(adType, tag);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager LoadAD Exception: " + e.ToString());
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 加载广告成功
+        /// </summary>
+        public static bool ADIsLoaded(string SDKName, ADType adType, string tag = "")
+        {
+            if (s_useNewSDKManager)
+            {
+                //SDKManagerNew.LoadAD(SDKName, adType, tag);
+                return true;
+            }
+            else
+            {
+                try
+                {
+                    return GetADService(SDKName).IsLoaded(adType, tag);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager LoadAD Exception: " + e.ToString());
+                    return false;
                 }
             }
         }
@@ -851,6 +943,7 @@ namespace FrameWork.SDKManager
 
     public delegate void LoginCallBack(OnLoginInfo info);
     public delegate void PayCallBack(OnPayInfo info);
+    public delegate void ADCallBack(OnADInfo info);
 
     public class SchemeData
     {

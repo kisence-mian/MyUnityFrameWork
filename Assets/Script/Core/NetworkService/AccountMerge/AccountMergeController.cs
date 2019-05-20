@@ -4,24 +4,60 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-
+/// <summary>
+/// 管理平台账号绑定
+/// </summary>
 public class AccountMergeController
 {
+    /// <summary>
+    /// 当要绑定的平台已存在回调
+    /// </summary>
     public static CallBack<AccountMergeInfo2Client> OnMergeAccountExist;
+    /// <summary>
+    /// 最终绑定的结果回调
+    /// </summary>
     public static CallBack<ConfirmMergeExistAccount2Client> OnConfirmMergeExistAccountCallback;
-    private static bool isInit = false;
+    /// <summary>
+    /// 返回当前账户已经绑定的平台（包含当前登录平台）
+    /// </summary>
+    public static CallBack<List<LoginPlatform>> OnRequsetAreadyBindPlatformCallBack;
+    private static List<LoginPlatform> areadyBindPlatform = new List<LoginPlatform>();
+    [RuntimeInitializeOnLoadMethod]
     private static void Init()
     {
-        if (isInit)
-            return;
-        isInit = true;
         GlobalEvent.AddTypeEvent<AccountMergeInfo2Client>(OnAccountMergeInfo);
         GlobalEvent.AddTypeEvent<ConfirmMergeExistAccount2Client>(OnConfirmMergeExistAccount);
+        GlobalEvent.AddTypeEvent<RequsetAreadyBindPlatform2Client>(OnRequsetAreadyBindPlatform);
+        LoginGameController.OnUserLogin += OnUserLogin;
+    }
+
+    private static void OnUserLogin(UserLogin2Client t)
+    {
+        RequsetAreadyBindPlatform();
+    }
+    #region 消息接收
+    private static void OnRequsetAreadyBindPlatform(RequsetAreadyBindPlatform2Client e, object[] args)
+    {
+        areadyBindPlatform = e.areadyBindPlatforms;
+        if (OnRequsetAreadyBindPlatformCallBack != null)
+        {
+            OnRequsetAreadyBindPlatformCallBack(e.areadyBindPlatforms);
+        }
     }
 
     private static void OnConfirmMergeExistAccount(ConfirmMergeExistAccount2Client e, object[] args)
     {
-
+        if(e.code==0)
+        {
+            if (areadyBindPlatform.Contains(e.loginType))
+                Debug.LogError("已包含绑定平台：" + e.loginType);
+            else
+                areadyBindPlatform.Add(e.loginType);
+        }
+        else
+        {
+            Debug.LogError("绑定出错");
+        }
         if (OnConfirmMergeExistAccountCallback != null)
         {
             OnConfirmMergeExistAccountCallback(e);
@@ -38,12 +74,43 @@ public class AccountMergeController
             OnMergeAccountExist(e);
         }
     }
+    #endregion
+
+
+    /// <summary>
+    /// 请求哪些是已绑定的平台信息
+    /// </summary>
+    private static void RequsetAreadyBindPlatform()
+    {
+        RequsetAreadyBindPlatform2Server msg = new RequsetAreadyBindPlatform2Server();
+        JsonMessageProcessingController.SendMessage(msg);
+    }
+    /// <summary>
+    /// 返回当前账户已经绑定的平台（包含当前登录平台）
+    /// </summary>
+    /// <returns></returns>
+    public static List<LoginPlatform> GetAreadyBindPlatform()
+    {
+        return areadyBindPlatform;
+    }
+    /// <summary>
+    /// 判断是否能使用商店（规则是当前是游客登录，并且未绑定其他登录方式）
+    /// </summary>
+    /// <param name="loginType">当前登录方式</param>
+    /// <returns></returns>
+    public static bool CheckCanUseStore(LoginPlatform loginType)
+    {
+        if (areadyBindPlatform.Contains(loginType) && areadyBindPlatform.Count == 1 && loginType == LoginPlatform.Tourist)
+            return false;
+        return true;
+    }
     /// <summary>
     /// 当要绑定的账户已存在，确认合并
     /// </summary>
-    public static void ConfirmMerge(User mergeAccount,bool useCurrentAccount)
+    public static void ConfirmMerge(bool useCurrentAccount)
     {
         ConfirmMergeExistAccount2Server msg = new ConfirmMergeExistAccount2Server();
+        msg.useCurrentAccount = useCurrentAccount;
         JsonMessageProcessingController.SendMessage(msg);
     }
     /// <summary>
@@ -54,7 +121,6 @@ public class AccountMergeController
     /// <param name="pw"></param>
     public static void MergeLoginPlatform(LoginPlatform loginPlatform, string accountID = "", string pw = "")
     {
-        Init();
         SDKManager.LoginCallBack += SDKLoginCallBack;
         string tag = "";
         if (loginPlatform == LoginPlatform.AccountLogin)
