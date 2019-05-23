@@ -20,6 +20,10 @@ public class AudioGroupData
     /// </summary>
     public List<MusicPlayData> fixedMusicDatas = new List<MusicPlayData>();
     /// <summary>
+    /// 
+    /// </summary>
+    public List<MusicRandomLoopData> loopMusicDatas = new List<MusicRandomLoopData>();
+    /// <summary>
     /// 固定播放一次的音效
     /// </summary>
     public List<SFXPlayData> fixedSFXDatas = new List<SFXPlayData>();
@@ -36,8 +40,23 @@ public class SFXRandomLoopData
     /// 循环次数，-1无限次
     /// </summary>
     public int loopTimes = -1;
+    /// <summary>
+    /// 在最小到最大时间间隔后随机
+    /// </summary>
     public Vector2 delayRange;
     public List<SFXPlayData> SFXDatas = new List<SFXPlayData>();
+}
+public class MusicRandomLoopData
+{
+    /// <summary>
+    /// 循环次数，-1无限次(顺序播放时起作用)
+    /// </summary>
+    public int loopTimes = -1;
+    /// <summary>
+    /// 是否随机播放，false：顺序播放
+    /// </summary>
+    public bool isRandom = false;
+    public List<MusicPlayData> musicDatas = new List<MusicPlayData>();
 }
 
 public class MusicPlayData

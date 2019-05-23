@@ -22,21 +22,29 @@ public class AudioGroupSystem :MonoBehaviour
     public static void Play(string keyName,float fadeTime =0.6f)
     {
         Init();
-        if (currentAudioGroupData != null && keyName == currentAudioGroupData.keyName)
+        if (currentAudioGroupData != null && keyName == currentAudioGroupData.keyName && audioGroupPlayState == AudioGroupPlayState.Playing)
             return;
 
+        //Debug.Log("AudioGroupSystem.Play :" + keyName);
         audioGroupPlayState = AudioGroupPlayState.Playing;
-        currentAudioGroupData = audioGroupDataDic[keyName];
 
-        Dictionary<int, AudioAsset> playingMusics = AudioPlayManager.a2DPlayer.bgMusicDic;
 
-        foreach (var item in playingMusics)
+        // Dictionary<int, AudioAsset> playingMusics = AudioPlayManager.a2DPlayer.bgMusicDic;
+        if (currentAudioGroupData != null)
         {
-            if (item.Key > currentAudioGroupData.fixedMusicDatas.Count - 1)
+            foreach (var item in currentAudioGroupData.fixedMusicDatas)
             {
-                AudioPlayManager.StopMusic2D(item.Key, fadeTime);
+                AudioPlayManager.StopMusic2D(item.channel, fadeTime);
+            }
+            foreach (var ss in currentAudioGroupData.loopMusicDatas)
+            {
+                foreach (var item in ss.musicDatas)
+                {
+                    AudioPlayManager.StopMusic2D(item.channel, fadeTime);
+                }
             }
         }
+        currentAudioGroupData = audioGroupDataDic[keyName];
         for (int i = 0; i < currentAudioGroupData.fixedMusicDatas.Count; i++)
         {
             MusicPlayData data = currentAudioGroupData.fixedMusicDatas[i];
@@ -51,7 +59,17 @@ public class AudioGroupSystem :MonoBehaviour
         instance.randomLoopSFXDatas.Clear();
         foreach (var item in currentAudioGroupData.sFXRandomLoopDatas)
         {
-           instance.randomLoopSFXDatas.Add( AddLoopSFX(item));
+           instance.randomLoopSFXDatas.Add( new RandomLoopSFXData(item));
+        }
+
+        foreach (var item in instance.randomLoopMusicDatas)
+        {
+            item.Close();
+        }
+        instance.randomLoopMusicDatas.Clear();
+        foreach (var item in currentAudioGroupData.loopMusicDatas)
+        {
+            instance.randomLoopMusicDatas.Add(new RandomLoopMusicData(item));
         }
     }
 
@@ -70,9 +88,9 @@ public class AudioGroupSystem :MonoBehaviour
         AudioPlayManager.PauseSFXAll2D(isPause);
     }
 
-    private static void PlayMusicData(MusicPlayData data)
+    private static void PlayMusicData(MusicPlayData data,string flag="")
     {
-        AudioPlayManager.PlayMusic2D(data.name, data.channel, data.volume, data.isLoop, data.fadeTime, data.delay);
+        AudioPlayManager.PlayMusic2D(data.name, data.channel, data.volume, data.isLoop, data.fadeTime, data.delay,flag:flag);
     }
 
     private static void PlaySFXData(SFXPlayData data)
@@ -99,22 +117,12 @@ public class AudioGroupSystem :MonoBehaviour
             audioGroupDataDic.Add(item.keyName, item);
         }
     }
-
-    private static RandomLoopSFXData AddLoopSFX(SFXRandomLoopData data)
-    {
-        RandomLoopSFXData r = new RandomLoopSFXData();
-        r.configData = data;
-        RandomTime(r);
-
-        return r;
-    }
-    private static void RandomTime(RandomLoopSFXData data)
-    {
-        float r = UnityEngine.Random.Range(data.configData.delayRange.x, data.configData.delayRange.y);
-        data.currentTime = r;
-    }
+ 
     List<RandomLoopSFXData> randomLoopSFXDatas = new List<RandomLoopSFXData>();
     List<RandomLoopSFXData> clearRandomList = new List<RandomLoopSFXData>();
+
+    List<RandomLoopMusicData> randomLoopMusicDatas = new List<RandomLoopMusicData>();
+    List<RandomLoopMusicData> clearLoopMusicDatas = new List<RandomLoopMusicData>();
     private void Update()
     {
         if (audioGroupPlayState != AudioGroupPlayState.Playing)
@@ -128,48 +136,52 @@ public class AudioGroupSystem :MonoBehaviour
             }
             else
             {
-                if (item.currentTime <= 0)
+              SFXPlayData sFXPlayData=  item.Excute();
+                if (sFXPlayData != null)
                 {
-                    if (item.configData.SFXDatas.Count > 0)
-                    {
-                        int r = UnityEngine.Random.Range(0, item.configData.SFXDatas.Count);
-                        PlaySFXData(item.configData.SFXDatas[r]);
-                    }
-                    item.runTime++;
-                    RandomTime(item);
+                    PlaySFXData(sFXPlayData);
                 }
-                else
+            }
+        }
+        if (clearRandomList.Count > 0)
+        {
+            foreach (var item in clearRandomList)
+            {
+                randomLoopSFXDatas.Remove(item);
+            }
+            clearRandomList.Clear();
+        }
+
+        foreach (var item in randomLoopMusicDatas)
+        {
+            if (item.IsRunFinished())
+            {
+                clearLoopMusicDatas.Add(item);
+            }
+            else
+            {
+                MusicPlayData musicPlayData = item.Excute();
+                if (musicPlayData != null)
                 {
-                    item.currentTime -= Time.deltaTime;
+                    Debug.Log("currentAudioGroupData: " + currentAudioGroupData.keyName+ " Play MusicPlayData: " + musicPlayData.name);
+                    PlayMusicData(musicPlayData,item.flag);
                 }
             }
         }
 
-        foreach (var item in clearRandomList)
+        if (clearLoopMusicDatas.Count > 0)
         {
-            randomLoopSFXDatas.Remove(item);
-        }
-        clearRandomList.Clear();
-    }
-
-
-    private class RandomLoopSFXData
-    {
-        public float currentTime;
-        public int runTime;
-
-        public SFXRandomLoopData configData;
-
-        public bool IsRunFinished()
-        {
-            if (configData.loopTimes == -1)
-                return false;
-            if (runTime >= configData.loopTimes)
-                return true;
-
-            return false;
+            foreach (var item in clearLoopMusicDatas)
+            {
+                item.Close();
+                randomLoopMusicDatas.Remove(item);
+            }
+            clearLoopMusicDatas.Clear();
         }
     }
+
+
+   
 
 }
 

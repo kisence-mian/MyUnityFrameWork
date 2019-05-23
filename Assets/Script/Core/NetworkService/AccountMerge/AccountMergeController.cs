@@ -113,6 +113,7 @@ public class AccountMergeController
         msg.useCurrentAccount = useCurrentAccount;
         JsonMessageProcessingController.SendMessage(msg);
     }
+    public static bool isWaiting = false;
     /// <summary>
     /// 请求绑定账户
     /// </summary>
@@ -121,6 +122,13 @@ public class AccountMergeController
     /// <param name="pw"></param>
     public static void MergeLoginPlatform(LoginPlatform loginPlatform, string accountID = "", string pw = "")
     {
+        if (isWaiting)
+        {
+            Debug.LogError("AccountMergeController => 等待sdk返回登录信息");
+            return;
+        }
+        isWaiting = true;
+
         SDKManager.LoginCallBack += SDKLoginCallBack;
         string tag = "";
         if (loginPlatform == LoginPlatform.AccountLogin)
@@ -135,12 +143,24 @@ public class AccountMergeController
 
     private static void SDKLoginCallBack(OnLoginInfo info)
     {
+        isWaiting = false;
         SDKManager.LoginCallBack -= SDKLoginCallBack;
 
         if (info.isSuccess)
         {
-            AccountMergeInfo2Server msg = AccountMergeInfo2Server.GetMessage(info.loginPlatform, info.accountId, info.pw);
+            AccountMergeInfo2Server msg = AccountMergeInfo2Server.GetMessage(info.loginPlatform, info.accountId, info.password);
             JsonMessageProcessingController.SendMessage(msg);
+        }
+        else
+        {
+           
+            if (OnConfirmMergeExistAccountCallback != null)
+            {
+                ConfirmMergeExistAccount2Client msg = new ConfirmMergeExistAccount2Client();
+                msg.code = -1;
+                msg.loginType = info.loginPlatform;
+                OnConfirmMergeExistAccountCallback(msg);
+            }
         }
     }
 }

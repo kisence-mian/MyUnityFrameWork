@@ -19,13 +19,14 @@ public class LoginGameController
     /// 退出登录回调
     /// </summary>
     public static CallBack<UserLogout2Client> OnUserLogout;
-
-    private static bool isInit = false;
+    /// <summary>
+    /// 是否已登录
+    /// </summary>
+    public static bool isLogin = false;
+   
+    [RuntimeInitializeOnLoadMethod]
     private static void Init()
     {
-        if (isInit)
-            return;
-        isInit = true;
         GlobalEvent.AddTypeEvent<UserLogin2Client>(OnUserLoginEvent);
         GlobalEvent.AddTypeEvent<UserLogout2Client>(OnUserLogoutEvent);
         ResendMessageManager.Init();
@@ -40,7 +41,6 @@ public class LoginGameController
     /// <param name="pw"></param>
     public static void Login(LoginPlatform loginPlatform, string accountID = "", string pw = "")
     {
-        Init();
         SDKManager.LoginCallBack += SDKLoginCallBack;
         string tag = "";
         if (loginPlatform == LoginPlatform.AccountLogin)
@@ -57,7 +57,6 @@ public class LoginGameController
     /// </summary>
     public static void Logout()
     {
-        Init();
         UserLogout2Server msg = new UserLogout2Server();
         JsonMessageProcessingController.SendMessage(msg);
     }
@@ -65,6 +64,7 @@ public class LoginGameController
     #region 消息返回
     private static void OnUserLogoutEvent(UserLogout2Client e, object[] args)
     {
+        isLogin = false;
         ResendMessageManager.startResend = false;
         loginMsg = null;
         if (OnUserLogout!=null)
@@ -80,6 +80,9 @@ public class LoginGameController
 
     private static void OnUserLoginEvent(UserLogin2Client e, object[] args)
     {
+        if (e.code == 0)
+            isLogin = true;
+
         if (OnUserLogin != null)
         {
             OnUserLogin(e);
@@ -102,7 +105,7 @@ public class LoginGameController
         }
         if (info.isSuccess)
         {
-            UserLogin2Server msg = UserLogin2Server.GetLoginMessage(info.loginPlatform, info.accountId, info.pw);
+            UserLogin2Server msg = UserLogin2Server.GetLoginMessage(info.loginPlatform, info.accountId, info.password);
             SendLoginMsg(msg);
         }
     }

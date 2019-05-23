@@ -7,7 +7,7 @@ using UnityEngine.UI;
 [CustomEditor(typeof(UITextStyleComponent))]
 public class UITextStyleComponentEditor : Editor {
 
-    TextStyleData oldData;
+    //TextStyleData oldData;
     Text text;
     UITextStyleComponent obj;
     public override void OnInspectorGUI()
@@ -20,7 +20,7 @@ public class UITextStyleComponentEditor : Editor {
 
         if(GUILayout.Button("Open Editor Window"))
         {
-            oldData = UITextStyleManager.GetTextStyleDataFromText(text);
+             UITextStyleManager.GetTextStyleDataFromText(text);
             UITextStyleManagerWindow.OpenWindow(obj);
         }
     }

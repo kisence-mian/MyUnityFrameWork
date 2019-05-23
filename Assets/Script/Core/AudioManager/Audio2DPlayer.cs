@@ -40,7 +40,7 @@ public class Audio2DPlayer : AudioPlayerBase
             au = CreateAudioAssetByPool(mono.gameObject, false,  AudioSourceType.Music);
             bgMusicDic.Add(channel, au);
         }
-
+        au.musicChannel = channel;
         PlayMusicControl(au, audioName, isLoop, volumeScale, delay, fadeTime, flag);
     }
     public void PauseMusic(int channel, bool isPause, float fadeTime = 0.5f)
@@ -111,6 +111,7 @@ public class Audio2DPlayer : AudioPlayerBase
     }
 
     private List<AudioAsset> clearList = new List<AudioAsset>();
+    //private List<int> channalClearList = new List<int>();
     public void ClearMoreAudioAsset()
     {
         for (int i = 0; i < sfxList.Count; i++)
@@ -121,6 +122,7 @@ public class Audio2DPlayer : AudioPlayerBase
                 clearList.Add(sfxList[i]);
             }
         }
+      
 
         for (int i = 0; i < clearList.Count; i++)
         {
@@ -129,6 +131,18 @@ public class Audio2DPlayer : AudioPlayerBase
         }
         clearList.Clear();
 
+        foreach (var item in bgMusicDic)
+        {
+            item.Value.CheckState();
+            //if (item.Value.PlayState == AudioPlayState.Stop)
+            //    channalClearList.Add(item.Key);
+        }
+        //foreach (var item in channalClearList)
+        //{
+        //    DestroyAudioAssetByPool(bgMusicDic[item]);
+        //    bgMusicDic.Remove(item);
+        //}
+        //channalClearList.Clear();
     }
 
 }

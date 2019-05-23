@@ -134,13 +134,14 @@ public class JsonNetworkService : INetworkInterface
 
                     if(m_msgCode != msg.m_MsgCode)
                     {
+                        Debug.LogError("MsgCode error currentCode " + m_msgCode + " server code " + msg.m_MsgCode);
                         if (msg.m_MsgCode > m_msgCode)
                         {
                             m_msgCode = msg.m_MsgCode;
                             m_msgCode++;
                         }
 
-                        Debug.LogError("MsgCode error currentCode " + m_msgCode + " server code " + msg.m_MsgCode);
+                        
                         //throw new Exception();
                     }
                     else

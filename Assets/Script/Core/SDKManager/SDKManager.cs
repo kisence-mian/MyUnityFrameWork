@@ -31,7 +31,7 @@ namespace FrameWork.SDKManager
 
         static bool s_useNewSDKManager = false; //是否使用新版本SDKManager
 
-#region 属性
+    #region 属性
 
         public static LoginCallBack LoginCallBack
         {
@@ -73,9 +73,9 @@ namespace FrameWork.SDKManager
 
         #endregion
 
-        #region 外部调用
+    #region 外部调用
 
-        #region 初始化
+    #region 初始化
 
         /// <summary>
         /// 初始化
@@ -94,14 +94,10 @@ namespace FrameWork.SDKManager
                     {
                         SDKManagerNew.Init();
                     }
-                    else
-                    {
-                        Debug.Log("SDKManager Init");
 
-                        LoadService(data);
-
-                        InitSDK();
-                    }
+                    Debug.Log("SDKManager Init");
+                    LoadService(data);
+                    InitSDK();
                 }
             }
             catch (Exception e)
@@ -166,7 +162,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 获取SDKInterface
+    #region 获取SDKInterface
 
         public static LoginInterface GetLoginService<T>() where T : LoginInterface
         {
@@ -270,7 +266,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 登录
+    #region 登录
 
         static void InitLogin(List<LoginInterface> list)
         {
@@ -337,34 +333,26 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void LoginByPlatform(LoginPlatform  loginPlatform, string tag = "")
         {
-            if (s_useNewSDKManager)
+            try
             {
-                //SDKManagerNew.Login(SDKName, tag);
-                Debug.LogError("SDKManager Login Exception: no implement in NewSDKManager");
-            }
-            else
-            {
-                try
+                bool isHave = false;
+                foreach(var item in s_loginServiceList)
                 {
-                    bool isHvae = false;
-                    foreach(var item in s_loginServiceList)
+                    if(item.GetPlatform().Contains( Application.platform) && item.GetLoginPlatform() == loginPlatform)
                     {
-                        if(item.GetPlatform().Contains( Application.platform) && item.GetLoginPlatform() == loginPlatform)
-                        {
-                            item.Login(tag);
-                            isHvae = true;
+                        item.Login(tag);
+                        isHave = true;
 
-                        }
-                    }
-                    if (!isHvae)
-                    {
-                        Debug.LogError("SDKManager Login dont find class by platform:" + Application.platform + " loginPlatform:" + loginPlatform);
                     }
                 }
-                catch (Exception e)
+                if (!isHave)
                 {
-                    Debug.LogError("SDKManager Login Exception: " + e.ToString());
+                    Debug.LogError("SDKManager Login dont find class by platform:" + Application.platform + " loginPlatform:" + loginPlatform);
                 }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager Login Exception: " + e.ToString());
             }
         }
         public static List<LoginPlatform> GetSupportLoginPlatform()
@@ -379,7 +367,6 @@ namespace FrameWork.SDKManager
             {
                 try
                 {
-
                     foreach (var item in s_loginServiceList)
                     {
                         if (item.GetPlatform().Contains( Application.platform))
@@ -402,7 +389,7 @@ namespace FrameWork.SDKManager
 
         #endregion
 
-        #region 支付
+    #region 支付
 
         static void InitPay(List<PayInterface> list)
         {
@@ -427,11 +414,8 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void Pay(string goodsID, string tag = "",GoodsType goodsType = GoodsType.NORMAL, string orderID = null)
         {
-            if(s_useNewSDKManager)
-            {
-                SDKManagerNew.Pay(goodsID, tag, goodsType, orderID);
-            }
-            else
+            //优先使用本地配置的SDK
+            if (s_payServiceList.Count > 0)
             {
                 try
                 {
@@ -442,6 +426,14 @@ namespace FrameWork.SDKManager
                     Debug.LogError("SDKManager Pay Exception: " + e.ToString());
                 }
             }
+            else if (s_useNewSDKManager)
+            {
+                SDKManagerNew.Pay(goodsID, tag, goodsType, orderID);
+            }
+            else
+            {
+                Debug.Log("支付SDK 没有配置！ ");
+            }
         }
 
         /// <summary>
@@ -449,11 +441,8 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void Pay(string SDKName, string goodsID,string tag ,GoodsType goodsType = GoodsType.NORMAL, string orderID = null)
         {
-            if (s_useNewSDKManager)
-            {
-                SDKManagerNew.Pay(SDKName,goodsID, tag, goodsType, orderID);
-            }
-            else
+            //优先使用本地配置的SDK
+            if(GetHasSDKService(s_payServiceList, SDKName))
             {
                 try
                 {
@@ -463,6 +452,14 @@ namespace FrameWork.SDKManager
                 {
                     Debug.LogError("SDKManager Pay Exception: " + e.ToString());
                 }
+            }
+            else if (s_useNewSDKManager)
+            {
+                SDKManagerNew.Pay(SDKName,goodsID, tag, goodsType, orderID);
+            }
+            else
+            {
+                Debug.LogError("支付SDK 没有配置！ ");
             }
         }
 
@@ -552,7 +549,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 广告
+    #region 广告
 
         /// <summary>
         /// 加载广告,默认访问第一个接口
@@ -737,7 +734,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 数据上报
+    #region 数据上报
 
         /// <summary>
         /// 数据上报
@@ -787,7 +784,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 加载SDK设置
+    #region 加载SDK设置
 
         /// <summary>
         /// 读取当前游戏内的SDK配置
@@ -877,7 +874,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 初始化SDK
+    #region 初始化SDK
 
         static void LoadService(SchemeData data)
         {
@@ -904,7 +901,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 功能函数
+    #region 功能函数
 
         static T GetSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
         {
@@ -917,6 +914,19 @@ namespace FrameWork.SDKManager
             }
 
             throw new Exception("GetSDKService " + typeof(T).Name + " Exception dont find ->" + name + "<-");
+        }
+
+        static bool GetHasSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].m_SDKName == name)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         static void InitSDKList<T>(List<T> list) where T : SDKInterfaceBase
@@ -939,7 +949,7 @@ namespace FrameWork.SDKManager
 #endregion
     }
 
-#region 声明
+    #region 声明
 
     public delegate void LoginCallBack(OnLoginInfo info);
     public delegate void PayCallBack(OnPayInfo info);

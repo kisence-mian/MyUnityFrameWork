@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using HDJ.Framework.Utils;
+using System.IO;
 
 public class AudioGroupSystemEditorWindow : EditorWindow {
 
@@ -19,13 +20,16 @@ public class AudioGroupSystemEditorWindow : EditorWindow {
     {
         Init();
     }
-    private List<AudioGroupData> datas;
+    private List<AudioGroupData> datas =null;
     private void Init()
     {
+        string path = SaveDir + AudioGroupSystem.ConfigName + ".txt";
+        if (File.Exists(path))
+        {
+            string text = FileUtils.LoadTextFileByPath(path);
 
-        string text = FileUtils.LoadTextFileByPath(SaveDir + AudioGroupSystem.ConfigName + ".txt");
-
-        datas = JsonUtils.FromJson<List<AudioGroupData>>(text);
+            datas = JsonUtils.FromJson<List<AudioGroupData>>(text);
+        }
         if (datas == null)
             datas = new List<AudioGroupData>();
 

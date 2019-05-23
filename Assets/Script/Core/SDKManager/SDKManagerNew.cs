@@ -279,7 +279,7 @@ namespace FrameWork.SDKManager
 
         #endregion
 
-      #region SDK接口
+        #region SDK接口
 
         #if UNITY_ANDROID
 
@@ -291,10 +291,14 @@ namespace FrameWork.SDKManager
 
         static void Call(Dictionary<string, string> data)
         {
-
-        #if UNITY_ANDROID
-
             string content = Serializer.Serialize(data);
+
+#if UNITY_EDITOR
+            Debug.LogError("SDKManagerNew Call 目前是在 Editor 下运行 ->" + content);
+            return;
+#endif
+
+#if UNITY_ANDROID
 
             if (androidInterface == null)
             {
@@ -351,15 +355,25 @@ namespace FrameWork.SDKManager
 
         static void OnPay(Dictionary<string, string> data)
         {
-            bool isSuccess = bool.Parse(data[SDKInterfaceDefine.ParameterName_IsSuccess]);
-            string goodsId = data[SDKInterfaceDefine.Pay_ParameterName_GoodsID];
-            //GoodsType goodsType = (GoodsType)Enum.Parse(typeof(GoodsType),data[SDKInterfaceDefine.Pay_ParameterName_GoodsType]);
+            try
+            {
+                bool isSuccess = bool.Parse(data[SDKInterfaceDefine.ParameterName_IsSuccess]);
+                string goodsId = data[SDKInterfaceDefine.Pay_ParameterName_GoodsID];
+                //GoodsType goodsType = (GoodsType)Enum.Parse(typeof(GoodsType),data[SDKInterfaceDefine.Pay_ParameterName_GoodsType]);
 
-            OnPayInfo info = new OnPayInfo();
-            info.isSuccess = isSuccess;
-            info.goodsId = goodsId;
+                OnPayInfo info = new OnPayInfo();
+                info.isSuccess = isSuccess;
+                info.goodsId = goodsId;
 
-            OnPayCallBack(info);
+                OnPayCallBack(info);
+            }
+            catch(Exception e)
+            {
+                Debug.LogError(e.ToString() + e.StackTrace);
+            }
+
+
+
         }
 
         #endregion
@@ -430,10 +444,7 @@ namespace FrameWork.SDKManager
         public string accountId;
         public string nickName;
         public string headPortrait;
-        /// <summary>
-        /// 账号登录使用的密码
-        /// </summary>
-        public string pw;
+        public string password;
         public LoginPlatform loginPlatform;
         public LoginErrorEnum error;
     }

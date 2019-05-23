@@ -18,7 +18,7 @@ public   class AccountLoginSDKClass: LoginInterface
         string[] arr = tag.Split('|');
         OnLoginInfo info = new OnLoginInfo();
         info.accountId = arr[0]; ;
-        info.pw = arr[1];
+        info.password = arr[1];
         info.isSuccess = true;
 
         LoginCallBack(info);

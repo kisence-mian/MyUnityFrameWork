@@ -8,15 +8,15 @@ public class AudioPlayManager : MonoBehaviour
     #region 属性，字段
     public static Audio2DPlayer a2DPlayer;
     public static Audio3DPlayer a3DPlayer;
-    ///// <summary>
-    ///// 2D 音乐转态转换 回调（参数 ：资源名，channel,切换的转态，flag（标识：用于在多个相同音频名称时分辨））
-    ///// </summary>
-    //public static CallBack<string, int, AudioPlayState, string> audio2DMusicStateCallBack;
+    /// <summary>
+    ///  音乐播放完成 回调（参数 ：资源名，channel，flag（标识：用于在多个相同音频名称时分辨））
+    /// </summary>
+    public static CallBack<string, int, string> OnMusicStopCallBack;
 
-    ///// <summary>
-    ///// 2D 音乐转态转换 回调（参数 ：资源名,切换的转态，flag（标识：用于在多个相同音频名称时分辨））
-    ///// </summary>
-    //public static CallBack<string, AudioPlayState, string> audio2DSFXStateCallBack;
+    /// <summary>
+    /// SFX播放完成 回调（参数 ：资源名，flag（标识：用于在多个相同音频名称时分辨））
+    /// </summary>
+    public static CallBack<string, string> OnSFXStopCallBack;
     #endregion
     public static void Init()
     {

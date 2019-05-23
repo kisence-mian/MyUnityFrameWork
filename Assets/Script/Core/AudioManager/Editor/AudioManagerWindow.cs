@@ -101,8 +101,10 @@ public class AudioManagerWindow : EditorWindow {
         GUILayout.BeginVertical("box");
         GUILayout.Label("Asset Name : " + au.assetName);
         GUILayout.Label("Play State : " + au.PlayState);
+        GUILayout.Label("flag : " + au.flag);
         EditorGUILayout.Slider("VolumeScale : ",au.VolumeScale, 0, 1);
-        EditorGUILayout.Slider("Volume : ", au.Volume, 0, au.GetMaxRealVolume());
+
+        //EditorGUILayout.Slider("Volume : ", au.Volume, 0, au.GetMaxRealVolume());
         if (isShowAudioSource)
             EditorGUILayout.ObjectField("AudioSource : ", au.audioSource, typeof(AudioSource), true);
         GUILayout.EndVertical();

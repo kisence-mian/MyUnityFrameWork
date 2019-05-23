@@ -49,7 +49,8 @@ namespace FrameWork.SDKManager
         public const string Pay_ParameterName_Count       = "Count";
         public const string Pay_ParameterName_GoodsName   = "GoodsName";
         public const string Pay_ParameterName_CallBackUrl = "CallBackUrl";
-        public const string Pay_ParameterName_CpOrderID   = "CpOrderID";
+        public const string Pay_ParameterName_CpOrderID   = "CpOrderID";//第三方支付ID
+        public const string Pay_ParameterName_OrderID     = "OrderID";  //我们自己的支付ID
 
         public const string Pay_GoodsTypeEnum_ONCE_ONLY = "ONCE_ONLY";
         public const string Pay_GoodsTypeEnum_NORMAL    = "NORMAL";

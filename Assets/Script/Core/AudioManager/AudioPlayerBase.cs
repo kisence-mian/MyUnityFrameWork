@@ -82,6 +82,8 @@ public class AudioPlayerBase
     }
     protected void PlayClip(AudioAsset au, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f,float pitch =1)
     {
+        //if (au.PlayState == AudioPlayState.Playing)
+        //    au.Stop();
         au.assetName = audioName;
         AudioClip ac = GetAudioClip(au.assetName);
         au.audioSource.clip = ac;
@@ -94,30 +96,28 @@ public class AudioPlayerBase
 
     protected void PlayMusicControl(AudioAsset au, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f, string flag = "")
     {
-        au.flag = flag;
+       
         if (au.assetName == audioName)
         {
             if (au.PlayState != AudioPlayState.Playing)
             {
-                AddFade(au, VolumeFadeType.FadeIn, fadeTime, delay, null, null);
+                AddFade(au, VolumeFadeType.FadeIn, fadeTime, delay,flag, null, null);
                 au.Play();
             }
         }
         else
         {
-            if (au.PlayState == AudioPlayState.Playing)
-            {
-                AddFade(au, VolumeFadeType.FadeOut2In, fadeTime, delay, null, (value) =>
-                {
-                    PlayClip(value, audioName, isLoop, volumeScale, delay);
 
-                });
-            }
-            else
+            if (au.PlayState != AudioPlayState.Playing)
             {
-                PlayClip(au, audioName, isLoop, volumeScale, delay);
-                AddFade(au, VolumeFadeType.FadeIn, fadeTime, delay, null, null);
+                fadeTime = fadeTime / 2f;
             }
+          
+            AddFade(au, VolumeFadeType.FadeOut2In, fadeTime, delay, flag, null, (value) =>
+            {
+                PlayClip(value, audioName, isLoop, volumeScale, delay);
+
+            });
 
         }
     }
@@ -130,7 +130,7 @@ public class AudioPlayerBase
             {
                 au.SetPlayState(AudioPlayState.Pause);
                 //Debug.Log("PauseMusicControl Pause");
-                AddFade(au, VolumeFadeType.FadeOut, fadeTime, 0, (value) =>
+                AddFade(au, VolumeFadeType.FadeOut, fadeTime, 0, null, (value) =>
                 {
                         //Debug.LogWarning("PauseMusicControl Pause fade CallBack");
                         value.Pause();
@@ -143,7 +143,7 @@ public class AudioPlayerBase
             if (au.PlayState == AudioPlayState.Pause)
             {
                 au.Play();
-                AddFade(au, VolumeFadeType.FadeIn, fadeTime, 0, null, null);
+                AddFade(au, VolumeFadeType.FadeIn, fadeTime, 0,null, null, null);
             }
         }
     }
@@ -152,10 +152,10 @@ public class AudioPlayerBase
         if (au.PlayState != AudioPlayState.Stop)
         {
             au.SetPlayState(AudioPlayState.Stoping);
-            Debug.Log("StopMusicControl Stop");
-            AddFade(au, VolumeFadeType.FadeOut, fadeTime, 0, (value) =>
+            //Debug.Log("StopMusicControl Stop");
+            AddFade(au, VolumeFadeType.FadeOut, fadeTime, 0, null,(value) =>
             {
-                Debug.LogWarning("StopMusicControl Stop fade CallBack");
+                //Debug.LogWarning("StopMusicControl Stop fade CallBack");
                 value.Stop();
             }, null);
         }
@@ -219,7 +219,7 @@ public class AudioPlayerBase
             }
         }
     }
-    public void AddFade(AudioAsset au, VolumeFadeType fadeType, float fadeTime, float delay, CallBack<AudioAsset> fadeCompleteCallBack, CallBack<AudioAsset> fadeOutCompleteCallBack)
+    public void AddFade(AudioAsset au, VolumeFadeType fadeType, float fadeTime, float delay,string flag, CallBack<AudioAsset> fadeCompleteCallBack, CallBack<AudioAsset> fadeOutCompleteCallBack)
     {
         VolumeFadeData data = null;
 
@@ -249,6 +249,8 @@ public class AudioPlayerBase
         data.fadeCompleteCallBack = null;
         data.fadeOutCompleteCallBack = null;
         data.au = au;
+        if (flag != null)
+            au.flag = flag;
         data.fadeType = fadeType;
         data.fadeTime = fadeTime;
         if (data.fadeTime <= 0)
@@ -273,7 +275,7 @@ public class AudioPlayerBase
         }
         data.tempVolume = data.au.Volume;
         data.delayTime = delay;
-        //Debug.Log("AddFade");
+        //Debug.Log("AddFade:"+ data.fadeType);
 
     }
 

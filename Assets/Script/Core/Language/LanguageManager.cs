@@ -133,6 +133,7 @@ public class LanguageManager
         }
         if (ApplicationManager.Instance != null && ApplicationManager.Instance.showLanguageValue && ApplicationManager.Instance.m_AppMode == AppMode.Developing)
             content = "[" + content + "]";
+
         return content;
     }
 

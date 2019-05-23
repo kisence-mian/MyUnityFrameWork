@@ -20,7 +20,6 @@ public class WXPayClass : PayInterface
     public override void Init()
     {
         Debug.LogWarning("=========WXPayClass Init===========");
-        WXListener.Instance.GetComponent<WXListener>().wXPayClass = this;
         GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
     }
 
@@ -31,9 +30,6 @@ public class WXPayClass : PayInterface
     /// <param name="args"></param>
     private void OnPrePay(PrePay2Client e, object[] args)
     {
-
-        WXListener.Instance.GetComponent<WXListener>().GoodId = e.goodsID ;
-
         Debug.LogWarning("OnPrePay=========：" + e.prepay_id + "=partnerId==");
         DateTime dt1970 = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
@@ -42,8 +38,6 @@ public class WXPayClass : PayInterface
         string stringA = "appid=wx3ce30b3054987098&" + "nonceStr=" + nonceStr + "&packageValue=Sign=WXPay&" + "partnerId=1526756671&" + "prepayId=" + e.prepay_id + "&timeStamp=" + timeStamp;
         string stringSignTemp = stringA + "&key=a8f73a2a5ecfafab1ea80515ef0efbad";
         string sign = MD5Tool.GetMD5FromString(stringSignTemp);
-
-        WXListener.Instance.GetComponent<WXListener>().Mch_orderID = e.mch_orderID;
 
         IndentListener(e.prepay_id,nonceStr, timeStamp, sign);
     }
@@ -68,18 +62,10 @@ public class WXPayClass : PayInterface
     /// </summary>
     private void IndentListener(string prepayid, string nonceStr ,string timeStamp , string sign)
     {
-        //Debug.LogWarning("get WXpay----message-----" );
-        //Debug.LogWarning("prepayid====" + prepayid);
-        //Debug.LogWarning("nonceStr====" + nonceStr);
-        //Debug.LogWarning("timeStamp====" + timeStamp);
-        //Debug.LogWarning("sign====" + sign);
+        string tag = prepayid + "|" + nonceStr + "|" + timeStamp + "|" + sign;
 
-        //WXPay  参数： prepayid(交易会话ID) ， nonceStr(随机字符串)， timeStamp(北京时间戳)， sign (签名)
-        WXLoginSDKClass.GetCurrentAndroidJavaObject().Call("WXPay", prepayid, nonceStr, timeStamp,sign);
-        //GetCurrentAndroidJavaObject().Call("WXPay2", prepayid);
+        SDKManagerNew.Pay("WeiXin.WeiXinSDK", prepayid, tag);
     }
-
-
 
     /// <summary>
     /// 从sdk返回支付结果
@@ -90,8 +76,6 @@ public class WXPayClass : PayInterface
     public void SetPayResult(string result,string goodID,string Mch_orderID)
     {
         Debug.LogWarning("wxPay Result======" + result);
-
-        
 
         OnPayInfo payInfo = new OnPayInfo();
         payInfo.isSuccess = (result == "0");
