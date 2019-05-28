@@ -52,7 +52,6 @@ public static class UIModelShowTool
         Vector3? eulerAngles = null,
         Vector3? localScale = null,
         Vector3? texSize = null,
-        bool isPutPool = false,
         float? nearClippingPlane = null,
         float? farClippingPlane = null)
     {
@@ -70,7 +69,6 @@ public static class UIModelShowTool
         float farClippingPlaneTmp = farClippingPlane ?? s_clippingPlanes.y;
         //构造Camera
         UIModelShowData data = new UIModelShowData();
-        data.isPutPool = isPutPool;
 
         GameObject uiModelShow = new GameObject("UIShowModelCamera");
         data.top = uiModelShow;
@@ -211,8 +209,6 @@ public static class UIModelShowTool
 
     public class UIModelShowData
     {
-        public bool isPutPool;
-
         public GameObject top;
         public GameObject root;
         public GameObject model;
@@ -221,25 +217,15 @@ public static class UIModelShowTool
 
         public void Dispose()
         {
-            if (isPutPool)
-            {
-                GameObjectManager.DestroyGameObjectByPool(model);
-            }
-            UnityEngine.Object.Destroy(top);
+           
+            GameObjectManager.DestroyGameObjectByPool(model);
+            GameObject.Destroy(top);
         }
 
         public void ChangeModel(string modelName)
         {
             int layer = model.layer;
-
-            if(isPutPool)
-            {
-                GameObjectManager.DestroyGameObjectByPool(model);
-            }
-            else
-            {
-                UnityEngine.Object.Destroy(model);
-            }
+            GameObjectManager.DestroyGameObjectByPool(model);
 
             model = GameObjectManager.CreateGameObjectByPool(modelName);
             model.transform.SetParent(root.transform);

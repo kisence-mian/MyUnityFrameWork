@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FrameWork.SDKManager;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -343,19 +344,25 @@ public class HotUpdateManager
         string downLoadServicePath = null;
         bool isTest = s_hotUpdateConfig[c_UseTestDownLoadPathKey].GetBool();
 
-        //使用测试下载地址
-        if(isTest)
+        //获取下载地址
+        if(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath,"") != "")
         {
-            downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
+            downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "");
         }
         else
         {
-            downLoadServicePath = s_hotUpdateConfig[c_downLoadPathKey].GetString();
+            if (isTest)
+            {
+                downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
+            }
+            else
+            {
+                downLoadServicePath = s_hotUpdateConfig[c_downLoadPathKey].GetString();
+            }
         }
 
         string downLoadPath = downLoadServicePath + "/" + platform + "/" + Application.version + "/";
         
-
         s_versionFileDownLoadPath   = downLoadPath + c_versionFileName.ToLower() ;
         s_ManifestFileDownLoadPath  = downLoadPath + AssetsManifestManager.c_ManifestFileName;
         s_resourcesFileDownLoadPath = downLoadPath;

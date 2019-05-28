@@ -521,7 +521,7 @@ public class UIManager : MonoBehaviour
         {
             Debug.LogError("OnDestroy :" + e.ToString());
         }
-        Destroy(UI.gameObject);
+        GameObjectManager.DestroyGameObjectByPool(UI.gameObject);
     }
 
     public static void DestroyAllUI()
@@ -552,7 +552,7 @@ public class UIManager : MonoBehaviour
                 {
                     Debug.LogError("OnDestroy :" + e.ToString());
                 }
-                Destroy(uis[i].gameObject);
+                GameObjectManager.DestroyGameObjectByPool(uis[i].gameObject);
             }
         }
 
@@ -731,7 +731,7 @@ public class UIManager : MonoBehaviour
                 {
                     Debug.LogError("OnDestroy :" + e.ToString());
                 }
-                Destroy(uis[i].gameObject);
+                GameObjectManager.DestroyGameObjectByPool(uis[i].gameObject);
             }
         }
 

@@ -36,7 +36,7 @@ public class UGUITool
             return;
         }
 
-            Sprite sp = ResourceManager.Load<Sprite>(name);// LoadSprite(name);
+            Sprite sp = AssetsPoolManager.Load<Sprite>(name);// LoadSprite(name);
             if (sp != null)
             {
                 img.overrideSprite = sp;// Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);

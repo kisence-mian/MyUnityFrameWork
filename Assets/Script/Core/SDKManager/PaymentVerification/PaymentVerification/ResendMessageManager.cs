@@ -83,6 +83,7 @@ public class ResendMessageManager
     private static float tempResendTime = 0;
     private static void Update()
     {
+
         if (msgs.Count == 0)
             return;
         if (!startResend)

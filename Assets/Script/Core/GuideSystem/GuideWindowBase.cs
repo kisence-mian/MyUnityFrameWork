@@ -8,7 +8,7 @@ namespace FrameWork.GuideSystem
 {
     public class GuideWindowBase : UIWindowBase
     {
-        protected List<PoolObject> m_effectList = new List<PoolObject>();
+        protected List<GameObject> m_effectList = new List<GameObject>();
         protected List<RectTransform> m_uiList = new List<RectTransform>();
 
         protected Image m_mask;
@@ -32,7 +32,7 @@ namespace FrameWork.GuideSystem
         #region 特效相关
         public GameObject CreateEffect(string effectName)
         {
-            PoolObject po = GameObjectManager.GetPoolObject(effectName, RectTransform.gameObject);
+            GameObject po = GameObjectManager.CreateGameObjectByPool(effectName, RectTransform.gameObject);
             m_effectList.Add(po);
 
             return po.gameObject;
@@ -62,7 +62,7 @@ namespace FrameWork.GuideSystem
         {
             for (int i = 0; i < m_effectList.Count; i++)
             {
-                GameObjectManager.DestroyPoolObject(m_effectList[i]);
+                GameObjectManager.DestroyGameObjectByPool(m_effectList[i]);
             }
 
             m_effectList.Clear();

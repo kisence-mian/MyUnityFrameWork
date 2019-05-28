@@ -134,7 +134,7 @@ public static class ResourceManager
         {
             throw new Exception("ResourceManager UnLoad -> name is null !");
         }
-
+        Debug.Log("UnLoad ==>>" + name);
         string path = ResourcesConfigManager.GetResourcePath(name);
 
         if (m_gameLoadType == ResLoadLocation.Resource)

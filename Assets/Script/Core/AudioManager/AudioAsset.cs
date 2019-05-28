@@ -152,6 +152,7 @@ public class AudioAsset
     /// </summary>
     public void ResetData()
     {
+        assetName = "";
         audioSource.pitch = 1;
         flag = "";
     }

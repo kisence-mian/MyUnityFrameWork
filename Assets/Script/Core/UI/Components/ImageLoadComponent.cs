@@ -7,12 +7,19 @@ using UnityEngine.UI;
 public class ImageLoadComponent : MonoBehaviour {
 
     public string iconName;
-	// Use this for initialization
-	void Start () {
-        LoadImage();
-
+    private Image loadImage;
+    // Use this for initialization
+    void Awake () {
+        loadImage = LoadImage();
     }
 
+    private void OnEnable()
+    {
+        if (loadImage == null || loadImage.sprite == null)
+        {
+            loadImage =  LoadImage();
+        }
+    }
     public Image LoadImage()
     {
         Image image = GetComponent<Image>();
@@ -25,6 +32,10 @@ public class ImageLoadComponent : MonoBehaviour {
             Debug.LogError(" Dont have Image!!!");
         }
         return image;
+    }
+    private void OnDestroy()
+    {
+        AssetsPoolManager.DestroyByPool(iconName);
     }
 
 }

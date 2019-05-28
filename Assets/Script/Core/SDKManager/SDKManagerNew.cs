@@ -6,9 +6,11 @@ namespace FrameWork.SDKManager
 {
     public static class SDKManagerNew
     {
-        static bool isInit = false;
         const string c_callBackObjectName = "CallBackObject";
+
+        static bool isInit = false;
         static SDKCallBackListener s_callBackListener;
+        static Dictionary<string, OtherCallBack> s_callBackDict = new Dictionary<string, OtherCallBack>();
 
         #region 外部调用
 
@@ -244,6 +246,56 @@ namespace FrameWork.SDKManager
             Call(data);
         }
 
+        public static void ToClipboard(String content)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Other);
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Other_FunctionName_CopyToClipboard);
+            data.Add(SDKInterfaceDefine.Other_ParameterName_Content, content);
+            Call(data);
+        }
+
+        public static void DownloadApk(string url = null)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Other);
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Other_FunctionName_DownloadAPK);
+            if(url != null)
+            {
+                data.Add(SDKInterfaceDefine.Other_ParameterName_DownloadURL, url);
+            }
+
+            Call(data);
+        }
+
+        #region 事件监听
+
+        public static void AddOtherCallBackListener(string functionName,OtherCallBack callBack)
+        {
+            if(s_callBackDict.ContainsKey(functionName))
+            {
+                s_callBackDict[functionName] += callBack;
+            }
+            else
+            {
+                s_callBackDict.Add(functionName, callBack);
+            }
+        }
+
+        public static void RemoveOtherCallBackListener(string functionName, OtherCallBack callBack)
+        {
+            if (s_callBackDict.ContainsKey(functionName))
+            {
+                s_callBackDict[functionName] -= callBack;
+            }
+            else
+            {
+                Debug.LogError("RemoveOtherCallBackListener 不存在的 function Name ->" + functionName + "<-");
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #endregion
@@ -294,11 +346,9 @@ namespace FrameWork.SDKManager
             string content = Serializer.Serialize(data);
 
 #if UNITY_EDITOR
-            Debug.LogError("SDKManagerNew Call 目前是在 Editor 下运行 ->" + content);
-            return;
-#endif
+            Debug.LogWarning("SDKManagerNew Call 目前是在 Editor 下运行 ->" + content);
 
-#if UNITY_ANDROID
+#elif UNITY_ANDROID
 
             if (androidInterface == null)
             {
@@ -312,7 +362,7 @@ namespace FrameWork.SDKManager
         }
 
         #endregion
-
+        
         #region 回调处理
 
         #region Debug
@@ -355,25 +405,24 @@ namespace FrameWork.SDKManager
 
         static void OnPay(Dictionary<string, string> data)
         {
+            bool isSuccess = bool.Parse(data[SDKInterfaceDefine.ParameterName_IsSuccess]);
+            string goodsId = data[SDKInterfaceDefine.Pay_ParameterName_GoodsID];
+
+            OnPayInfo info = new OnPayInfo();
+            info.isSuccess = isSuccess;
+            info.goodsId = goodsId;
+
             try
             {
-                bool isSuccess = bool.Parse(data[SDKInterfaceDefine.ParameterName_IsSuccess]);
-                string goodsId = data[SDKInterfaceDefine.Pay_ParameterName_GoodsID];
-                //GoodsType goodsType = (GoodsType)Enum.Parse(typeof(GoodsType),data[SDKInterfaceDefine.Pay_ParameterName_GoodsType]);
-
-                OnPayInfo info = new OnPayInfo();
-                info.isSuccess = isSuccess;
-                info.goodsId = goodsId;
-
-                OnPayCallBack(info);
+                if(OnPayCallBack!= null)
+                {
+                    OnPayCallBack(info);
+                }
             }
             catch(Exception e)
             {
-                Debug.LogError(e.ToString() + e.StackTrace);
+                Debug.LogError("OnPayCallBack Error" + e.ToString() + e.StackTrace);
             }
-
-
-
         }
 
         #endregion
@@ -400,14 +449,60 @@ namespace FrameWork.SDKManager
 
         static void OnOther(Dictionary<string, string> data)
         {
+            OnOtherInfo info = new OnOtherInfo();
+            info.data = data;
 
+            string functionName = data[SDKInterfaceDefine.FunctionName];
+
+            DispatchOtherCallBack(functionName, info);
+        }
+
+        static void DispatchOtherCallBack(string functionName, OnOtherInfo info)
+        {
+            if(s_callBackDict.ContainsKey(functionName))
+            {
+                try
+                {
+                    if (s_callBackDict[functionName] != null)
+                    {
+                        s_callBackDict[functionName](info);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("DispatchOtherCallBack Error " + e.ToString());
+                }
+            }
+        }
+
+        public static string GetProperties(string properties, string key, string defaultValue)
+        {
+
+#if UNITY_EDITOR
+            return defaultValue;
+
+#elif UNITY_ANDROID
+            try
+            {
+                if (androidInterface == null)
+                {
+                    androidInterface = new AndroidJavaClass("SdkInterface.SdkInterface");
+                }
+                return androidInterface.CallStatic<string>("GetProperties", properties, key, defaultValue);
+            }
+            catch(Exception e)
+            {
+                Debug.LogError("GetProperties Error:" + e.ToString());
+                return defaultValue;
+            }
+#endif
         }
         #endregion
 
         #endregion
     }
 
-    #region 声明
+#region 声明
 
     public class SDKCallBackListener : MonoBehaviour
     {
@@ -449,6 +544,11 @@ namespace FrameWork.SDKManager
         public LoginErrorEnum error;
     }
 
+    public struct OnOtherInfo
+    {
+        public Dictionary<string, string> data;
+    }
+
     public enum GoodsType
     {
         NORMAL,    //可以反复购买的商品
@@ -466,5 +566,5 @@ namespace FrameWork.SDKManager
         NoInstallApp,
     }
 
-    #endregion
+#endregion
 }

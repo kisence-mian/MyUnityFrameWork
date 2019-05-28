@@ -29,6 +29,8 @@ namespace FrameWork.SDKManager
         private static PayCallBack s_payCallBack;
         private static ADCallBack s_adCallBack;
 
+        static Dictionary<string, OtherCallBack> s_callBackDict = new Dictionary<string, OtherCallBack>();
+
         static bool s_useNewSDKManager = false; //是否使用新版本SDKManager
 
     #region 属性
@@ -780,9 +782,86 @@ namespace FrameWork.SDKManager
 
             Log(eventID, send_info);
         }
-#endregion
+        #endregion
 
-#endregion
+    #region 其他SDK
+
+        public static void ToClipboard(string content)
+        {
+#if UNITY_EDITOR
+            GUIUtility.systemCopyBuffer = content;
+
+#elif UNITY_ANDROID
+
+            SDKManagerNew.ToClipboard(content);
+#endif
+        }
+
+        public static void DownloadApk(string url = null)
+        {
+#if UNITY_ANDROID
+
+            SDKManagerNew.DownloadApk(url);
+#endif
+        }
+
+        public static string GetProperties(string key,string defaultValue = "")
+        {
+           return GetProperties(SDKInterfaceDefine.FileName_ChannelProperties,key, defaultValue);
+        }
+
+        public static string GetProperties(string properties, string key, string defaultValue)
+        {
+            if(s_useNewSDKManager)
+            {
+                return SDKManagerNew.GetProperties(properties,key,defaultValue);
+            }
+
+            return defaultValue;
+        }
+
+        #region 事件监听
+
+            public static void AddOtherCallBackListener(string functionName, OtherCallBack callBack)
+        {
+            if (s_callBackDict.ContainsKey(functionName))
+            {
+                s_callBackDict[functionName] += callBack;
+            }
+            else
+            {
+                s_callBackDict.Add(functionName, callBack);
+            }
+
+            if(s_useNewSDKManager)
+            {
+                SDKManagerNew.AddOtherCallBackListener(functionName, callBack);
+            }
+        }
+
+        public static void RemoveOtherCallBackListener(string functionName, OtherCallBack callBack)
+        {
+            if (s_callBackDict.ContainsKey(functionName))
+            {
+                s_callBackDict[functionName] -= callBack;
+            }
+            else
+            {
+                Debug.LogError("RemoveOtherCallBackListener 不存在的 function Name ->" + functionName + "<-");
+            }
+
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.RemoveOtherCallBackListener(functionName, callBack);
+            }
+        }
+
+
+        #endregion
+
+        #endregion
+
+    #endregion
 
     #region 加载SDK设置
 
@@ -954,6 +1033,7 @@ namespace FrameWork.SDKManager
     public delegate void LoginCallBack(OnLoginInfo info);
     public delegate void PayCallBack(OnPayInfo info);
     public delegate void ADCallBack(OnADInfo info);
+    public delegate void OtherCallBack(OnOtherInfo info);
 
     public class SchemeData
     {

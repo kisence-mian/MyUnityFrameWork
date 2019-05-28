@@ -139,7 +139,11 @@ public class BundleConfigEditorWindow : EditorWindow
         {
             ResourcesConfigManager.CreateResourcesConfig();
         }
-
+        if(GUILayout.Button("Create Bundle Names"))
+        {
+            //自动设置打包信息
+            SetAssetsInfo();
+        }
         if (GUILayout.Button("5.0 打包"))
         {
             NewPackage();

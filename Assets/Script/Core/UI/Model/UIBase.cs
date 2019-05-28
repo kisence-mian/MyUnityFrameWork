@@ -78,6 +78,8 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         RemoveAllListener();
         CleanItem();
         CleanModelShowCameraList();
+
+        ClearLoadSprite();
         try
         {
             OnUIDestroy();
@@ -982,6 +984,31 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     }
 
     #endregion
+    #region 动态加载Sprite赋值
+    private Dictionary<string, int> loadSpriteNames = new Dictionary<string, int>();
+    public void SetImageSprite(Image img, string name, bool is_nativesize = false)
+    {
+        UGUITool.SetImageSprite(img, name, is_nativesize);
+        if (!loadSpriteNames.ContainsKey(name))
+            loadSpriteNames.Add(name, 1);
+        else
+            loadSpriteNames[name]++;
+    }
+
+    private void ClearLoadSprite()
+    {
+        foreach (var item in loadSpriteNames)
+        {
+            int num = item.Value;
+            for (int i = 0; i < num; i++)
+            {
+                AssetsPoolManager.DestroyByPool(item.Key);
+            }
+           
+        }
+        loadSpriteNames.Clear();
+    }
+    #endregion
 
     #region RawImageCamera
 
@@ -996,11 +1023,10 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         Vector3? localScale = null,
         Vector3? eulerAngles = null ,
         Vector3? texSize = null,
-        bool isPutPool = false,
         float? nearClippingPlane = null,
         float? farClippingPlane = null)
     {
-        var model = CreateModelShow(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, localScale, eulerAngles, texSize, isPutPool, nearClippingPlane, farClippingPlane);
+        var model = CreateModelShow(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, localScale, eulerAngles, texSize, nearClippingPlane, farClippingPlane);
 
         GetRawImage(rawimageName).texture = model.renderTexture;
 
@@ -1026,11 +1052,10 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         Vector3? localScale = null,
         Vector3? eulerAngles = null,
         Vector3? texSize = null,
-        bool isPutPool = false,
         float? nearClippingPlane = null,
         float? farClippingPlane = null)
     {
-        var model = UIModelShowTool.CreateModelData(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, eulerAngles, localScale, texSize, isPutPool, nearClippingPlane, farClippingPlane);
+        var model = UIModelShowTool.CreateModelData(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, eulerAngles, localScale, texSize, nearClippingPlane, farClippingPlane);
         modelList.Add(model);
 
         return model;

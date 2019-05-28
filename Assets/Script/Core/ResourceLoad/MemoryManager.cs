@@ -23,7 +23,10 @@ public class MemoryManager
     /// 最大允许的堆内存使用量
     /// </summary>
     public static int s_MaxHeapMemoryUse = 70;
-
+    /// <summary>
+    /// 清理间隔时间
+    /// </summary>
+    public static float ClearIntervalTime = 5f;
     public static void Init()
     {
         ApplicationManager.s_OnApplicationUpdate += Update;
@@ -51,8 +54,8 @@ public class MemoryManager
 
     static void GUI()
     {
-        GUILayout.Label("总内存：" + ByteToM(Profiler.GetTotalAllocatedMemory()).ToString("F") + "M");
-        GUILayout.Label("堆内存：" + ByteToM(Profiler.GetMonoUsedSize()).ToString("F") + "M");
+        GUILayout.Label("总内存：" + totalAllocatedMemory.ToString("F") + "M");
+        GUILayout.Label("堆内存：" + ByteToM(Profiler.GetMonoUsedSizeLong()).ToString("F") + "M");
     }
 
     /// <summary>
@@ -61,17 +64,17 @@ public class MemoryManager
     public static void FreeMemory()
     {
         GlobalEvent.DispatchEvent(MemoryEvent.FreeMemory);
-
-        //清空对象池
-        GameObjectManager.CleanPool();
-
-        GameObjectManager.CleanPool_New();
-
         //清空缓存的UI
         UIManager.DestroyAllHideUI();
+        //清空对象池
+        GameObjectManager.CleanPool(true);
+
+        //GameObjectManager.CleanPool_New();
+
+        AssetsPoolManager.Dispose();
 
         FreeHeapMemory();
-
+        Resources.UnloadUnusedAssets();
         //GC
         //GC.Collect();
     }
@@ -189,75 +192,104 @@ public class MemoryManager
     static bool s_isFreeHeapMemory = false;
     static bool s_isFreeHeapMemory2 = false;
 
+    public static double totalReservedMemory;
+    public static double totalAllocatedMemory;
+    static double monoHeapSize;
+
+    private static float tempTime;
     /// <summary>
     /// 用于监控内存
     /// </summary>
     /// <param name="tag"></param>
     static void MonitorMemorySize()
     {
-        if(ByteToM(Profiler.GetTotalReservedMemory() ) > s_MaxMemoryUse * 0.7f)
+        if (ApplicationManager.AppMode != AppMode.Release)
         {
-            if (!s_isFreeMemory)
-            {
-                s_isFreeMemory = true;
-                FreeMemory();
-            }
-
-            if (ByteToM(Profiler.GetMonoHeapSize()) > s_MaxMemoryUse)
-            {
-                if (!s_isFreeMemory2)
-                {
-                    s_isFreeMemory2 = true;
-                    FreeMemory();
-
-#if !UNITY_EDITOR
-                    Debug.LogError("总内存超标告警 ！当前总内存使用量： " + ByteToM(Profiler.GetTotalAllocatedMemory()) + "M");
-#endif
-                }
-            }
-            else
-            {
-                s_isFreeMemory2 = false;
-            }
+            totalReservedMemory = ByteToM(Profiler.GetTotalReservedMemoryLong());
+            totalAllocatedMemory = ByteToM(Profiler.GetTotalAllocatedMemoryLong());
         }
-        else
-        {
-            s_isFreeMemory = false;
-        }
+       // Debug.Log("内存占用：" + totalReservedMemory+" ++" + ByteToM(Profiler.GetTotalAllocatedMemoryLong()));
+        //monoHeapSize = ByteToM(Profiler.GetMonoHeapSizeLong());
+        //if (tempTime <= 0)
+        //{
+        //    tempTime = ClearIntervalTime;
+        //    if(totalReservedMemory >= s_MaxMemoryUse)
+        //    {
+        //        FreeMemory();
+        //    }
+        //     if(monoHeapSize>= s_MaxHeapMemoryUse)
+        //    {
+        //        GC.Collect();
+        //    }
+        //}
+        //else
+        //{
+        //    tempTime -= Time.deltaTime;
+        //}
+        
+//        if (ByteToM(Profiler.GetTotalReservedMemoryLong() ) > s_MaxMemoryUse * 0.7f)
+//        {
+//            if (!s_isFreeMemory)
+//            {
+//                s_isFreeMemory = true;
+//                FreeMemory();
+//            }
 
-        if (ByteToM( Profiler.GetMonoUsedSize() ) > s_MaxHeapMemoryUse * 0.7f)
-        {
-            if (!s_isFreeHeapMemory)
-            {
-                s_isFreeHeapMemory = true;
-            }
+//            if (ByteToM(Profiler.GetTotalReservedMemoryLong()) > s_MaxMemoryUse)
+//            {
+//                if (!s_isFreeMemory2)
+//                {
+//                    s_isFreeMemory2 = true;
+//                    FreeMemory();
 
-            if (ByteToM( Profiler.GetMonoUsedSize()) > s_MaxHeapMemoryUse)
-            {
-                if (!s_isFreeHeapMemory2)
-                {
-                    s_isFreeHeapMemory2 = true;
-#if !UNITY_EDITOR
-                    Debug.LogError("堆内存超标告警 ！当前堆内存使用量： " + ByteToM( Profiler.GetMonoUsedSize()) + "M");
-#endif
-                }
-            }
-            else
-            {
-                s_isFreeHeapMemory2 = false;
-            }
-        }
-        else
-        {
-            s_isFreeHeapMemory = false;
-        }
+//#if !UNITY_EDITOR
+//                    Debug.LogError("总内存超标告警 ！当前总内存使用量： " + ByteToM(Profiler.GetTotalAllocatedMemory()) + "M");
+//#endif
+//                }
+//            }
+//            else
+//            {
+//                s_isFreeMemory2 = false;
+//            }
+//        }
+//        else
+//        {
+//            s_isFreeMemory = false;
+//        }
+
+//        if (ByteToM( Profiler.GetMonoUsedSizeLong() ) > s_MaxHeapMemoryUse * 0.7f)
+//        {
+//            if (!s_isFreeHeapMemory)
+//            {
+//                s_isFreeHeapMemory = true;
+//            }
+
+//            if (ByteToM( Profiler.GetMonoUsedSizeLong()) > s_MaxHeapMemoryUse)
+//            {
+//                if (!s_isFreeHeapMemory2)
+//                {
+//                    s_isFreeHeapMemory2 = true;
+//#if !UNITY_EDITOR
+//                    Debug.LogError("堆内存超标告警 ！当前堆内存使用量： " + ByteToM( Profiler.GetMonoUsedSize()) + "M");
+//#endif
+//                }
+//            }
+//            else
+//            {
+//                s_isFreeHeapMemory2 = false;
+//            }
+//        }
+//        else
+//        {
+//            s_isFreeHeapMemory = false;
+//        }
     }
 
 #endregion
 
-    static float ByteToM(uint byteCount)
+    static double ByteToM(long byteCount)
     {
-        return (float)(byteCount / (1024.0f * 1024.0f));
+        return (double)(byteCount / (1024.0f * 1024.0f));
     }
 }
 

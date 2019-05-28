@@ -43,7 +43,7 @@ public class AudioPlayerBase
 
     public AudioClip GetAudioClip(string name)
     {
-        AudioClip red = ResourceManager.Load<AudioClip>(name);
+        AudioClip red = AssetsPoolManager.Load<AudioClip>(name);
         if (red != null)
         {
             return red;
@@ -78,12 +78,29 @@ public class AudioPlayerBase
     }
     public void DestroyAudioAssetByPool(AudioAsset asset)
     {
+        UnloadClip(asset);
         audioAssetsPool.Enqueue(asset);
+        //string name = asset.assetName;
+        //asset.audioSource.clip = null;
+        //ResourceManager.UnLoad(name);
+        // GameObject.DestroyImmediate(asset.audioSource, true);
+        //Resources.UnloadAsset(asset.audioSource.clip);
     }
+    public void UnloadClip(AudioAsset asset)
+    {
+        if (asset.audioSource.clip != null)
+        {
+            string name = asset.assetName;
+            asset.audioSource.clip = null;
+            AssetsPoolManager.DestroyByPool(name);
+        }
+    }
+         
     protected void PlayClip(AudioAsset au, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f,float pitch =1)
     {
         //if (au.PlayState == AudioPlayState.Playing)
         //    au.Stop();
+        UnloadClip(au);
         au.assetName = audioName;
         AudioClip ac = GetAudioClip(au.assetName);
         au.audioSource.clip = ac;

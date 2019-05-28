@@ -19,7 +19,7 @@ public class NetworkVerificationImplement : PaymentVerificationInterface
         ResendMessageManager.AddResendMessage(msg, typeof(StoreBuyGoods2Client).Name,(resMsg)=>
         {
             StoreBuyGoods2Client e = (StoreBuyGoods2Client)resMsg;
-            PaymentVerificationManager.OnVerificationResult(e.code == 0, e.id, e.repeatReceipt);
+            PaymentVerificationManager.OnVerificationResult(e.code == 0, e.id, e.repeatReceipt,e.receipt);
         });
        // JsonMessageProcessingController.SendMessage(msg);
         Debug.Log(" 当前游戏服务器验证");

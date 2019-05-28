@@ -73,5 +73,20 @@ namespace FrameWork.SDKManager
 
         //Other相关参数
         public const string Other_FunctionName_Exit = "Exit";
+
+        public const string Other_FunctionName_CopyToClipboard = "CopyToClipboard";
+        public const string Other_FunctionName_CopyFromClipboard = "CopyFromClipboard";
+        public const string Other_ParameterName_Content = "Content";
+
+        //Other -> 热更新安装包
+        public const string Other_FunctionName_DownloadAPK = "DownloadAPK";
+        public const string Other_ParameterName_DownloadURL = "DownloadURL";
+        public const string Other_ParameterName_Progress = "Progress";
+        public const string Other_ParameterName_TotalProgress = "TotalProgress";
+
+        //Properties
+        public const string FileName_ChannelProperties = "Channel";
+
+        public const string PropertiesKey_UpdateDownLoadPath = "UpdateDownLoadPath"; //热更新下载地址
     }
 }

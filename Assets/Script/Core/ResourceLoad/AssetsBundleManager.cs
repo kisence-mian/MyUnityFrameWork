@@ -11,7 +11,7 @@ public static class AssetsBundleManager
 {
     //public const string c_AssetsBundlesExpandName = "assetBundle";
 
-    static Dictionary<string, Bundle> s_bundles        = new Dictionary<string, Bundle>();//所有包
+    public static Dictionary<string, Bundle> s_bundles        = new Dictionary<string, Bundle>();//所有包
 
 #if !UNITY_WEBGL
 
@@ -142,10 +142,18 @@ public static class AssetsBundleManager
     {
         if (s_bundles.ContainsKey(relyBundleName))
         {
-            Bundle tmp = s_bundles[relyBundleName];
-            tmp.relyCount++;
+            //加载站位中
+            if (s_bundles[relyBundleName] == null)
+            {
+                Debug.LogError("未实现的加载回调缓存！");
+            }
+            else
+            {
+                Bundle tmp = s_bundles[relyBundleName];
+                tmp.relyCount++;
 
-            callBack(LoadState.CompleteState, tmp);
+                callBack(LoadState.CompleteState, tmp);
+            }
         }
         else
         {
@@ -291,10 +299,18 @@ public static class AssetsBundleManager
         if (s_bundles.ContainsKey(bundleName))
         {
             string[] AllDependencies = s_bundles[bundleName].allDependencies;
-            //卸载依赖包
-            for (int i = 0; i < AllDependencies.Length; i++)
+
+            if(AllDependencies == null)
             {
-                UnLoadRelyBundle(AllDependencies[i]);
+                Debug.LogError("UnLoadBundle AllDependencies == null " + bundleName);
+            }
+            else
+            {
+                //卸载依赖包
+                for (int i = 0; i < AllDependencies.Length; i++)
+                {
+                    UnLoadRelyBundle(AllDependencies[i]);
+                }
             }
 
             s_bundles[bundleName].relyCount--;
@@ -302,7 +318,6 @@ public static class AssetsBundleManager
             //普通包也有可能被依赖
             if(s_bundles[bundleName].relyCount <=0)
             {
-                //这里不能执行Unload(true);
                 UnloadBundle(s_bundles[bundleName]);
                 s_bundles.Remove(bundleName);
             }
@@ -320,6 +335,11 @@ public static class AssetsBundleManager
         for (int i = 0; i < bundle.allAsset.Length; i++)
         {
             UnloadObject(bundle.allAsset[i]);
+        }
+
+        if(bundle.bundle!= null)
+        {
+            bundle.bundle.Unload(true);
         }
     }
 
@@ -379,7 +399,7 @@ public static class AssetsBundleManager
     static Bundle AddBundle(string bundleName, AssetBundle asset)
     {
         //Debug.Log("AddBundle " + bundleName);
-
+        Debug.LogWarning("Load ab====>" + bundleName);
         Bundle bundleTmp = new Bundle();
         string[] AllDependencies = AssetsManifestManager.GetAllDependencies(bundleName);
 
@@ -403,7 +423,10 @@ public static class AssetsBundleManager
 
             //延迟卸载资源，因为unity的资源卸载有时会异步
             Timer.DelayCallBack(5, (obj) => {
-                bundleTmp.bundle.Unload(false);
+                if(bundleTmp.bundle != null)
+                {
+                    bundleTmp.bundle.Unload(false);
+                }
             });
 
             //如果有缓存起来的回调这里一起回调
@@ -429,12 +452,14 @@ public static class AssetsBundleManager
 
     static Bundle AddRelyBundle(string relyBundleName, AssetBundle asset)
     {
+        Debug.LogWarning("Load ab====>" + relyBundleName);
         Bundle tmp = new Bundle();
 
         tmp.relyCount = 1;
         tmp.bundle = asset;
         tmp.mainAsset = asset.mainAsset;
         tmp.allAsset = asset.LoadAllAssets();
+        tmp.allDependencies = AssetsManifestManager.GetAllDependencies(relyBundleName);
 
         if (s_bundles.ContainsKey(relyBundleName))
         {
@@ -510,7 +535,15 @@ public class Bundle
             }
         }
 
-        throw new Exception("Bundle Load Exception : not find by " + typeof(T).Name  + " " + mainAsset.name + "->" + mainAsset.GetType().Name);
+        Debug.Log("mainAsset " + mainAsset + " allAsset " + allAsset.Length);
+        for (int i = 0; i < allAsset.Length; i++)
+        {
+            Debug.Log("allAsset " + allAsset[i].GetType());
+        }
+
+        return null;
+
+        //throw new Exception("Bundle Load Exception : not find by " + typeof(T).Name  + " " + mainAsset.name + "->" + mainAsset.GetType().Name);
     }
 
     public object Load(string name)

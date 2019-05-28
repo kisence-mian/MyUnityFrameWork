@@ -7,7 +7,8 @@ using UnityEngine;
 
 public class WXPayClass : PayInterface
 {
-
+    string goodsID;
+    string prepayID;
     GameObject androidListener;
     public override List<RuntimePlatform> GetPlatform()
     {
@@ -20,7 +21,9 @@ public class WXPayClass : PayInterface
     public override void Init()
     {
         Debug.LogWarning("=========WXPayClass Init===========");
+        SDKManagerNew.OnPayCallBack += SetPayResult;
         GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
+        //WXPayReSend.Instance.ReSendPay();
     }
 
     /// <summary>
@@ -30,6 +33,7 @@ public class WXPayClass : PayInterface
     /// <param name="args"></param>
     private void OnPrePay(PrePay2Client e, object[] args)
     {
+
         Debug.LogWarning("OnPrePay=========：" + e.prepay_id + "=partnerId==");
         DateTime dt1970 = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
@@ -39,6 +43,11 @@ public class WXPayClass : PayInterface
         string stringSignTemp = stringA + "&key=a8f73a2a5ecfafab1ea80515ef0efbad";
         string sign = MD5Tool.GetMD5FromString(stringSignTemp);
 
+        OnPayInfo onPayInfo = new OnPayInfo();
+        onPayInfo.isSuccess = true;
+        onPayInfo.goodsId = e.goodsID;
+        onPayInfo.storeName = StoreName.WX;
+        //WXPayReSend.Instance.AddPrePayID(onPayInfo);
         IndentListener(e.prepay_id,nonceStr, timeStamp, sign);
     }
 
@@ -51,6 +60,8 @@ public class WXPayClass : PayInterface
     /// <param name="orderID"></param>
     public override void Pay(string goodsID, string tag, FrameWork.SDKManager.GoodsType goodsType = FrameWork.SDKManager.GoodsType.NORMAL, string orderID = null)
     {
+        this.goodsID = goodsID;
+        
         Debug.LogWarning("send WXpay----message-----" + goodsID);
         //给服务器发消息1
         PrePay2Service.SendPrePayMsg(StoreName.WX, goodsID);
@@ -62,6 +73,8 @@ public class WXPayClass : PayInterface
     /// </summary>
     private void IndentListener(string prepayid, string nonceStr ,string timeStamp , string sign)
     {
+        this.prepayID = prepayid;
+
         string tag = prepayid + "|" + nonceStr + "|" + timeStamp + "|" + sign;
 
         SDKManagerNew.Pay("WeiXin.WeiXinSDK", prepayid, tag);
@@ -73,21 +86,24 @@ public class WXPayClass : PayInterface
     /// <param name="result"></param>
     /// <param name="goodID"></param>
     /// <param name="Mch_orderID"></param>
-    public void SetPayResult(string result,string goodID,string Mch_orderID)
+    public void SetPayResult(OnPayInfo info)
     {
-        Debug.LogWarning("wxPay Result======" + result);
+        Debug.LogWarning("wxPay Result======" + info.isSuccess);
 
         OnPayInfo payInfo = new OnPayInfo();
-        payInfo.isSuccess = (result == "0");
-        payInfo.goodsId = goodID;
-        payInfo.goodsType = GetGoodType(goodID);
-        payInfo.receipt = Mch_orderID;
+        payInfo.isSuccess = info.isSuccess;
+        payInfo.goodsId = goodsID;
+        payInfo.goodsType = GetGoodType(goodsID);
+        payInfo.receipt = prepayID;
         payInfo.storeName = StoreName.WX;
 
         PayCallBack(payInfo);
         
     }
 
-
+    public override void ConfirmPay(string goodsID, string tag)
+    {
+        //WXPayReSend.Instance.ClearPrePayID(tag);
+    }
 
 }

@@ -181,18 +181,6 @@ public class FileTool
         if (Path.HasExtension(name))
             name = Path.ChangeExtension(name, null);
         return name;
-
-
-        //int dirIndex = name.LastIndexOf(".");
-
-        //if (dirIndex != -1)
-        //{
-        //    return name.Remove(dirIndex);
-        //}
-        //else
-        //{
-        //    return name;
-         //}
     }
 
     public static string GetExpandName(string name)
@@ -212,6 +200,12 @@ public class FileTool
     {
         string[] paths = path.Split('/');
         return paths[paths.Length - 1];
+    }
+
+    public static string GetUpperPath(string path)
+    {
+        int index = path.LastIndexOf('/');
+        return path.Substring(0,index);
     }
 
     //修改文件名

@@ -61,20 +61,33 @@ public class PreloadManager:MonoBehaviour
         try
         {
             Type resType= ReflectionUtils.GetTypeByTypeFullName(da.m_ResType);
-            ResourceManager.LoadAsync(da.m_key,resType, (LoadState loadState, object loadRes) =>
-            {
-                if (loadState.isDone)
-                {
-                    if (loadRes != null && loadRes is GameObject)
+
+            //  object loadRes = AssetsPoolManager.Load(da.m_key);
+            AssetsPoolManager.LoadAsync(da.m_key, resType, (LoadState loadState, object loadRes) =>
+             {
+             if (loadState.isDone)
+             {
+
+                 if (loadRes != null )
                     {
-                        if (da.m_instantiateNum > 0)
+                        if (loadRes is GameObject )
                         {
                             GameObject prefab = (GameObject)loadRes;
+                            List<GameObject> resList = new List<GameObject>();
                             for (int i = 0; i < da.m_instantiateNum; i++)
                             {
-                                GameObject obj = GameObjectManager.CreateGameObject(prefab);
+                                GameObject obj = GameObjectManager.CreateGameObjectByPool(prefab);
+                                resList.Add(obj);
+                                
+                            }
+                            foreach (var obj in resList)
+                            {
                                 GameObjectManager.DestroyGameObjectByPool(obj, !da.m_createInstanceActive);
                             }
+                        }
+                        else
+                        {
+                            AssetsPoolManager.DestroyByPool(da.m_key);
                         }
                     }
                     else
@@ -87,7 +100,7 @@ public class PreloadManager:MonoBehaviour
                     RunCallBack();
                     LoadQueue();
                 }
-            });
+             });
         }
         catch (Exception e)
         {

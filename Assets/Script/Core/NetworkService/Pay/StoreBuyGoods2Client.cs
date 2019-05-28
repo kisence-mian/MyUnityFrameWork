@@ -9,6 +9,7 @@ public class StoreBuyGoods2Client : MessageClassInterface
     public int number;
     //是否是重复的凭据
     public bool repeatReceipt = false;
+    public string receipt;
 
     public  void DispatchMessage()
     {

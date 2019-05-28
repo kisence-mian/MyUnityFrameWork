@@ -89,7 +89,10 @@ public class AssetsManifestManager
             Initialize();
         }
 
-        return s_manifest.GetAllDependencies(bundleName);
+        string[] dep= s_manifest.GetAllDependencies(bundleName);
+        if (dep == null)
+            dep = new string[0];
+        return dep;
     }
 
     public static AssetBundleManifest GetManifest()

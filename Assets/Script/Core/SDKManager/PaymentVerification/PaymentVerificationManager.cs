@@ -28,7 +28,7 @@ public class PaymentVerificationManager
         }
         else
         {
-            OnVerificationResult(info.isSuccess, info.goodsId,false);
+            OnVerificationResult(info.isSuccess, info.goodsId,false,info.receipt);
         }
     }
     /// <summary>
@@ -37,16 +37,15 @@ public class PaymentVerificationManager
     /// <param name="isSucess">是否成功</param>
     /// <param name="goodID">物品ID</param>
     /// <param name="repeatReceipt">是否是重复的订单凭据</param>
-    public static void OnVerificationResult(bool isSucess,string goodID, bool repeatReceipt)
+    public static void OnVerificationResult(bool isSucess,string goodID, bool repeatReceipt,string receipt)
     {
         if (onVerificationResultCallBack != null)
         {
-
             onVerificationResultCallBack(isSucess, goodID);
         }
        
         if (isSucess || repeatReceipt)
-            SDKManager.ConfirmPay(goodID);
+            SDKManager.ConfirmPay(goodID, receipt);
         //验证成功
         if (!isSucess)
         {
