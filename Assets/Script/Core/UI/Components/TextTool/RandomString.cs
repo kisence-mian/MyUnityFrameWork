@@ -28,7 +28,7 @@ public class RandomString : MonoBehaviour {
             {
                 continue;
             }
-            string[] subString = ResourceManager.ReadTextFile(subStringList[i]).Split(splitChar);
+            string[] subString = AssetsPoolManager.ReadTextFile(subStringList[i]).Split(splitChar);
 
             subStringsData.Add(subStringList[i], subString);
         }

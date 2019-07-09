@@ -11,7 +11,7 @@ namespace FrameWork.SDKManager
         /// 验证回调，参数：string（商店名）,string（订单凭据，base64加密串）
         /// </summary>
         //public CallBack<StoreName, string> m_ConfirmCallBack;
-        protected List<PayProductDefinition> productDefinitions = new List<PayProductDefinition>();
+        protected List<LocalizedGoodsInfo> productDefinitions = new List<LocalizedGoodsInfo>();
         public virtual StoreName GetStoreName()
         {
             return StoreName.None;
@@ -20,7 +20,7 @@ namespace FrameWork.SDKManager
         {
             if (!string.IsNullOrEmpty(tag))
             {
-                productDefinitions = JsonUtils.FromJson<List<PayProductDefinition>>(tag);
+                productDefinitions = JsonUtils.FromJson<List<LocalizedGoodsInfo>>(tag);
             }
             ExtraInit();
         }
@@ -41,12 +41,20 @@ namespace FrameWork.SDKManager
 
         virtual public LocalizedGoodsInfo GetGoodsInfo(string goodsID)
         {
+            for (int i = 0; i < productDefinitions.Count; i++)
+            {
+                if(productDefinitions[i].goodsID == goodsID)
+                {
+                    return productDefinitions[i];
+                }
+            }
+
             return null;
         }
 
         virtual public List<LocalizedGoodsInfo> GetAllGoodsInfo()
         {
-            return null;
+            return productDefinitions;
         }
 
         public override void Init()
@@ -72,7 +80,7 @@ namespace FrameWork.SDKManager
             {
                 if (productDefinitions[i].goodsID == goodID)
                 {
-                    return productDefinitions[i].type;
+                    return productDefinitions[i].goodsType;
                 }
             }
 
@@ -92,6 +100,18 @@ namespace FrameWork.SDKManager
     /// </summary>
     public class LocalizedGoodsInfo
     {
+        public LocalizedGoodsInfo()
+        {
+        }
+        public LocalizedGoodsInfo(string goodsID, GoodsType goodsType, float price,string isoCurrencyCode = "CNY")
+        {
+            this.goodsID = goodsID;
+            this.goodsType = goodsType;
+            this.localizedPrice = price;
+
+            this.isoCurrencyCode = isoCurrencyCode; //默认人民币
+        }
+
         /// <summary>
         /// id
         /// </summary>
@@ -115,21 +135,11 @@ namespace FrameWork.SDKManager
         /// <summary>
         /// 价格
         /// </summary>
-        public decimal localizedPrice;
-    }
-    public class PayProductDefinition
-    {
-        public PayProductDefinition()
-        {
-        }
-        public PayProductDefinition(string goodsID, GoodsType type)
-        {
-            this.goodsID = goodsID;
-            this.type = type;
-        }
+        public float localizedPrice;
 
-        public string goodsID;
-        public GoodsType type;
-
+        /// <summary>
+        /// 商品类型
+        /// </summary>
+        public GoodsType goodsType;
     }
 }

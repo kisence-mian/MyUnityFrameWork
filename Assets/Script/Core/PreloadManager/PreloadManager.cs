@@ -40,7 +40,13 @@ public class PreloadManager:MonoBehaviour
         if (otherResList != null)
             queueRes.AddRange(otherResList);
 
-        queueRes.AddRange(configs);
+        foreach (var item in configs)
+        {
+            if (item.m_UseLoad)
+            {
+                queueRes.Add(item);
+            }
+        }
 
         count = queueRes.Count;
         currentNum = 0;
@@ -60,7 +66,8 @@ public class PreloadManager:MonoBehaviour
         //Debug.Log("da.m_key " + da.m_key);
         try
         {
-            Type resType= ReflectionUtils.GetTypeByTypeFullName(da.m_ResType);
+            string typeStr = da.m_ResType.ToString().Replace("_", ".");
+            Type resType= ReflectionUtils.GetTypeByTypeFullName(typeStr);
 
             //  object loadRes = AssetsPoolManager.Load(da.m_key);
             AssetsPoolManager.LoadAsync(da.m_key, resType, (LoadState loadState, object loadRes) =>
@@ -162,6 +169,20 @@ public class PreloadManager:MonoBehaviour
 
     private void Destroy()
     {
+        ;
+        ;
         Destroy(instance.gameObject);
     }
+}
+
+public enum ReloadResType
+{
+    UnityEngine_GameObject,
+    UnityEngine_Sprite,
+    UnityEngine_Texture2D,
+    UnityEngine_RenderTexture,
+    UnityEngine_AudioClip,
+    UnityEngine_Material,
+    UnityEngine_Shader,
+    UnityEngine_TextAsset,
 }

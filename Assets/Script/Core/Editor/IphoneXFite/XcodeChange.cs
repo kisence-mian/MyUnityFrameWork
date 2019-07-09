@@ -52,6 +52,7 @@ namespace UnityEditor.XCodeEditor
             if (beginIndex == -1)
             {
                 Debug.LogError(filePath + " not found sign in " + below);
+                Debug.LogError(text_all);
                 return;
             }
 

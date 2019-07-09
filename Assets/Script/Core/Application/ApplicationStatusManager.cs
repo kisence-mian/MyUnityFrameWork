@@ -74,6 +74,7 @@ public class ApplicationStatusManager
                 try
                 {
                     s_currentAppStatus.OnExitStatus();
+                    MemoryManager.FreeMemory();
                 }
                 catch (Exception e)
                 {
@@ -119,6 +120,9 @@ public class ApplicationStatusManager
                     UIManager.SetEventSystemEnable(true);
                     s_currentAppStatus.CloseAllUI(false);
                     s_currentAppStatus.OnExitStatus();
+
+                    MemoryManager.FreeMemory();
+
                     s_currentAppStatusName = statusName;
                     ApplicationManager.Instance.currentStatus = statusName;
 

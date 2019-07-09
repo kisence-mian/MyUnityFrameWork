@@ -22,7 +22,7 @@ public class UITextStyleManager
         string text = "";
         if (Application.isPlaying)
         {
-            text = ResourceManager.ReadTextFile(FileName);
+            text = AssetsPoolManager.ReadTextFile(FileName);
         }
         else
         {
@@ -92,7 +92,7 @@ public class UITextStyleManager
                 Debug.LogError("dont find font :" + data.fontName);
             }
             else
-                text.font = ResourceManager.Load<Font>(data.fontName);
+                text.font = AssetsPoolManager.Load<Font>(data.fontName);
             text.fontSize = data.fontSize;
             text.fontStyle = data.fontStyle;
             text.resizeTextForBestFit = data.bestFit;
@@ -113,7 +113,7 @@ public class UITextStyleManager
             Debug.LogError("dont find font :" + data.fontName);
         }
         else
-            text.font = ResourceManager.Load<Font>(data.fontName);
+            text.font = AssetsPoolManager.Load<Font>(data.fontName);
         text.fontSize = data.fontSize;
         text.fontStyle = data.fontStyle;
         text.resizeTextForBestFit = data.bestFit;

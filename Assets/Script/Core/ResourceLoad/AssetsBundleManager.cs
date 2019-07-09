@@ -21,18 +21,18 @@ public static class AssetsBundleManager
     /// <param name="name">bundle名</param>
     public static Bundle LoadBundle(string bundleName)
     {
-        string path = GetBundlePath(bundleName);
-
-        string[] AllDependencies = AssetsManifestManager.GetAllDependencies(bundleName);
-
-        //加载依赖包
-        for (int i = 0;i< AllDependencies.Length;i++ )
-        {
-            LoadRelyBundle(AllDependencies[i]);
-        }
-        
         if(!AssetsManifestManager.GetIsDependencies(bundleName))
         {
+            string path = GetBundlePath(bundleName);
+
+            string[] AllDependencies = AssetsManifestManager.GetAllDependencies(bundleName);
+
+            //加载依赖包
+            for (int i = 0; i < AllDependencies.Length; i++)
+            {
+                LoadRelyBundle(AllDependencies[i]);
+            }
+
             return AddBundle(bundleName, AssetBundle.LoadFromFile(path));
         }
         //如果这个包被别人依赖，则当做依赖包处理
@@ -47,10 +47,23 @@ public static class AssetsBundleManager
     {
         Bundle tmp = null;
 
+        string[] AllDependencies = AssetsManifestManager.GetAllDependencies(relyBundleName);
+
+        //加载依赖的依赖包
+        for (int i = 0; i < AllDependencies.Length; i++)
+        {
+            LoadRelyBundle(AllDependencies[i]);
+        }
+
         if (s_bundles.ContainsKey(relyBundleName))
         {
             tmp = s_bundles[relyBundleName];
             tmp.relyCount++;
+
+            if (relyBundleName.ToLower().Contains("_res/shader/card_rely"))
+            {
+                Debug.LogWarning("LoadRelyBundle " + relyBundleName + " relyCount :" + s_bundles[relyBundleName].relyCount);
+            }
         }
         else
         {
@@ -300,17 +313,10 @@ public static class AssetsBundleManager
         {
             string[] AllDependencies = s_bundles[bundleName].allDependencies;
 
-            if(AllDependencies == null)
+            //卸载依赖包
+            for (int i = 0; i < AllDependencies.Length; i++)
             {
-                Debug.LogError("UnLoadBundle AllDependencies == null " + bundleName);
-            }
-            else
-            {
-                //卸载依赖包
-                for (int i = 0; i < AllDependencies.Length; i++)
-                {
-                    UnLoadRelyBundle(AllDependencies[i]);
-                }
+                UnLoadRelyBundle(AllDependencies[i]);
             }
 
             s_bundles[bundleName].relyCount--;
@@ -318,8 +324,8 @@ public static class AssetsBundleManager
             //普通包也有可能被依赖
             if(s_bundles[bundleName].relyCount <=0)
             {
-                UnloadBundle(s_bundles[bundleName]);
-                s_bundles.Remove(bundleName);
+                if (UnloadBundle(s_bundles[bundleName]))
+                    s_bundles.Remove(bundleName);
             }
         }
         else
@@ -328,26 +334,41 @@ public static class AssetsBundleManager
         }
     }
 
-    static void UnloadBundle(Bundle bundle)
+    static bool UnloadBundle(Bundle bundle)
     {
-        UnloadObject(bundle.mainAsset);
-
+        //UnloadObject(bundle.mainAsset);
+        bool canUnload = true;
         for (int i = 0; i < bundle.allAsset.Length; i++)
         {
-            UnloadObject(bundle.allAsset[i]);
+           bool state =  UnloadObject(bundle.allAsset[i]);
+            if (canUnload)
+            {
+                canUnload = state;
+            }
+            else
+            {
+                break;
+            }
         }
 
-        if(bundle.bundle!= null)
+        if(canUnload && bundle.bundle!= null)
         {
             bundle.bundle.Unload(true);
         }
+        return canUnload;
     }
 
-    static void UnloadObject(UnityEngine.Object obj)
+    static bool UnloadObject(UnityEngine.Object obj)
     {
-        if(obj == null)
+       
+        if (obj == null)
         {
-            return;
+            return true;
+        }
+        //Debug.Log("UnloadObject " + obj.GetType()+" :"+obj.name);
+        if (obj is Shader)
+        {
+            return false;
         }
 
         if (!(obj is GameObject)
@@ -367,6 +388,7 @@ public static class AssetsBundleManager
             AssetBundle ab = (AssetBundle)obj;
             ab.Unload(true);
         }
+        return true;
     }
 
     /// <summary>
@@ -380,14 +402,32 @@ public static class AssetsBundleManager
             return;
         }
 
+        //if (relyBundleName.Contains("res_models"))
+        //{
+        //    Debug.Log("UnLoadRelyBundle " + relyBundleName);
+        //}
+
+        string[] AllDependencies = AssetsManifestManager.GetAllDependencies(relyBundleName);
+
+        //卸载依赖的依赖包
+        for (int i = 0; i < AllDependencies.Length; i++)
+        {
+            UnLoadRelyBundle(AllDependencies[i]);
+        }
+
         if (s_bundles.ContainsKey(relyBundleName))
         {
+            if(relyBundleName.ToLower().Contains("card_black"))
+            {
+                Debug.LogWarning("UnLoadRelyBundle " + relyBundleName + " relyCount :" + s_bundles[relyBundleName].relyCount);
+            }
+
             s_bundles[relyBundleName].relyCount --;
 
             if (s_bundles[relyBundleName].relyCount <=0)
             {
-                s_bundles[relyBundleName].bundle.Unload(true);
-                s_bundles.Remove(relyBundleName);
+                if (UnloadBundle(s_bundles[relyBundleName]))
+                    s_bundles.Remove(relyBundleName);
             }
         }
         else
@@ -398,14 +438,13 @@ public static class AssetsBundleManager
 
     static Bundle AddBundle(string bundleName, AssetBundle asset)
     {
-        //Debug.Log("AddBundle " + bundleName);
-        Debug.LogWarning("Load ab====>" + bundleName);
         Bundle bundleTmp = new Bundle();
         string[] AllDependencies = AssetsManifestManager.GetAllDependencies(bundleName);
 
         if (s_bundles.ContainsKey(bundleName))
         {
             s_bundles[bundleName] = bundleTmp;
+            s_bundles[bundleName].relyCount++;
         }
         else
         {
@@ -420,6 +459,7 @@ public static class AssetsBundleManager
             bundleTmp.bundle.name = bundleName;
             bundleTmp.mainAsset = asset.mainAsset;
             bundleTmp.allAsset = bundleTmp.bundle.LoadAllAssets();
+            bundleTmp.relyCount = 1;
 
             //延迟卸载资源，因为unity的资源卸载有时会异步
             Timer.DelayCallBack(5, (obj) => {
@@ -452,22 +492,35 @@ public static class AssetsBundleManager
 
     static Bundle AddRelyBundle(string relyBundleName, AssetBundle asset)
     {
-        Debug.LogWarning("Load ab====>" + relyBundleName);
         Bundle tmp = new Bundle();
 
-        tmp.relyCount = 1;
         tmp.bundle = asset;
         tmp.mainAsset = asset.mainAsset;
         tmp.allAsset = asset.LoadAllAssets();
         tmp.allDependencies = AssetsManifestManager.GetAllDependencies(relyBundleName);
 
+        //if(relyBundleName.Contains("res_models"))
+        //{
+        //    for (int i = 0; i < tmp.allAsset.Length; i++)
+        //    {
+        //        Debug.Log("allAsset " + tmp.allAsset[i]);
+        //    }
+        //}
+
         if (s_bundles.ContainsKey(relyBundleName))
         {
             s_bundles[relyBundleName] = tmp;
+            tmp.relyCount ++;
         }
         else
         {
             s_bundles.Add(relyBundleName, tmp);
+            tmp.relyCount = 1;
+        }
+
+        if (relyBundleName.ToLower().Contains("card_black"))
+        {
+            Debug.LogWarning("AddRelyBundle " + relyBundleName + " relyCount :" + s_bundles[relyBundleName].relyCount);
         }
 
         if (tmp.bundle == null)
@@ -535,11 +588,11 @@ public class Bundle
             }
         }
 
-        Debug.Log("mainAsset " + mainAsset + " allAsset " + allAsset.Length);
-        for (int i = 0; i < allAsset.Length; i++)
-        {
-            Debug.Log("allAsset " + allAsset[i].GetType());
-        }
+        //Debug.Log("mainAsset " + mainAsset + " allAsset " + allAsset.Length);
+        //for (int i = 0; i < allAsset.Length; i++)
+        //{
+        //    Debug.Log("allAsset " + allAsset[i].GetType());
+        //}
 
         return null;
 

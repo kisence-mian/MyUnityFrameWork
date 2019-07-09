@@ -13,7 +13,7 @@ namespace FrameWork.GuideSystem
 
         protected Image m_mask;
         protected Text m_TipText;
-        protected RectTransform m_TipTransfrom;
+        public RectTransform m_TipTransfrom;
 
         public override void OnOpen()
         {

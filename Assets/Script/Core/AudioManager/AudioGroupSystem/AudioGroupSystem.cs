@@ -108,7 +108,7 @@ public class AudioGroupSystem :MonoBehaviour
         GameObject obj = new GameObject("[AudioGroupSystem]");
         instance = obj.AddComponent<AudioGroupSystem>();
 
-        TextAsset asset = ResourceManager.Load<TextAsset>(ConfigName);
+        TextAsset asset = AssetsPoolManager.Load<TextAsset>(ConfigName);
 
         List<AudioGroupData> datas = JsonUtils.FromJson<List<AudioGroupData>>(asset.text);
         audioGroupDataDic.Clear();
@@ -163,7 +163,7 @@ public class AudioGroupSystem :MonoBehaviour
                 MusicPlayData musicPlayData = item.Excute();
                 if (musicPlayData != null)
                 {
-                    Debug.Log("currentAudioGroupData: " + currentAudioGroupData.keyName+ " Play MusicPlayData: " + musicPlayData.name);
+                    //Debug.Log("currentAudioGroupData: " + currentAudioGroupData.keyName+ " Play MusicPlayData: " + musicPlayData.name);
                     PlayMusicData(musicPlayData,item.flag);
                 }
             }

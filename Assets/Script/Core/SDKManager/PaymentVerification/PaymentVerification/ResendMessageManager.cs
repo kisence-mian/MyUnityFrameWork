@@ -26,11 +26,7 @@ public class ResendMessageManager
 
     private static void MessageReceiveCallBack(InputNetworkMessageEvent inputEvent)
     {
-        //心跳包
-        if (inputEvent.m_MessgaeType == "HB")
-        {
-            return;
-        }
+
         if (msgs.Count == 0)
             return;
         foreach(ResendMessage m in msgs)
@@ -97,18 +93,39 @@ public class ResendMessageManager
         tempResendTime = resendTime;
         foreach (ResendMessage m in msgs)
         {
+            if (m.noSend)
+                continue;
             JsonMessageProcessingController.SendMessage(m.mt, m.content);
         }
     }
     static List<ResendMessage> msgs = new List<ResendMessage>();
 
 
-    public static void AddResendMessage<T>(T data,string removeMT,CallBack<MessageClassInterface> callBack)
+    public static void AddResendMessage<T>(T data,string removeMT,CallBack<MessageClassInterface> callBack, bool noSend=false)
     {
         string mt = typeof(T).Name;
-        string content = JsonUtils.ToJson(data); //Serializer.Serialize(data);
-        ResendMessage msg = new ResendMessage(removeMT, mt, content,callBack);
-        msgs.Add(msg);
+        ResendMessage msgResnd = null;
+        foreach (ResendMessage m in msgs)
+        {
+            if (m.mt == mt)
+            {
+                msgResnd = m;
+                break;
+            }
+        }
+            string content = JsonUtils.ToJson(data);
+        if (msgResnd != null)
+        {
+            msgResnd.removeMT = removeMT;
+            msgResnd.content = content;
+            msgResnd.callBack = callBack;
+            msgResnd.noSend = noSend;
+        }
+        else
+        {
+            ResendMessage msg = new ResendMessage(removeMT, mt, content, callBack, noSend);
+            msgs.Add(msg);
+        }
        // JsonMessageProcessingController.SendMessage(mt, content);
         //indexCode++;
     }
@@ -118,14 +135,19 @@ public class ResendMessageManager
         public string removeMT;
         public string mt;
         public string content;
+        /// <summary>
+        /// 不发消息（也不重发），只监听接收
+        /// </summary>
+        public bool noSend = false;
         public CallBack<MessageClassInterface> callBack;
         public ResendMessage() { }
-        public ResendMessage(string removeMT, string mt, string content,CallBack<MessageClassInterface> callBack)
+        public ResendMessage(string removeMT, string mt, string content,CallBack<MessageClassInterface> callBack, bool noSend)
         {
             this.removeMT = removeMT;
             this.mt = mt;
             this.content = content;
             this.callBack = callBack;
+            this.noSend = noSend;
         }
     }
 }

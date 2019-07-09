@@ -205,7 +205,15 @@ public class FileTool
     public static string GetUpperPath(string path)
     {
         int index = path.LastIndexOf('/');
-        return path.Substring(0,index);
+
+        if(index != -1)
+        {
+            return path.Substring(0, index);
+        }
+        else
+        {
+            return "";
+        }
     }
 
     //修改文件名

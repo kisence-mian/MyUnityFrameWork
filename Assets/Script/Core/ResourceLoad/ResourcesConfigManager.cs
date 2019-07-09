@@ -64,28 +64,25 @@ public static class ResourcesConfigManager
         else
         {
             ResLoadLocation type = ResLoadLocation.Streaming;
-
-            if (RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(c_ManifestFileName, "null") != "null")
+            if (RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(c_ManifestFileName.ToLower(), "null") != "null")
             {
                 Debug.Log("LoadResourceConfig 读取沙盒路径");
 
                 type = ResLoadLocation.Persistent;
                 //更新资源存放在Application.persistentDataPath+"/Resources/"目录下
                 string persistentPath = PathTool.GetAssetsBundlePersistentPath() + c_ManifestFileName.ToLower();
-
+  
                 AssetBundle ab = AssetBundle.LoadFromFile(persistentPath);
 
-                TextAsset text = (TextAsset)ab.mainAsset;
+                TextAsset text = (TextAsset)ab.LoadAsset<TextAsset>(c_ManifestFileName);
                 data = text.text;
+
             }
             else
             {
                 //Debug.Log("LoadResourceConfig 读取stream路径");
 
                 string path = PathTool.GetAbsolutePath(type, c_ManifestFileName.ToLower());
-
-                //Debug.Log(path);
-
                 AssetBundle ab = AssetBundle.LoadFromFile(path);
 
                 TextAsset text = ab.LoadAsset<TextAsset>(c_ManifestFileName);
@@ -175,13 +172,20 @@ public static class ResourcesConfigManager
                 sd.Add(c_MainKey, fileName.ToLower());
                 sd.Add(c_PathKey, relativePath.ToLower());
 
-                if(!data.ContainsKey(fileName.ToLower()))
+                if(fileName.Contains(" "))
                 {
-                    data.AddData(sd);
+                    Debug.LogError("文件名中有空格！ ->" + fileName + "<-");
                 }
                 else
                 {
-                    Debug.LogError("GenerateResourcesConfig error 存在重名文件！" + relativePath);
+                    if (!data.ContainsKey(fileName.ToLower()))
+                    {
+                        data.AddData(sd);
+                    }
+                    else
+                    {
+                        Debug.LogError("GenerateResourcesConfig error 存在重名文件！" + relativePath);
+                    }
                 }
             }
         }

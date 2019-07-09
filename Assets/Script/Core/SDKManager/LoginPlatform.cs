@@ -36,6 +36,22 @@ public enum LoginPlatform
     /// 苹果
     /// </summary>
     Apple,
-    
+    /// <summary>
+    /// 脸书
+    /// </summary>
+    FaceBook,
+    /// <summary>
+    /// 4399
+    /// </summary>
+    m4399,
+    /// <summary>
+    /// OPPO
+    /// </summary>
+    OPPO,
+    /// <summary>
+    /// VIVO
+    /// </summary>
+    VIVO,
+
 }
 

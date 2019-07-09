@@ -59,6 +59,15 @@ public class MemoryManager
     }
 
     /// <summary>
+    /// 低内存机型
+    /// </summary>
+    /// <returns></returns>
+    public static bool IsLowMachine()
+    {
+        return AssetRecycleLevelController.NowRecycleLevel < AssetRecycleLevel.Level3000;
+    }
+
+    /// <summary>
     /// 释放内存
     /// </summary>
     public static void FreeMemory()
@@ -66,17 +75,20 @@ public class MemoryManager
         GlobalEvent.DispatchEvent(MemoryEvent.FreeMemory);
         //清空缓存的UI
         UIManager.DestroyAllHideUI();
-        //清空对象池
-        GameObjectManager.CleanPool(true);
-
+        if (IsLowMachine())
+        {
+            //清空对象池
+            GameObjectManager.CleanPool();
+        }
+        LanguageManager.Release();
         //GameObjectManager.CleanPool_New();
 
-        AssetsPoolManager.Dispose();
+       // AssetsPoolManager.DisposeAll();
 
         FreeHeapMemory();
         Resources.UnloadUnusedAssets();
         //GC
-        //GC.Collect();
+        GC.Collect();
     }
 
     /// <summary>
@@ -87,6 +99,7 @@ public class MemoryManager
         DataManager.CleanCache();
         ConfigManager.CleanCache();
         RecordManager.CleanCache();
+
     }
 
     public static void LoadRes(List<string> resList,LoadProgressCallBack callBack)
@@ -104,16 +117,16 @@ public class MemoryManager
         }
     }
 
-    public static void UnLoadRes(List<string> resList)
-    {
-        if (ResourceManager.m_gameLoadType != ResLoadLocation.Resource)
-        {
-            for (int i = 0; i < resList.Count; i++)
-            {
-                ResourceManager.UnLoad(resList[i]);
-            }
-        }
-    }
+    //public static void UnLoadRes(List<string> resList)
+    //{
+    //    if (ResourceManager.m_gameLoadType != ResLoadLocation.Resource)
+    //    {
+    //        for (int i = 0; i < resList.Count; i++)
+    //        {
+    //            ResourceManager.UnLoad(resList[i]);
+    //        }
+    //    }
+    //}
 
     #region 资源加载
 

@@ -976,7 +976,7 @@ public class BundleConfigEditorWindow : EditorWindow
         Selection.objects = EditorUtility.CollectDependencies(roots);
     }
 
-    [MenuItem("Window/打包设置编辑器 &1")]
+    [MenuItem("Window/打包设置编辑器 &9")]
 
     public static void ShowWindow()
     {

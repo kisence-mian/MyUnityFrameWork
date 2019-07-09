@@ -25,7 +25,8 @@ public class ImageLoadComponent : MonoBehaviour {
         Image image = GetComponent<Image>();
         if (image)
         {
-            UGUITool.SetImageSprite(image, iconName);
+            if (!string.IsNullOrEmpty(iconName))
+                UGUITool.SetImageSprite(image, iconName);
         }
         else
         {
@@ -35,7 +36,8 @@ public class ImageLoadComponent : MonoBehaviour {
     }
     private void OnDestroy()
     {
-        AssetsPoolManager.DestroyByPool(iconName);
+        if (!string.IsNullOrEmpty(iconName))
+            AssetsPoolManager.DestroyByPool(iconName);
     }
 
 }

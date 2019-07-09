@@ -32,7 +32,11 @@ public class LoginGameController
         ResendMessageManager.Init();
         AutoReconnectController.EndReconnect += OnEndReconnect;
         AutoReconnectController.Init();
+        ApplicationManager.s_OnApplicationUpdate += LogonUpdate;
     }
+
+
+
     /// <summary>
     /// 登录
     /// </summary>
@@ -60,6 +64,39 @@ public class LoginGameController
         UserLogout2Server msg = new UserLogout2Server();
         JsonMessageProcessingController.SendMessage(msg);
     }
+
+    #region 消息重发
+    const float c_reSendTimer = 3; //重发间隔
+
+
+    static float reSendTimer = 0;
+
+    /// <summary>
+    /// 按时重发登录消息
+    /// </summary>
+    private static void LogonUpdate()
+    {
+        if (isLogin)
+        {
+            return;
+        }
+        if (reSendTimer > 0)
+        {
+            reSendTimer -= Time.deltaTime;
+
+            if (reSendTimer < 0)
+            {
+                SendLoginMsg(loginMsg);
+            }
+
+        }
+
+
+    }
+
+
+    #endregion
+
 
     #region 消息返回
     private static void OnUserLogoutEvent(UserLogout2Client e, object[] args)
@@ -91,9 +128,9 @@ public class LoginGameController
             return;
         ResendMessageManager.startResend = true;
         loginMsg.typeKey = e.typeKey;
+
+        SDKManager.LogLogin(e.user.userID);
     }
-
-
 
     private static void SDKLoginCallBack(OnLoginInfo info)
     {
@@ -118,7 +155,8 @@ public class LoginGameController
     /// <param name="msg"></param>
     private static void SendLoginMsg(UserLogin2Server msg = null)
     {
-       bool reLoginState = false;
+        reSendTimer = c_reSendTimer;
+        bool reLoginState = false;
         if (msg != null)
             loginMsg = msg;
         else
@@ -127,7 +165,8 @@ public class LoginGameController
                 return;
             else
             {
-                reLoginState = true;
+                if (isLogin)
+                    reLoginState = true;
             }
         }
         loginMsg.reloginState = reLoginState;

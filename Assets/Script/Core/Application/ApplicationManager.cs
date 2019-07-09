@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using FrameWork.SDKManager;
 
 public class ApplicationManager : MonoBehaviour 
 {
@@ -111,8 +112,11 @@ public class ApplicationManager : MonoBehaviour
     public void AppLaunch()
     {
         DontDestroyOnLoad(gameObject);
+        Application.runInBackground = true;
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         SetResourceLoadType();               //设置资源加载类型
-        //ResourcesConfigManager.Initialize(); //资源路径管理器启动
+
         AudioPlayManager.Init();
         MemoryManager.Init();                //内存管理初始化
         Timer.Init();                        //计时器启动
@@ -126,6 +130,8 @@ public class ApplicationManager : MonoBehaviour
 
         ApplicationStatusManager.Init();     //游戏流程状态机初始化
         GlobalLogicManager.Init();           //初始化全局逻辑
+
+        SDKManager.Init();                   //初始化SDKManger
 
         if (AppMode != AppMode.Release)
         {
@@ -167,6 +173,8 @@ public class ApplicationManager : MonoBehaviour
 
     void OnApplicationQuit()
     {
+        Debug.Log("ApplicationManager OnApplicationQuit ");
+
         if (s_OnApplicationQuit != null)
         {
             try

@@ -98,6 +98,11 @@ public class AudioPlayerBase
          
     protected void PlayClip(AudioAsset au, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f,float pitch =1)
     {
+        if (!ResourcesConfigManager.GetIsExitRes(audioName))
+        {
+            Debug.LogError("不存在音频：" + audioName);
+            return;
+        }
         //if (au.PlayState == AudioPlayState.Playing)
         //    au.Stop();
         UnloadClip(au);

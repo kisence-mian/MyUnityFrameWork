@@ -35,7 +35,7 @@ public class UIManager : MonoBehaviour
 
             if (instance == null)
             {
-                instance = GameObjectManager.CreateGameObject("UIManager");
+                instance = GameObjectManager.CreateGameObjectByPool("UIManager");
             }
 
             UIManagerGo = instance;
@@ -53,21 +53,21 @@ public class UIManager : MonoBehaviour
     }
 
     ///异步加载UIMnager
-    public static void InitAsync()
-    {
-        GameObject instance = GameObject.Find("UIManager");
+    //public static void InitAsync()
+    //{
+    //    GameObject instance = GameObject.Find("UIManager");
 
-        if (instance == null)
-        {
-            GameObjectManager.CreateGameObjectByPoolAsync("UIManager",(obj)=> {
-                SetUIManager(obj);
-            });
-        }
-        else
-        {
-            SetUIManager(instance);
-        }
-    }
+    //    if (instance == null)
+    //    {
+    //        GameObjectManager.CreateGameObjectByPoolAsync("UIManager",(obj)=> {
+    //            SetUIManager(obj);
+    //        });
+    //    }
+    //    else
+    //    {
+    //        SetUIManager(instance);
+    //    }
+    //}
 
     static void SetUIManager(GameObject instance)
     {
@@ -830,12 +830,12 @@ public class UIManager : MonoBehaviour
 
     public enum UIType
     {
-        GameUI,
+        GameUI=0,
 
-        Fixed,
-        Normal,
-        TopBar,
-        PopUp
+        Fixed=1,
+        Normal=2,
+        TopBar=3,
+        PopUp=4,
     }
 
     public enum UIEvent

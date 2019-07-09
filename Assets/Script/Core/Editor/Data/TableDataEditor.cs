@@ -1044,7 +1044,7 @@ public class TableDataEditor
             //ResourcesConfigManager.Initialize();
             if (ResourcesConfigManager.GetIsExitRes(content))
             {
-                GameObject obj = ResourceManager.Load<GameObject>(content);
+                GameObject obj = AssetsPoolManager.Load<GameObject>(content);
                 if (obj)
                 {
 
@@ -1103,7 +1103,7 @@ public class TableDataEditor
             //ResourcesConfigManager.Initialize();
             if (ResourcesConfigManager.GetIsExitRes(content))
             {
-                Texture2D obj = ResourceManager.Load<Texture2D>(content);
+                Texture2D obj = AssetsPoolManager.Load<Texture2D>(content);
                 if (obj)
                 {
 

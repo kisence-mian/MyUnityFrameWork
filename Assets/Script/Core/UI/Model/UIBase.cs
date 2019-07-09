@@ -729,7 +729,7 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
     #region 创建对象
 
-    List<UIBase> m_ChildList = new List<UIBase>();
+   protected List<UIBase> m_ChildList = new List<UIBase>();
     int m_childUIIndex = 0;
     public UIBase CreateItem(string itemName, GameObject parent, bool isActive)
     {
@@ -984,15 +984,23 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     }
 
     #endregion
+
     #region 动态加载Sprite赋值
     private Dictionary<string, int> loadSpriteNames = new Dictionary<string, int>();
     public void SetImageSprite(Image img, string name, bool is_nativesize = false)
     {
-        UGUITool.SetImageSprite(img, name, is_nativesize);
-        if (!loadSpriteNames.ContainsKey(name))
-            loadSpriteNames.Add(name, 1);
+        if(ResourceManager.GetResourceIsExist(name))
+        {
+            UGUITool.SetImageSprite(img, name, is_nativesize);
+            if (!loadSpriteNames.ContainsKey(name))
+                loadSpriteNames.Add(name, 1);
+            else
+                loadSpriteNames[name]++;
+        }
         else
-            loadSpriteNames[name]++;
+        {
+            Debug.LogError("SetImageSprite 资源不存在! ->" + name + "<-");
+        }
     }
 
     private void ClearLoadSprite()
@@ -1000,10 +1008,9 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         foreach (var item in loadSpriteNames)
         {
             int num = item.Value;
-            for (int i = 0; i < num; i++)
-            {
-                AssetsPoolManager.DestroyByPool(item.Key);
-            }
+            //Debug.Log("UIBase 回收图片：" + item.Key + ":" + num);
+                AssetsPoolManager.DestroyByPool(item.Key,num);
+            
            
         }
         loadSpriteNames.Clear();
@@ -1141,7 +1148,7 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         return obj;
     }
     /// <summary>
-    /// 新手引导获得动态创建Item  格式为：PetItem[0].Use（PetItem的Item上挂有UIBase脚本， [0] 第几个Item，Use：拖到PetItem上的GameObject）
+    /// 新手引导获得动态创建Item  格式为：PetItem[0].Use（PetItem的Item上挂有UIBase脚本， [0] 该名字的第几个Item，Use：拖到PetItem上的GameObject）
     /// </summary>
     /// <param name="itemName"></param>
     /// <returns></returns>
@@ -1188,15 +1195,28 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
             if (strArr.Length > 1)
             {
                 childName = strArr[1];
+                Debug.Log("childName:" + childName);
                 if (childName.Contains("["))
                 {
-                    childName = itemName.Replace(firstName + ".", "");
-
+                    childName = itemName.Replace(strArr[0] + ".", "");
+                    Debug.Log("childName:" + childName);
                     obj = uIBase.GetGuideDynamicCreateItem(childName);
                 }
                 else
                 {
-                    obj= uIBase.GetGameObject(childName);
+                  string afterNames=  itemName.Replace(strArr[0] + ".", "");
+                    strArr = afterNames.Split('.');
+                    Debug.Log("afterNames :" + afterNames + "  UIBase:" + GetType().Name);
+                    for (int i = 0; i < strArr.Length; i++)
+                    {
+                        string findName = strArr[i];
+                        obj = uIBase.GetGameObject(findName);
+                        if (i < strArr[i].Length - 1)
+                        {
+                            uIBase = obj.GetComponent<UIBase>();
+                        }
+                    }
+                       
                 }
             }
         }

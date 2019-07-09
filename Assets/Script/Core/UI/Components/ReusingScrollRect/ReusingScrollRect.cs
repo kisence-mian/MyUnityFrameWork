@@ -36,7 +36,7 @@ public class ReusingScrollRect : ScrollRectInput
         UpdateBound();
         SetLayout();
 
-        m_itemPrefab = ResourceManager.Load<GameObject>(m_ItemName);
+        m_itemPrefab = GameObjectManager.CreateGameObjectByPool(m_ItemName);
         m_itemSize = m_itemPrefab.GetComponent<RectTransform>().sizeDelta;
     }
 

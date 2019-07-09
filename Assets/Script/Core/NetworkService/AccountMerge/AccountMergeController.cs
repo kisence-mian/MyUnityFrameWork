@@ -153,7 +153,7 @@ public class AccountMergeController
         }
         else
         {
-           
+           //sdk登录失败
             if (OnConfirmMergeExistAccountCallback != null)
             {
                 ConfirmMergeExistAccount2Client msg = new ConfirmMergeExistAccount2Client();

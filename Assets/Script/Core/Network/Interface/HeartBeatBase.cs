@@ -1,14 +1,31 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 public abstract class HeartBeatBase
 {
+    public const string c_HeartBeatMT = "HB";
+    /// <summary>
+    /// 接收线程循环间隔时间（毫秒）
+    /// </summary>
+    public const int ReciveThreadSleepTime = 100;
+    public const int SendThreadSleepTime = 100;
     #region 属性
     private float m_heatBeatSendSpaceTime = 3f;
 
     private float m_sendHeatBeatTimer;
     private float m_receviceHeatBeatTimer;
+
+    /// <summary>
+    /// 接收心跳包消息线程
+    /// </summary>
+    private Thread reciveHBThread;
+    /// <summary>
+    /// 发送心跳包线程
+    /// </summary>
+    private Thread sendHBThread;
 
     /// <summary>
     /// 设置心跳包发送间隔时间
@@ -34,81 +51,120 @@ public abstract class HeartBeatBase
     public virtual void Init(int spaceTime)
     {
         HeatBeatSendSpaceTime = spaceTime;
-
         ResetReceviceTimer();
         ResetSendTimer();
 
-        InputManager.AddListener<InputNetworkMessageEvent>("HB",ReceviceMessage);
-        InputManager.AddListener<InputNetworkConnectStatusEvent>(ReceviceConnectStatus);
+        reciveHBThread = new Thread(ReciveHBDealThread);
+        reciveHBThread.Start();
+        sendHBThread = new Thread(SendHBDealThread);
+        sendHBThread.Start();
     }
+
+    private void SendHBDealThread()
+    {
+        while (true)
+        {
+            if (NetworkManager.IsConnect)
+            {
+                //定时发送心跳包
+                if (m_sendHeatBeatTimer <= 0)
+                {
+                    ResetSendTimer();
+                    SendHeartBeatMessage();
+                }
+                else
+                {
+                    m_sendHeatBeatTimer -= SendThreadSleepTime;
+                }
+            }
+            else
+            {
+                ResetSendTimer();
+            }
+            Thread.Sleep(SendThreadSleepTime);
+        }
+    }
+
+    private void ReciveHBDealThread()
+    {
+        while (true)
+        {
+            if (NetworkManager.IsConnect)
+            {
+                NetWorkMessage msg = NetworkManager.GetHeartBeatMessage();
+
+                if (!string.IsNullOrEmpty(msg.m_MessageType))
+                {
+                    ResetReceviceTimer();
+                }
+                else
+                {
+                    m_receviceHeatBeatTimer -= ReciveThreadSleepTime;
+                }
+                //长期没收到服务器返回认为断线
+                if (m_receviceHeatBeatTimer <= 0)
+                {
+                    Debug.Log("HeartBeat Break connect");
+                    NetworkManager.DisConnect();
+                }
+
+            }
+            else
+            {
+                ResetReceviceTimer();
+            }
+            Thread.Sleep(ReciveThreadSleepTime);
+
+        }
+    } 
 
     public virtual void Dispose()
     {
-        InputManager.RemoveListener<InputNetworkMessageEvent>("HB",ReceviceMessage);
-        InputManager.RemoveListener<InputNetworkConnectStatusEvent>(ReceviceConnectStatus);
+        if (reciveHBThread != null)
+        {
+            reciveHBThread.Abort();
+        }
+        if (sendHBThread != null)
+        {
+            sendHBThread.Abort();
+        }
     }
 
     #endregion
 
     #region 重载方法
-
+    /// <summary>
+    /// 判断消息是否是心跳包消息
+    /// </summary>
+    /// <param name="msg"></param>
+    /// <returns></returns>
+    public virtual bool IsHeartBeatMessage(NetWorkMessage msg)
+    {
+        if (msg.m_MessageType == null)
+            return false;
+        if(msg.m_MessageType == c_HeartBeatMT)
+        {
+            return true;
+        }
+        return false;
+    }
     protected virtual void SendHeartBeatMessage()
     {
         //Debug.Log("SendHeartBeatMessage");
-        NetworkManager.SendMessage("HB", new Dictionary<string, object>());
+        NetworkManager.SendMessage(c_HeartBeatMT, new Dictionary<string, object>());
     }
 
-    protected virtual void ReceviceMessage(InputNetworkMessageEvent e)
-    {
-        if(e.m_MessgaeType == "HB")
-        {
-            //Debug.Log("Recevice HB");
-            ResetReceviceTimer();
-        }
-    }
-
-    protected virtual void ReceviceConnectStatus(InputNetworkConnectStatusEvent e)
-    {
-        if(e.m_status == NetworkState.Connected)
-        {
-            ResetSendTimer();
-            ResetReceviceTimer();
-        }
-    }
 
     #endregion
 
     #region Update
-
-    public void Update()
-    {
-        m_sendHeatBeatTimer -= Time.unscaledDeltaTime;
-        m_receviceHeatBeatTimer -= Time.unscaledDeltaTime;
-
-        //Debug.Log("m_receviceHeatBeatTimer " + m_receviceHeatBeatTimer);
-        //Debug.Log("m_sendHeatBeatTimer " + m_sendHeatBeatTimer);
-
-        //定时发送心跳包
-        if (m_sendHeatBeatTimer <= 0)
-        {
-            ResetSendTimer();
-            SendHeartBeatMessage();
-        }
-
-        //长期没收到服务器返回认为断线
-        if (m_receviceHeatBeatTimer <= 0)
-        {
-            Debug.Log("HeartBeat Break connect");
-            NetworkManager.DisConnect();
-        }
-    }
-
+   
     /// <summary>
     /// 重设心跳包接收Timer
     /// </summary>
     void ResetReceviceTimer()
     {
-        m_receviceHeatBeatTimer = HeatBeatSendSpaceTime * 2 + 1;
+        m_receviceHeatBeatTimer = (HeatBeatSendSpaceTime * 2 + 1) *1000;
     }
 
     void ResetSendTimer()

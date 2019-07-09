@@ -29,7 +29,7 @@ public class PayUnityIAPImplement : PayInterface
        
         foreach (var item in productDefinitions)
         {
-            ProductType productType = GoodsType2ProductType(item.type);
+            ProductType productType = GoodsType2ProductType(item.goodsType);
             ProductDefinition p = new ProductDefinition(item.goodsID, productType);
             products.Add(p);
         }
@@ -147,7 +147,7 @@ public class PayUnityIAPImplement : PayInterface
             f.goodsID = item.definition.id;
             f.isoCurrencyCode = item.metadata.isoCurrencyCode;
             f.localizedDescription = item.metadata.localizedDescription;
-            f.localizedPrice = item.metadata.localizedPrice;
+            f.localizedPrice = (float)item.metadata.localizedPrice;
             f.localizedPriceString = item.metadata.localizedPriceString;
             f.localizedTitle = item.metadata.localizedTitle;
             infos.Add(f);
@@ -169,7 +169,7 @@ public class PayUnityIAPImplement : PayInterface
             f.goodsID = goodsID;
             f.isoCurrencyCode = item.metadata.isoCurrencyCode;
             f.localizedDescription = item.metadata.localizedDescription;
-            f.localizedPrice = item.metadata.localizedPrice;
+            f.localizedPrice = (float)item.metadata.localizedPrice;
             f.localizedPriceString = item.metadata.localizedPriceString;
             f.localizedTitle = item.metadata.localizedTitle;
             return f;

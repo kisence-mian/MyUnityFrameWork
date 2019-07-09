@@ -10,7 +10,7 @@ using UnityEngine;
 /// </summary>
 public class PaymentVerificationManager
 {
-    public static CallBack<bool, string> onVerificationResultCallBack;
+    public static CallBack<int, string> onVerificationResultCallBack;
 
     private static PaymentVerificationInterface verificationInterface;
     public static void Init(PaymentVerificationInterface verificationInterface)
@@ -28,28 +28,32 @@ public class PaymentVerificationManager
         }
         else
         {
-            OnVerificationResult(info.isSuccess, info.goodsId,false,info.receipt);
+            Debug.LogWarning("PaymentVerificationManager PayCallBack=========" + info.goodsId);
+            int code = info.isSuccess ? 0 : -1;
+            OnVerificationResult(code, info.goodsId,false,info.receipt);
         }
     }
     /// <summary>
     /// 验证结果调用
     /// </summary>
-    /// <param name="isSucess">是否成功</param>
-    /// <param name="goodID">物品ID</param>
+    /// <param name="code">是否成功</param>
+    /// <param name="goodsID">物品ID</param>
     /// <param name="repeatReceipt">是否是重复的订单凭据</param>
-    public static void OnVerificationResult(bool isSucess,string goodID, bool repeatReceipt,string receipt)
+    /// <param name="receipt">回执，商户订单号等</param>
+    public static void OnVerificationResult(int code,string goodsID, bool repeatReceipt,string receipt)
     {
         if (onVerificationResultCallBack != null)
         {
-            onVerificationResultCallBack(isSucess, goodID);
+            Debug.LogWarning("验证回调code=========" + code + "-------goodsID=========" + goodsID);
+            onVerificationResultCallBack(code, goodsID);
         }
        
-        if (isSucess || repeatReceipt)
-            SDKManager.ConfirmPay(goodID, receipt);
+        if (code==0 || repeatReceipt)
+            SDKManager.ConfirmPay(goodsID, receipt);
         //验证成功
-        if (!isSucess)
+        if (code!=0)
         {
-            Debug.LogError("凭据验证失败！ goodID:" + goodID);
+            Debug.LogError("凭据验证失败！ goodID:" + goodsID);
         }
     }
 }

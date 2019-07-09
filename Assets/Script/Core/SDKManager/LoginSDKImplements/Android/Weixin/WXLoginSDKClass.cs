@@ -14,22 +14,22 @@ public class WXLoginSDKClass : LoginInterface
         return new List<RuntimePlatform>() { RuntimePlatform.Android, RuntimePlatform.WindowsEditor };
     }
 
-    public override void Init()
-    {
-        base.Init();
+    //public override void Init()
+    //{
+    //    base.Init();
 
-        SDKManagerNew.OnLoginCallBack += ReceiveWXResult;
-    }
+    //    //SDKManagerNew.OnLoginCallBack += ReceiveWXResult;
+    //}
 
     public override void Login(string tage)
     {
-        SDKManagerNew.Login("WeiXin.WeiXinSDK", "");
+        SDKManagerNew.Login("WeiXin", "");
     }
 
-    //接受微信SDK返回消息
-    public void ReceiveWXResult(OnLoginInfo info)
-    {
-        info.loginPlatform = LoginPlatform.WeiXin;
-        LoginCallBack(info);
-    }
+    ////接受微信SDK返回消息
+    //public void ReceiveWXResult(OnLoginInfo info)
+    //{
+    //    info.loginPlatform = LoginPlatform.WeiXin;
+    //    LoginCallBack(info);
+    //}
 }

@@ -31,7 +31,6 @@ public class ImportTool : AssetPostprocessor
         ModelImporter model = (ModelImporter)assetImporter;
         if (model != null)
         {
-           
             if (isLoopAnimation(g.name))
             {
                 //由于我们采用动画分离的导出策略，每个fbx只有一个动画
@@ -51,11 +50,11 @@ public class ImportTool : AssetPostprocessor
               
             }
 
-            if (model.isReadable)
-            {
-                model.isReadable = false;
-                model.SaveAndReimport();
-            }
+            //if (model.isReadable)
+            //{
+            //    model.isReadable = false;
+            //    model.SaveAndReimport();
+            //}
         }
         //Debug.Log("OnPostprocessModel : " + g.name);
     }

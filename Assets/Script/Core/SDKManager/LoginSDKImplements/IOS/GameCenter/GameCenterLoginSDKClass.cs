@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class GameCenterLoginSDKClass : LoginInterface
 {
+    static bool isAuthenticated = false; //已经调用过
+
     public override List<RuntimePlatform> GetPlatform()
     {
         return new List<RuntimePlatform>() { RuntimePlatform.IPhonePlayer, RuntimePlatform.WindowsEditor, RuntimePlatform.OSXEditor };
@@ -26,23 +28,31 @@ public class GameCenterLoginSDKClass : LoginInterface
 
     private void AccessGameCenter()
     {
-        UnityEngine.Social.localUser.Authenticate(AccessGameCenterCallback);
-        //if (UnityEngine.Social.localUser.authenticated)
-        //{
-            
-        //}
-        //else
-        //{
-        //    OnLoginInfo info = new OnLoginInfo();
-        //    info.isSuccess = false;
-        //    info.error = LoginErrorEnum.GameCenterNotOpen;
+        if (isAuthenticated)
+        {
+            OnLoginInfo info = new OnLoginInfo();
+            if (UnityEngine.Social.localUser.authenticated)
+            {
+                info.isSuccess = true;
+            }
+            else
+            {
 
-        //    LoginCallBack(info);
-        //}
+                info.isSuccess = false;
+
+            }
+            LoginCallBack(info);
+        }
+        
+        UnityEngine.Social.localUser.Authenticate(AccessGameCenterCallback);
+        Debug.LogWarning("=========GameCenter authenticated==========" + UnityEngine.Social.localUser.authenticated);
+
+        isAuthenticated = true;
     }
 
     private void AccessGameCenterCallback(bool success)
     {
+        Debug.LogWarning("=========GameCenter Callback==========" + success);
         OnLoginInfo info = new OnLoginInfo();
         if (success)
         {
@@ -53,6 +63,7 @@ public class GameCenterLoginSDKClass : LoginInterface
         else
         {
             info.isSuccess = false;
+            info.error = LoginErrorEnum.GameCenterNotOpen;
         }
         LoginCallBack(info);
     }

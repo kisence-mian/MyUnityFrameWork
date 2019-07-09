@@ -32,8 +32,10 @@ public class LanguageManager
         if (!isInit)
         {
             isInit = true;
-
-            config = LanguageDataUtils.LoadEditorConfig();
+            if (config == null)
+            {
+                config = LanguageDataUtils.LoadEditorConfig();
+            }
             SetLanguage(ApplicationManager.Langguage);
         }
     }
@@ -43,6 +45,9 @@ public class LanguageManager
         SystemLanguage oldLan = s_currentLanguage;
         if (config == null)
             return;
+        if (lang == SystemLanguage.Chinese)
+            lang = SystemLanguage.ChineseSimplified;
+
         if (config.gameExistLanguages.Contains(lang))
         {
             s_currentLanguage = lang;
@@ -136,18 +141,24 @@ public class LanguageManager
 
         return content;
     }
-
+    private static Dictionary<string, int> loadTextFileTimesDic = new Dictionary<string, int>();
     private static DataTable LoadDataTable(SystemLanguage language, string fullFileName)
     {
         if (Application.isPlaying)
         {
 
             string name = GetLanguageDataName(language, fullFileName);
-            TextAsset text = ResourceManager.Load<TextAsset>(name);
+            TextAsset text = AssetsPoolManager.Load<TextAsset>(name);
             if (text == null)
             {
                 Debug.LogError("Error： no Language file ：" + name);
                 return null;
+            }
+            if (loadTextFileTimesDic.ContainsKey(name))
+                loadTextFileTimesDic[name]++;
+            else
+            {
+                loadTextFileTimesDic.Add(name, 1);
             }
             DataTable data = DataTable.Analysis(text.text);
             return data;
@@ -174,6 +185,12 @@ public class LanguageManager
     {
         s_languageDataDict.Clear();
         isInit = false;
+
+        foreach (var item in loadTextFileTimesDic)
+        {
+            AssetsPoolManager.DestroyByPool(item.Key, item.Value);
+        }
+        loadTextFileTimesDic.Clear();
     }
 }
 

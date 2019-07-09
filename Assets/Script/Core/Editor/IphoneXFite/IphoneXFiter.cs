@@ -47,6 +47,7 @@ public class Package
        project.WriteToFile(configFilePath);
 
        EditSuitIpXCode(pathToBuiltProject);
+        EditSuitIpXCodeHomeButton(pathToBuiltProject);
    }
 
    public static void EditSuitIpXCode(string path) {
@@ -105,6 +106,42 @@ public class Package
     "+
         @"#include <sys/utsname.h>";
         
+        UnityAppController.Replace(src, dst);
+    }
+    //修改锁定手势，苹果Xhome建
+    public static void EditSuitIpXCodeHomeButton(string path)
+    {
+        //插入代码
+        //读取UnityViewControllerBase+iOS.mm文件
+        string src = @"- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures";
+        string dst = @"- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures
+{
+    //UIRectEdge res = UIRectEdgeNone;
+  //  if (UnityGetDeferSystemGesturesTopEdge())
+   //     res |= UIRectEdgeTop;
+    //if (UnityGetDeferSystemGesturesBottomEdge())
+   //     res |= UIRectEdgeBottom;
+   //if (UnityGetDeferSystemGesturesLeftEdge())
+   //    res |= UIRectEdgeLeft;
+  // if (UnityGetDeferSystemGesturesRightEdge())
+    //   res |= UIRectEdgeRight;
+   // return res;
+    return UIRectEdgeAll;
+    
+}
+- (UIRectEdge)preferredScreenEdgesDeferringSystemGestures1";
+
+        string unityAppControllerPath = path + "/Classes/UI/UnityViewControllerBase+iOS.mm";
+        XClassExt UnityAppController = new XClassExt(unityAppControllerPath);
+        UnityAppController.Replace(src, dst);
+
+        src = @"- (BOOL)prefersHomeIndicatorAutoHidden";
+        dst = @"- (BOOL)prefersHomeIndicatorAutoHidden
+{
+    return NO;
+}
+- (BOOL)prefersHomeIndicatorAutoHidden1;";
+
         UnityAppController.Replace(src, dst);
     }
 

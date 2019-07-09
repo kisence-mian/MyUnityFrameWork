@@ -116,6 +116,7 @@ public class NetworkManager
 
     public static void SetServer(string IP, int port)
     {
+        Debug.Log("Set IP=>" + IP + ":" + port);
         IPAddress address;
         if (IPAddress.TryParse(IP, out address))
         {
@@ -198,9 +199,20 @@ public class NetworkManager
     {
         if(message.m_MessageType != null)
         {
-            lock (s_messageList)
+            if (s_heatBeat.IsHeartBeatMessage(message))
             {
-                s_messageList.Add(message);
+                lock (s_messageListHeartBeat)
+                {
+                    s_messageListHeartBeat.Add(message);
+                }
+               
+            }
+            else
+            {
+                lock (s_messageList)
+                {
+                    s_messageList.Add(message);
+                }
             }
 
             msgCount++;
@@ -248,8 +260,29 @@ public class NetworkManager
 
     static List<NetworkState> s_statusList = new List<NetworkState>();
     static List<NetWorkMessage> s_messageList = new List<NetWorkMessage>();
+    /// <summary>
+    /// 心跳包消息
+    /// </summary>
+    static List<NetWorkMessage> s_messageListHeartBeat = new List<NetWorkMessage>();
     const int MaxDealCount = 2000;
 
+    /// <summary>
+    /// 取出心跳消息
+    /// </summary>
+    /// <returns></returns>
+    public static NetWorkMessage GetHeartBeatMessage()
+    {
+        NetWorkMessage msg = default(NetWorkMessage);
+        lock (s_messageListHeartBeat)
+        {
+            if (s_messageListHeartBeat.Count > 0)
+            {
+                msg = s_messageListHeartBeat[0];
+                s_messageListHeartBeat.RemoveAt(0);
+            }
+        }
+        return msg;
+    }
     //将消息的处理并入主线程
     static void Update()
     {
@@ -284,10 +317,10 @@ public class NetworkManager
             s_network.Update();
         }
 
-        if(s_heatBeat != null && IsConnect)
-        {
-            s_heatBeat.Update();
-        }
+        //if(s_heatBeat != null && IsConnect)
+        //{
+        //    s_heatBeat.Update();
+        //}
     }
 
    

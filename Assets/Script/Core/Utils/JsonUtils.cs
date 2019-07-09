@@ -19,20 +19,44 @@ namespace HDJ.Framework.Utils
         private static Type notJsonSerialized_Type = typeof(NotJsonSerializedAttribute);
         public static string ToJson(object data)
         {
-            object temp = ChangeObjectToJsonObject(data);
-            if (null == temp)
-                return "";
-            return SimpleJsonTool.SerializeObject(temp);
+            try
+            {
+                object temp = ChangeObjectToJsonObject(data);
+                if (null == temp)
+                    return "";
+                return SimpleJsonTool.SerializeObject(temp);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+            return null;
         }
         public static T FromJson<T>(string json)
         {
-            object obj = FromJson(typeof(T), json);
-            return obj == null ? default(T) : (T)obj;
+            try
+            {
+                object obj = FromJson(typeof(T), json);
+                return obj == null ? default(T) : (T)obj;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+            return default(T);
         }
         public static object FromJson(Type type, string json)
         {
-            object jsonObj = SimpleJsonTool.DeserializeObject(json);
-            return ChangeJsonDataToObjectByType(type, jsonObj);
+            try
+            {
+                object jsonObj = SimpleJsonTool.DeserializeObject(json);
+                return ChangeJsonDataToObjectByType(type, jsonObj);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+            return null;
         }
 
         #region   List<T>
@@ -201,7 +225,7 @@ namespace HDJ.Framework.Utils
                         v = ChangeObjectToJsonObject(v);
                         dic.Add(p.Name, v);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         Debug.LogError("property :" + p.Name + "\n" + e);
                         continue;
@@ -349,7 +373,8 @@ namespace HDJ.Framework.Utils
         #region Other
         private static bool IsSupportBaseValueParseJson(Type t)
         {
-            if (t.IsPrimitive || t == typeof(string) || t.IsEnum)
+            //p.PropertyType.IsPrimitive IsPrimitive 表示是否为基元类型之一，则为 true；否则为 false。 基元类型是 Boolean、 Byte、 SByte、 Int16、 UInt16、 Int32、 UInt32、 Int64、 UInt64、 Char、 Double和 Single。
+            if (t.IsPrimitive || t == typeof(decimal) || t == typeof(string) || t.IsEnum)
                 return true;
             return false;
         }
@@ -358,14 +383,16 @@ namespace HDJ.Framework.Utils
             object value = null;
             if (data == null)
                 return value;
-            if (type.IsPrimitive || type == typeof(string))
+            if (IsSupportBaseValueParseJson(type))
             {
-                value = data;
-            }
-            else if (type.IsEnum)
-            {
-                value = Enum.Parse(type, data.ToString());
-                // value = Enum.ToObject(type, data);
+                if (type.IsEnum)
+                {
+                    value = Enum.Parse(type, data.ToString());
+                }
+                else
+                {
+                    value = data;
+                }
             }
             else if (type.IsArray)
             {
@@ -399,7 +426,14 @@ namespace HDJ.Framework.Utils
             {
                 if (type.IsClass || type.IsValueType)
                 {
-                    value = JsonObjectToClassOrStruct(data, type);
+                    if (type == typeof(DateTime))
+                    {
+                        value = Convert.ToDateTime(data.ToString());
+                    }
+                    else
+                    {
+                        value = JsonObjectToClassOrStruct(data, type);
+                    }
                 }
             }
             if (value == null)
@@ -446,13 +480,13 @@ namespace HDJ.Framework.Utils
             if (!(property.CanRead && property.CanWrite))
                 return false;
             //索引器
-            if (property.GetIndexParameters().Length>0)
+            if (property.GetIndexParameters().Length > 0)
             {
                 return false;
             }
             if (ReflectionUtils.IsDelegate(property.PropertyType))
                 return false;
-          
+
 
             return true;
         }
@@ -468,6 +502,10 @@ namespace HDJ.Framework.Utils
             {
                 if (t.IsArray)
                     value = ListArrayToJsonObject(data, false);
+                else if (t == typeof(DateTime))
+                {
+                    value = data.ToString();
+                }
                 else if (t.IsClass || t.IsGenericType)
                 {
                     if (list_Type.Name == t.Name)

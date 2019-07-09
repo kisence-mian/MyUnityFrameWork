@@ -16,11 +16,7 @@ public class NetworkVerificationImplement : PaymentVerificationInterface
         msg.storeName = info.storeName;
         msg.receipt = info.receipt;
         msg.id = info.goodsId;
-        ResendMessageManager.AddResendMessage(msg, typeof(StoreBuyGoods2Client).Name,(resMsg)=>
-        {
-            StoreBuyGoods2Client e = (StoreBuyGoods2Client)resMsg;
-            PaymentVerificationManager.OnVerificationResult(e.code == 0, e.id, e.repeatReceipt,e.receipt);
-        });
+        SetBuyResendMessage(msg, false);
        // JsonMessageProcessingController.SendMessage(msg);
         Debug.Log(" 当前游戏服务器验证");
     }
@@ -31,9 +27,15 @@ public class NetworkVerificationImplement : PaymentVerificationInterface
         //Debug.Log(" 当前游戏服务器验证 .Init");
     }
 
-    //private void OnUserPaymentVerification(StoreBuyGoods2Client e, object[] args)
-    //{
-    //    PaymentVerificationManager.OnVerificationResult(e.code==0, e.id,e.repeatReceipt);
-    //}
+   public static void SetBuyResendMessage(StoreBuyGoods2Server msg, bool noSend)
+    {
+        ResendMessageManager.AddResendMessage(msg, typeof(StoreBuyGoods2Client).Name, (resMsg) =>
+        {
+
+            StoreBuyGoods2Client e = (StoreBuyGoods2Client)resMsg;
+            Debug.LogWarning("NetworkVerificationImplement   StoreBuyGoods2Client=========" + e.id);
+            PaymentVerificationManager.OnVerificationResult(e.code, e.id, e.repeatReceipt, e.receipt);
+        },noSend);
+    }
 }
 

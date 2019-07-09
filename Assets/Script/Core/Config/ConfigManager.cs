@@ -32,7 +32,6 @@ public static class ConfigManager
 
         string dataJson = "";
 
-#if UNITY_EDITOR
         if (!Application.isPlaying)
         {
             dataJson = ResourceIOTool.ReadStringByResource(
@@ -42,11 +41,9 @@ public static class ConfigManager
         }
         else
         {
-            dataJson = ResourceManager.ReadTextFile(ConfigName);
+            dataJson = AssetsPoolManager.ReadTextFile(ConfigName);
         }
-#else
-                dataJson = ResourceManager.ReadTextFile(ConfigName);
-#endif
+
 
         if (dataJson == "")
         {
@@ -59,6 +56,11 @@ public static class ConfigManager
             s_configCache.Add(ConfigName, config);
             return config;
         }
+    }
+
+    public static SingleField GetData(string ConfigName,string key)
+    {
+        return GetData(ConfigName)[key];
     }
 
     public static void CleanCache()

@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System;
 
 public class BundleEditorWindow : EditorWindow
 {
 
     #region GUI
 
-    //[MenuItem("Window/新打包设置编辑器 &1")]
+    [MenuItem("Window/新打包设置编辑器 &1")]
 
     public static void ShowWindow()
     {
@@ -51,12 +52,31 @@ public class BundleEditorWindow : EditorWindow
 
         if (GUILayout.Button("生成 AssetsBundle 设置"))
         {
+            long start = DateTime.Now.Ticks;
+            Debug.Log("生成 AssetsBundle 设置=>");
             PackageService.SetAssetBundlesName();
+            Debug.Log("结束，用时：" + ((DateTime.Now.Ticks - start) / 10000 / 1000f) + "s");
         }
+        //if (GUILayout.Button("生成 AssetsBundle 设置 New"))
+        //{
+        //    long start = DateTime.Now.Ticks;
+        //    Debug.Log("生成 AssetsBundle 设置New=>");
+        //    PackageService.SetAllResourceBundleName("Assets/Resources/",null);
+        //    Debug.Log("结束，用时：" + ((DateTime.Now.Ticks - start) / 10000 / 1000f) + "s");
+        //}
 
         if (GUILayout.Button("清除 AssetsBundle 设置"))
         {
+            long start = DateTime.Now.Ticks;
+            Debug.Log("清除 AssetsBundle 设置=>");
             PackageService.ClearAssetBundlesName();
+            Debug.Log("结束，用时：" + ((DateTime.Now.Ticks - start) / 10000 / 1000f) + "s");
+        }
+
+        if (GUILayout.Button("清除并重新生成 AssetsBundle 设置"))
+        {
+            PackageService.ClearAssetBundlesName();
+            PackageService.SetAssetBundlesName();
         }
 
         GUILayout.Space(10);

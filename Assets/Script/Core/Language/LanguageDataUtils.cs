@@ -15,7 +15,7 @@ public class LanguageDataUtils
         {
             LanguageSettingConfig config;
 
-            string json = ResourceManager.ReadTextFile(LanguageManager.c_configFileName);
+            string json = AssetsPoolManager.ReadTextFile(LanguageManager.c_configFileName);
 
             if (!string.IsNullOrEmpty(json))
                 config = JsonUtils.FromJson<LanguageSettingConfig>(json);

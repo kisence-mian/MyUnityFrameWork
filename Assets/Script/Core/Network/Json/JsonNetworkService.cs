@@ -46,6 +46,13 @@ public class JsonNetworkService : INetworkInterface
 
             string mes = Json.Serialize(data);
             mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
+
+            //加密
+            if (EncryptionService.IsSecret && MessageType != HeartBeatBase.c_HeartBeatMT)
+            {
+                mes = EncryptionService.Encrypt(mes);
+            }
+
             byte[] bytes = Encoding.UTF8.GetBytes(mes + c_endChar);
 
             m_socketService.Send(bytes);
@@ -115,14 +122,15 @@ public class JsonNetworkService : INetworkInterface
         {
             if(s != null && s != "")
             {
-                //Debug.Log("MessageReceive ->" + s);
+                //解密
+                if(EncryptionService.IsSecret)
+                {
+                    s = EncryptionService.Decrypt(s);
+                }
 
                 NetWorkMessage msg = new NetWorkMessage();
 
-                //s = WWW.UnEscapeURL(s);
-                //Debug.Log("MessageReceive0 ->" + s);
                 s = s.Replace(c_endCharReplaceString, c_endChar.ToString());
-                //Debug.Log("MessageReceive1 ->" + s);
                 Dictionary<string, object> data = Json.Deserialize(s) as Dictionary<string, object>;
 
                 msg.m_data = data;
@@ -140,9 +148,6 @@ public class JsonNetworkService : INetworkInterface
                             m_msgCode = msg.m_MsgCode;
                             m_msgCode++;
                         }
-
-                        
-                        //throw new Exception();
                     }
                     else
                     {

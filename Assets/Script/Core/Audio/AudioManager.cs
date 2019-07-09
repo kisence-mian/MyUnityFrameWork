@@ -257,7 +257,7 @@ public class AudioManager : MonoBehaviour
     {
         AudioClip clipTmp = null;
 
-        clipTmp = ResourceManager.Load<AudioClip>(soundName);
+        clipTmp = AssetsPoolManager.Load<AudioClip>(soundName);
 
         if (clipTmp == null)
         {

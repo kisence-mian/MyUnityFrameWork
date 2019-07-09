@@ -5,7 +5,8 @@ using System;
 
 public class AudioPlayManager : MonoBehaviour
 {
-    #region 属性，字段
+    #region 属性
+
     public static Audio2DPlayer a2DPlayer;
     public static Audio3DPlayer a3DPlayer;
     /// <summary>
@@ -17,7 +18,11 @@ public class AudioPlayManager : MonoBehaviour
     /// SFX播放完成 回调（参数 ：资源名，flag（标识：用于在多个相同音频名称时分辨））
     /// </summary>
     public static CallBack<string, string> OnSFXStopCallBack;
+
     #endregion
+
+    #region 外部调用
+
     public static void Init()
     {
         GameObject obj = new GameObject("[AudioManager]");
@@ -30,7 +35,9 @@ public class AudioPlayManager : MonoBehaviour
         MusicVolume = RecordManager.GetFloatRecord("GameSettingData", "MusicVolume", 1f);
         SFXVolume = RecordManager.GetFloatRecord("GameSettingData", "SFXVolume", 1f);
     }
+
     #region Volume
+
     private static float totleVolume = 1f;
     public static float TotleVolume
     {
@@ -95,6 +102,7 @@ public class AudioPlayManager : MonoBehaviour
     }
     #endregion
 
+    #region 播放接口
 
     public static void PlayMusic2D(string name, int channel, float volumeScale = 1, bool isLoop = true, float fadeTime = 0.5f, float delay = 0f, string flag = "")
     {
@@ -187,6 +195,9 @@ public class AudioPlayManager : MonoBehaviour
         a3DPlayer.ReleaseSFXAll();
     }
 
+    #endregion
+
+    #endregion
 
     void Update()
     {

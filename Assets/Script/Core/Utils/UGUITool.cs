@@ -36,19 +36,19 @@ public class UGUITool
             return;
         }
 
-            Sprite sp = AssetsPoolManager.Load<Sprite>(name);// LoadSprite(name);
-            if (sp != null)
-            {
-                img.overrideSprite = sp;// Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);
-                img.sprite = img.overrideSprite;
+        Sprite sp = AssetsPoolManager.Load<Sprite>(name);// LoadSprite(name);
+        if (sp != null)
+        {
+            img.overrideSprite = sp;// Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);
+            img.sprite = img.overrideSprite;
                
-                if (is_nativesize)
-                    img.SetNativeSize();
-            }
-            else
-            {
-                Debug.LogError("SetImageSprite 加载失败，查看资源是否存在，图片格式是否正确:" + name);
-            }
+            if (is_nativesize)
+                img.SetNativeSize();
+        }
+        else
+        {
+            Debug.LogError("SetImageSprite 加载失败，查看资源是否存在，图片格式是否正确:" + name);
+        }
        
     }
 
@@ -60,7 +60,7 @@ public class UGUITool
 
     public static Sprite LoadSprite(string resName)
     {
-        Texture2D texture = ResourceManager.Load<Texture2D>(resName);
+        Texture2D texture = AssetsPoolManager.Load<Texture2D>(resName);
         if (texture)
         {
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));

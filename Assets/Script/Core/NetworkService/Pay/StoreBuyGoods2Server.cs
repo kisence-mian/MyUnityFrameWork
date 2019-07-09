@@ -10,6 +10,7 @@ public class StoreBuyGoods2Server
     /// 物品id
     /// </summary>
     public string id; 
+
     /// <summary>
     /// 数量
     /// </summary>
@@ -23,7 +24,6 @@ public class StoreBuyGoods2Server
 
     public StoreBuyGoods2Server(string id, int number, StoreName storeName, string receipt)
     {
-        
         this.id = id;
         this.number = number;
         this.storeName = storeName;
@@ -33,10 +33,6 @@ public class StoreBuyGoods2Server
     public static void SenBuyMsg(string id, int number, StoreName storeName, string receipt)
     {
         JsonMessageProcessingController.SendMessage(new StoreBuyGoods2Server(id,number,storeName,receipt));
-
-
     }
-
-
 }
 

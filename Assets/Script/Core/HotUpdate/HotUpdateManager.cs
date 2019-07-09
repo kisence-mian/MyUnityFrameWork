@@ -35,6 +35,7 @@ public class HotUpdateManager
     static HotUpdateCallBack s_UpdateCallBack;
 
     static string s_versionFileCache;
+    static byte[] s_versionByteCache;
 
     static AssetBundleManifest s_ManifestCache;
     static byte[] s_ManifestByteCache;
@@ -124,12 +125,10 @@ public class HotUpdateManager
     {
         if(s_versionConfig == null)
         {
-            return "0.0";
+            s_versionConfig = (Dictionary<string, object>)FrameWork.Json.Deserialize(ReadVersionContent());
         }
-        else
-        {
-            return GetInt(s_versionConfig[c_largeVersionKey]) + "." + GetInt(s_versionConfig[c_smallVersonKey]);
-        }
+
+        return GetInt(s_versionConfig[c_largeVersionKey]) + "." + GetInt(s_versionConfig[c_smallVersonKey]);
     }
 
     static IEnumerator CheckVersion()
@@ -157,15 +156,10 @@ public class HotUpdateManager
         }
 
         s_versionFileCache = www.assetBundle.LoadAsset<TextAsset>(c_versionFileName).text;
-
+        s_versionByteCache = www.bytes;
         www.assetBundle.Unload(true);
 
         UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingVersionFile, GetHotUpdateProgress(false, false, 1));
-
-        //Debug.Log("Version File :text: " + m_versionFileCatch);
-
-        //Debug.Log("Service Version File :text: " + s_versionFileCache);
-        //Debug.Log("local Version  : " + GetInt(s_versionConfig[c_largeVersionKey]) + " " + GetInt(s_versionConfig[c_smallVersonKey]));
 
         Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(s_versionFileCache);
 
@@ -262,9 +256,6 @@ public class HotUpdateManager
 
             if (!sHash.Equals(lHash))
             {
-                //Debug.Log("sHash" + sHash);
-                //Debug.Log("lHash" + lHash);
-
                 DownLoadData data = new DownLoadData();
                 data.name = allServiceBundle[i];
                 data.md5 = sHash;
@@ -275,7 +266,6 @@ public class HotUpdateManager
     }
 
     static List<DownLoadData> s_downLoadList = new List<DownLoadData>();
-    //static List<ResourcesConfig> s_deleteList = new List<ResourcesConfig>();
 
     static IEnumerator StartDownLoad()
     {
@@ -323,7 +313,7 @@ public class HotUpdateManager
 
         //保存版本信息
         //保存文件信息
-        //ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath()+ c_versionFileName , s_versionByteCache);
+        ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath() + c_versionFileName, s_versionByteCache);
         ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath() + AssetsManifestManager.c_ManifestFileName, s_ManifestByteCache);
 
         //从stream读取配置
@@ -341,16 +331,12 @@ public class HotUpdateManager
         s_versionConfig   = (Dictionary<string,object>) FrameWork.Json.Deserialize(ReadVersionContent());
         s_hotUpdateConfig = ConfigManager.GetData(c_HotUpdateConfigName);
 
-        string downLoadServicePath = null;
+        string downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "");//优先从注入数据中查询
         bool isTest = s_hotUpdateConfig[c_UseTestDownLoadPathKey].GetBool();
 
         //获取下载地址
-        if(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath,"") != "")
-        {
-            downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "");
-        }
-        else
-        {
+        if(string.IsNullOrEmpty(downLoadServicePath))
+        { 
             if (isTest)
             {
                 downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();

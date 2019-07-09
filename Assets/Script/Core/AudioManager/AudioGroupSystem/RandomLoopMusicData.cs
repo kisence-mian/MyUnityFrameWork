@@ -23,7 +23,7 @@ public class RandomLoopMusicData
     {
         if (this.flag == flag)
         {
-            Debug.Log("OnMusicStopCallBack :" + name + " flag:" + flag);
+            //Debug.Log("OnMusicStopCallBack :" + name + " flag:" + flag);
             foreach (var item in configData.musicDatas)
             {
                 if (item.name == name)
@@ -55,7 +55,7 @@ public class RandomLoopMusicData
             return null;
 
         isPlaying = true;
-        Debug.Log("currentPlayIndex:" + currentPlayIndex + " flag :"+flag);
+        //Debug.Log("currentPlayIndex:" + currentPlayIndex + " flag :"+flag);
         if (configData.isRandom)
         {
             List<MusicPlayData> musicDatas = new List<MusicPlayData>();

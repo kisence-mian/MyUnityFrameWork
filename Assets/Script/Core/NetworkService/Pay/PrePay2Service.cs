@@ -26,20 +26,20 @@ public class PrePay2Service
         string timeStamp = (new DateTime(DateTime.UtcNow.Ticks - dt1970.Ticks).AddHours(8).Ticks / 10000000).ToString();
         Debug.LogWarning("支付发起时间" + timeStamp);
 
+        //if (Application.platform == RuntimePlatform.WindowsEditor)
+        //{
+        //    return;
+        //}
 
-        if (Application.platform == RuntimePlatform.WindowsEditor)
-        {
-            return;
-        }
+        //PrePay2Service msg = new PrePay2Service(storeName, goodsID);
+        //PrePay2Service.SendPrePayMsg(storeName, goodsID);
 
-        PrePay2Service msg = new PrePay2Service(storeName, goodsID);
+        //ResendMessageManager.AddResendMessage(msg, typeof(StoreBuyGoods2Client).Name, (resMsg) =>
+        //{
 
-        ResendMessageManager.AddResendMessage(msg, typeof(StoreBuyGoods2Client).Name, (resMsg) =>
-        {
+        //});
 
-        });
-
-        //JsonMessageProcessingController.SendMessage<PrePay2Service>(new PrePay2Service(storeName, goodsID));
+        JsonMessageProcessingController.SendMessage<PrePay2Service>(new PrePay2Service(storeName, goodsID));
 
     }
 
