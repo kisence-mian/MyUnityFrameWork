@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 #if USE_LUA
-using BindType = ToLuaMenu.BindType;.
+using BindType = ToLuaMenu.BindType;
 #endif
 
 public static class CustomSettings

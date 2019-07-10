@@ -16,16 +16,8 @@ langdata_chinesesimplified	data/language/langdata_chinesesimplified
 guidedata	data/guidedata
 item	data/item
 testdata	data/testdata
-gameobject 1	prefab/gameobject 1
-gameobject 2	prefab/gameobject 2
 gameobject	prefab/gameobject
 gogo	prefab/gogo
-uitest 1	prefab/uitest 1
-uitest 2	prefab/uitest 2
-uitest 3	prefab/uitest 3
-uitest 4	prefab/uitest 4
-uitest 5	prefab/uitest 5
-uitest 6	prefab/uitest 6
 uitest	prefab/uitest
 dl_01	sprite/dl_01
 dl_01.png	sprite/dl_01.png
@@ -57,11 +49,5 @@ image_item	ui/testwindow/image_item
 testwindow	ui/testwindow/testwindow
 uimanager	ui/uimanager
 gameobject_adasd	gameobject_adasd
-new material 2	new material 2
-new material 3	new material 3
-new material 4	new material 4
-new material 5	new material 5
-new material 6	new material 6
-new material	new material
 resourcesmanifest	resourcesmanifest
 version	version
