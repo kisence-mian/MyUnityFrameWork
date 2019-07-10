@@ -1,3 +1,5 @@
+#if USE_LUA
+
 using LuaInterface;
 using UnityEditor;
 using System;
@@ -17,7 +19,7 @@ public class LuaExportList
     {
         _GT(typeof(Debugger)).SetNameSpace(null),        
 
-    #region Base
+#region Base
         _GT(typeof(UnityEngine.Object)),
         _GT(typeof(GameObject)),
         _GT(typeof(Transform)),
@@ -29,9 +31,9 @@ public class LuaExportList
         _GT(typeof(Vector4)),
         _GT(typeof(Vector2)),
         _GT(typeof(Color)),
-    #endregion
+#endregion
 
-    #region UGUI
+#region UGUI
         _GT(typeof(Selectable)),
         _GT(typeof(UIBehaviour)),
         _GT(typeof(Graphic)),
@@ -45,20 +47,20 @@ public class LuaExportList
         _GT(typeof(ScrollRectInput)),
         _GT(typeof(ReusingScrollRect)),
 
-    #endregion
+#endregion
 
-    #region Framework
+#region Framework
 
-        #region AnimSystem
+#region AnimSystem
 
             _GT(typeof(InterpType)),
             _GT(typeof(RepeatType)),
             _GT(typeof(AnimData)),
             _GT(typeof(AnimSystem)),
 
-        #endregion
+#endregion
 
-        #region UI
+#region UI
 
             _GT(typeof(UIBase)),
             _GT(typeof(UIWindowBase)),
@@ -67,9 +69,9 @@ public class LuaExportList
             _GT(typeof(UISystemEvent)),
             _GT(typeof(UIEvent)),
 
-        #endregion
+#endregion
 
-        #region Data
+#region Data
 
             _GT(typeof(List<string>)),
             _GT(typeof(Dictionary<string,object>)),
@@ -85,9 +87,9 @@ public class LuaExportList
             _GT(typeof(RecordManager)),
             _GT(typeof(AudioPlayManager)),
 
-        #endregion
+#endregion
 
-        #region Input
+#region Input
             
             _GT(typeof(IInputEventBase)),
             _GT(typeof(InputUIEventType)),
@@ -102,7 +104,7 @@ public class LuaExportList
             _GT(typeof(InputManager)),
             _GT(typeof(NetworkManager)),
 
-        #endregion
+#endregion
 
          //_GT(typeof(HeapObjectPool)),
          //_GT(typeof(ResourceManager)),
@@ -110,15 +112,15 @@ public class LuaExportList
          //_GT(typeof(ApplicationStatusManager)),
          _GT(typeof(GameObjectManager)),
 
-    #endregion
+#endregion
 
-    #region Custom
+#region Custom
     	//要导出的C#类文件请放在这里 
     	//格式： _GT(typeof(类名)),
 
-    #endregion
+#endregion
 
-    #region Note
+#region Note
         //这里是注释
 
 
@@ -226,3 +228,5 @@ public class LuaExportList
         return new DelegateType(t);
     }
 }
+
+#endif

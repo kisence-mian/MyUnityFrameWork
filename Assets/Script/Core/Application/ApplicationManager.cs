@@ -173,8 +173,6 @@ public class ApplicationManager : MonoBehaviour
 
     void OnApplicationQuit()
     {
-        Debug.Log("ApplicationManager OnApplicationQuit ");
-
         if (s_OnApplicationQuit != null)
         {
             try

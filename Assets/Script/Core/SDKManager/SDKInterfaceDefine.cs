@@ -113,5 +113,6 @@ namespace FrameWork.SDKManager
         public const string PropertiesKey_StoreName   = "StoreName";                 //商店名称
         public const string PropertiesKey_LoginPlatform = "LoginPlatform";           //登录平台
         public const string PropertiesKey_NetworkID = "NetworkID";                   //服务器选择
+        public const string PropertiesKey_QQGroup   = "QQGroup";                     //服务器选择
     }
 }
