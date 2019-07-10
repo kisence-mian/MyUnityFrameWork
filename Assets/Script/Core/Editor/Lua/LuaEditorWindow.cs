@@ -67,11 +67,35 @@ public class LuaEditorWindow : EditorWindow
     {
         if (GUILayout.Button("Lua 项目初始化"))
         {
-            //InitLua();
+            InitLua();
         }
     }
 
 #if !USE_LUA
+    void InitLua()
+    {
+        CreateEmptyLuaBinder();
+    }
+
+    static void CreateEmptyLuaBinder()
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.AppendLine("using System;");
+        sb.AppendLine("using LuaInterface;");
+        sb.AppendLine();
+        sb.AppendLine("public static class LuaBinder");
+        sb.AppendLine("{");
+        sb.AppendLine("\tpublic static void Bind(LuaState L)");
+        sb.AppendLine("\t{");
+        sb.AppendLine("\t\tthrow new LuaException(\"Please generate LuaBinder files first!\");");
+        sb.AppendLine("\t}");
+        sb.AppendLine("}");
+
+        string filePath = Application.dataPath + "/Script/LuaGenerate" + "/LuaBinder.cs";
+
+        EditorUtil.WriteStringByFile(filePath, sb.ToString());
+    }
+
 }
 #endif
 
