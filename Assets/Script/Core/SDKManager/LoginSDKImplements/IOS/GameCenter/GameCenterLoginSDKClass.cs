@@ -34,6 +34,8 @@ public class GameCenterLoginSDKClass : LoginInterface
             if (UnityEngine.Social.localUser.authenticated)
             {
                 info.isSuccess = true;
+                info.accountId = Social.localUser.id;
+                info.nickName = Social.localUser.userName;
             }
             else
             {

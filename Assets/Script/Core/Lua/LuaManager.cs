@@ -120,7 +120,7 @@ public class LuaManager
 
     public static void DoLuaFile(string fileName)
     {
-        string content = AssetsPoolManager.ReadTextFile(fileName);
+        string content = ResourceManager.ReadTextFile(fileName);
         s_state.DoString(content, fileName);
     }
 #endif

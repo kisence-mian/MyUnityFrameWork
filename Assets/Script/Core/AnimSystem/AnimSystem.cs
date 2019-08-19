@@ -1026,6 +1026,7 @@ public class AnimSystem : MonoBehaviour
         {
             GetInstance().animList.Remove(GetInstance().removeList[i]);
         }
+        GetInstance().removeList.Clear();
     }
 
     /// <summary>
@@ -1097,7 +1098,7 @@ public class AnimSystem : MonoBehaviour
                 AnimData animTmp = animList[i];
 
                 //执行回调
-                animTmp.ExecuteCallBack();
+                animTmp.ExecuteCallBack();  
 
                 if (!animTmp.AnimReplayLogic())
                 {

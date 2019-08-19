@@ -20,7 +20,7 @@ public class TouristLoginSDKClass : LoginInterface
     public override void Login(string tage)
     {
         OnLoginInfo info = new OnLoginInfo();
-        info.accountId = SystemInfo.deviceUniqueIdentifier;
+        info.accountId = SystemInfoManager.deviceUniqueIdentifier;
         info.isSuccess = true;
         LoginCallBack(info);
     }

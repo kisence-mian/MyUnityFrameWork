@@ -14,7 +14,7 @@ public class LanguageManager
     public const string c_valueKey = "value";
 
     static public SystemLanguage s_currentLanguage = SystemLanguage.ChineseSimplified; //当前语言
-    static public Dictionary<string,Dictionary<string,string>> s_languageDataDict = new Dictionary<string, Dictionary<string,string>>();//所有语言数据
+    static public Dictionary<string,string> s_languageDataDict = new Dictionary<string, string>();//所有语言数据
 
     private static LanguageSettingConfig config;
     static private bool isInit = false;
@@ -34,7 +34,7 @@ public class LanguageManager
             isInit = true;
             if (config == null)
             {
-                config = LanguageDataUtils.LoadEditorConfig();
+                config = LanguageDataUtils.LoadRuntimeConfig();
             }
             SetLanguage(ApplicationManager.Langguage);
         }
@@ -88,6 +88,41 @@ public class LanguageManager
     {
         return GetContent(moduleName, contentID, contentParams.ToArray());
     }
+
+    public static bool ContainsFullKeyName(string fullKeyName)
+    {
+        if (string.IsNullOrEmpty(fullKeyName))
+        {
+            Debug.LogError("LanguageManager =>Error : key is null :" + fullKeyName);
+            return false;
+        }
+        Init();
+
+
+        if (s_languageDataDict.ContainsKey(fullKeyName))
+        {
+            return true;
+        }
+        else
+        {
+            int indexEnd = fullKeyName.LastIndexOf("/");
+            if (indexEnd < 0)
+            {
+                Debug.LogError("LanguageManager => Error : Format is error :"+fullKeyName);
+                return false;
+            }
+            string key = fullKeyName.Substring(indexEnd + 1);
+            string fullFileName = fullKeyName.Remove(indexEnd);
+
+            DataTable data = LoadDataTable(s_currentLanguage, fullFileName);
+
+            foreach (var item in data.TableIDs)
+            {
+                s_languageDataDict.Add(fullFileName + "/" + item, data[item].GetString(c_valueKey));
+            }
+            return s_languageDataDict.ContainsKey(fullKeyName);
+        }
+    }
     /// <summary>
     /// moduleName_key ： MiniGame/title_0
     /// </summary>
@@ -97,35 +132,18 @@ public class LanguageManager
     public static string GetContentByKey(string fullKeyName, params object[] contentParams)
     {
         Init();
-        if (string.IsNullOrEmpty(fullKeyName))
-            return "Error : key is null";
-        int indexEnd = fullKeyName.LastIndexOf("/");
-        if (indexEnd < 0)
-            return "Error : Format is error";
-        string key = fullKeyName.Substring(indexEnd + 1);
-        string fullFileName = fullKeyName.Remove(indexEnd);
-        if (string.IsNullOrEmpty(fullFileName) || string.IsNullOrEmpty(key))
-            return "Error : key is null";
 
-        Dictionary<string, string> contentDic = null;
-        if (s_languageDataDict.ContainsKey(fullFileName))
+        string content = null;
+
+        if (ContainsFullKeyName(fullKeyName))
         {
-            contentDic = s_languageDataDict[fullFileName];
+            content = s_languageDataDict[fullKeyName];
         }
         else
         {
-            DataTable data = LoadDataTable(s_currentLanguage, fullFileName);
-
-            contentDic = new Dictionary<string, string>();
-            foreach (var item in data.TableIDs)
-            {
-                contentDic.Add(item, data[item].GetString(c_valueKey));
-            }
-            s_languageDataDict.Add(fullFileName, contentDic);
+            Debug.LogError("LanguageManager => Error : no find key :" + fullKeyName);
+            return "";
         }
-        if (!contentDic.ContainsKey(key))
-            return "Error:no key in File:" + fullFileName + "  key:" + key;
-        string content = contentDic[key];
         if (contentParams != null && contentParams.Length > 0)
         {
             for (int i = 0; i < contentParams.Length; i++)
@@ -148,7 +166,7 @@ public class LanguageManager
         {
 
             string name = GetLanguageDataName(language, fullFileName);
-            TextAsset text = AssetsPoolManager.Load<TextAsset>(name);
+            TextAsset text = ResourceManager.Load<TextAsset>(name);
             if (text == null)
             {
                 Debug.LogError("Error： no Language file ：" + name);
@@ -188,7 +206,7 @@ public class LanguageManager
 
         foreach (var item in loadTextFileTimesDic)
         {
-            AssetsPoolManager.DestroyByPool(item.Key, item.Value);
+            ResourceManager.DestoryAssetsCounter(item.Key, item.Value);
         }
         loadTextFileTimesDic.Clear();
     }

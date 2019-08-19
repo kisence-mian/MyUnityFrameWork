@@ -50,6 +50,10 @@ public  class SaveRecordManager
             {
                 string text = GetFileTextData(fileName);
                 fileContent = converter.String2Object<Dictionary<string, string>>(text);
+                if (fileContent == null)
+                {
+                    fileContent = new Dictionary<string, string>();
+                }
                 allRecords.Add(fileName, fileContent);
             }
 
@@ -80,19 +84,23 @@ public  class SaveRecordManager
     {
         Dictionary<string, string> fileContent = null;
 
-        if (!allRecords.TryGetValue(fileName, out fileContent))
+        if (allRecords.ContainsKey(fileName))
         {
+            fileContent = allRecords[fileName];
+        }
+        else
+        {
+            
             string text = GetFileTextData(fileName);
             fileContent = converter.String2Object<Dictionary<string, string>>(text);
+            if (fileContent == null)
+            {
+                fileContent = new Dictionary<string, string>();
+            }
             allRecords.Add(fileName, fileContent);
         }
         string valueStr = converter.Object2String(value);
 
-        if (fileContent == null)
-        {
-            fileContent = new Dictionary<string, string>();
-          
-        }
         if (fileContent.ContainsKey(key))
         {
             fileContent[key] = valueStr;
@@ -102,6 +110,7 @@ public  class SaveRecordManager
             fileContent.Add(key, valueStr);
         }
         string ss = converter.Object2String(fileContent);
+
         FileUtils.CreateTextFile(GetFilePath(fileName), ss);
     }
     /// <summary>

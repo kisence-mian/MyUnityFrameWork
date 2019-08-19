@@ -142,6 +142,7 @@ public abstract class IApplicationStatus
     {
         for (int i = 0; i < m_uiList.Count; i++)
         {
+            //Debug.Log("CloseAllUI " + m_uiList[i]);
             UIManager.CloseUIWindow(m_uiList[i],isPlayAnim);
         }
         m_uiList.Clear();

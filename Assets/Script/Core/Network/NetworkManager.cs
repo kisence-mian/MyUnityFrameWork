@@ -89,8 +89,12 @@ public class NetworkManager
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationQuit += DisConnect;
     }
-
-    public static void InitHeartBeat<T>(int spaceTime = 15) where T : HeartBeatBase, new()
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="spaceTime">发送间隔时间，毫秒</param>
+    public static void InitHeartBeat<T>(int spaceTime = 2500) where T : HeartBeatBase, new()
     {
         s_heatBeat = new T();
         s_heatBeat.Init(spaceTime);
@@ -265,7 +269,14 @@ public class NetworkManager
     /// </summary>
     static List<NetWorkMessage> s_messageListHeartBeat = new List<NetWorkMessage>();
     const int MaxDealCount = 2000;
-
+    /// <summary>
+    /// 是否有心跳消息过来
+    /// </summary>
+    /// <returns></returns>
+    public static bool HasHeartBeatMessage()
+    {
+        return s_messageListHeartBeat.Count > 0;
+    }
     /// <summary>
     /// 取出心跳消息
     /// </summary>
@@ -337,6 +348,7 @@ public enum NetworkState
     Connecting,
     ConnectBreak,
     FaildToConnect,
+    NetworkError,
 }
 
 public struct NetWorkMessage

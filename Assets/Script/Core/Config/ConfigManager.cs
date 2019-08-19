@@ -20,7 +20,7 @@ public static class ConfigManager
 
     public static bool GetIsExistConfig(string ConfigName)
     {
-        return ResourceManager.GetResourceIsExist(ConfigName);
+        return ResourcesConfigManager.GetIsExitRes(ConfigName);
     }
 
     public static Dictionary<string, SingleField> GetData(string ConfigName)
@@ -32,6 +32,7 @@ public static class ConfigManager
 
         string dataJson = "";
 
+        //#if UNITY_EDITOR
         if (!Application.isPlaying)
         {
             dataJson = ResourceIOTool.ReadStringByResource(
@@ -39,10 +40,13 @@ public static class ConfigManager
                             ConfigName,
                             c_expandName));
         }
+
+        //#else
         else
         {
-            dataJson = AssetsPoolManager.ReadTextFile(ConfigName);
+            dataJson = ResourceManager.LoadText(ConfigName);
         }
+        //#endif
 
 
         if (dataJson == "")
@@ -65,6 +69,10 @@ public static class ConfigManager
 
     public static void CleanCache()
     {
+        foreach (var item in s_configCache.Keys)
+        {
+            ResourceManager.DestoryAssetsCounter(item);
+        }
         s_configCache.Clear();
     }
 }

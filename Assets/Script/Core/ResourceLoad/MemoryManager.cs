@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Text;
 #if UNITY_5_5_OR_NEWER
 using UnityEngine.Profiling;
 #endif
@@ -10,36 +11,22 @@ using UnityEngine.Profiling;
 public class MemoryManager
 {
     /// <summary>
-    /// 是否允许动态加载
+    /// 是否开启内存回收（默认开启）
     /// </summary>
-    public static bool s_allowDynamicLoad = true;
+    public static bool OpenAutoMemoryClean = true;
 
-    /// <summary>
-    /// 最大允许的内存使用量
-    /// </summary>
-    public static int s_MaxMemoryUse = 200;
-
-    /// <summary>
-    /// 最大允许的堆内存使用量
-    /// </summary>
-    public static int s_MaxHeapMemoryUse = 70;
-    /// <summary>
-    /// 清理间隔时间
-    /// </summary>
-    public static float ClearIntervalTime = 5f;
     public static void Init()
     {
-        ApplicationManager.s_OnApplicationUpdate += Update;
-
+        ApplicationManager.s_OnApplicationLateUpdate += Update;
+        Application.lowMemory += OnLowMemoryCallBack;
         if (ApplicationManager.AppMode != AppMode.Release)
             DevelopReplayManager.s_ProfileGUICallBack += GUI;
     }
 
+  
+
     static void Update()
     {
-        //资源加载
-        LoadResources();
-
         //内存管理
         MonitorMemorySize();
 
@@ -47,50 +34,78 @@ public class MemoryManager
         if (Input.GetKeyDown(KeyCode.F12))
         {
             FreeMemory();
+            AssetsUnloadHandler.UnloadAll();
         }
-    #endif
+
+#endif
 
     }
 
+    
     static void GUI()
     {
-        GUILayout.Label("总内存：" + totalAllocatedMemory.ToString("F") + "M");
-        GUILayout.Label("堆内存：" + ByteToM(Profiler.GetMonoUsedSizeLong()).ToString("F") + "M");
+        StringBuilder showGUIStr = new StringBuilder();
+        showGUIStr.Append("总内存：" + (int)allMemory + "M"+ "\n");
+        showGUIStr.Append("使用内存：" + (int)usedMemory + "M" + "\n");
+        showGUIStr.Append("空闲内存：" + (int)freeMemory + "M" + "\n");
+        showGUIStr.Append("内存阈值：" + (int)MemoryInfo.GetMemoryLimit() + "M" + "\n");
+        showGUIStr.Append("已加载资源：" + AssetsUnloadHandler.usedAssetsDic.Count + "\n");
+        showGUIStr.Append("可回收资源：" + AssetsUnloadHandler .noUsedAssetsList.Count+ "\n");
+        GUIStyle style = new GUIStyle("Box");
+        style.fontSize = 20;
+        style.richText = true;
+        style.alignment = TextAnchor.UpperLeft;
+        
+        GUILayout.Box(showGUIStr.ToString(),style);
     }
+
 
     /// <summary>
-    /// 低内存机型
+    /// 判断已使用的内存是否超过内存阈值
     /// </summary>
     /// <returns></returns>
-    public static bool IsLowMachine()
+    public static bool NeedReleaseMemory()
     {
-        return AssetRecycleLevelController.NowRecycleLevel < AssetRecycleLevel.Level3000;
+        //return true;
+        float mLimit = MemoryInfo.GetMemoryLimit();
+        if (mLimit == -1)
+            return false;
+        return   usedMemory>= mLimit;
     }
+    private static void OnLowMemoryCallBack()
+    {
+        Debug.LogWarning("低内存警告！！！");
+        if (Application.platform != RuntimePlatform.Android)
+        {
+            FreeMemory();
+            AssetsUnloadHandler.UnloadAll();
+        }
 
+    }
     /// <summary>
     /// 释放内存
     /// </summary>
     public static void FreeMemory()
     {
+
         GlobalEvent.DispatchEvent(MemoryEvent.FreeMemory);
         //清空缓存的UI
         UIManager.DestroyAllHideUI();
-        if (IsLowMachine())
-        {
+
             //清空对象池
-            GameObjectManager.CleanPool();
-        }
+         GameObjectManager.CleanPool();
+
         LanguageManager.Release();
-        //GameObjectManager.CleanPool_New();
 
-       // AssetsPoolManager.DisposeAll();
-
+         // AssetsUnloadHandler.UnloadAll();
+        
         FreeHeapMemory();
         Resources.UnloadUnusedAssets();
         //GC
         GC.Collect();
-    }
 
+       
+    }
     /// <summary>
     /// 释放堆内存
     /// </summary>
@@ -101,115 +116,17 @@ public class MemoryManager
         RecordManager.CleanCache();
 
     }
-
-    public static void LoadRes(List<string> resList,LoadProgressCallBack callBack)
-    {
-        //Resource 模式直接返回完成
-        if (ResourceManager.m_gameLoadType != ResLoadLocation.Resource)
-        {
-            s_loadCallBack += callBack;
-            s_LoadList.AddRange(resList);
-            s_loadCount += resList.Count;
-        }
-        else
-        {
-            callBack(LoadState.CompleteState);
-        }
-    }
-
-    //public static void UnLoadRes(List<string> resList)
-    //{
-    //    if (ResourceManager.m_gameLoadType != ResLoadLocation.Resource)
-    //    {
-    //        for (int i = 0; i < resList.Count; i++)
-    //        {
-    //            ResourceManager.UnLoad(resList[i]);
-    //        }
-    //    }
-    //}
-
-    #region 资源加载
-
-    static int s_loadCount = 0;
-    static bool isLoading = false;
-    static List<string> s_LoadList = new List<string>();
-    static LoadProgressCallBack s_loadCallBack;
-
-    static LoadState s_loadStatus = new LoadState();
-
-    static void LoadResources()
-    {
-        if (!isLoading)
-        {
-            if (s_LoadList.Count == 0)
-            {
-                if (s_loadCallBack != null)
-                {
-                    try
-                    {
-                        s_loadCallBack(LoadState.CompleteState);
-                    }
-                    catch(Exception e)
-                    {
-                        Debug.LogError("Load Finsih CallBack Error : " + e.ToString());
-                    }
-                    s_loadCallBack = null;
-                    s_loadCount = 0;
-                }
-            }
-            else
-            {
-                isLoading = true;
-                ResourceManager.LoadAsync(s_LoadList[0], LoadResourcesFinishCallBack);
-                //AssetsBundleManager.LoadBundleAsync(s_LoadList[0], LoadResourcesFinishCallBack);
-                s_LoadList.RemoveAt(0);
-                
-
-                s_loadStatus.isDone = false;
-                s_loadStatus.progress = (1- ((float)s_LoadList.Count / (float)s_loadCount));
-
-                try
-                {
-                    s_loadCallBack(s_loadStatus);
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError("Load Finsih CallBack Error : " + e.ToString());
-                }
-            }
-        }
-        //else
-        //{
-        //    Debug.Log("s_LoadList.Count " + s_LoadList.Count);
-        //}
-    }
-
-    static void LoadResourcesFinishCallBack(LoadState state, object res)
-    {
-        if (state.isDone == true)
-        {
-            isLoading = false;
-        }
-    }
-
-    #endregion
-
     #region 内存监控
-
-    // 字节到兆
-    //const float ByteToM = 0.000001f;
-
-    static bool s_isFreeMemory = false;
-    static bool s_isFreeMemory2 = false;
-
-    static bool s_isFreeHeapMemory = false;
-    static bool s_isFreeHeapMemory2 = false;
 
     public static double totalReservedMemory;
     public static double totalAllocatedMemory;
-    static double monoHeapSize;
 
-    private static float tempTime;
+    public static float freeMemory = 0;
+    public static float usedMemory = 0;
+    public static float allMemory = 0;
+    private static float UpdateMemoryTime = 0.5f;
+    private static float tempTime = 0;
+     
     /// <summary>
     /// 用于监控内存
     /// </summary>
@@ -221,81 +138,29 @@ public class MemoryManager
             totalReservedMemory = ByteToM(Profiler.GetTotalReservedMemoryLong());
             totalAllocatedMemory = ByteToM(Profiler.GetTotalAllocatedMemoryLong());
         }
-       // Debug.Log("内存占用：" + totalReservedMemory+" ++" + ByteToM(Profiler.GetTotalAllocatedMemoryLong()));
-        //monoHeapSize = ByteToM(Profiler.GetMonoHeapSizeLong());
-        //if (tempTime <= 0)
-        //{
-        //    tempTime = ClearIntervalTime;
-        //    if(totalReservedMemory >= s_MaxMemoryUse)
-        //    {
-        //        FreeMemory();
-        //    }
-        //     if(monoHeapSize>= s_MaxHeapMemoryUse)
-        //    {
-        //        GC.Collect();
-        //    }
-        //}
-        //else
-        //{
-        //    tempTime -= Time.deltaTime;
-        //}
+
+        if (tempTime <= 0)
+        {
+            tempTime = UpdateMemoryTime;
+            if (MemoryInfo.GetMemoryInfo())
+            {
+                freeMemory = MemoryInfo.minf.memfree / 1024f / 1024f;
+                allMemory = MemoryInfo.minf.memtotal / 1024f / 1024f;
+                usedMemory = MemoryInfo.minf.memused / 1024f / 1024f;
+            }
+        }
+        else
+        {
+            tempTime -= Time.deltaTime;
+        }
+
+        AssetsUnloadHandler.LateUpdate();
+
+        if (NeedReleaseMemory() && OpenAutoMemoryClean)
+        {
+            AssetsUnloadHandler.UnloadOne();
+        }
         
-//        if (ByteToM(Profiler.GetTotalReservedMemoryLong() ) > s_MaxMemoryUse * 0.7f)
-//        {
-//            if (!s_isFreeMemory)
-//            {
-//                s_isFreeMemory = true;
-//                FreeMemory();
-//            }
-
-//            if (ByteToM(Profiler.GetTotalReservedMemoryLong()) > s_MaxMemoryUse)
-//            {
-//                if (!s_isFreeMemory2)
-//                {
-//                    s_isFreeMemory2 = true;
-//                    FreeMemory();
-
-//#if !UNITY_EDITOR
-//                    Debug.LogError("总内存超标告警 ！当前总内存使用量： " + ByteToM(Profiler.GetTotalAllocatedMemory()) + "M");
-//#endif
-//                }
-//            }
-//            else
-//            {
-//                s_isFreeMemory2 = false;
-//            }
-//        }
-//        else
-//        {
-//            s_isFreeMemory = false;
-//        }
-
-//        if (ByteToM( Profiler.GetMonoUsedSizeLong() ) > s_MaxHeapMemoryUse * 0.7f)
-//        {
-//            if (!s_isFreeHeapMemory)
-//            {
-//                s_isFreeHeapMemory = true;
-//            }
-
-//            if (ByteToM( Profiler.GetMonoUsedSizeLong()) > s_MaxHeapMemoryUse)
-//            {
-//                if (!s_isFreeHeapMemory2)
-//                {
-//                    s_isFreeHeapMemory2 = true;
-//#if !UNITY_EDITOR
-//                    Debug.LogError("堆内存超标告警 ！当前堆内存使用量： " + ByteToM( Profiler.GetMonoUsedSize()) + "M");
-//#endif
-//                }
-//            }
-//            else
-//            {
-//                s_isFreeHeapMemory2 = false;
-//            }
-//        }
-//        else
-//        {
-//            s_isFreeHeapMemory = false;
-//        }
     }
 
 #endregion

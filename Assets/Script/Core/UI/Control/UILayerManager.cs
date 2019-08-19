@@ -44,6 +44,11 @@ public class UILayerManager : MonoBehaviour
                 Debug.LogError("UILayerManager :TopbarLayerParent is null!" + " key : " + data.m_key + " index : " + i);
             }
 
+            if (data.m_UpperParent == null)
+            {
+                Debug.LogError("UILayerManager :m_UpperParent is null!" + " key : " + data.m_key + " index : " + i);
+            }
+
             if (data.m_PopUpLayerParent == null)
             {
                 Debug.LogError("UILayerManager :popUpLayerParent is null!" + " key : " + data.m_key + " index : " + i);
@@ -73,6 +78,7 @@ public class UILayerManager : MonoBehaviour
                 ui.transform.SetParent(data.m_NormalLayerParent);
                 break;
             case UIType.TopBar: ui.transform.SetParent(data.m_TopbarLayerParent); break;
+            case UIType.Upper: ui.transform.SetParent(data.m_UpperParent); break;
             case UIType.PopUp: ui.transform.SetParent(data.m_PopUpLayerParent); break;
         }
 
@@ -146,6 +152,7 @@ public class UILayerManager : MonoBehaviour
         public Transform m_FixedLayerParent;
         public Transform m_NormalLayerParent;
         public Transform m_TopbarLayerParent;
+        public Transform m_UpperParent;
         public Transform m_PopUpLayerParent;
     }
 }

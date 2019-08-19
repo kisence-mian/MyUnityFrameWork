@@ -36,7 +36,7 @@ public class UGUITool
             return;
         }
 
-        Sprite sp = AssetsPoolManager.Load<Sprite>(name);// LoadSprite(name);
+        Sprite sp = ResourceManager.Load<Sprite>(name);// LoadSprite(name);
         if (sp != null)
         {
             img.overrideSprite = sp;// Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);
@@ -60,7 +60,7 @@ public class UGUITool
 
     public static Sprite LoadSprite(string resName)
     {
-        Texture2D texture = AssetsPoolManager.Load<Texture2D>(resName);
+        Texture2D texture = ResourceManager.Load<Texture2D>(resName);
         if (texture)
         {
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));

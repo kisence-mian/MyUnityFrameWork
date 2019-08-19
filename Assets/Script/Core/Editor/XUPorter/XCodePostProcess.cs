@@ -8,13 +8,16 @@ using System.IO;
 
 public static class XCodePostProcess
 {
-    const string c_configPath = "/IOSMods"; 
 
-#if UNITY_EDITOR 
+#if UNITY_EDITOR
 	[PostProcessBuild(999)]
 	public static void OnPostProcessBuild( BuildTarget target, string pathToBuiltProject )
 	{
+#if UNITY_5
 		if (target != BuildTarget.iOS) {
+#else
+        if (target != BuildTarget.iOS) {
+#endif
 			Debug.LogWarning("Target is not iPhone. XCodePostProcess will not run");
 			return;
 		}
@@ -22,19 +25,20 @@ public static class XCodePostProcess
 		// Create a new project object from build target
 		XCProject project = new XCProject( pathToBuiltProject );
 
-        string configPath = Application.dataPath + c_configPath;
-        FileTool.CreatPath(configPath);
-
-        // Find and run through all projmods files to patch the project.
-        // Please pay attention that ALL projmods files in your project folder will be excuted!
-        string[] files = Directory.GetFiles(configPath, "*.projmods", SearchOption.AllDirectories );
+		// Find and run through all projmods files to patch the project.
+		// Please pay attention that ALL projmods files in your project folder will be excuted!
+		string[] files = Directory.GetFiles( Application.dataPath, "*.projmods", SearchOption.AllDirectories );
 		foreach( string file in files ) {
-            Debug.Log("ProjMod File: "+file);
+			UnityEngine.Debug.Log("ProjMod File: "+file);
 			project.ApplyMod( file );
 		}
 
+		//TODO disable the bitcode for iOS 9
+		project.overwriteBuildSetting("ENABLE_BITCODE", "NO", "Release");
+		project.overwriteBuildSetting("ENABLE_BITCODE", "NO", "Debug");
+
 		//TODO implement generic settings as a module option
-		project.overwriteBuildSetting("CODE_SIGN_IDENTITY[sdk=iphoneos*]", "iPhone Distribution", "Release");
+//		project.overwriteBuildSetting("CODE_SIGN_IDENTITY[sdk=iphoneos*]", "iPhone Distribution", "Release");
 		
 		// Finally save the xcode project
 		project.Save();

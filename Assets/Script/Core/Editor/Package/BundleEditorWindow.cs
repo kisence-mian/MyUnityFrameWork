@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
+using System.IO;
 
 public class BundleEditorWindow : EditorWindow
 {
 
     #region GUI
+
+
 
     [MenuItem("Window/新打包设置编辑器 &1")]
 
@@ -128,6 +131,101 @@ public class BundleEditorWindow : EditorWindow
         hotUpdateConfig.Add(HotUpdateManager.c_UseTestDownLoadPathKey, new SingleField(false));
 
         ConfigEditorWindow.SaveData(HotUpdateManager.c_HotUpdateConfigName, hotUpdateConfig);
+    }
+
+    #endregion
+
+    #region 菜单工具
+
+    [MenuItem("Tools/资源/显示选中对象所有依赖资源")]
+    public static void ShowAllCorrelationResource()
+    {
+        UnityEngine.Object[] roots = Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Unfiltered);
+        Selection.objects = EditorUtility.CollectDependencies(roots);
+    }
+
+    [MenuItem("Tools/资源/显示所有引用选中资源的对象")]
+    public static void ShowAllQuotePefab()
+    {
+        selects = Selection.GetFiltered(typeof(UnityEngine.Object), SelectionMode.Unfiltered);
+        objects.Clear();
+        resourcePath = Application.dataPath + "/Resources/";
+        direIndex = resourcePath.LastIndexOf("/Resources/");
+        direIndex += "/Resources/".Length;
+        assetsIndex = resourcePath.LastIndexOf("Assets/");
+
+        RecursionDirectory(Application.dataPath + "/Resources/");
+        //RecursionDirectory(Application.dataPath + "/_Resources/");
+
+        Debug.Log("共有 " + objects.Count + " 个预设使用了选中资源");
+
+        Selection.objects = objects.ToArray();
+    }
+
+    static UnityEngine.Object[] selects;
+    static int direIndex = 0;
+    static int assetsIndex = 0;
+    static string resourcePath;
+
+    static List<UnityEngine.Object> objects = new List<UnityEngine.Object>();
+
+    static void RecursionDirectory(string path)
+    {
+        if (!File.Exists(path))
+        {
+            FileTool.CreatPath(path);
+        }
+
+        string[] dires = Directory.GetDirectories(path);
+
+        for (int i = 0; i < dires.Length; i++)
+        {
+            RecursionDirectory(dires[i]);
+        }
+
+        string[] files = Directory.GetFiles(path);
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            string f = files[i];
+            if (f.EndsWith(".meta") || f.EndsWith(".exe"))
+                continue;
+            else
+            {
+                string relativePath = FileTool.RemoveExpandName(f.Substring(direIndex));
+                string assetsPath = f.Substring(assetsIndex);
+                UnityEngine.Object obj = Resources.Load(relativePath);
+                if (obj == null)
+                {
+                    Debug.LogError("Resources obj is null ->" + relativePath);
+                }
+
+                FindAsset(obj, assetsPath);
+            }
+        }
+    }
+
+    static UnityEngine.Object[] GetCorrelationResource(UnityEngine.Object go)
+    {
+        UnityEngine.Object[] roots = new UnityEngine.Object[] { go };
+        return EditorUtility.CollectDependencies(roots);
+    }
+
+    private static void FindAsset(UnityEngine.Object obj, string assetsPath)
+    {
+        //Debug.Log(assetsPath);
+        UnityEngine.Object[] objs = GetCorrelationResource(obj);
+
+        for (int i = 0; i < selects.Length; i++)
+        {
+            for (int j = 0; j < objs.Length; j++)
+            {
+                if(selects[i] == objs[j])
+                {
+                    objects.Add(obj);
+                }
+            }
+        }
     }
 
     #endregion

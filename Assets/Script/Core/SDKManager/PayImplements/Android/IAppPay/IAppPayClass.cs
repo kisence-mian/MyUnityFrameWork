@@ -59,7 +59,7 @@ public class IAppPayClass : PayInterface
         onPayInfo.storeName = StoreName.IAppPay;
         onPayInfo.receipt = e.mch_orderID;
         PayReSend.Instance.AddPrePayID(onPayInfo);
-        IndentListener(e.mch_orderID, e.prepay_id, nonceStr, timeStamp, sign);
+        IndentListener(e.goodsID,e.mch_orderID, e.prepay_id, nonceStr, timeStamp, sign);
     }
 
     /// <summary>
@@ -82,12 +82,12 @@ public class IAppPayClass : PayInterface
     /// <summary>
     /// 消息1 的监听， 获得订单信息，然后调支付sdk
     /// </summary>
-    private void IndentListener(string mch_orderID,string prepay_id, string nonceStr ,string timeStamp , string sign)
+    private void IndentListener(string goodID, string mch_orderID,string prepay_id, string nonceStr ,string timeStamp , string sign)
     {
         this.mch_orderID = mch_orderID;
 
-        string tag = prepay_id + "|" + nonceStr + "|" + timeStamp + "|" + sign;
-        PayInfo payInfo = new PayInfo(prepay_id, "", tag, FrameWork.SDKManager.GoodsType.NORMAL, "", 0, GetGoodsInfo(goodsID).isoCurrencyCode);
+        string tag = mch_orderID;
+        PayInfo payInfo = new PayInfo(goodID, "", tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, 0, GetGoodsInfo(goodsID).isoCurrencyCode);
 
         SDKManagerNew.Pay(StoreName.IAppPay.ToString(), payInfo);
     }

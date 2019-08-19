@@ -80,7 +80,7 @@ namespace HDJ.Framework.Tools
 			{
 				return result;
 			}
-			throw new SerializationException("Invalid JSON string");
+			throw new SerializationException("Invalid JSON string£º"+ json);
 		}
 
 		public static bool TryDeserializeObject(string json, out object obj)

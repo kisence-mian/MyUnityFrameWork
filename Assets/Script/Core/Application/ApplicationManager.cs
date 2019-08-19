@@ -186,11 +186,11 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-    /*
-     * 强制暂停时，先 OnApplicationPause，后 OnApplicationFocus
-     * 重新“启动”游戏时，先OnApplicationFocus，后 OnApplicationPause
-     */
-    void OnApplicationPause(bool pauseStatus)
+/*
+ * 强制暂停时，先 OnApplicationPause，后 OnApplicationFocus
+ * 重新“启动”游戏时，先OnApplicationFocus，后 OnApplicationPause
+ */
+void OnApplicationPause(bool pauseStatus)
     {
         if (s_OnApplicationPause != null)
         {
@@ -262,11 +262,11 @@ public class ApplicationManager : MonoBehaviour
     {
         if (UseAssetsBundle)
         {
-            ResourceManager.m_gameLoadType = ResLoadLocation.Streaming;
+            ResourceManager.LoadType =  AssetsLoadType.AssetBundle;
         }
         else
         {
-            ResourceManager.m_gameLoadType = ResLoadLocation.Resource;
+            ResourceManager.LoadType = AssetsLoadType.Resources;
         }
     }
 

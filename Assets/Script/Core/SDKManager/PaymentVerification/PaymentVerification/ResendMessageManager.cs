@@ -26,6 +26,7 @@ public class ResendMessageManager
 
     private static void MessageReceiveCallBack(InputNetworkMessageEvent inputEvent)
     {
+       
 
         if (msgs.Count == 0)
             return;
@@ -79,7 +80,7 @@ public class ResendMessageManager
     private static float tempResendTime = 0;
     private static void Update()
     {
-
+        //Debug.Log(msgs.Count+" :"+ startResend+" :"+ tempResendTime);
         if (msgs.Count == 0)
             return;
         if (!startResend)
@@ -93,6 +94,7 @@ public class ResendMessageManager
         tempResendTime = resendTime;
         foreach (ResendMessage m in msgs)
         {
+            //Debug.LogWarning(m.mt + " :" + m.noSend);
             if (m.noSend)
                 continue;
             JsonMessageProcessingController.SendMessage(m.mt, m.content);
@@ -114,12 +116,14 @@ public class ResendMessageManager
             }
         }
             string content = JsonUtils.ToJson(data);
+        //Debug.LogError("noSend:" + noSend);
         if (msgResnd != null)
         {
             msgResnd.removeMT = removeMT;
             msgResnd.content = content;
             msgResnd.callBack = callBack;
             msgResnd.noSend = noSend;
+            //Debug.LogError("msgResnd.noSend:" + msgResnd.noSend);
         }
         else
         {

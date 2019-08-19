@@ -871,7 +871,15 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
     public void SetText(string TextID, string content)
     {
-        GetText(TextID).text = content.Replace("\\n", "\n");
+        if (string.IsNullOrEmpty(content))
+        {
+            GetText(TextID).text = content;
+        }
+        else
+        {
+            GetText(TextID).text = content.Replace("\\n", "\n");
+        }
+
     }
 
     public void SetImageColor(string ImageID, Color color)
@@ -989,13 +997,15 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     private Dictionary<string, int> loadSpriteNames = new Dictionary<string, int>();
     public void SetImageSprite(Image img, string name, bool is_nativesize = false)
     {
-        if(ResourceManager.GetResourceIsExist(name))
+        if(ResourcesConfigManager.GetIsExitRes(name))
         {
             UGUITool.SetImageSprite(img, name, is_nativesize);
             if (!loadSpriteNames.ContainsKey(name))
                 loadSpriteNames.Add(name, 1);
             else
                 loadSpriteNames[name]++;
+            //if (name == "CLT_border_TagBg_Hunter")
+            //    Debug.Log("UIBase 加载图片：" + name + " ==>" + loadSpriteNames[name]);
         }
         else
         {
@@ -1005,11 +1015,13 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
     private void ClearLoadSprite()
     {
+        //Debug.Log("===>> ClearLoadSprite");
         foreach (var item in loadSpriteNames)
         {
             int num = item.Value;
-            //Debug.Log("UIBase 回收图片：" + item.Key + ":" + num);
-                AssetsPoolManager.DestroyByPool(item.Key,num);
+            //if (item.Key == "CLT_border_TagBg_Hunter")
+            //    Debug.Log("UIBase 回收图片：" + item.Key + ":" + num);
+            ResourceManager.DestoryAssetsCounter(item.Key,num);
             
            
         }

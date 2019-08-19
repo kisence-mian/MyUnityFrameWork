@@ -108,9 +108,10 @@ public class AudioGroupSystem :MonoBehaviour
         GameObject obj = new GameObject("[AudioGroupSystem]");
         instance = obj.AddComponent<AudioGroupSystem>();
 
-        TextAsset asset = AssetsPoolManager.Load<TextAsset>(ConfigName);
+        TextAsset asset = ResourceManager.Load<TextAsset>(ConfigName);
 
         List<AudioGroupData> datas = JsonUtils.FromJson<List<AudioGroupData>>(asset.text);
+        ResourceManager.DestoryAssetsCounter(ConfigName);
         audioGroupDataDic.Clear();
         foreach (var item in datas)
         {

@@ -261,31 +261,12 @@ public static class PackageService
         direIndex += c_ResourceParentPath.Length;
 
         assetsIndex = resourcePath.LastIndexOf(c_AssetsParentPath);
-
+        EditorUtility.DisplayProgressBar("生成Bundle名字", "进度", 0);
         RecursionDirectory(Application.dataPath + "/Resources/");
 
         length = AssetDatabase.GetAllAssetBundleNames().Length;
         Debug.Log("生成后 bundle数目 " + length);
-
-        //string[] allFilePath= HDJ.Framework.Utils.PathUtils.GetDirectoryFilePath("Assets/Resources/");
-
-        //foreach (var path in allFilePath)
-        //{
-        //    if (path.EndsWith(".meta") || path.EndsWith(".exe"))
-        //        continue;
-        //    else
-        //    {
-        //        string relativePath = FileTool.RemoveExpandName(f.Substring(direIndex));
-        //        string assetsPath = f.Substring(assetsIndex);
-        //        Object obj = Resources.Load(relativePath);
-        //        if (obj == null)
-        //        {
-        //            Debug.LogError("Resources obj is null ->" + relativePath);
-        //        }
-
-        //        SetAssetBundle(obj, assetsPath);
-        //    }
-        //}
+        EditorUtility.ClearProgressBar();
     }
 
     //递归所有目录
@@ -576,7 +557,6 @@ public static class PackageService
     //            }
     //            SetBundleName(tempPath);
     //        }
-
     //    }
     //}
 }

@@ -11,12 +11,37 @@ public class LanguageDataUtils
     public static LanguageSettingConfig LoadEditorConfig()
     {
 
-        if(ResourceManager.GetResourceIsExist(LanguageManager.c_configFileName))
+        if(ResourcesConfigManager.GetIsExitRes(LanguageManager.c_configFileName))
         {
             LanguageSettingConfig config;
 
-            string json = AssetsPoolManager.ReadTextFile(LanguageManager.c_configFileName);
+            string json = ResourceManager.EditorLoad<TextAsset>(LanguageManager.c_configFileName).text;
 
+            if (!string.IsNullOrEmpty(json))
+                config = JsonUtils.FromJson<LanguageSettingConfig>(json);
+            else
+            {
+                config = null;
+
+                //config.defaultLanguage = SystemLanguage.ChineseSimplified;
+                //config.gameExistLanguages.Add(SystemLanguage.ChineseSimplified);
+            }
+            return config;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public static LanguageSettingConfig LoadRuntimeConfig()
+    {
+
+        if (ResourcesConfigManager.GetIsExitRes(LanguageManager.c_configFileName))
+        {
+            LanguageSettingConfig config;
+
+            string json = ResourceManager.LoadText(LanguageManager.c_configFileName);
+            ResourceManager.DestoryAssetsCounter(LanguageManager.c_configFileName);
             if (!string.IsNullOrEmpty(json))
                 config = JsonUtils.FromJson<LanguageSettingConfig>(json);
             else

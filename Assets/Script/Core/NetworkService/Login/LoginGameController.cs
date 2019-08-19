@@ -19,11 +19,13 @@ public class LoginGameController
     /// 退出登录回调
     /// </summary>
     public static CallBack<UserLogout2Client> OnUserLogout;
+
     /// <summary>
     /// 是否已登录
     /// </summary>
     public static bool isLogin = false;
-   
+    public static bool isClickLogin = false;
+
     [RuntimeInitializeOnLoadMethod]
     private static void Init()
     {
@@ -35,8 +37,6 @@ public class LoginGameController
         ApplicationManager.s_OnApplicationUpdate += LogonUpdate;
     }
 
-
-
     /// <summary>
     /// 登录
     /// </summary>
@@ -45,6 +45,7 @@ public class LoginGameController
     /// <param name="pw"></param>
     public static void Login(LoginPlatform loginPlatform, string accountID = "", string pw = "")
     {
+        
         SDKManager.LoginCallBack += SDKLoginCallBack;
         string tag = "";
         if (loginPlatform == LoginPlatform.AccountLogin)
@@ -56,6 +57,7 @@ public class LoginGameController
         }
         SDKManager.LoginByPlatform(loginPlatform, tag);
     }
+
     /// <summary>
     /// 退出登录
     /// </summary>
@@ -68,7 +70,6 @@ public class LoginGameController
     #region 消息重发
     const float c_reSendTimer = 3; //重发间隔
 
-
     static float reSendTimer = 0;
 
     /// <summary>
@@ -80,18 +81,21 @@ public class LoginGameController
         {
             return;
         }
+
+        if(!isClickLogin)
+        {
+            return;
+        }
+
         if (reSendTimer > 0)
         {
             reSendTimer -= Time.deltaTime;
 
             if (reSendTimer < 0)
             {
-                SendLoginMsg(loginMsg);
+                NetworkManager.DisConnect();
             }
-
         }
-
-
     }
 
 
@@ -102,6 +106,7 @@ public class LoginGameController
     private static void OnUserLogoutEvent(UserLogout2Client e, object[] args)
     {
         isLogin = false;
+        isClickLogin = false;
         ResendMessageManager.startResend = false;
         loginMsg = null;
         if (OnUserLogout!=null)
@@ -142,6 +147,7 @@ public class LoginGameController
         }
         if (info.isSuccess)
         {
+            isClickLogin = true;
             UserLogin2Server msg = UserLogin2Server.GetLoginMessage(info.loginPlatform, info.accountId, info.password);
             SendLoginMsg(msg);
         }
@@ -174,6 +180,5 @@ public class LoginGameController
         Debug.Log("SendLoginMsg -->" + reLoginState);
         JsonMessageProcessingController.SendMessage(loginMsg);
     }
-
 }
 

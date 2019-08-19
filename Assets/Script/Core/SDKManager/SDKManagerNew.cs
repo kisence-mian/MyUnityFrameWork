@@ -78,7 +78,7 @@ namespace FrameWork.SDKManager
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Login);
-            data.Add(SDKInterfaceDefine.Login_ParameterName_Device, SystemInfo.deviceUniqueIdentifier);
+            data.Add(SDKInterfaceDefine.Login_ParameterName_Device, SystemInfoManager.deviceUniqueIdentifier);
             data.Add(SDKInterfaceDefine.SDKName, SDKName);
             data.Add(SDKInterfaceDefine.Tag, tag);
 
@@ -121,6 +121,8 @@ namespace FrameWork.SDKManager
             }
 
 #elif UNITY_IOS
+             return new List<LoginPlatform>();
+#else
              return new List<LoginPlatform>();
 #endif
 

@@ -969,13 +969,6 @@ public class BundleConfigEditorWindow : EditorWindow
 
     #region 添加菜单按钮
 
-    [MenuItem("Tool/显示选中对象所有相关资源")]
-    public static void ShowAllCorrelationResource()
-    {
-        Object[] roots = Selection.GetFiltered(typeof(Object), SelectionMode.Unfiltered);
-        Selection.objects = EditorUtility.CollectDependencies(roots);
-    }
-
     [MenuItem("Window/打包设置编辑器 &9")]
 
     public static void ShowWindow()

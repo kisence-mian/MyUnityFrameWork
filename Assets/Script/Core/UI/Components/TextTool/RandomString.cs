@@ -28,8 +28,8 @@ public class RandomString : MonoBehaviour {
             {
                 continue;
             }
-            string[] subString = AssetsPoolManager.ReadTextFile(subStringList[i]).Split(splitChar);
-
+            string[] subString = ResourceManager.LoadText(subStringList[i]).Split(splitChar);
+            ResourceManager.DestoryAssetsCounter(subStringList[i]);
             subStringsData.Add(subStringList[i], subString);
         }
 

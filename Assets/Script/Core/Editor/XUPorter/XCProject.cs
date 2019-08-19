@@ -46,6 +46,7 @@ namespace UnityEditor.XCodeEditor
 		
 		#endregion
 
+
 		#region Constructor
 		
 		public XCProject()
@@ -55,6 +56,7 @@ namespace UnityEditor.XCodeEditor
 		
 		public XCProject( string filePath ) : this()
 		{
+
 			if( !System.IO.Directory.Exists( filePath ) ) {
 				Debug.LogWarning( "XCode project path does not exist: " + filePath );
 				return;
@@ -107,9 +109,11 @@ namespace UnityEditor.XCodeEditor
 				_project = null;
 				_rootGroup = null;
 			}
+
 		}
 		
 		#endregion
+
 
 		#region Properties
 		
@@ -235,6 +239,7 @@ namespace UnityEditor.XCodeEditor
 
 		#endregion
 
+
 		#region PBXMOD
 		
 		public bool AddOtherCFlags( string flag )
@@ -249,6 +254,19 @@ namespace UnityEditor.XCodeEditor
 			}
 			modified = true;
 			return modified;	
+		}
+
+		public bool AddOtherLinkerFlagsWithForceLoad(string absoluteFilePath){
+			if (!File.Exists(absoluteFilePath)) {
+				return false;
+			}
+
+			AddOtherLinkerFlags ("-force_load");
+			System.Uri fileURI = new System.Uri( absoluteFilePath );
+			System.Uri rootURI = new System.Uri( ( projectRootPath + "/." ) );
+			string relativeFilePath = rootURI.MakeRelativeUri( fileURI ).ToString();
+
+			return AddOtherLinkerFlags (relativeFilePath);
 		}
 
 		public bool AddOtherLinkerFlags( string flag )
@@ -706,7 +724,7 @@ namespace UnityEditor.XCodeEditor
 		{	
 			PBXGroup modGroup = this.GetGroup( mod.group );
 			
-			Debug.Log( "Adding libraries.." );
+			Debug.Log( "Adding libraries..." );
 			
 			foreach( XCModFile libRef in mod.libs ) {
 				string completeLibPath = System.IO.Path.Combine( "usr/lib", libRef.filePath );
@@ -714,7 +732,7 @@ namespace UnityEditor.XCodeEditor
 				this.AddFile( completeLibPath, modGroup, "SDKROOT", true, libRef.isWeak );
 			}
 			
-			Debug.Log( "Adding frameworks.." );
+			Debug.Log( "Adding frameworks..." );
 			PBXGroup frameworkGroup = this.GetGroup( "Frameworks" );
 			foreach( string framework in mod.frameworks ) {
 				string[] filename = framework.Split( ':' );
@@ -723,13 +741,14 @@ namespace UnityEditor.XCodeEditor
 				this.AddFile( completePath, frameworkGroup, "SDKROOT", true, isWeak );
 			}
 
-			Debug.Log( "Adding files.." );
+			Debug.Log( "Adding files..." );
 			foreach( string filePath in mod.files ) {
 				string absoluteFilePath = System.IO.Path.Combine( mod.path, filePath );
+
 				this.AddFile( absoluteFilePath, modGroup );
 			}
 
-			Debug.Log( "Adding embed binaries.." );
+			Debug.Log( "Adding embed binaries..." );
 			if (mod.embed_binaries != null)
 			{
 				//1. Add LD_RUNPATH_SEARCH_PATHS for embed framework
@@ -742,14 +761,14 @@ namespace UnityEditor.XCodeEditor
 				}
 			}
 			
-			Debug.Log( "Adding folders.." );
+			Debug.Log( "Adding folders..." );
 			foreach( string folderPath in mod.folders ) {
 				string absoluteFolderPath = System.IO.Path.Combine( Application.dataPath, folderPath );
 				Debug.Log ("Adding folder " + absoluteFolderPath);
 				this.AddFolder( absoluteFolderPath, modGroup, (string[])mod.excludes.ToArray( typeof(string) ) );
 			}
 			
-			Debug.Log( "Adding headerpaths.." );
+			Debug.Log( "Adding headerpaths..." );
 			foreach( string headerpath in mod.headerpaths ) {
 				if (headerpath.Contains("$(inherited)")) {
 					Debug.Log ("not prepending a path to " + headerpath);
@@ -760,17 +779,17 @@ namespace UnityEditor.XCodeEditor
 				}
 			}
 
-			Debug.Log( "Adding compiler flags.." );
+			Debug.Log( "Adding compiler flags..." );
 			foreach( string flag in mod.compiler_flags ) {
 				this.AddOtherCFlags( flag );
 			}
 
-			Debug.Log( "Adding linker flags.." );
+			Debug.Log( "Adding linker flags..." );
 			foreach( string flag in mod.linker_flags ) {
 				this.AddOtherLinkerFlags( flag );
 			}
 
-			Debug.Log ("Adding plist items..");
+			Debug.Log ("Adding plist items...");
 			string plistPath = this.projectRootPath + "/Info.plist";
 			XCPlist plist = new XCPlist (plistPath);
 			plist.Process(mod.plist);

@@ -774,7 +774,7 @@ public class DevelopReplayManager
             Time.timeScale *= 0.5f;
         }
 
-        if (Input.GetKeyDown(KeyCode.F12))
+        if (Input.GetKeyDown(KeyCode.F10))
         {
             string name = GetScreenshotFileName();
             Debug.Log("已保存 屏幕截图 " + name);

@@ -79,6 +79,7 @@ public static class StorePayController
     public static void Pay(string goodID,float price,string goodsName,string currency)
     {
         PayInfo payInfo = new PayInfo(goodID, goodsName, "", FrameWork.SDKManager.GoodsType.NORMAL, "", price, currency);
+        NetworkVerificationImplement.SetBuyResendMessage(new StoreBuyGoods2Server(), true);
         if (Application.platform == RuntimePlatform.Android)
         {
            
@@ -89,7 +90,7 @@ public static class StorePayController
         {
             SDKManager.Pay(payInfo);
         }
-        NetworkVerificationImplement.SetBuyResendMessage(new StoreBuyGoods2Server(), true);
+        
     }
 }
 

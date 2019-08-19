@@ -51,13 +51,51 @@ public static class ResourcesConfigManager
 
         return s_config[bundleName].GetString(c_PathKey);
     }
+    /// <summary>
+    /// 根据AssetsLoadType获取加载路径
+    /// </summary>
+    /// <param name="bundleName"></param>
+    /// <returns></returns>
+  public  static string GetLoadPath(AssetsLoadType assetsloadType, string name)
+    {
+        string path = GetResourcePath(name);
+        if (assetsloadType == AssetsLoadType.Resources)
+            return path;
+        else
+        {
+            return GetLoadPathBase(assetsloadType, path);
+        }
+    }
+    public static string GetLoadPathBase(AssetsLoadType assetsloadType, string path)
+    {
+//#if !UNITY_WEBGL
 
+        bool isLoadByPersistent = RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(path, "null") == "null" ? false : true;
+        ResLoadLocation loadType = ResLoadLocation.Streaming;
+
+        //加载路径由 加载根目录 和 相对路径 合并而成
+        //加载根目录由配置决定
+        if (isLoadByPersistent)
+        {
+            loadType = ResLoadLocation.Persistent;
+            return PathTool.GetAssetsBundlePersistentPath() + path;
+        }
+        else
+        {
+            loadType = ResLoadLocation.Streaming;
+            return PathTool.GetAbsolutePath(loadType, path);
+        }
+
+//#else
+//        return PathTool.GetLoadURL(config.path + "." + c_AssetsBundlesExpandName);
+//#endif
+    }
     public static void LoadResourceConfig()
     {
 #if !UNITY_WEBGL
         string data = "";
 
-        if (ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
+        if (ResourceManager.LoadType ==  AssetsLoadType.Resources)
         {
             data = ResourceIOTool.ReadStringByResource(c_ManifestFileName + "." + DataManager.c_expandName);
         }

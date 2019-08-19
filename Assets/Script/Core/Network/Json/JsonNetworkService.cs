@@ -24,6 +24,8 @@ public class JsonNetworkService : INetworkInterface
 
     public override void Connect()
     {
+        EncryptionService.Init();
+
         m_msgCode = 0;
         base.Connect();
     }
@@ -48,7 +50,7 @@ public class JsonNetworkService : INetworkInterface
             mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
 
             //加密
-            if (EncryptionService.IsSecret && MessageType != HeartBeatBase.c_HeartBeatMT)
+            if ( MessageType != HeartBeatBase.c_HeartBeatMT && EncryptionService.IsSecret)
             {
                 mes = EncryptionService.Encrypt(mes);
             }
@@ -59,7 +61,7 @@ public class JsonNetworkService : INetworkInterface
         }
         catch (Exception e)
         {
-            Debug.LogError(e.ToString());
+            Debug.LogError(e.ToString() + " MT:" + MessageType);
         }
     }
 
@@ -88,29 +90,32 @@ public class JsonNetworkService : INetworkInterface
             isEnd = true;
         }
 
-        m_buffer.Append(s);
-
-        string buffer = m_buffer.ToString();
-
-        m_buffer.Remove(0,m_buffer.Length);
-
-        string[] str = buffer.Split(c_endChar);
-
-        for (int i = 0; i < str.Length; i++)
+        lock(m_buffer)
         {
-            if (i != str.Length - 1)
+            m_buffer.Append(s);
+
+            string buffer = m_buffer.ToString();
+
+            m_buffer.Remove(0, m_buffer.Length);
+
+            string[] str = buffer.Split(c_endChar);
+
+            for (int i = 0; i < str.Length; i++)
             {
-                CallBack(str[i]);
-            }
-            else
-            {
-                if (isEnd)
+                if (i != str.Length - 1)
                 {
                     CallBack(str[i]);
                 }
                 else
                 {
-                    m_buffer.Append(str[i]);
+                    if (isEnd)
+                    {
+                        CallBack(str[i]);
+                    }
+                    else
+                    {
+                        m_buffer.Append(str[i]);
+                    }
                 }
             }
         }
@@ -147,6 +152,7 @@ public class JsonNetworkService : INetworkInterface
                         {
                             m_msgCode = msg.m_MsgCode;
                             m_msgCode++;
+                            m_messageCallBack(msg);
                         }
                     }
                     else

@@ -89,7 +89,7 @@ public class HotUpdateManager
                 string StreamVersionContent = text.text;
 
                 ab.Unload(true);
-
+                Debug.Log("Streaming版本:" + StreamVersionContent);
                 //stream版本
                 Dictionary<string, object> StreamVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(StreamVersionContent);
 
@@ -102,6 +102,7 @@ public class HotUpdateManager
 
                     RecordManager.CleanRecord(c_HotUpdateRecordName);
                     Init();
+                    AssetsManifestManager.LoadAssetsManifest();
                 }
                 return true;
             }
@@ -319,11 +320,13 @@ public class HotUpdateManager
         //从stream读取配置
         RecordManager.SaveRecord(c_HotUpdateRecordName, c_useHotUpdateRecordKey, true);
 
-        UpdateDateCallBack(HotUpdateStatusEnum.UpdateSuccess, 1);
-
         //重新生成资源配置
         ResourcesConfigManager.LoadResourceConfig();
         AssetsManifestManager.LoadAssetsManifest();
+        ResourceManager.ReleaseAll(false);
+        UpdateDateCallBack(HotUpdateStatusEnum.UpdateSuccess, 1);
+
+        
     }
 
     static void Init()
@@ -331,20 +334,32 @@ public class HotUpdateManager
         s_versionConfig   = (Dictionary<string,object>) FrameWork.Json.Deserialize(ReadVersionContent());
         s_hotUpdateConfig = ConfigManager.GetData(c_HotUpdateConfigName);
 
-        string downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "");//优先从注入数据中查询
-        bool isTest = s_hotUpdateConfig[c_UseTestDownLoadPathKey].GetBool();
-
         //获取下载地址
-        if(string.IsNullOrEmpty(downLoadServicePath))
-        { 
-            if (isTest)
+        //优先从注入数据中查询
+        string downLoadServicePath = null;
+        if (ApplicationManager.AppMode == AppMode.Release)
+        {
+            if(string.IsNullOrEmpty(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "")))
+            {
+                downLoadServicePath = s_hotUpdateConfig[c_downLoadPathKey].GetString();
+            }
+            else
+            {
+                downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "");
+            }
+        }
+        else
+        {
+            if (string.IsNullOrEmpty(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_TestUpdateDownLoadPath, "")))
             {
                 downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
             }
             else
             {
-                downLoadServicePath = s_hotUpdateConfig[c_downLoadPathKey].GetString();
+                downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_TestUpdateDownLoadPath, "");
             }
+
+            downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
         }
 
         string downLoadPath = downLoadServicePath + "/" + platform + "/" + Application.version + "/";
@@ -416,7 +431,7 @@ public class HotUpdateManager
     {
         string dataJson = "";
 
-        if (ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
+        if (ResourceManager.LoadType == AssetsLoadType.Resources)
         {
             dataJson = ResourceIOTool.ReadStringByResource(
                 c_versionFileName + "." + ConfigManager.c_expandName);
@@ -434,6 +449,7 @@ public class HotUpdateManager
                 TextAsset text = ab.LoadAsset<TextAsset>(c_versionFileName);
                 dataJson = text.text;
                 ab.Unload(true);
+                Debug.Log("沙河路径版本："+dataJson);
             }
             else
             {
@@ -441,7 +457,9 @@ public class HotUpdateManager
                     TextAsset text = ab.LoadAsset<TextAsset>(c_versionFileName);
                     dataJson = text.text;
                     ab.Unload(true);
+                Debug.Log("Streaming路径版本：" + dataJson);
             }
+            
         }
 
         return dataJson;

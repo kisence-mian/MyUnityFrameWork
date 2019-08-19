@@ -109,6 +109,7 @@ namespace FrameWork.SDKManager
 
         public const string PropertiesKey_IsLog = "IsLog";                           //是否输出日志
         public const string PropertiesKey_UpdateDownLoadPath = "UpdateDownLoadPath"; //热更新下载地址(最后没有斜线)
+        public const string PropertiesKey_TestUpdateDownLoadPath = "TestUpdateDownLoadPath"; //热更新下载测试地址(最后没有斜线)
         public const string PropertiesKey_ChannelName = "ChannelName";               //渠道名称
         public const string PropertiesKey_StoreName   = "StoreName";                 //商店名称
         public const string PropertiesKey_LoginPlatform = "LoginPlatform";           //登录平台

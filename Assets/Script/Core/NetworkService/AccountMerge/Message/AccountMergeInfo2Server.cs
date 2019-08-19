@@ -29,7 +29,7 @@ public class AccountMergeInfo2Server
         msg.typeKey = typeKey;
         msg.pw = pw;
 
-        msg.deviceUniqueIdentifier = SystemInfo.deviceUniqueIdentifier;
+        msg.deviceUniqueIdentifier = SystemInfoManager.deviceUniqueIdentifier;
         msg.platform = Application.platform;
         msg.deviceSystemLanguage = Application.systemLanguage;
 

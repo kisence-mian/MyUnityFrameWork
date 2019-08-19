@@ -28,11 +28,11 @@ public class ProtocolNetworkService : INetworkInterface
 
     public override void Init()
     {
-        m_protocolInfo = ReadProtocolInfo(AssetsPoolManager.ReadTextFile(c_ProtocolFileName));
+        m_protocolInfo = ReadProtocolInfo(ResourceManager.LoadText(c_ProtocolFileName));
         ReadMethodNameInfo(
             out m_methodNameInfo,
             out m_methodIndexInfo,
-            AssetsPoolManager.ReadTextFile(c_methodNameInfoFileName));
+            ResourceManager.LoadText(c_methodNameInfoFileName));
 
         m_messageBuffer = new byte[1024 * 1024 * 8];
 

@@ -43,7 +43,7 @@ public class AudioPlayerBase
 
     public AudioClip GetAudioClip(string name)
     {
-        AudioClip red = AssetsPoolManager.Load<AudioClip>(name);
+        AudioClip red = ResourceManager.Load<AudioClip>(name);
         if (red != null)
         {
             return red;
@@ -92,7 +92,7 @@ public class AudioPlayerBase
         {
             string name = asset.assetName;
             asset.audioSource.clip = null;
-            AssetsPoolManager.DestroyByPool(name);
+            ResourceManager.DestoryAssetsCounter(name);
         }
     }
          

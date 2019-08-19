@@ -80,7 +80,7 @@ public class EncryptionService : MonoBehaviour
         }
     }
 
-    static void Init()
+    public static void Init()
     {
         if (!isInit)
         {

@@ -53,7 +53,7 @@ public class vivoPayClass : PayInterface
         onPayInfo.storeName = StoreName.VIVO;
         onPayInfo.receipt = e.mch_orderID;
         PayReSend.Instance.AddPrePayID(onPayInfo);
-        IndentListener(e.mch_orderID, e.prepay_id);
+        IndentListener(e.goodsID,e.mch_orderID, e.prepay_id);
     }
 
     /// <summary>
@@ -76,12 +76,12 @@ public class vivoPayClass : PayInterface
     /// <summary>
     /// 消息1 的监听， 获得订单信息，然后调支付sdk
     /// </summary>
-    private void IndentListener(string mch_orderID,string prepay_id)
+    private void IndentListener(string goodID,string mch_orderID,string prepay_id)
     {
         this.mch_orderID = mch_orderID;
 
-        string tag = "";
-        PayInfo payInfo = new PayInfo(prepay_id, "", tag, FrameWork.SDKManager.GoodsType.NORMAL, "", 0, GetGoodsInfo(goodsID).isoCurrencyCode);
+        string tag = mch_orderID;
+        PayInfo payInfo = new PayInfo(goodID, "", tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, 0, GetGoodsInfo(goodsID).isoCurrencyCode);
         SDKManagerNew.Pay(StoreName.VIVO.ToString(), payInfo);
     }
 

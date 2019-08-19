@@ -36,7 +36,7 @@ public class DataManager
 
             if (Application.isPlaying)
             {
-                dataJson = AssetsPoolManager.ReadTextFile(DataName);
+                dataJson = ResourceManager.LoadText(DataName);
             }
             else
             {
@@ -67,6 +67,10 @@ public class DataManager
     /// </summary>
     public static void CleanCache()
     {
+        foreach (var item in s_dataCache.Keys)
+        {
+            ResourceManager.DestoryAssetsCounter(item);
+        }
         s_dataCache.Clear();
     }
 }

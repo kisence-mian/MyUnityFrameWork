@@ -13,7 +13,8 @@ public abstract class HeartBeatBase
     public const int ReciveThreadSleepTime = 100;
     public const int SendThreadSleepTime = 100;
     #region 属性
-    private float m_heatBeatSendSpaceTime = 3f;
+    //毫秒
+    private float m_heatBeatSendSpaceTime = 3000f;
 
     private float m_sendHeatBeatTimer;
     private float m_receviceHeatBeatTimer;
@@ -39,7 +40,9 @@ public abstract class HeartBeatBase
 
         set
         {
-            m_heatBeatSendSpaceTime = Mathf.Clamp(value, 2f, 100);
+            m_heatBeatSendSpaceTime = value;
+            if (m_heatBeatSendSpaceTime < 0)
+                m_heatBeatSendSpaceTime = 3000;
             ResetSendTimer();
         }
     }
@@ -91,10 +94,9 @@ public abstract class HeartBeatBase
         {
             if (NetworkManager.IsConnect)
             {
-                NetWorkMessage msg = NetworkManager.GetHeartBeatMessage();
-
-                if (!string.IsNullOrEmpty(msg.m_MessageType))
+                if (NetworkManager.HasHeartBeatMessage())
                 {
+                    NetworkManager.GetHeartBeatMessage();
                     ResetReceviceTimer();
                 }
                 else
@@ -164,7 +166,7 @@ public abstract class HeartBeatBase
     /// </summary>
     void ResetReceviceTimer()
     {
-        m_receviceHeatBeatTimer = (HeatBeatSendSpaceTime * 2 + 1) *1000;
+        m_receviceHeatBeatTimer = HeatBeatSendSpaceTime * 2 +1000;
     }
 
     void ResetSendTimer()

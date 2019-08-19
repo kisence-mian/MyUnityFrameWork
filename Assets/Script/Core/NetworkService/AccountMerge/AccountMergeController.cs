@@ -66,8 +66,8 @@ public class AccountMergeController
 
     private static void OnAccountMergeInfo(AccountMergeInfo2Client e, object[] args)
     {
-        if (!e.alreadyExistAccount)
-            return;
+        //if (!e.alreadyExistAccount)
+        //    return;
         Debug.Log("要绑定的账户已存在：" + e.mergeAccount.userID);
         if (OnMergeAccountExist != null)
         {

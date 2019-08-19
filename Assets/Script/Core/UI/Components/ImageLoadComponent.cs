@@ -37,7 +37,7 @@ public class ImageLoadComponent : MonoBehaviour {
     private void OnDestroy()
     {
         if (!string.IsNullOrEmpty(iconName))
-            AssetsPoolManager.DestroyByPool(iconName);
+            ResourceManager.DestoryAssetsCounter(iconName);
     }
 
 }

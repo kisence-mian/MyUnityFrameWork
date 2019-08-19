@@ -441,13 +441,66 @@ namespace HDJ.Framework.Utils
             try
             {
                 if (!type.Equals(value.GetType()))
-                    value = Convert.ChangeType(value, type);
+                    value = ChangeType(value, type);
             }
             catch (Exception e)
             {
-                Debug.LogError("无法转换类型， type：" + type.FullName + "  valueType: " + value.GetType().FullName + "\n " + e);
+                Debug.LogError("无法转换类型， type：" + type.FullName + "  valueType: " + value.GetType().FullName +" :"+value+"\n data:"+data.GetType()+" : "+data+ "\n " + e);
             }
             return value;
+        }
+        static public object ChangeType(object value, Type type)
+        {
+            if (value == null && type.IsGenericType) return Activator.CreateInstance(type);
+            if (value == null) return null;
+            if (type == value.GetType()) return value;
+            if (type.IsEnum)
+            {
+                if (value is string)
+                    return Enum.Parse(type, value as string);
+                else
+                    return Enum.ToObject(type, value);
+            }
+            if (!type.IsInterface && type.IsGenericType)
+            {
+                Type innerType = type.GetGenericArguments()[0];
+                object innerValue = ChangeType(value, innerType);
+                return Activator.CreateInstance(type, new object[] { innerValue });
+            }
+            if (value is string && type == typeof(Guid)) return new Guid(value as string);
+            if (value is string && type == typeof(Version)) return new Version(value as string);
+            if (!(value is IConvertible)) return value;
+
+            if (type == typeof(byte))
+            {
+                return Convert.ToByte(value);
+            }
+            else if (type == typeof(int))
+                return Convert.ToInt32(value);
+            else if (type == typeof(long))
+                return Convert.ToInt64(value);
+            else if (type == typeof(bool))
+                return Convert.ToBoolean(value);
+            else if (type == typeof(float))
+                return Convert.ToSingle(value);
+            else if (type == typeof(double))
+                return Convert.ToDouble(value);
+            else if (type == typeof(decimal))
+                return Convert.ToDecimal(value);
+            else if (type == typeof(char))
+                return Convert.ToChar(value);
+            else if (type == typeof(short))
+                return Convert.ToInt16(value);
+            else if (type == typeof(sbyte))
+                return Convert.ToSByte(value);
+            else if (type == typeof(ushort))
+                return Convert.ToUInt16(value);
+            else if (type == typeof(uint))
+                return Convert.ToUInt32(value);
+            else if (type == typeof(ulong))
+                return Convert.ToUInt64(value);
+
+            return Convert.ChangeType(value, type);
         }
         /// <summary>
         /// 检测是否字段或属性添加了 NotJsonSerializedAttribute 特性
