@@ -1,21 +1,24 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 #pragma warning disable
-public class PackageService
+public static class PackageService
 {
+    #region 4.0旧版本打包
+
     static BuildAssetBundleOptions relyBuildOption = BuildAssetBundleOptions.AppendHashToAssetBundleName;    //每次二进制一致  //依赖包打包设置   
-                                                    // | BuildAssetBundleOptions.ForceRebuildAssetBundle;
-                                                    // | BuildAssetBundleOptions.CollectDependencies;   //收集依赖
-                                                    // | BuildAssetBundleOptions.CompleteAssets;         //完整资源    
-                                                    // | BuildAssetBundleOptions.ChunkBasedCompression;   //块压缩 
+                                                                                                             // | BuildAssetBundleOptions.ForceRebuildAssetBundle;
+                                                                                                             // | BuildAssetBundleOptions.CollectDependencies;   //收集依赖
+                                                                                                             // | BuildAssetBundleOptions.CompleteAssets;         //完整资源    
+                                                                                                             // | BuildAssetBundleOptions.ChunkBasedCompression;   //块压缩 
 
     static BuildAssetBundleOptions bundleBuildOption = BuildAssetBundleOptions.DeterministicAssetBundle  //每次二进制一致  //Bundle打包设置
                                                        | BuildAssetBundleOptions.CollectDependencies     //收集依赖
                                                        | BuildAssetBundleOptions.CompleteAssets;         //完整资源
-                                                       //| BuildAssetBundleOptions.ChunkBasedCompression; //块压缩
+                                                                                                         //| BuildAssetBundleOptions.ChunkBasedCompression; //块压缩
     public static BuildTarget GetTargetPlatform
     {
         get
@@ -90,7 +93,6 @@ public class PackageService
             FileTool.SafeDeleteDirectory(Application.dataPath + "/StreamingAssets");
         }
 
-
         //先打依赖包
         for (int i = 0; i < relyPackages.Count; i++)
         {
@@ -102,11 +104,6 @@ public class PackageService
         {
             PackageBundle(bundles[i]);
         }
-
-        //for (int i = 0; i < m_NoPackagekFile.Count; i++)
-        //{
-        //    CopyFile(m_NoPackagekFile[i]);
-        //}
 
         BuildPipeline.PopAssetDependencies();
 
@@ -123,7 +120,7 @@ public class PackageService
             Debug.LogError(package.name + " 没有资源！");
         }
 
-        Object[] res = new Object[package.objects.Count];
+        UnityEngine.Object[] res = new UnityEngine.Object[package.objects.Count];
 
         for (int i = 0; i < package.objects.Count; i++)
         {
@@ -134,7 +131,7 @@ public class PackageService
 
         FileTool.CreatFilePath(path);
 
-        if(package.isCollectDependencies)
+        if (package.isCollectDependencies)
         {
             BuildPipeline.BuildAssetBundle(null, res, path, relyBuildOption, GetTargetPlatform);
         }
@@ -152,7 +149,7 @@ public class PackageService
         BuildPipeline.PushAssetDependencies();
 
         //打包
-        Object[] res = new Object[package.objects.Count];
+        UnityEngine.Object[] res = new UnityEngine.Object[package.objects.Count];
 
         for (int i = 0; i < package.objects.Count; i++)
         {
@@ -170,7 +167,7 @@ public class PackageService
 
     static string GetExportPath(string path, string name)
     {
-        return Application.dataPath + "/StreamingAssets/" + BundleConfigEditorWindow. GetRelativePath(FileTool.RemoveExpandName(path)).ToLower();
+        return Application.dataPath + "/StreamingAssets/" + BundleConfigEditorWindow.GetRelativePath(FileTool.RemoveExpandName(path)).ToLower();
     }
 
     static void CopyFile(string fileName)
@@ -190,4 +187,376 @@ public class PackageService
     }
 
     public delegate void PackageCallBack(float progress, string content);
+
+    #endregion
+
+    #region 5.0新版本打包
+
+    public const string c_StreamingAssetsPath = "/StreamingAssets/";
+    public const string c_ResourceParentPath = "/Resources/";
+    public const string c_AssetsParentPath = "Assets/";
+
+    public static void Package_5_0(bool deleteManifestFile)
+    {
+        string streamingPath = Application.dataPath + c_StreamingAssetsPath;
+
+        //删除streaming下所有旧资源
+        if (Directory.Exists(streamingPath))
+        {
+            FileTool.DeleteDirectory(streamingPath);
+        }
+        else
+        {
+            FileTool.CreatPath(streamingPath);
+        }
+
+        Debug.Log("GetTargetPlatform " + PackageService.GetTargetPlatform);
+
+        BuildPipeline.BuildAssetBundles(streamingPath, BuildAssetBundleOptions.None, PackageService.GetTargetPlatform);
+
+        //删除冗余的清单文件
+        if (deleteManifestFile)
+        {
+            DeleteManifestFile(streamingPath);
+        }
+        AssetDatabase.Refresh();
+    }
+
+    /// <summary>
+    /// 清除所有AssetsBundle设置
+    /// </summary>
+    public static void ClearAssetBundlesName()
+    {
+        string[] oldAssetBundleNames = AssetDatabase.GetAllAssetBundleNames();
+
+        int count = oldAssetBundleNames.Length;
+        for (int j = 0; j < oldAssetBundleNames.Length; j++)
+        {
+            AssetDatabase.RemoveAssetBundleName(oldAssetBundleNames[j], true);
+            EditorUtility.DisplayProgressBar("清除Bundle名字", "进度", j / count);
+        }
+        EditorUtility.ClearProgressBar();
+    }
+
+    //构造相对路径使用
+    static int direIndex = 0;
+    static int assetsIndex = 0;
+    static string resourcePath;
+
+    static Dictionary<string, string> nameDict = new Dictionary<string, string>();
+    static Dictionary<string, bool> pathDict = new Dictionary<string, bool>();
+
+    public static void SetAssetBundlesName()
+    {
+        //nameDict.Clear();
+        pathDict.Clear();
+
+        int length = AssetDatabase.GetAllAssetBundleNames().Length;
+        Debug.Log("生成前 bundle数目 " + length);
+
+        //构造相对路径使用
+        resourcePath = Application.dataPath + c_ResourceParentPath;
+
+        direIndex = resourcePath.LastIndexOf(c_ResourceParentPath);
+        direIndex += c_ResourceParentPath.Length;
+
+        assetsIndex = resourcePath.LastIndexOf(c_AssetsParentPath);
+        EditorUtility.DisplayProgressBar("生成Bundle名字", "进度", 0);
+        RecursionDirectory(Application.dataPath + "/Resources/");
+
+        length = AssetDatabase.GetAllAssetBundleNames().Length;
+        Debug.Log("生成后 bundle数目 " + length);
+        EditorUtility.ClearProgressBar();
+    }
+
+    //递归所有目录
+    static void RecursionDirectory(string path)
+    {
+        if (!File.Exists(path))
+        {
+            FileTool.CreatPath(path);
+        }
+
+        string[] dires = Directory.GetDirectories(path);
+
+        for (int i = 0; i < dires.Length; i++)
+        {
+            RecursionDirectory(dires[i]);
+        }
+
+        string[] files = Directory.GetFiles(path);
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            string f = files[i];
+            if (f.EndsWith(".meta")|| f.EndsWith(".exe"))
+                continue;
+            else
+            {
+                string relativePath = FileTool.RemoveExpandName(f.Substring(direIndex));
+                string assetsPath = f.Substring(assetsIndex);
+                UnityEngine.Object obj = Resources.Load(relativePath);
+                if (obj == null)
+                {
+                    Debug.LogError("Resources obj is null ->" + relativePath);
+                }
+
+                SetAssetBundle(obj, assetsPath);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取所有相关资源
+    /// </summary>
+    /// <param name="go">目标对象</param>
+    /// <returns>所有相关资源</returns>
+    static UnityEngine.Object[] GetCorrelationResource(UnityEngine.Object go)
+    {
+        UnityEngine.Object[] roots = new UnityEngine.Object[] { go };
+        return EditorUtility.CollectDependencies(roots);
+    }
+
+    static void SetAssetBundle(UnityEngine.Object obj,string path)
+    {
+        //寻找资源的依赖，将其设为ABN
+        AssetImporter assetImporter = AssetImporter.GetAtPath(path);
+
+        UnityEngine.Object[] objs = GetCorrelationResource(obj);
+        for (int i = 0; i < objs.Length; i++)
+        {
+            if(!ComponentFilter(objs[i]))
+            {
+                string tmp = AssetDatabase.GetAssetPath(objs[i]);
+                SetAssetsBundleName(tmp);
+            }
+        }
+
+        //将资源设为ABN
+        SetAssetsBundleName(path);
+    }
+
+    static void SetAssetsBundleName(string path)
+    {
+        if(pathDict.ContainsKey(path))
+        {
+            return;
+        }
+        else
+        {
+            pathDict.Add(path,true);
+        }
+
+        //if(path.Contains(" "))
+        //{
+        //    Debug.LogError("SetAssetsBundleName 文件或路径有空格！->" + path + "<-");
+        //    return;
+        //}
+
+        //Resources下的资源单独打包
+        //Res下的资源以文件夹为单位打包
+        //移除文件夹中的下划线
+        //移除空格
+        string name = FileTool.RemoveExpandName(path).ToLower().Replace("/_","/").Replace("assets/", "").Replace(" ", "");
+
+        if (name.Contains("resources/"))
+        {
+            name = name.Replace("resources/", "");
+        }
+        else
+        {
+            name = FileTool.GetUpperPath(name);
+            name = "rely/" + name.Replace("/", "_");
+        }
+
+        string fileName = FileTool.GetFileNameBySring(name);
+        string upperPath = FileTool.GetUpperPath(name);
+
+        ////重复判断
+        //if (nameDict.ContainsKey(fileName))
+        //{
+        //    if(upperPath != nameDict[fileName])
+        //    {
+        //        Debug.LogError("文件名重复！ ->" + name + "<- A:" + upperPath + " b:" + nameDict[fileName]);
+        //    }
+        //}
+        //else
+        //{
+        //    nameDict.Add(fileName, upperPath);
+        //}
+
+        AssetImporter assetImporter = AssetImporter.GetAtPath(path);
+        if (assetImporter != null)
+        {
+            assetImporter.assetBundleName = name;
+        }
+        else
+        {
+            Debug.LogError("SetAssetsInfo relyPackages error :->" + path);
+        }
+    }
+
+    static bool ComponentFilter(UnityEngine.Object comp)
+    {
+        //过滤掉unity自带对象
+        string path = AssetDatabase.GetAssetPath(comp);
+        if (path.IndexOf("Assets") != 0)
+        {
+            return true;
+        }
+
+        ////过滤掉所有shander
+        //if (comp as Shader != null)
+        //{
+        //    if (!shaderFilter.ContainsKey(comp.ToString()))
+        //    {
+        //        shaderFilter.Add(comp.ToString(), (Shader)comp);
+        //        Debug.LogWarning("包含 Shader! :" + comp.ToString());
+        //    }
+
+        //    return true;
+        //}
+
+        if (comp is MonoScript)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 删除打包后冗余的Manifest文件
+    /// </summary>
+    /// <param name="path"></param>
+    public static void DeleteManifestFile(string path)
+    {
+        string[] dires = Directory.GetDirectories(path);
+
+        for (int i = 0; i < dires.Length; i++)
+        {
+            DeleteManifestFile(dires[i]);
+        }
+
+        string[] files = Directory.GetFiles(path);
+
+        for (int i = 0; i < files.Length; i++)
+        {
+            if (files[i].EndsWith(".manifest")
+                || files[i].EndsWith(".meta"))
+            {
+                File.Delete(files[i]);
+            }
+        }
+    }
+
+    #endregion
+
+    ///// <summary>
+    ///// 设置Resources目录下所有资源的BundleName
+    ///// </summary>
+    ///// <param name="path"></param>
+    ///// <param name="endsWith"></param>
+    //public static void SetAllResourceBundleName(string path, string[] endsWith)
+    //{
+    //    string[] pathArr = HDJ.Framework.Utils.PathUtils.GetDirectoryFilePath(path, endsWith);
+
+    //    for (int i = 0; i < pathArr.Length; i++)
+    //    {
+    //        string filePath = pathArr[i];
+    //        if (filePath.EndsWith(".meta"))
+    //            continue;
+    //        string s = Path.GetFileNameWithoutExtension(filePath);
+    //        //if (s == AssetsPathController.PathFileName)
+    //        //    continue;
+    //        SetBundleName(filePath);
+    //    }
+
+    //    Debug.Log("bundleName数目：" + bundleNameDics.Count);
+
+    //    int index = 0;
+    //    int count = bundleNameDics.Count;
+    //    foreach (var item in bundleNameDics)
+    //    {
+    //        index++;
+    //        item.Key.assetBundleName = item.Value;
+    //        EditorUtility.DisplayProgressBar("设置Bundle名字", "进度", index / count);
+    //    }
+    //    bundleNameDics.Clear();
+    //    EditorUtility.ClearProgressBar();
+        
+    //    Debug.Log("生成后 bundle数目 " + AssetDatabase.GetAllAssetBundleNames().Length);
+    //    //foreach (var item in assetTypeDic)
+    //    //{
+    //    //    Debug.Log("assetType:" + item.Key.FullName + " : " + item.Value);
+    //    //}
+    //}
+
+    //private const string ResPathDirName = "Assets/Resources/";
+    //private static Dictionary<AssetImporter, string> bundleNameDics = new Dictionary<AssetImporter, string>();
+    //public const string EndsWith_assetbundle = ".assetbundle";
+    ////private static Dictionary<Type, string> assetTypeDic = new Dictionary<Type, string>();
+    //private static void SetBundleName(string filePath)
+    //{
+
+    //    AssetImporter assetImporter = AssetImporter.GetAtPath(filePath);
+       
+
+    //    if (assetImporter)
+    //    {
+    //        if (assetImporter.GetType() == typeof(MonoImporter))
+    //            return;
+    //        if (bundleNameDics.ContainsKey(assetImporter))
+    //            return;
+
+    //        string bundleName = null;
+    //        //Resources 文件夹下面资源的命名方式
+    //        if (filePath.Contains(ResPathDirName))
+    //        {
+    //            bundleName = HDJ.Framework.Utils.PathUtils.CutPath(filePath, "Resources");
+    //            bundleName = bundleName.Replace(Path.GetExtension(bundleName), EndsWith_assetbundle);
+    //            // assetImporter.assetBundleName = bundleName;
+
+    //        }
+    //        else
+    //        {
+    //            string name = FileTool.RemoveExpandName(filePath).ToLower().Replace("/_", "/").Replace("assets/", "").Replace(" ", "");
+    //            name = FileTool.GetUpperPath(name);
+    //            name = "rely/" + name.Replace("/", "_");
+    //            //string dir = Path.GetDirectoryName(filePath);
+    //            //dir = dir.Replace("\\", "/");
+    //            //bundleName = dir + "/" + dir.Replace("/", "_") + EndsWith_assetbundle;
+    //            bundleName = name;
+
+    //        }
+    //        bundleNameDics.Add(assetImporter, bundleName);
+
+    //        //if (!assetTypeDic.ContainsKey(assetImporter.GetType()))
+    //        //{
+    //        //    assetTypeDic.Add(assetImporter.GetType(), filePath);
+    //        //}
+    //        if (assetImporter.GetType() == typeof(AudioImporter))
+    //            return;
+    //        if (assetImporter.GetType() == typeof(TextureImporter))
+    //            return;
+    //        if (assetImporter.GetType() == typeof(ShaderImporter))
+    //            return;
+    //        Type assetType = AssetDatabase.GetMainAssetTypeAtPath(filePath);
+
+    //        if (assetType == typeof(TextAsset))
+    //            return;
+    //        if (assetType == typeof(AnimationClip))
+    //            return;
+            
+    //        string[] deps = AssetDatabase.GetDependencies(filePath);
+    //        foreach (var tempPath in deps)
+    //        {
+    //            if (tempPath.Contains(ResPathDirName))
+    //            {
+    //                continue;
+    //            }
+    //            SetBundleName(tempPath);
+    //        }
+    //    }
+    //}
 }

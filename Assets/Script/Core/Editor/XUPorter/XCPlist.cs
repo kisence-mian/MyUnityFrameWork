@@ -30,6 +30,8 @@ namespace UnityEditor.XCodeEditor
 
 		public void Process(Hashtable plist)
 		{
+			if (plist == null) return;
+
 			Dictionary<string, object> dict = (Dictionary<string, object>)PlistCS.Plist.readPlist(plistPath);
 			foreach( DictionaryEntry entry in plist)
 			{

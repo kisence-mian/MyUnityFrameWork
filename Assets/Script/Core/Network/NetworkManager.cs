@@ -54,6 +54,10 @@ public class NetworkManager
         s_network = new TProtocol();
         s_network.m_socketService = new TSocket();
 
+        Debug.Log("protocolType " + s_network.m_socketService.m_protocolType);
+
+        s_network.m_socketService.m_protocolType = protocolType;
+
         NetInit();
     }
 
@@ -65,6 +69,7 @@ public class NetworkManager
 
         Type socketType = Type.GetType(networkInterfaceName);
         s_network.m_socketService = Activator.CreateInstance(socketType) as SocketBase;
+        s_network.m_socketService.m_protocolType = ProtocolType.Tcp;
 
         NetInit();
     }
@@ -84,8 +89,12 @@ public class NetworkManager
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationQuit += DisConnect;
     }
-
-    public static void InitHeartBeat<T>(int spaceTime = 15) where T : HeartBeatBase, new()
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="spaceTime">发送间隔时间，毫秒</param>
+    public static void InitHeartBeat<T>(int spaceTime = 2500) where T : HeartBeatBase, new()
     {
         s_heatBeat = new T();
         s_heatBeat.Init(spaceTime);
@@ -111,6 +120,7 @@ public class NetworkManager
 
     public static void SetServer(string IP, int port)
     {
+        Debug.Log("Set IP=>" + IP + ":" + port);
         IPAddress address;
         if (IPAddress.TryParse(IP, out address))
         {
@@ -127,7 +137,7 @@ public class NetworkManager
     {
         IPHostEntry IPinfo = Dns.GetHostEntry(url);
         IPAddress[] ipList = IPinfo.AddressList;
-
+        Debug.Log("解析域名：" + ipList[0].ToString());
         s_network.SetIPAddress(ipList[0].ToString(), port);
     }
 
@@ -193,9 +203,20 @@ public class NetworkManager
     {
         if(message.m_MessageType != null)
         {
-            lock (s_messageList)
+            if (s_heatBeat.IsHeartBeatMessage(message))
             {
-                s_messageList.Add(message);
+                lock (s_messageListHeartBeat)
+                {
+                    s_messageListHeartBeat.Add(message);
+                }
+               
+            }
+            else
+            {
+                lock (s_messageList)
+                {
+                    s_messageList.Add(message);
+                }
             }
 
             msgCount++;
@@ -243,8 +264,36 @@ public class NetworkManager
 
     static List<NetworkState> s_statusList = new List<NetworkState>();
     static List<NetWorkMessage> s_messageList = new List<NetWorkMessage>();
+    /// <summary>
+    /// 心跳包消息
+    /// </summary>
+    static List<NetWorkMessage> s_messageListHeartBeat = new List<NetWorkMessage>();
     const int MaxDealCount = 2000;
-
+    /// <summary>
+    /// 是否有心跳消息过来
+    /// </summary>
+    /// <returns></returns>
+    public static bool HasHeartBeatMessage()
+    {
+        return s_messageListHeartBeat.Count > 0;
+    }
+    /// <summary>
+    /// 取出心跳消息
+    /// </summary>
+    /// <returns></returns>
+    public static NetWorkMessage GetHeartBeatMessage()
+    {
+        NetWorkMessage msg = default(NetWorkMessage);
+        lock (s_messageListHeartBeat)
+        {
+            if (s_messageListHeartBeat.Count > 0)
+            {
+                msg = s_messageListHeartBeat[0];
+                s_messageListHeartBeat.RemoveAt(0);
+            }
+        }
+        return msg;
+    }
     //将消息的处理并入主线程
     static void Update()
     {
@@ -279,10 +328,10 @@ public class NetworkManager
             s_network.Update();
         }
 
-        if(s_heatBeat != null && IsConnect)
-        {
-            s_heatBeat.Update();
-        }
+        //if(s_heatBeat != null && IsConnect)
+        //{
+        //    s_heatBeat.Update();
+        //}
     }
 
    
@@ -299,6 +348,7 @@ public enum NetworkState
     Connecting,
     ConnectBreak,
     FaildToConnect,
+    NetworkError,
 }
 
 public struct NetWorkMessage

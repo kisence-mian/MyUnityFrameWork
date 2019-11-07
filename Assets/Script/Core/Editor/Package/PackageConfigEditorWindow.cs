@@ -139,7 +139,11 @@ public class BundleConfigEditorWindow : EditorWindow
         {
             ResourcesConfigManager.CreateResourcesConfig();
         }
-
+        if(GUILayout.Button("Create Bundle Names"))
+        {
+            //自动设置打包信息
+            SetAssetsInfo();
+        }
         if (GUILayout.Button("5.0 打包"))
         {
             NewPackage();
@@ -965,14 +969,7 @@ public class BundleConfigEditorWindow : EditorWindow
 
     #region 添加菜单按钮
 
-    [MenuItem("Tool/显示选中对象所有相关资源")]
-    public static void ShowAllCorrelationResource()
-    {
-        Object[] roots = Selection.GetFiltered(typeof(Object), SelectionMode.Unfiltered);
-        Selection.objects = EditorUtility.CollectDependencies(roots);
-    }
-
-    [MenuItem("Window/打包设置编辑器 &1")]
+    [MenuItem("Window/打包设置编辑器 &9")]
 
     public static void ShowWindow()
     {

@@ -15,7 +15,6 @@ public class UIManager : MonoBehaviour
     private static UIAnimManager s_UIAnimManager;   //UI动画管理器
     private static UIStackManager s_UIStackManager; //UI栈管理器
 
-    //public static Camera s_UIcamera;               //UICamera
     private static EventSystem s_EventSystem;
 
     static public Dictionary<string, List<UIWindowBase>> s_UIs     = new Dictionary<string, List<UIWindowBase>>(); //打开的UI
@@ -35,7 +34,7 @@ public class UIManager : MonoBehaviour
 
             if (instance == null)
             {
-                instance = GameObjectManager.CreateGameObject("UIManager");
+                instance = GameObjectManager.CreateGameObjectByPool("UIManager");
             }
 
             UIManagerGo = instance;
@@ -53,21 +52,21 @@ public class UIManager : MonoBehaviour
     }
 
     ///异步加载UIMnager
-    public static void InitAsync()
-    {
-        GameObject instance = GameObject.Find("UIManager");
+    //public static void InitAsync()
+    //{
+    //    GameObject instance = GameObject.Find("UIManager");
 
-        if (instance == null)
-        {
-            GameObjectManager.CreateGameObjectByPoolAsync("UIManager",(obj)=> {
-                SetUIManager(obj);
-            });
-        }
-        else
-        {
-            SetUIManager(instance);
-        }
-    }
+    //    if (instance == null)
+    //    {
+    //        GameObjectManager.CreateGameObjectByPoolAsync("UIManager",(obj)=> {
+    //            SetUIManager(obj);
+    //        });
+    //    }
+    //    else
+    //    {
+    //        SetUIManager(instance);
+    //    }
+    //}
 
     static void SetUIManager(GameObject instance)
     {
@@ -315,7 +314,6 @@ public class UIManager : MonoBehaviour
     {
         RemoveUI(UI);        //移除UI引用
         UI.RemoveAllListener();
-        //s_UILayerManager.RemoveUI(UI);
 
         if (isPlayAnim)
         {
@@ -352,7 +350,7 @@ public class UIManager : MonoBehaviour
         UIStackManager.OnUIClose(UI);
         AddHideUI(UI);
 
-        UISystemEvent.Dispatch(UI, UIEvent.OnClosed);  //派发OnOpened事件
+        UISystemEvent.Dispatch(UI, UIEvent.OnClosed);  //派发OnClosed事件
     }
     public static void CloseUIWindow(string UIname, bool isPlayAnim = true, UICallBack callback = null, params object[] objs)
     {
@@ -484,15 +482,12 @@ public class UIManager : MonoBehaviour
         OpenUIAsync(UIName,callback,objs);
     }
 
-    public static void OpenUIAsync(string UIName , UICallBack callback, params object[] objs)
+    public static void OpenUIAsync(string UIName, UICallBack callback, params object[] objs)
     {
-        ResourceManager.LoadAsync(UIName, (loadState,resObject) =>
-         {
-             if(loadState.isDone)
-             {
-                 OpenUIWindow(UIName, callback, objs);
-             }
-         });
+        ResourceManager.LoadAsync(UIName, (resObject) =>
+        {
+             OpenUIWindow(UIName, callback, objs);
+        });
     }
 
 #endregion
@@ -521,7 +516,7 @@ public class UIManager : MonoBehaviour
         {
             Debug.LogError("OnDestroy :" + e.ToString());
         }
-        Destroy(UI.gameObject);
+        GameObjectManager.DestroyGameObjectByPool(UI.gameObject);
     }
 
     public static void DestroyAllUI()
@@ -552,7 +547,7 @@ public class UIManager : MonoBehaviour
                 {
                     Debug.LogError("OnDestroy :" + e.ToString());
                 }
-                Destroy(uis[i].gameObject);
+                GameObjectManager.DestroyGameObjectByPool(uis[i].gameObject);
             }
         }
 
@@ -731,7 +726,7 @@ public class UIManager : MonoBehaviour
                 {
                     Debug.LogError("OnDestroy :" + e.ToString());
                 }
-                Destroy(uis[i].gameObject);
+                GameObjectManager.DestroyGameObjectByPool(uis[i].gameObject);
             }
         }
 
@@ -830,13 +825,14 @@ public class UIManager : MonoBehaviour
 
     public enum UIType
     {
-        GameUI,
+        GameUI=0,
 
-        Fixed,
-        Normal,
-        TopBar,
-        PopUp
-    }
+        Fixed=1,
+        Normal=2,
+        TopBar=3,
+        Upper = 4,
+        PopUp =5,
+     }
 
     public enum UIEvent
     {

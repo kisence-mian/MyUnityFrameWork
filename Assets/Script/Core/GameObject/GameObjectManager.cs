@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class GameObjectManager :MonoBehaviour
+public class GameObjectManager
 {
     static Vector3 s_OutOfRange = new Vector3(9000, 9000, 9000);
 
@@ -16,8 +16,8 @@ public class GameObjectManager :MonoBehaviour
             {
                 GameObject instancePool = new GameObject("ObjectPool");
                 s_poolParent = instancePool.transform;
-                if(Application.isPlaying)
-                DontDestroyOnLoad(s_poolParent);
+                if (Application.isPlaying)
+                    UnityEngine.Object.DontDestroyOnLoad(s_poolParent);
             }
 
             return s_poolParent;
@@ -25,16 +25,24 @@ public class GameObjectManager :MonoBehaviour
     }
 
     #region 旧版本对象池
+    private static Dictionary<string, Dictionary<int, GameObject>> createPools = new Dictionary<string, Dictionary<int, GameObject>>();
+    private static Dictionary<string, Dictionary<int, GameObject>> recyclePools = new Dictionary<string, Dictionary<int, GameObject>>();
 
-    static Dictionary<string, List<GameObject>> s_objectPool = new Dictionary<string, List<GameObject>>();
-
+    public static Dictionary<string, Dictionary<int, GameObject>> GetCreatePool()
+    {
+        return createPools;
+    }
+    public static Dictionary<string, Dictionary<int, GameObject>> GetRecyclePool()
+    {
+        return recyclePools;
+    }
     /// <summary>
     /// 加载一个对象并把它实例化
     /// </summary>
     /// <param name="gameObjectName">对象名</param>
     /// <param name="parent">对象的父节点,可空</param>
     /// <returns></returns>
-    public static GameObject CreateGameObject(string gameObjectName,GameObject parent = null)
+    private static GameObject NewGameObject(string gameObjectName, GameObject parent = null)
     {
         GameObject goTmp = ResourceManager.Load<GameObject>(gameObjectName);
 
@@ -43,17 +51,17 @@ public class GameObjectManager :MonoBehaviour
             throw new Exception("CreateGameObject error dont find :" + gameObjectName);
         }
 
-        return CreateGameObject(goTmp, parent);
+        return ObjectInstantiate(goTmp, parent);
     }
 
-    public static GameObject CreateGameObject(GameObject prefab, GameObject parent = null)
+    private static GameObject ObjectInstantiate(GameObject prefab, GameObject parent = null)
     {
         if (prefab == null)
         {
-            throw new Exception("CreateGameObject error : l_prefab  is null");
+            throw new Exception("CreateGameObject error : prefab  is null");
         }
         Transform transform = parent == null ? null : parent.transform;
-        GameObject instanceTmp = Instantiate(prefab, transform);
+        GameObject instanceTmp = GameObject.Instantiate(prefab, transform);
         instanceTmp.name = prefab.name;
         return instanceTmp;
     }
@@ -61,13 +69,14 @@ public class GameObjectManager :MonoBehaviour
 
     public static bool IsExist(string objectName)
     {
-        if (string.IsNullOrEmpty( objectName))
+        if (string.IsNullOrEmpty(objectName))
         {
             Debug.LogError("GameObjectManager objectName is null!");
             return false;
         }
 
-        if (s_objectPool.ContainsKey(objectName) && s_objectPool[objectName].Count > 0)
+        if ((recyclePools.ContainsKey(objectName) && recyclePools[objectName].Count > 0)
+            || (createPools.ContainsKey(objectName)&& createPools[objectName].Count>0))
         {
             return true;
         }
@@ -78,9 +87,10 @@ public class GameObjectManager :MonoBehaviour
     //判断是否在对象池中
     public static bool IsExist(GameObject go)
     {
-        if (s_objectPool.ContainsKey(go.name) && s_objectPool[go.name].Count > 0)
+        if ((recyclePools.ContainsKey(go.name) && recyclePools[go.name].Count > 0)
+            || (createPools.ContainsKey(go.name) && createPools[go.name].Count > 0))
         {
-            return s_objectPool[go.name].Contains(go);
+            return true;
         }
         else
         {
@@ -88,26 +98,105 @@ public class GameObjectManager :MonoBehaviour
         }
     }
 
+   
+    public static GameObject CreateGameObject(string name, GameObject parent = null, bool isSetActive = true)
+    {
+        return GetNewObject(true, name, null, parent, isSetActive);
+    }
+
+    public static GameObject CreateGameObject(GameObject prefab, GameObject parent = null, bool isSetActive = true)
+    {
+        return GetNewObject(true, null, prefab, parent, isSetActive);
+    }
     /// <summary>
     /// 从对象池取出一个对象，如果没有，则直接创建它
     /// </summary>
     /// <param name="name">对象名</param>
     /// <param name="parent">要创建到的父节点</param>
     /// <returns>返回这个对象</returns>
-    public static GameObject CreateGameObjectByPool(string name,GameObject parent = null,bool isSetActive = true)
+    public static GameObject CreateGameObjectByPool(string name, GameObject parent = null, bool isSetActive = true)
+    {
+        return GetNewObject(false, name, null, parent, isSetActive);
+    }
+
+    public static GameObject CreateGameObjectByPool(GameObject prefab, GameObject parent = null, bool isSetActive = true)
+    {
+        return GetNewObject(false, null, prefab, parent, isSetActive);
+    }
+    private static List<int> objIDs = new List<int>();
+    private static GameObject GetNewObject(bool isAlwaysNew, string objName, GameObject prefab, GameObject parent = null, bool isSetActive = true)
     {
         GameObject go = null;
-        if (IsExist(name))
+        string name = objName;
+        if (string.IsNullOrEmpty(name))
         {
-             go = s_objectPool[name][0];
-            s_objectPool[name].RemoveAt(0);
+            name = prefab.name;
+        }
 
+        if (!isAlwaysNew && IsExist(name))
+        {
+            if (!recyclePools.ContainsKey(name))
+            {
+                if (prefab != null)
+                {
+                    go = ObjectInstantiate(prefab, parent);
+                }
+                else
+                {
+                    go = NewGameObject(name, parent);
+                }
+            }
+            else
+            {
+                objIDs.Clear();
+                objIDs.AddRange(recyclePools[name].Keys);
+                int id = objIDs[0];
+                go = recyclePools[name][id];
+                recyclePools[name].Remove(id);
+                if (recyclePools[name].Count == 0)
+                    recyclePools.Remove(name);
+            }
            
         }
         else
         {
-            go = CreateGameObject(name, parent);
+            if (prefab == null && !string.IsNullOrEmpty(objName))
+            {
+                go = NewGameObject(name, parent);
+               
+            }
+            else if (prefab != null && string.IsNullOrEmpty(objName))
+            {
+                go = ObjectInstantiate(prefab, parent);
+            }
         }
+        if (go == null)
+        {
+            Debug.LogError("GameObjectManager 加载失败：" + name);
+            return go;
+        }
+        if (createPools.ContainsKey(name))
+        {
+            createPools[name].Add(go.GetInstanceID(), go);
+        }
+        else
+        {
+            createPools.Add(name, new  Dictionary<int, GameObject>() { { go.GetInstanceID(), go } });
+        }
+        AssetsUnloadHandler.MarkUseAssets(name);
+        PoolObject po = go.GetComponent<PoolObject>();
+        if (po)
+        {
+            try
+            {
+                po.OnFetch();
+            }
+            catch(Exception e)
+            {
+                Debug.LogError("GetNewObject Error: " + e.ToString());
+            }
+        }
+
         if (isSetActive)
             go.SetActive(true);
 
@@ -119,74 +208,92 @@ public class GameObjectManager :MonoBehaviour
         {
             go.transform.SetParent(parent.transform);
         }
-
-        //go.transform.localScale = Vector3.one;
-
-        return go;
-    }
-
-    public static GameObject CreateGameObjectByPool(GameObject prefab, GameObject parent = null, bool isSetActive = true)
-    {
-        GameObject go = null;
-        if (IsExist(prefab.name))
-        {
-             go = s_objectPool[prefab.name][0];
-            s_objectPool[prefab.name].RemoveAt(0);
-
-            if (parent == null)
-            {
-                go.transform.SetParent(null);
-            }
-            else
-            {
-                go.transform.SetParent(parent.transform);
-            }
-
-        }
-        else
-        {
-            go= CreateGameObject(prefab, parent);
-        }
-        if (isSetActive)
-            go.SetActive(true);
-
-        
         return go;
     }
 
     /// <summary>
     /// 将一个对象放入对象池
     /// </summary>
-    /// <param name="obj"></param>
+    /// <param name="go"></param>
     /// <param name="isSetInactive">是否将放入的物体设为不激活状态（obj.SetActive(false)）</param>
-    public static void DestroyGameObjectByPool(GameObject obj, bool isSetInactive = true)
+    public static void DestroyGameObjectByPool(GameObject go, bool isSetInactive = true)
     {
-        string key = obj.name.Replace("(Clone)", "");
+        if (go == null)
+            return;
 
-        if (s_objectPool.ContainsKey(key) == false)
+        string key = go.name.Replace("(Clone)", "");
+        if (recyclePools.ContainsKey(key) == false)
         {
-            s_objectPool.Add(key, new List<GameObject>());
+            recyclePools.Add(key, new  Dictionary<int, GameObject>());
         }
 
-        if(s_objectPool[key].Contains(obj))
+        if (recyclePools[key].ContainsKey(go.GetInstanceID()))
         {
-            throw new Exception("DestroyGameObjectByPool:-> Repeat Destroy GameObject !" + obj);
+            Debug.LogError("DestroyGameObjectByPool:-> Repeat Destroy GameObject !" + go);
+            return;
         }
 
-        s_objectPool[key].Add(obj);
+        recyclePools[key].Add(go.GetInstanceID(), go);
 
-        if(isSetInactive)
-            obj.SetActive(false);
+        if (isSetInactive)
+            go.SetActive(false);
         else
         {
-            obj.transform.position = s_OutOfRange;
+            go.transform.position = s_OutOfRange;
         }
 
-        obj.name = key;
-        obj.transform.SetParent(PoolParent);
+        go.name = key;
+        go.transform.SetParent(PoolParent);
+        PoolObject po = go.GetComponent<PoolObject>();
+        if (po)
+        {
+            po.OnRecycle();
+        }
+
+
+        if (createPools.ContainsKey(key) && createPools[key].ContainsKey(go.GetInstanceID()))
+        {
+            createPools[key].Remove(go.GetInstanceID());
+            //ResourceManager.DestoryAssetsCounter(go.name);
+        }
+        else
+        {
+            Debug.LogError("创建池不存在GameObject：" + go + " 不能回收！");
+        }
+
+    }
+    /// <summary>
+    /// 立即摧毁克隆体
+    /// </summary>
+    /// <param name="go"></param>
+    public static void DestroyGameObject(GameObject go)
+    {
+        if (go == null)
+            return;
+
+        string key = go.name.Replace("(Clone)", "");
+
+        PoolObject po = go.GetComponent<PoolObject>();
+        if (po)
+        {
+            po.OnObjectDestroy();
+        }
+
+        if (createPools.ContainsKey(key) && createPools[key].ContainsKey(go.GetInstanceID()))
+        {
+            createPools[key].Remove(go.GetInstanceID());
+
+            if (createPools[key].Count == 0)
+            {
+                createPools.Remove(key);
+            }
+
+        }
+        ResourceManager.DestoryAssetsCounter(go.name);
+        UnityEngine.Object.Destroy(go);
     }
 
-    public static void DestroyGameObjectByPool(GameObject go,float time)
+    public static void DestroyGameObjectByPool(GameObject go, float time)
     {
         Timer.DelayCallBack(time, (object[] obj) =>
         {
@@ -195,28 +302,49 @@ public class GameObjectManager :MonoBehaviour
         });
     }
 
+    private static List<string> removeObjList = new List<string>();
     /// <summary>
     /// 清空对象池
     /// </summary>
     public static void CleanPool()
     {
-        foreach (string name in s_objectPool.Keys)
+        //Debug.LogWarning("清空对象池");
+        removeObjList.Clear();
+
+        foreach (string name in createPools.Keys)
         {
-            if (s_objectPool.ContainsKey(name))
+
+            if (createPools[name].Count == 0)
             {
-                List<GameObject> l_objList = s_objectPool[name];
-
-                for (int i = 0; i < l_objList.Count; i++)
-                {
-                    Destroy(l_objList[i]);
-                }
-
-                l_objList.Clear();
-
+                removeObjList.Add(name);
+                //Debug.Log("Pool DestoryAssetsCounter :" + name);
             }
         }
 
-        s_objectPool.Clear();
+        foreach (var item in removeObjList)
+        {
+            createPools.Remove(item);
+        }
+
+        foreach (var name in recyclePools.Keys)
+        {
+            Dictionary<int, GameObject> l_objList = recyclePools[name];
+
+            foreach (var go in l_objList.Values)
+            {
+                PoolObject po = go.GetComponent<PoolObject>();
+                if (po)
+                {
+                    po.OnObjectDestroy();
+                }
+                ResourceManager.DestoryAssetsCounter(name);
+                UnityEngine.Object.Destroy(go);
+            }
+            l_objList.Clear();
+
+        }
+        recyclePools.Clear();
+
     }
 
     /// <summary>
@@ -225,273 +353,35 @@ public class GameObjectManager :MonoBehaviour
     public static void CleanPoolByName(string name)
     {
         Debug.Log("CleanPool :" + name);
-
-        if (s_objectPool.ContainsKey(name))
+        if (recyclePools.ContainsKey(name))
         {
-            List<GameObject> l_objList = s_objectPool[name];
+            Dictionary<int, GameObject> l_objList = recyclePools[name];
 
-            for (int i = 0; i < l_objList.Count; i++)
+            foreach (var go in l_objList.Values)
             {
-                Destroy(l_objList[i]);
-            }
 
+                PoolObject po = go.GetComponent<PoolObject>();
+                if (po)
+                {
+                    po.OnObjectDestroy();
+                }
+
+                GameObject.Destroy(go);
+            }
             l_objList.Clear();
+            recyclePools.Remove(name);
+        }
 
-            s_objectPool.Remove(name);
+        if (createPools[name].Count == 0)
+        {
+            createPools.Remove(name);
+            ResourceManager.DestoryAssetsCounter(name);
         }
     }
 
     #endregion
 
-    #region 旧版本对象池 异步方法
+ 
 
-    public static void CreateGameObjectByPoolAsync(string name, CallBack<GameObject> callback, GameObject parent = null, bool isSetActive = true)
-    {
-        ResourceManager.LoadAsync(name, (status, res) =>
-        {
-            if(status.isDone)
-            {
-                try
-                {
-                    callback(CreateGameObjectByPool(name, parent, isSetActive));
-                }
-                catch (Exception e)
-                {
-                    Debug.LogError("CreateGameObjectByPoolAsync Exception: " + e.ToString());
-                }
-            }
-        });
-    }
-
-    #endregion
-
-    #region 新版本对象池
-
-    static Dictionary<string, List<PoolObject>> s_objectPool_new = new Dictionary<string, List<PoolObject>>();
-
-    /// <summary>
-    /// 加载一个对象并把它实例化
-    /// </summary>
-    /// <param name="gameObjectName">对象名</param>
-    /// <param name="parent">对象的父节点,可空</param>
-    /// <returns></returns>
-    static PoolObject CreatePoolObject(string gameObjectName, GameObject parent = null)
-    {
-        GameObject go = ResourceManager.Load<GameObject>(gameObjectName);
-
-        if (go == null)
-        {
-            throw new Exception("CreatPoolObject error dont find : ->" + gameObjectName + "<-");
-        }
-
-        GameObject instanceTmp = Instantiate(go);
-        instanceTmp.name = go.name;
-
-        PoolObject po = instanceTmp.GetComponent<PoolObject>();
-
-        if (po == null)
-        {
-            throw new Exception("CreatPoolObject error : ->" + gameObjectName + "<- not is PoolObject !");
-        }
-
-        po.OnCreate();
-
-        if (parent != null)
-        {
-            instanceTmp.transform.SetParent(parent.transform);
-        }
-
-        instanceTmp.SetActive(true);
-
-        return po;
-    }
-
-    /// <summary>
-    /// 把一个对象放入对象池
-    /// </summary>
-    /// <param name="gameObjectName"></param>
-    public static void PutPoolObject(string gameObjectName)
-    {
-        DestroyPoolObject(CreatePoolObject(gameObjectName));
-    }
-
-    /// <summary>
-    /// 预存入对象池
-    /// </summary>
-    /// <param name="name"></param>
-    public static void PutPoolGameOject(string name)
-    {
-        DestroyGameObjectByPool(CreateGameObjectByPool(name));
-    }
-
-    public static bool IsExist_New(string objectName)
-    {
-        if (objectName == null)
-        {
-            Debug.LogError("IsExist_New error : objectName is null!");
-            return false;
-        }
-
-        if (s_objectPool_new.ContainsKey(objectName) && s_objectPool_new[objectName].Count > 0)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// 从对象池取出一个对象，如果没有，则直接创建它
-    /// </summary>
-    /// <param name="name">对象名</param>
-    /// <param name="parent">要创建到的父节点</param>
-    /// <returns>返回这个对象</returns>
-    public static PoolObject GetPoolObject(string name, GameObject parent = null)
-    {
-        PoolObject po;
-        if (IsExist_New(name))
-        {
-            po = s_objectPool_new[name][0];
-            s_objectPool_new[name].RemoveAt(0);
-            if (po && po.SetActive)
-                po.gameObject.SetActive(true);
-
-            if (parent == null)
-            {
-                po.transform.SetParent(null);
-            }
-            else
-            {
-                po.transform.SetParent(parent.transform);
-            }
-        }
-        else
-        {
-            po = CreatePoolObject(name, parent);
-        }
-
-        po.OnFetch();
-
-        return po;
-    }
-
-    /// <summary>
-    /// 将一个对象放入对象池
-    /// </summary>
-    /// <param name="obj">目标对象</param>
-    public static void DestroyPoolObject(PoolObject obj)
-    {
-        string key = obj.name.Replace("(Clone)", "");
-
-        if (s_objectPool_new.ContainsKey(key) == false)
-        {
-            s_objectPool_new.Add(key, new List<PoolObject>());
-        }
-
-        if (s_objectPool_new[key].Contains(obj))
-        {
-            throw new Exception("DestroyPoolObject:-> Repeat Destroy GameObject !" + obj);
-        }
-
-        s_objectPool_new[key].Add(obj);
-
-        if (obj.SetActive)
-            obj.gameObject.SetActive(false);
-        else
-            obj.transform.position = s_OutOfRange;
-
-        obj.OnRecycle();
-
-        obj.name = key;
-        obj.transform.SetParent(PoolParent);
-    }
-
-    public static void DestroyPoolObject(PoolObject go, float time)
-    {
-        Timer.DelayCallBack(time, (object[] obj) =>
-        {
-            DestroyPoolObject(go);
-        });
-    }
-
-    /// <summary>
-    /// 清空对象池
-    /// </summary>
-    public static void CleanPool_New()
-    {
-        foreach (string name in s_objectPool_new.Keys)
-        {
-            if (s_objectPool_new.ContainsKey(name))
-            {
-                List<PoolObject> objList = s_objectPool_new[name];
-
-                for (int i = 0; i < objList.Count; i++)
-                {
-                    try
-                    {
-                        objList[i].OnObjectDestroy();
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.Log(e.ToString());
-                    }
-
-                    Destroy(objList[i].gameObject);
-                }
-
-                objList.Clear();
-            }
-        }
-
-        s_objectPool_new.Clear();
-    }
-
-    /// <summary>
-    /// 清除掉某一个对象的所有对象池缓存
-    /// </summary>
-    public static void CleanPoolByName_New(string name)
-    {
-        if (s_objectPool_new.ContainsKey(name))
-        {
-            List<PoolObject> objList = s_objectPool_new[name];
-
-            for (int i = 0; i < objList.Count; i++)
-            {
-                try
-                {
-                    objList[i].OnObjectDestroy();
-                }
-                catch(Exception e)
-                {
-                    Debug.Log(e.ToString());
-                }
-
-                Destroy(objList[i].gameObject);
-            }
-
-            objList.Clear();
-            s_objectPool_new.Remove(name);
-        }
-    }
-
-    #endregion
-
-    #region 新版本对象池 异步方法
-
-    public static void CreatePoolObjectAsync(string name, CallBack<PoolObject> callback, GameObject parent = null)
-    {
-        ResourceManager.LoadAsync(name, (status,res) =>
-        {
-            try
-            {
-                callback(CreatePoolObject(name, parent));
-            }
-            catch(Exception e)
-            {
-                Debug.LogError("CreatePoolObjectAsync Exception: " + e.ToString());
-            }
-        });
-    }
-
-    #endregion
+   
 }

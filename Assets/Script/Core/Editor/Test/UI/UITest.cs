@@ -12,7 +12,7 @@ namespace Framework
         {
             //ResourcesConfigManager.Initialize();
 
-            GameObject manager = GameObjectManager.CreateGameObject("UIManager");
+            GameObject manager = GameObjectManager.CreateGameObjectByPool("UIManager");
 
             Assert.AreNotEqual(manager.GetComponent<UILayerManager>(), null);
             Assert.AreNotEqual(manager.GetComponent<UIAnimManager>(), null);

@@ -1,3 +1,4 @@
+#if USE_LUA
 using LuaInterface;
 using UnityEditor;
 using System;
@@ -226,3 +227,4 @@ public class LuaExportList
         return new DelegateType(t);
     }
 }
+#endif

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class UIBase : MonoBehaviour , UILifeCycleInterface
 {
+    [HideInInspector]
     public Canvas m_canvas;
 
     #region 重载方法
@@ -77,6 +78,8 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         RemoveAllListener();
         CleanItem();
         CleanModelShowCameraList();
+
+        ClearLoadSprite();
         try
         {
             OnUIDestroy();
@@ -726,12 +729,11 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
     #region 创建对象
 
-    List<UIBase> m_ChildList = new List<UIBase>();
+   protected List<UIBase> m_ChildList = new List<UIBase>();
     int m_childUIIndex = 0;
     public UIBase CreateItem(string itemName, GameObject parent, bool isActive)
     {
         GameObject item = GameObjectManager.CreateGameObjectByPool(itemName, parent, isActive);
-
         return SetItem(item);
     }
     public UIBase CreateItem(string itemName, string prantName, bool isActive)
@@ -869,7 +871,15 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
     public void SetText(string TextID, string content)
     {
-        GetText(TextID).text = content.Replace("\\n", "\n");
+        if (string.IsNullOrEmpty(content))
+        {
+            GetText(TextID).text = content;
+        }
+        else
+        {
+            GetText(TextID).text = content.Replace("\\n", "\n");
+        }
+
     }
 
     public void SetImageColor(string ImageID, Color color)
@@ -906,6 +916,11 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     public void SetTextByLangeage(string textID, string contentID, params object[] objs)
     {
         GetText(textID).text = LanguageManager.GetContent(LanguageManager.c_defaultModuleKey, contentID, objs);
+    }
+
+    void SetTextStyle(string textID, string work)
+    {
+
     }
 
     public void SetTextByLangeage(string textID, string moduleName, string contentID, params object[] objs)
@@ -978,6 +993,42 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
     #endregion
 
+    #region 动态加载Sprite赋值
+    private Dictionary<string, int> loadSpriteNames = new Dictionary<string, int>();
+    public void SetImageSprite(Image img, string name, bool is_nativesize = false)
+    {
+        if(ResourcesConfigManager.GetIsExitRes(name))
+        {
+            UGUITool.SetImageSprite(img, name, is_nativesize);
+            if (!loadSpriteNames.ContainsKey(name))
+                loadSpriteNames.Add(name, 1);
+            else
+                loadSpriteNames[name]++;
+            //if (name == "CLT_border_TagBg_Hunter")
+            //    Debug.Log("UIBase 加载图片：" + name + " ==>" + loadSpriteNames[name]);
+        }
+        else
+        {
+            Debug.LogError("SetImageSprite 资源不存在! ->" + name + "<-");
+        }
+    }
+
+    private void ClearLoadSprite()
+    {
+        //Debug.Log("===>> ClearLoadSprite");
+        foreach (var item in loadSpriteNames)
+        {
+            int num = item.Value;
+            //if (item.Key == "CLT_border_TagBg_Hunter")
+            //    Debug.Log("UIBase 回收图片：" + item.Key + ":" + num);
+            ResourceManager.DestoryAssetsCounter(item.Key,num);
+            
+           
+        }
+        loadSpriteNames.Clear();
+    }
+    #endregion
+
     #region RawImageCamera
 
     List<UIModelShowTool.UIModelShowData> modelList = new List<UIModelShowTool.UIModelShowData>();
@@ -991,11 +1042,10 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         Vector3? localScale = null,
         Vector3? eulerAngles = null ,
         Vector3? texSize = null,
-        bool isPutPool = false,
         float? nearClippingPlane = null,
         float? farClippingPlane = null)
     {
-        var model = CreateModelShow(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, localScale, eulerAngles, texSize, isPutPool, nearClippingPlane, farClippingPlane);
+        var model = CreateModelShow(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, localScale, eulerAngles, texSize, nearClippingPlane, farClippingPlane);
 
         GetRawImage(rawimageName).texture = model.renderTexture;
 
@@ -1021,11 +1071,10 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         Vector3? localScale = null,
         Vector3? eulerAngles = null,
         Vector3? texSize = null,
-        bool isPutPool = false,
         float? nearClippingPlane = null,
         float? farClippingPlane = null)
     {
-        var model = UIModelShowTool.CreateModelData(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, eulerAngles, localScale, texSize, isPutPool, nearClippingPlane, farClippingPlane);
+        var model = UIModelShowTool.CreateModelData(modelName, layerName, orthographic, orthographicSize, backgroundColor, localPosition, eulerAngles, localScale, texSize, nearClippingPlane, farClippingPlane);
         modelList.Add(model);
 
         return model;
@@ -1111,7 +1160,7 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         return obj;
     }
     /// <summary>
-    /// 新手引导获得动态创建Item  格式为：PetItem[0].Use（PetItem的Item上挂有UIBase脚本， [0] 第几个Item，Use：拖到PetItem上的GameObject）
+    /// 新手引导获得动态创建Item  格式为：PetItem[0].Use（PetItem的Item上挂有UIBase脚本， [0] 该名字的第几个Item，Use：拖到PetItem上的GameObject）
     /// </summary>
     /// <param name="itemName"></param>
     /// <returns></returns>
@@ -1158,15 +1207,28 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
             if (strArr.Length > 1)
             {
                 childName = strArr[1];
+                Debug.Log("childName:" + childName);
                 if (childName.Contains("["))
                 {
-                    childName = itemName.Replace(firstName + ".", "");
-
+                    childName = itemName.Replace(strArr[0] + ".", "");
+                    Debug.Log("childName:" + childName);
                     obj = uIBase.GetGuideDynamicCreateItem(childName);
                 }
                 else
                 {
-                    obj= uIBase.GetGameObject(childName);
+                  string afterNames=  itemName.Replace(strArr[0] + ".", "");
+                    strArr = afterNames.Split('.');
+                    Debug.Log("afterNames :" + afterNames + "  UIBase:" + GetType().Name);
+                    for (int i = 0; i < strArr.Length; i++)
+                    {
+                        string findName = strArr[i];
+                        obj = uIBase.GetGameObject(findName);
+                        if (i < strArr[i].Length - 1)
+                        {
+                            uIBase = obj.GetComponent<UIBase>();
+                        }
+                    }
+                       
                 }
             }
         }

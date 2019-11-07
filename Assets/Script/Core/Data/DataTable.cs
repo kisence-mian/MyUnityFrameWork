@@ -491,6 +491,24 @@ public class DataTable : Dictionary<string, SingleData>
         }
     }
 
+    public void SetAssetTypes(string key, DataFieldAssetType type)
+    {
+        //主键只能是String类型
+        if (key == TableKeys[0])
+        {
+            return;
+        }
+
+        if (m_fieldAssetTypes.ContainsKey(key))
+        {
+            m_fieldAssetTypes[key] = type;
+        }
+        else
+        {
+            m_fieldAssetTypes.Add(key, type);
+        }
+    }
+
     public SingleData GetLineFromKey(string key)
     {
         //主键只能是String类型

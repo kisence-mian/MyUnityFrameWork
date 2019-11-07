@@ -1,0 +1,6 @@
+IOSÔ¿³×´®¹¦ÄÜ
+Plugin Methods
+
+Keychain.SetValue(string key, string value) - Stores a string value in the Keychain.
+Keychain.GetValue(string key) - Returns a string value from Keychain associated with that key.
+Keychain.DeleteValue(string key) - Deletes the keychain value associated with that key.

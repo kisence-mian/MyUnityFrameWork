@@ -40,59 +40,135 @@ public class PreloadManager:MonoBehaviour
         if (otherResList != null)
             queueRes.AddRange(otherResList);
 
-        queueRes.AddRange(configs);
+        foreach (var item in configs)
+        {
+            if (item.m_UseLoad)
+            {
+                queueRes.Add(item);
+            }
+        }
 
         count = queueRes.Count;
         currentNum = 0;
-        LoadQueue();
+       instance.StartCoroutine( LoadQueue());
     }
 
-    private void LoadQueue()
+    //private void LoadQueue()
+    //{
+    //    if (currentNum >= count)
+    //    {
+    //        RunCallBack();
+    //        Destroy();
+    //        return;
+    //    }
+    //    PreloadResourcesDataGenerate da = queueRes[currentNum];
+    //    currentNum++;
+    //    //Debug.Log("da.m_key " + da.m_key);
+    //    try
+    //    {
+    //        string typeStr = da.m_ResType.ToString().Replace("_", ".");
+    //        Type resType= ReflectionUtils.GetTypeByTypeFullName(typeStr);
+
+    //        //  object loadRes = ResourceManager.Load(da.m_key);
+    //        ResourceManager.LoadAsync(da.m_key, resType, (LoadState loadState, object loadRes) =>
+    //         {
+    //         if (loadState.isDone)
+    //         {
+
+    //             if (loadRes != null )
+    //                {
+    //                    if (loadRes is GameObject )
+    //                    {
+    //                        GameObject prefab = (GameObject)loadRes;
+    //                        List<GameObject> resList = new List<GameObject>();
+    //                        for (int i = 0; i < da.m_instantiateNum; i++)
+    //                        {
+    //                            GameObject obj = GameObjectManager.CreateGameObjectByPool(prefab);
+    //                            resList.Add(obj);
+                                
+    //                        }
+    //                        foreach (var obj in resList)
+    //                        {
+    //                            GameObjectManager.DestroyGameObjectByPool(obj, !da.m_createInstanceActive);
+    //                        }
+    //                    }
+    //                    else
+    //                    {
+    //                        ResourceManager.DestroyByPool(da.m_key);
+    //                    }
+    //                }
+    //                else
+    //                {
+    //                    if (loadRes == null)
+    //                    {
+    //                        Debug.LogError("Error： 预加载失败  key：" + da.m_key);
+    //                    }
+    //                }
+    //                RunCallBack();
+    //                LoadQueue();
+    //            }
+    //         });
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        Debug.LogError(e);
+    //        LoadQueue();
+    //    }
+    //}
+    private IEnumerator LoadQueue()
     {
-        if (currentNum >= count)
+        while (true)
         {
-            RunCallBack();
-            Destroy();
-            return;
-        }
-        PreloadResourcesDataGenerate da = queueRes[currentNum];
-        currentNum++;
-        //Debug.Log("da.m_key " + da.m_key);
-        try
-        {
-            Type resType= ReflectionUtils.GetTypeByTypeFullName(da.m_ResType);
-            ResourceManager.LoadAsync(da.m_key,resType, (LoadState loadState, object loadRes) =>
+            if (currentNum >= count)
             {
-                if (loadState.isDone)
+                RunCallBack();
+                Destroy();
+                break;
+            }
+            PreloadResourcesDataGenerate da = queueRes[currentNum];
+            currentNum++;
+            Debug.Log("预加载：" + da.m_key);
+            try
+            {
+                string typeStr = da.m_ResType.ToString().Replace("_", ".");
+                Type resType = ReflectionUtils.GetTypeByTypeFullName(typeStr);
+
+                if (resType == typeof(GameObject))
                 {
-                    if (loadRes != null && loadRes is GameObject)
+                    List<GameObject> resList = new List<GameObject>();
+                    for (int i = 0; i < da.m_instantiateNum; i++)
                     {
-                        if (da.m_instantiateNum > 0)
-                        {
-                            GameObject prefab = (GameObject)loadRes;
-                            for (int i = 0; i < da.m_instantiateNum; i++)
-                            {
-                                GameObject obj = GameObjectManager.CreateGameObject(prefab);
-                                GameObjectManager.DestroyGameObjectByPool(obj, !da.m_createInstanceActive);
-                            }
-                        }
+                        GameObject obj = GameObjectManager.CreateGameObjectByPool(da.m_key);
+                        if (obj)
+                            resList.Add(obj);
+
+                    }
+                    foreach (var obj in resList)
+                    {
+                        GameObjectManager.DestroyGameObjectByPool(obj, !da.m_createInstanceActive);
+                    }
+                }
+                else
+                {
+                    object loadRes = ResourceManager.Load(da.m_key);
+                    if (loadRes == null)
+                    {
+                        Debug.LogError("Error： 预加载失败  key：" + da.m_key);
                     }
                     else
-                    {
-                        if (loadRes == null)
-                        {
-                            Debug.LogError("Error： 预加载失败  key：" + da.m_key);
-                        }
-                    }
-                    RunCallBack();
-                    LoadQueue();
-                }
-            });
-        }
-        catch (Exception e)
-        {
-            Debug.LogError(e);
-            LoadQueue();
+                        ResourceManager.DestoryAssetsCounter(da.m_key);
+                }             
+                RunCallBack();
+               // LoadQueue();
+               
+
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+               // LoadQueue();
+            }
+            yield return new WaitForEndOfFrame();
         }
     }
 
@@ -149,6 +225,20 @@ public class PreloadManager:MonoBehaviour
 
     private void Destroy()
     {
+        ;
+        ;
         Destroy(instance.gameObject);
     }
+}
+
+public enum ReloadResType
+{
+    UnityEngine_GameObject,
+    UnityEngine_Sprite,
+    UnityEngine_Texture2D,
+    UnityEngine_RenderTexture,
+    UnityEngine_AudioClip,
+    UnityEngine_Material,
+    UnityEngine_Shader,
+    UnityEngine_TextAsset,
 }

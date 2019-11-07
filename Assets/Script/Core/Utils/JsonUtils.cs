@@ -19,20 +19,44 @@ namespace HDJ.Framework.Utils
         private static Type notJsonSerialized_Type = typeof(NotJsonSerializedAttribute);
         public static string ToJson(object data)
         {
-            object temp = ChangeObjectToJsonObject(data);
-            if (null == temp)
-                return "";
-            return SimpleJsonTool.SerializeObject(temp);
+            try
+            {
+                object temp = ChangeObjectToJsonObject(data);
+                if (null == temp)
+                    return "";
+                return SimpleJsonTool.SerializeObject(temp);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+            return null;
         }
         public static T FromJson<T>(string json)
         {
-            object obj = FromJson(typeof(T), json);
-            return obj == null ? default(T) : (T)obj;
+            try
+            {
+                object obj = FromJson(typeof(T), json);
+                return obj == null ? default(T) : (T)obj;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+            return default(T);
         }
         public static object FromJson(Type type, string json)
         {
-            object jsonObj = SimpleJsonTool.DeserializeObject(json);
-            return ChangeJsonDataToObjectByType(type, jsonObj);
+            try
+            {
+                object jsonObj = SimpleJsonTool.DeserializeObject(json);
+                return ChangeJsonDataToObjectByType(type, jsonObj);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+            return null;
         }
 
         #region   List<T>
@@ -169,8 +193,6 @@ namespace HDJ.Framework.Utils
 
                 if (ReflectionUtils.IsDelegate(f.FieldType))
                     continue;
-
-
                 if (CheckHaveNotJsonSerializedAttribute(f))
                     continue;
                 try
@@ -193,23 +215,19 @@ namespace HDJ.Framework.Utils
             for (int i = 0; i < propertys.Length; i++)
             {
                 PropertyInfo p = propertys[i];
-                if (p.CanRead && p.CanWrite)
+                if (CheckPropertyInfo(p))
                 {
-                    if (ReflectionUtils.IsDelegate(p.PropertyType))
-                        continue;
-                    if (CheckHaveNotJsonSerializedAttribute(p))
-                        continue;
                     try
                     {
-
                         object v = p.GetValue(data, null);
                         if (v == null)
                             continue;
                         v = ChangeObjectToJsonObject(v);
                         dic.Add(p.Name, v);
                     }
-                    catch
+                    catch (Exception e)
                     {
+                        Debug.LogError("property :" + p.Name + "\n" + e);
                         continue;
                     }
                 }
@@ -250,11 +268,19 @@ namespace HDJ.Framework.Utils
                 }
                 else
                 {
-                    PropertyInfo property = type.GetProperty(key, flags);
-                    if (property != null && property.CanRead && property.CanWrite)
+                    PropertyInfo p = type.GetProperty(key, flags);
+                    if (CheckPropertyInfo(p))
                     {
-                        value = ChangeJsonDataToObjectByType(property.PropertyType, value);
-                        property.SetValue(instance, value, null);
+                        try
+                        {
+                            value = ChangeJsonDataToObjectByType(p.PropertyType, value);
+                            p.SetValue(instance, value, null);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError("property :" + p.Name + "\n" + e);
+                            continue;
+                        }
                     }
                 }
             }
@@ -347,7 +373,8 @@ namespace HDJ.Framework.Utils
         #region Other
         private static bool IsSupportBaseValueParseJson(Type t)
         {
-            if (t.IsPrimitive || t == typeof(string) || t.IsEnum)
+            //p.PropertyType.IsPrimitive IsPrimitive 表示是否为基元类型之一，则为 true；否则为 false。 基元类型是 Boolean、 Byte、 SByte、 Int16、 UInt16、 Int32、 UInt32、 Int64、 UInt64、 Char、 Double和 Single。
+            if (t.IsPrimitive || t == typeof(decimal) || t == typeof(string) || t.IsEnum)
                 return true;
             return false;
         }
@@ -356,14 +383,16 @@ namespace HDJ.Framework.Utils
             object value = null;
             if (data == null)
                 return value;
-            if (type.IsPrimitive || type == typeof(string))
+            if (IsSupportBaseValueParseJson(type))
             {
-                value = data;
-            }
-            else if (type.IsEnum)
-            {
-                value = Enum.Parse(type, data.ToString());
-                // value = Enum.ToObject(type, data);
+                if (type.IsEnum)
+                {
+                    value = Enum.Parse(type, data.ToString());
+                }
+                else
+                {
+                    value = data;
+                }
             }
             else if (type.IsArray)
             {
@@ -397,7 +426,14 @@ namespace HDJ.Framework.Utils
             {
                 if (type.IsClass || type.IsValueType)
                 {
-                    value = JsonObjectToClassOrStruct(data, type);
+                    if (type == typeof(DateTime))
+                    {
+                        value = Convert.ToDateTime(data.ToString());
+                    }
+                    else
+                    {
+                        value = JsonObjectToClassOrStruct(data, type);
+                    }
                 }
             }
             if (value == null)
@@ -405,13 +441,66 @@ namespace HDJ.Framework.Utils
             try
             {
                 if (!type.Equals(value.GetType()))
-                    value = Convert.ChangeType(value, type);
+                    value = ChangeType(value, type);
             }
             catch (Exception e)
             {
-                Debug.LogError("无法转换类型， type：" + type.FullName + "  valueType: " + value.GetType().FullName + "\n " + e);
+                Debug.LogError("无法转换类型， type：" + type.FullName + "  valueType: " + value.GetType().FullName +" :"+value+"\n data:"+data.GetType()+" : "+data+ "\n " + e);
             }
             return value;
+        }
+        static public object ChangeType(object value, Type type)
+        {
+            if (value == null && type.IsGenericType) return Activator.CreateInstance(type);
+            if (value == null) return null;
+            if (type == value.GetType()) return value;
+            if (type.IsEnum)
+            {
+                if (value is string)
+                    return Enum.Parse(type, value as string);
+                else
+                    return Enum.ToObject(type, value);
+            }
+            if (!type.IsInterface && type.IsGenericType)
+            {
+                Type innerType = type.GetGenericArguments()[0];
+                object innerValue = ChangeType(value, innerType);
+                return Activator.CreateInstance(type, new object[] { innerValue });
+            }
+            if (value is string && type == typeof(Guid)) return new Guid(value as string);
+            if (value is string && type == typeof(Version)) return new Version(value as string);
+            if (!(value is IConvertible)) return value;
+
+            if (type == typeof(byte))
+            {
+                return Convert.ToByte(value);
+            }
+            else if (type == typeof(int))
+                return Convert.ToInt32(value);
+            else if (type == typeof(long))
+                return Convert.ToInt64(value);
+            else if (type == typeof(bool))
+                return Convert.ToBoolean(value);
+            else if (type == typeof(float))
+                return Convert.ToSingle(value);
+            else if (type == typeof(double))
+                return Convert.ToDouble(value);
+            else if (type == typeof(decimal))
+                return Convert.ToDecimal(value);
+            else if (type == typeof(char))
+                return Convert.ToChar(value);
+            else if (type == typeof(short))
+                return Convert.ToInt16(value);
+            else if (type == typeof(sbyte))
+                return Convert.ToSByte(value);
+            else if (type == typeof(ushort))
+                return Convert.ToUInt16(value);
+            else if (type == typeof(uint))
+                return Convert.ToUInt32(value);
+            else if (type == typeof(ulong))
+                return Convert.ToUInt64(value);
+
+            return Convert.ChangeType(value, type);
         }
         /// <summary>
         /// 检测是否字段或属性添加了 NotJsonSerializedAttribute 特性
@@ -432,6 +521,28 @@ namespace HDJ.Framework.Utils
             }
             return isSerialized;
         }
+        /// <summary>
+        /// 检查属性是否能用于序列化
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        private static bool CheckPropertyInfo(PropertyInfo property)
+        {
+            if (property == null)
+                return false;
+            if (!(property.CanRead && property.CanWrite))
+                return false;
+            //索引器
+            if (property.GetIndexParameters().Length > 0)
+            {
+                return false;
+            }
+            if (ReflectionUtils.IsDelegate(property.PropertyType))
+                return false;
+
+
+            return true;
+        }
         private static object ChangeObjectToJsonObject(object data)
         {
             if (null == data)
@@ -444,6 +555,10 @@ namespace HDJ.Framework.Utils
             {
                 if (t.IsArray)
                     value = ListArrayToJsonObject(data, false);
+                else if (t == typeof(DateTime))
+                {
+                    value = data.ToString();
+                }
                 else if (t.IsClass || t.IsGenericType)
                 {
                     if (list_Type.Name == t.Name)

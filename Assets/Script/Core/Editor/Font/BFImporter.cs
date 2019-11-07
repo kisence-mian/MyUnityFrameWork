@@ -59,7 +59,6 @@ namespace litefeel
             texImporter.mipmapEnabled = false;
             texImporter.SaveAndReimport();
 
-
             Font font = AssetDatabase.LoadMainAssetAtPath(fontPath) as Font;
             if (font == null)
             {

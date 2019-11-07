@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System;
-using FrameWork;
 
 public class DevelopReplayManager 
 {
@@ -50,6 +49,8 @@ public class DevelopReplayManager
         get { return s_onLunchCallBack; }
         set { s_onLunchCallBack = value; }
     }
+
+    #region Init
 
     public static void Init(bool isQuickLunch)
     {
@@ -150,6 +151,8 @@ public class DevelopReplayManager
     {
         WriteRandomRecord(random);
     }
+
+    #endregion
 
     #region SaveReplayFile
 
@@ -273,6 +276,16 @@ public class DevelopReplayManager
                 s_randomList.Add(int.Parse(content[i].ToString()));
             }
         }
+    }
+
+    #endregion
+
+    #region SaveScreenShot
+
+    static void SaveScreenShot(string fileName)
+    {
+        FileTool.CreatFilePath(fileName);
+        UnityEngine.ScreenCapture.CaptureScreenshot(fileName);
     }
 
     #endregion
@@ -760,6 +773,14 @@ public class DevelopReplayManager
 
             Time.timeScale *= 0.5f;
         }
+
+        if (Input.GetKeyDown(KeyCode.F10))
+        {
+            string name = GetScreenshotFileName();
+            Debug.Log("已保存 屏幕截图 " + name);
+
+            SaveScreenShot(name);
+        }
     }
 
 #endregion
@@ -884,7 +905,7 @@ public class DevelopReplayManager
 
 #endregion
 
-#region Update
+    #region Update
 
     static float s_currentTime = 0;
 
@@ -919,7 +940,9 @@ public class DevelopReplayManager
         s_currentTime += Time.deltaTime;
     }
 
-#endregion
+    #endregion
+
+    #region Tool
 
     public static string[] GetRelpayFileNames()
     {
@@ -948,6 +971,24 @@ public class DevelopReplayManager
         return logName;
     }
 
+    static string GetScreenshotFileName()
+    {
+        DateTime now = System.DateTime.Now;
+        //string screenshotName = string.Format("Screenshot{0}-{1:D2}-{2:D2}#{3:D2}-{4:D2}-{5:D2}",
+        //    now.Year, now.Month, now.Day, now.Hour, now.Minute, now.Second);
+
+        string screenshotName = string.Format("ScreenShot_{0}x{1}_{2}", Screen.width, Screen.height, System.DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
+
+
+        string path = PathTool.GetAbsolutePath(ResLoadLocation.Persistent,
+                                         PathTool.GetRelativelyPath(
+                                                        "ScreenShot",
+                                                        screenshotName,
+                                                        "jpg"));
+
+        return path;
+    }
+
     static void UploadCallBack(string result)
     {
         GUIUtil.ShowTips(result);
@@ -960,4 +1001,6 @@ public class DevelopReplayManager
         Log,
         PersistentFile
     }
+
+    #endregion
 }

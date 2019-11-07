@@ -14,6 +14,8 @@ public class UIWindowBase : UIBase
     public GameObject m_bgMask;
     public GameObject m_uiRoot;
 
+    public float m_PosZ; //Z轴偏移
+
     #region 重载方法
 
     public virtual void OnOpen()

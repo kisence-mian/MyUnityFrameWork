@@ -74,6 +74,8 @@ public class ApplicationStatusManager
                 try
                 {
                     s_currentAppStatus.OnExitStatus();
+                    if (MemoryManager.NeedReleaseMemory())
+                        MemoryManager.FreeMemory();
                 }
                 catch (Exception e)
                 {
@@ -109,16 +111,23 @@ public class ApplicationStatusManager
         {
             if (s_currentAppStatus != null)
             {
-                //Debug.Log("Change ");
-
                 UIManager.SetEventSystemEnable(false);
                 CameraFade.FadeInToOut(s_fadeInTime, s_afterInDelayTime, s_fadeOutTime, () =>
                 {
-                    //Debug.Log("Change call back ");
-
                     UIManager.SetEventSystemEnable(true);
                     s_currentAppStatus.CloseAllUI(false);
-                    s_currentAppStatus.OnExitStatus();
+
+                    try
+                    {
+                        s_currentAppStatus.OnExitStatus();
+                    }catch(Exception e)
+                    {
+                        Debug.LogError("OnExitStatus Exception " + statusName + " " + e.ToString());
+                    }
+                    
+                    if (MemoryManager.NeedReleaseMemory())
+                        MemoryManager.FreeMemory();
+
                     s_currentAppStatusName = statusName;
                     ApplicationManager.Instance.currentStatus = statusName;
 

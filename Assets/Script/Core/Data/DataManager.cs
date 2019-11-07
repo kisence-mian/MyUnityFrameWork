@@ -34,11 +34,9 @@ public class DataManager
             DataTable data = null;
             string dataJson = "";
 
-#if UNITY_EDITOR
-
             if (Application.isPlaying)
             {
-                dataJson = ResourceManager.ReadTextFile(DataName);
+                dataJson = ResourceManager.LoadText(DataName);
             }
             else
             {
@@ -47,9 +45,6 @@ public class DataManager
                                                     DataName,
                                                     c_expandName));
             }
-#else
-            dataJson = ResourceManager.ReadTextFile(DataName);
-#endif
 
             if (dataJson == "")
             {
@@ -72,6 +67,10 @@ public class DataManager
     /// </summary>
     public static void CleanCache()
     {
+        foreach (var item in s_dataCache.Keys)
+        {
+            ResourceManager.DestoryAssetsCounter(item);
+        }
         s_dataCache.Clear();
     }
 }

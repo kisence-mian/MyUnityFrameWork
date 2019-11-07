@@ -6,7 +6,7 @@ public class LuaTestStstus : IApplicationStatus
 
     public override void OnEnterStatus()
     {
-        LuaManager.LoadLua();
-        LuaManager.LaunchLua();
+        //LuaManager.LoadLua();
+        //LuaManager.LaunchLua();
     }
 }

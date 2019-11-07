@@ -270,6 +270,21 @@ public class Audio3DPlayer : AudioPlayerBase
                 if (clearList[i] == null)
                     bgMusicDic.Remove(clearList[i]);
             }
+
+            foreach (var dic in bgMusicDic)
+            {
+                foreach (var item in dic.Value)
+                {
+                    item.Value.CheckState();
+                    //if(item.Value.PlayState == AudioPlayState.Stop)
+                    //{
+                    //    DestroyAudioAssetByPool(bgMusicDic[dic.Key][item.Key]);
+                    //    bgMusicDic[dic.Key].Remove(item.Key);
+                       
+                    //    break;
+                    //}
+                }
+            }
         }
         if (sfxDic.Count > 0)
         {
@@ -278,7 +293,22 @@ public class Audio3DPlayer : AudioPlayerBase
             for (int i = 0; i < clearList.Count; i++)
             {
                 if (clearList[i] == null)
+                {
                     sfxDic.Remove(clearList[i]);
+                }
+            }
+            foreach (var list in sfxDic)
+            {
+                foreach (var item in list.Value)
+                {
+                    item.CheckState();
+                    if(item.PlayState== AudioPlayState.Stop)
+                    {
+                        DestroyAudioAssetByPool(item);
+                        sfxDic[list.Key].Remove(item);
+                        break;
+                    }
+                }
             }
         }
     }

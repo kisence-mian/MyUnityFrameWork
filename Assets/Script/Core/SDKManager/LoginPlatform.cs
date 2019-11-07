@@ -9,6 +9,10 @@ using System.Text;
 public enum LoginPlatform
 {
     /// <summary>
+    /// 账号登录
+    /// </summary>
+    AccountLogin,
+    /// <summary>
     /// 游客
     /// </summary>
     Tourist,
@@ -32,6 +36,22 @@ public enum LoginPlatform
     /// 苹果
     /// </summary>
     Apple,
-    
+    /// <summary>
+    /// 脸书
+    /// </summary>
+    FaceBook,
+    /// <summary>
+    /// 4399
+    /// </summary>
+    m4399,
+    /// <summary>
+    /// OPPO
+    /// </summary>
+    OPPO,
+    /// <summary>
+    /// VIVO
+    /// </summary>
+    VIVO,
+
 }
 

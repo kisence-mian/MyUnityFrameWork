@@ -282,24 +282,21 @@ public class SDKEditorWindow : EditorWindow
         {
             m_currentSchemeData.UseNewSDKManager = GUILayout.Toggle(m_currentSchemeData.UseNewSDKManager, "使用新版本SDKManager");
 
-            if(!m_currentSchemeData.UseNewSDKManager)
+            m_isFoldSDKGUI = EditorGUILayout.Foldout(m_isFoldSDKGUI, "配置插件类型和参数：");
+
+            if (m_isFoldSDKGUI)
             {
-                m_isFoldSDKGUI = EditorGUILayout.Foldout(m_isFoldSDKGUI, "配置插件类型和参数：");
+                EditorGUI.indentLevel++;
+                m_pos = EditorGUILayout.BeginScrollView(m_pos);
 
-                if (m_isFoldSDKGUI)
-                {
-                    EditorGUI.indentLevel++;
-                    m_pos = EditorGUILayout.BeginScrollView(m_pos);
+                EditorSDKListGUI(ref m_isFoldlogin, ref selectLoginIndex, m_loginFoldList, typeof(LoginInterface), m_LoginScheme, "登陆SDK");
+                EditorSDKListGUI(ref m_isFoldAd, ref selectADIndex, m_AdFoldList, typeof(ADInterface), m_ADScheme, "广告SDK");
+                EditorSDKListGUI(ref m_isFoldPay, ref selectPayIndex, m_PayFoldList, typeof(PayInterface), m_PayScheme, "支付SDK");
+                EditorSDKListGUI(ref m_isFoldLog, ref selectLogIndex, m_LogFoldList, typeof(LogInterface), m_LogScheme, "事件上报SDK");
+                EditorSDKListGUI(ref m_isFoldOther, ref selectOtherIndex, m_OtherFoldList, typeof(OtherSDKInterface), m_otherScheme, "其他SDK");
 
-                    EditorSDKListGUI(ref m_isFoldlogin, ref selectLoginIndex, m_loginFoldList, typeof(LoginInterface), m_LoginScheme, "登陆SDK");
-                    EditorSDKListGUI(ref m_isFoldAd, ref selectADIndex, m_AdFoldList, typeof(ADInterface), m_ADScheme, "广告SDK");
-                    EditorSDKListGUI(ref m_isFoldPay, ref selectPayIndex, m_PayFoldList, typeof(PayInterface), m_PayScheme, "支付SDK");
-                    EditorSDKListGUI(ref m_isFoldLog, ref selectLogIndex, m_LogFoldList, typeof(LogInterface), m_LogScheme, "事件上报SDK");
-                    EditorSDKListGUI(ref m_isFoldOther, ref selectOtherIndex, m_OtherFoldList, typeof(OtherSDKInterface), m_otherScheme, "其他SDK");
-
-                    EditorGUILayout.EndScrollView();
-                    EditorGUI.indentLevel--;
-                }
+                EditorGUILayout.EndScrollView();
+                EditorGUI.indentLevel--;
             }
         }
         else

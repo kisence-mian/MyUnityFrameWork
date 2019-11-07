@@ -32,8 +32,9 @@ public class MaskWord : MonoBehaviour {
             //无屏蔽字库
             return;
         }
-        SentiWords = ResourceManager.ReadTextFile(textName).Split(splitChar);
-        for(int i =0;i< SentiWords.Length;i++)
+        SentiWords = ResourceManager.LoadText(textName).Split(splitChar);
+        ResourceManager.DestoryAssetsCounter(textName);
+        for (int i =0;i< SentiWords.Length;i++)
         {
             if (SentiWords[i].Contains("\n"))
             {

@@ -4,8 +4,7 @@ using System.IO;
 using System.Collections.Generic;
 using System;
 
-namespace HDJ.Framework.Utils
-{
+
     public class PathUtils
     {
 
@@ -284,7 +283,6 @@ namespace HDJ.Framework.Utils
             return name;
         }
     }
-}
 public enum SpecialPathType
 {
     Resources,

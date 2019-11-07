@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using FrameWork;
 using System.Text;
 using System;
-using LuaInterface;
 
 /// <summary>
 /// 配置管理器，只读
@@ -21,7 +20,7 @@ public static class ConfigManager
 
     public static bool GetIsExistConfig(string ConfigName)
     {
-        return ResourceManager.GetResourceIsExist(ConfigName);
+        return ResourcesConfigManager.GetIsExitRes(ConfigName);
     }
 
     public static Dictionary<string, SingleField> GetData(string ConfigName)
@@ -33,7 +32,7 @@ public static class ConfigManager
 
         string dataJson = "";
 
-#if UNITY_EDITOR
+        //#if UNITY_EDITOR
         if (!Application.isPlaying)
         {
             dataJson = ResourceIOTool.ReadStringByResource(
@@ -41,13 +40,14 @@ public static class ConfigManager
                             ConfigName,
                             c_expandName));
         }
+
+        //#else
         else
         {
-            dataJson = ResourceManager.ReadTextFile(ConfigName);
+            dataJson = ResourceManager.LoadText(ConfigName);
         }
-#else
-                dataJson = ResourceManager.ReadTextFile(ConfigName);
-#endif
+        //#endif
+
 
         if (dataJson == "")
         {
@@ -62,8 +62,17 @@ public static class ConfigManager
         }
     }
 
+    public static SingleField GetData(string ConfigName,string key)
+    {
+        return GetData(ConfigName)[key];
+    }
+
     public static void CleanCache()
     {
+        foreach (var item in s_configCache.Keys)
+        {
+            ResourceManager.DestoryAssetsCounter(item);
+        }
         s_configCache.Clear();
     }
 }

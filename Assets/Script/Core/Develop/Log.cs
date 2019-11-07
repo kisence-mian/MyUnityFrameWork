@@ -22,9 +22,17 @@ public class Log
         if (isOpenLog)
         {
             s_LogOutPutThread.Init();
+            ApplicationManager.s_OnApplicationQuit += OnApplicationQuit;
             Application.logMessageReceivedThreaded += UnityLogCallBackThread;
             Application.logMessageReceived += UnityLogCallBack;
         }
+    }
+
+    private static void OnApplicationQuit()
+    {
+        Application.logMessageReceivedThreaded -= UnityLogCallBackThread;
+        Application.logMessageReceived -= UnityLogCallBack;
+        s_LogOutPutThread.Close();
     }
 
     static void UnityLogCallBackThread(string log, string track, LogType type)

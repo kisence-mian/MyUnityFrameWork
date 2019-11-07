@@ -1,4 +1,4 @@
-﻿
+﻿#if USE_LUA
 /*
 Copyright (c) 2015-2016 topameng(topameng@qq.com)
 
@@ -3855,3 +3855,4 @@ public static class ToLuaExport
         return space; 
     }
 }
+#endif

@@ -32,14 +32,6 @@ public static class ResourcesConfigManager
             Initialize();
         }
 
-#if UNITY_EDITOR
-        //重新加载路径文件
-        if (!s_config.ContainsKey(resName))
-        {
-            Initialize();
-        }
-#endif
-
         return s_config.ContainsKey(resName);
     }
 
@@ -52,14 +44,6 @@ public static class ResourcesConfigManager
             Initialize();
         }
 
-#if UNITY_EDITOR
-        //重新加载路径文件
-        if(!s_config.ContainsKey(bundleName))
-        {
-            Initialize();
-        }
-#endif
-
         if (!s_config.ContainsKey(bundleName))
         {
             throw new Exception("RecourcesConfigManager can't find ->" + bundleName + "<-");
@@ -67,41 +51,76 @@ public static class ResourcesConfigManager
 
         return s_config[bundleName].GetString(c_PathKey);
     }
+    /// <summary>
+    /// 根据AssetsLoadType获取加载路径
+    /// </summary>
+    /// <param name="bundleName"></param>
+    /// <returns></returns>
+  public  static string GetLoadPath(AssetsLoadType assetsloadType, string name)
+    {
+        string path = GetResourcePath(name);
+        if (assetsloadType == AssetsLoadType.Resources)
+            return path;
+        else
+        {
+            return GetLoadPathBase(assetsloadType, path);
+        }
+    }
+    public static string GetLoadPathBase(AssetsLoadType assetsloadType, string path)
+    {
+//#if !UNITY_WEBGL
 
+        bool isLoadByPersistent = RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(path, "null") == "null" ? false : true;
+        ResLoadLocation loadType = ResLoadLocation.Streaming;
+
+        //加载路径由 加载根目录 和 相对路径 合并而成
+        //加载根目录由配置决定
+        if (isLoadByPersistent)
+        {
+            loadType = ResLoadLocation.Persistent;
+            return PathTool.GetAssetsBundlePersistentPath() + path;
+        }
+        else
+        {
+            loadType = ResLoadLocation.Streaming;
+            return PathTool.GetAbsolutePath(loadType, path);
+        }
+
+//#else
+//        return PathTool.GetLoadURL(config.path + "." + c_AssetsBundlesExpandName);
+//#endif
+    }
     public static void LoadResourceConfig()
     {
 #if !UNITY_WEBGL
         string data = "";
 
-        if (ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
+        if (ResourceManager.LoadType ==  AssetsLoadType.Resources)
         {
             data = ResourceIOTool.ReadStringByResource(c_ManifestFileName + "." + DataManager.c_expandName);
         }
         else
         {
             ResLoadLocation type = ResLoadLocation.Streaming;
-
-            if (RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(c_ManifestFileName, "null") != "null")
+            if (RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(c_ManifestFileName.ToLower(), "null") != "null")
             {
                 Debug.Log("LoadResourceConfig 读取沙盒路径");
 
                 type = ResLoadLocation.Persistent;
                 //更新资源存放在Application.persistentDataPath+"/Resources/"目录下
                 string persistentPath = PathTool.GetAssetsBundlePersistentPath() + c_ManifestFileName.ToLower();
-
+  
                 AssetBundle ab = AssetBundle.LoadFromFile(persistentPath);
 
-                TextAsset text = (TextAsset)ab.mainAsset;
+                TextAsset text = (TextAsset)ab.LoadAsset<TextAsset>(c_ManifestFileName);
                 data = text.text;
+
             }
             else
             {
-                Debug.Log("LoadResourceConfig 读取stream路径");
+                //Debug.Log("LoadResourceConfig 读取stream路径");
 
                 string path = PathTool.GetAbsolutePath(type, c_ManifestFileName.ToLower());
-
-                //Debug.Log(path);
-
                 AssetBundle ab = AssetBundle.LoadFromFile(path);
 
                 TextAsset text = ab.LoadAsset<TextAsset>(c_ManifestFileName);
@@ -181,7 +200,7 @@ public static class ResourcesConfigManager
         {
             string fileName = FileTool.RemoveExpandName(FileTool.GetFileNameByPath(files[i]));
             string relativePath = files[i].Substring(direIndex);
-            if (relativePath.EndsWith(".meta"))
+            if (relativePath.EndsWith(".meta") || relativePath.EndsWith(".DS_Store"))
                 continue;
             else
             {
@@ -191,13 +210,20 @@ public static class ResourcesConfigManager
                 sd.Add(c_MainKey, fileName.ToLower());
                 sd.Add(c_PathKey, relativePath.ToLower());
 
-                if(!data.ContainsKey(fileName.ToLower()))
+                if(fileName.Contains(" "))
                 {
-                    data.AddData(sd);
+                    Debug.LogError("文件名中有空格！ ->" + fileName + "<-");
                 }
                 else
                 {
-                    Debug.LogError("GenerateResourcesConfig error 存在重名文件！" + relativePath);
+                    if (!data.ContainsKey(fileName.ToLower()))
+                    {
+                        data.AddData(sd);
+                    }
+                    else
+                    {
+                        Debug.LogError("GenerateResourcesConfig error 存在重名文件！" + relativePath);
+                    }
                 }
             }
         }

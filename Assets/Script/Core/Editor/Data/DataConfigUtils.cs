@@ -120,6 +120,11 @@ public static class DataConfigUtils
             Vector3 v3 = (Vector3)value;
             return v3.x + "," + v3.y + "," + v3.z;
         }
+        if (t == typeof(Color))
+        {
+            Color c = (Color)value;
+            return c.r + "," + c.g + "," + c.b + "," + c.a;
+        }
         else
             return value.ToString();
     }

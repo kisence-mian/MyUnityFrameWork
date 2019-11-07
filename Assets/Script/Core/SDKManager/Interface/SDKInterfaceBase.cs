@@ -12,4 +12,15 @@ public abstract class SDKInterfaceBase
     {
 
     }
+    public virtual List<RuntimePlatform> GetPlatform()
+    {
+        return new List<RuntimePlatform>() { Application.platform };
+    }
+    /// <summary>
+    /// 额外初始化，当SDK需要特殊的初始化时机时使用
+    /// </summary>
+    public virtual void ExtraInit(string tag )
+    {
+
+    }
 }

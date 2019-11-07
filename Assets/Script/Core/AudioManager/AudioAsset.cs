@@ -23,6 +23,10 @@ public class AudioAsset
     public AudioSourceType sourceType;
     public string flag = "";
     public string assetName = "";
+    /// <summary>
+    /// music，记录channel
+    /// </summary>
+    public int musicChannel = 0;
     private float totleVolume = 1;
     /// <summary>
     /// 总音量
@@ -94,10 +98,17 @@ public class AudioAsset
     {
         playState = state;
     }
+    /// <summary>
+    /// 检查音频是否播放完成
+    /// </summary>
     public void CheckState()
     {
+        if (playState == AudioPlayState.Stop)
+            return;
         if (audioSource == null || (!audioSource.isPlaying && playState != AudioPlayState.Pause))
+        {
             Stop();
+        }
 
     }
 
@@ -123,6 +134,17 @@ public class AudioAsset
         if (audioSource)
             audioSource.Stop();
         playState = AudioPlayState.Stop;
+
+        if(sourceType== AudioSourceType.Music)
+        {
+            if (AudioPlayManager.OnMusicStopCallBack != null)
+                AudioPlayManager.OnMusicStopCallBack(assetName, musicChannel, flag);
+        }
+        else
+        {
+            if (AudioPlayManager.OnSFXStopCallBack != null)
+                AudioPlayManager.OnSFXStopCallBack(assetName, flag);
+        }
     }
 
     /// <summary>
@@ -130,6 +152,7 @@ public class AudioAsset
     /// </summary>
     public void ResetData()
     {
+        assetName = "";
         audioSource.pitch = 1;
         flag = "";
     }

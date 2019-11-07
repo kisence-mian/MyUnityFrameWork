@@ -131,7 +131,8 @@ public class RandomService
                 return min;
             int random = GetFixRandom();
             int range = max - min;
-            return (random % range) + min;
+            int res = (random % range) + min;
+            return res;
         }
     }
 }

@@ -18,7 +18,7 @@ public static class UIModelShowTool
     const float c_defaultOrthographicSize = 0.72f;
     const float c_defaultFOV = 60;
     static Color s_defaultBackgroundColor = new Color(0, 0, 0, 0 / 255f);
-    static Vector3 s_StartPosition = new Vector3(0, 0, 5000);
+    static Vector3 s_StartPosition = new Vector3(5000, 5000, 5000);
     static Vector3 s_defaultLocationPosition = new Vector3(0, 0, 10);
     static Vector3 s_defaultEulerAngles = new Vector3(0, 180, 0);
     static Vector3 s_defaultLocalScale = Vector3.one;
@@ -34,6 +34,7 @@ public static class UIModelShowTool
             modelShowList[i].top.transform.position = s_StartPosition + i * s_ShowSpace;
         }
     }
+     
 
     public static void DisposeModelShow(UIModelShowData data)
     {
@@ -51,7 +52,6 @@ public static class UIModelShowTool
         Vector3? eulerAngles = null,
         Vector3? localScale = null,
         Vector3? texSize = null,
-        bool isPutPool = false,
         float? nearClippingPlane = null,
         float? farClippingPlane = null)
     {
@@ -69,7 +69,6 @@ public static class UIModelShowTool
         float farClippingPlaneTmp = farClippingPlane ?? s_clippingPlanes.y;
         //构造Camera
         UIModelShowData data = new UIModelShowData();
-        data.isPutPool = isPutPool;
 
         GameObject uiModelShow = new GameObject("UIShowModelCamera");
         data.top = uiModelShow;
@@ -100,7 +99,7 @@ public static class UIModelShowTool
         root.transform.localScale = localScaleTmp;
 
         //创建模型
-        GameObject obj = GameObjectManager.CreateGameObjectByPool(prefabName);
+        GameObject obj = GameObjectManager.CreateGameObject(prefabName);
         data.model = obj;
 
         obj.transform.SetParent(root.transform);
@@ -152,7 +151,7 @@ public static class UIModelShowTool
         root.transform.localPosition = new Vector3(0, 0, 100);
         root.transform.eulerAngles = new Vector3(0, 180, 0);
 
-        GameObject obj = GameObjectManager.CreateGameObjectByPool(prefabName);
+        GameObject obj = GameObjectManager.CreateGameObject(prefabName);
         obj.transform.SetParent(root.transform);
         obj.transform.localPosition = new Vector3(0, 0, 0);
         obj.transform.localEulerAngles = Vector3.zero;
@@ -210,8 +209,6 @@ public static class UIModelShowTool
 
     public class UIModelShowData
     {
-        public bool isPutPool;
-
         public GameObject top;
         public GameObject root;
         public GameObject model;
@@ -220,27 +217,16 @@ public static class UIModelShowTool
 
         public void Dispose()
         {
-            if (isPutPool)
-            {
-                GameObjectManager.DestroyGameObjectByPool(model);
-            }
-            UnityEngine.Object.Destroy(top);
+            GameObjectManager.DestroyGameObject(model);
+            GameObject.Destroy(top);
         }
 
         public void ChangeModel(string modelName)
         {
             int layer = model.layer;
+            GameObjectManager.DestroyGameObject(model);
 
-            if(isPutPool)
-            {
-                GameObjectManager.DestroyGameObjectByPool(model);
-            }
-            else
-            {
-                UnityEngine.Object.Destroy(model);
-            }
-
-            model = GameObjectManager.CreateGameObjectByPool(modelName);
+            model = GameObjectManager.CreateGameObject(modelName);
             model.transform.SetParent(root.transform);
             model.transform.localPosition = new Vector3(0, 0, 0);
             model.transform.localEulerAngles = Vector3.zero;

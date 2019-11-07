@@ -24,6 +24,8 @@ public class JsonNetworkService : INetworkInterface
 
     public override void Connect()
     {
+        EncryptionService.Init();
+
         m_msgCode = 0;
         base.Connect();
     }
@@ -46,13 +48,20 @@ public class JsonNetworkService : INetworkInterface
 
             string mes = Json.Serialize(data);
             mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
+
+            //加密
+            if ( MessageType != HeartBeatBase.c_HeartBeatMT && EncryptionService.IsSecret)
+            {
+                mes = EncryptionService.Encrypt(mes);
+            }
+
             byte[] bytes = Encoding.UTF8.GetBytes(mes + c_endChar);
 
             m_socketService.Send(bytes);
         }
         catch (Exception e)
         {
-            Debug.LogError(e.ToString());
+            Debug.LogError(e.ToString() + " MT:" + MessageType);
         }
     }
 
@@ -81,29 +90,32 @@ public class JsonNetworkService : INetworkInterface
             isEnd = true;
         }
 
-        m_buffer.Append(s);
-
-        string buffer = m_buffer.ToString();
-
-        m_buffer.Remove(0,m_buffer.Length);
-
-        string[] str = buffer.Split(c_endChar);
-
-        for (int i = 0; i < str.Length; i++)
+        lock(m_buffer)
         {
-            if (i != str.Length - 1)
+            m_buffer.Append(s);
+
+            string buffer = m_buffer.ToString();
+
+            m_buffer.Remove(0, m_buffer.Length);
+
+            string[] str = buffer.Split(c_endChar);
+
+            for (int i = 0; i < str.Length; i++)
             {
-                CallBack(str[i]);
-            }
-            else
-            {
-                if (isEnd)
+                if (i != str.Length - 1)
                 {
                     CallBack(str[i]);
                 }
                 else
                 {
-                    m_buffer.Append(str[i]);
+                    if (isEnd)
+                    {
+                        CallBack(str[i]);
+                    }
+                    else
+                    {
+                        m_buffer.Append(str[i]);
+                    }
                 }
             }
         }
@@ -115,12 +127,15 @@ public class JsonNetworkService : INetworkInterface
         {
             if(s != null && s != "")
             {
-                //Debug.Log("MessageReceive ->" + s);
+                //解密
+                if(EncryptionService.IsSecret)
+                {
+                    s = EncryptionService.Decrypt(s);
+                }
 
                 NetWorkMessage msg = new NetWorkMessage();
 
-                s = WWW.UnEscapeURL(s);
-                s = s.Replace(c_endCharReplaceString, c_endChar.ToString()); 
+                s = s.Replace(c_endCharReplaceString, c_endChar.ToString());
                 Dictionary<string, object> data = Json.Deserialize(s) as Dictionary<string, object>;
 
                 msg.m_data = data;
@@ -132,14 +147,13 @@ public class JsonNetworkService : INetworkInterface
 
                     if(m_msgCode != msg.m_MsgCode)
                     {
+                        Debug.LogError("MsgCode error currentCode " + m_msgCode + " server code " + msg.m_MsgCode);
                         if (msg.m_MsgCode > m_msgCode)
                         {
                             m_msgCode = msg.m_MsgCode;
                             m_msgCode++;
+                            m_messageCallBack(msg);
                         }
-
-                        Debug.LogError("MsgCode error currentCode " + m_msgCode + " server code " + msg.m_MsgCode);
-                        //throw new Exception();
                     }
                     else
                     {

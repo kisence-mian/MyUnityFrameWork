@@ -4,7 +4,7 @@ using System;
 
 public class UIWindowLuaHelper : UIWindowBase
 {
-
+#if USE_LUA
     public override void OnInit()
     {
         UIEventCallBackHelper.CallOnUIInit(this);
@@ -84,4 +84,5 @@ public class UIWindowLuaHelper : UIWindowBase
     {
         UIEventCallBackHelper.CallOnUIDestroy(this);
     }
+#endif
 }

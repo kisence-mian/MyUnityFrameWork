@@ -19,6 +19,13 @@ public class AudioButtonClickComponent : MonoBehaviour {
 
     private void OnClick()
     {
-        AudioPlayManager.PlaySFX2D(audioName, volume);
+        if (ResourcesConfigManager.GetIsExitRes(audioName))
+        {
+            AudioPlayManager.PlaySFX2D(audioName, volume);
+        }
+        else
+        {
+            Debug.LogError("不存在音频文件：" + audioName);
+        }
     }
 }

@@ -31,7 +31,6 @@ public class ImportTool : AssetPostprocessor
         ModelImporter model = (ModelImporter)assetImporter;
         if (model != null)
         {
-           
             if (isLoopAnimation(g.name))
             {
                 //由于我们采用动画分离的导出策略，每个fbx只有一个动画
@@ -51,11 +50,11 @@ public class ImportTool : AssetPostprocessor
               
             }
 
-            if (model.isReadable)
-            {
-                model.isReadable = false;
-                model.SaveAndReimport();
-            }
+            //if (model.isReadable)
+            //{
+            //    model.isReadable = false;
+            //    model.SaveAndReimport();
+            //}
         }
         //Debug.Log("OnPostprocessModel : " + g.name);
     }
@@ -85,17 +84,17 @@ public class ImportTool : AssetPostprocessor
         return res;
     }
 
-    static string ModelPathDre = "Assets/_Res/Models/Charactors/Player/male";
-    [MenuItem("Tools/模型动画转换AnimatorController")]
-    static void ReCreateFBXAnimations()
-    {
-        List<string> paths = FileTool.GetAllFileNamesByPath(ModelPathDre,new string[] { "fbx","FBX"});
-        foreach (var item in paths)
-        {
-           // Debug.Log(item);
-            OnImportFBX(item);
-        }
-    }
+    //static string ModelPathDre = "Assets/_Res/Models/Charactors/Player/male";
+    //[MenuItem("Tools/模型动画转换AnimatorController")]
+    //static void ReCreateFBXAnimations()
+    //{
+    //    List<string> paths = FileTool.GetAllFileNamesByPath(ModelPathDre,new string[] { "fbx","FBX"});
+    //    foreach (var item in paths)
+    //    {
+    //       // Debug.Log(item);
+    //        OnImportFBX(item);
+    //    }
+    //}
 
     static void OnImportFBX(string assetPath)
     {

@@ -723,8 +723,16 @@ public class TableDataEditor
 
     private FieldType GetFieldType(int index, string field)
     {
-        FieldType fieldValueType = index == 0 ? FieldType.String : m_currentData.m_tableTypes[field];
-        return fieldValueType;
+        try
+        {
+            FieldType fieldValueType = index == 0 ? FieldType.String : m_currentData.m_tableTypes[field];
+            return fieldValueType;
+        }
+        catch(Exception e)
+        {
+            Debug.Log("field " + field + " exception " + e.ToString());
+            return FieldType.String;
+        }
     }
     private string GetEnumType(FieldType fieldValueType,  string field)
     {
@@ -1036,7 +1044,7 @@ public class TableDataEditor
             //ResourcesConfigManager.Initialize();
             if (ResourcesConfigManager.GetIsExitRes(content))
             {
-                GameObject obj = ResourceManager.Load<GameObject>(content);
+                GameObject obj = ResourceManager.EditorLoad<GameObject>(content);
                 if (obj)
                 {
 
@@ -1095,7 +1103,7 @@ public class TableDataEditor
             //ResourcesConfigManager.Initialize();
             if (ResourcesConfigManager.GetIsExitRes(content))
             {
-                Texture2D obj = ResourceManager.Load<Texture2D>(content);
+                Texture2D obj = ResourceManager.EditorLoad<Texture2D>(content);
                 if (obj)
                 {
 

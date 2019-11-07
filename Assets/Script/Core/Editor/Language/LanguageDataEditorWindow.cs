@@ -67,7 +67,7 @@ public class LanguageDataEditorWindow : EditorWindow
     void OnGUI()
     {
         titleContent.text = "多语言编辑器";
-        if (config == null)
+        if (config == null|| config.gameExistLanguages.Count==0)
         {
             AddLanguageGUI();
             return;
@@ -151,7 +151,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
     void ConfigSettingGUI()
     {
-        config.defaultLanguage = EditorDrawGUIUtil.DrawPopup("默认语言", currentLanguage, config.gameExistLanguages);
+        config.defaultLanguage = EditorDrawGUIUtil.DrawPopup("默认语言", config.defaultLanguage, config.gameExistLanguages);
         string lanNames = "";
         foreach (var item in config.gameExistLanguages)
         {
@@ -427,20 +427,33 @@ public class LanguageDataEditorWindow : EditorWindow
     {
         if (GUILayout.Button("删除语言"))
         {
-            if (EditorUtility.DisplayDialog("警告", "确定要删除该语言吗！", "是", "取消"))
+            SystemLanguage deleteLan = config.defaultLanguage;
+            if (EditorUtility.DisplayDialog("警告", "确定要删除[" + deleteLan + "]语言吗！", "是", "取消"))
             {
-                config.gameExistLanguages.Remove(currentLanguage);
-                if (config.defaultLanguage == currentLanguage)
-                {
-                    if (config.gameExistLanguages.Count > 0)
-                        config.defaultLanguage = config.gameExistLanguages[0];
-                    else
-                        config.defaultLanguage = SystemLanguage.Unknown;
+               
+                config.gameExistLanguages.Remove(deleteLan);
+                if (config.gameExistLanguages.Count > 0)
+                    config.defaultLanguage = config.gameExistLanguages[0];
+                else
+                    config.defaultLanguage = SystemLanguage.Unknown;
 
+                if (!config.gameExistLanguages.Contains(currentLanguage))
+                {
+                    currentLanguage = config.defaultLanguage;
                 }
-                Directory.Delete(LanguageDataUtils.SavePathDir + currentLanguage, true);
+                try
+                {
+                    currentFileDataTable = null;
+                    selectFullFileName = "";
+                    Directory.Delete(LanguageDataUtils.SavePathDir + deleteLan, true);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError(e);
+                }
                 SaveData();
                 AssetDatabase.Refresh();
+
             }
         }
     }
@@ -475,6 +488,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
         LanguageManager.Release();
         GlobalEvent.DispatchEvent(EditorEvent.LanguageDataEditorChange);
+        UnityEditor.AssetDatabase.Refresh();
     }
 
     #endregion
@@ -510,7 +524,7 @@ public class LanguageDataEditorWindow : EditorWindow
              }, (value) =>
              {
                  SystemLanguage lan = (SystemLanguage)value;
-                
+                 config.gameExistLanguages.Add(lan);
                  CreateNewLangusge(lan);
 
              }
@@ -564,6 +578,7 @@ public class LanguageDataEditorWindow : EditorWindow
         {
             keyPaths = CreateLanguageNewFile(item, tempContent, contentDic);
         }
+        UnityEditor.AssetDatabase.Refresh();
         return keyPaths;
     }
 
@@ -588,6 +603,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
         }
         LanguageDataEditorUtils.SaveData(language, fullKeyFileName, data);
+       
         return keyPaths;
     }
     private void AddNewKey(string fullKeyFileName, string key)
@@ -602,6 +618,7 @@ public class LanguageDataEditorWindow : EditorWindow
 
             LanguageDataEditorUtils.SaveData(language, fullKeyFileName, data);
         }
+        UnityEditor.AssetDatabase.Refresh();
     }
 
     private void DeleteKey(string fullKeyFileName, string key)
@@ -612,6 +629,7 @@ public class LanguageDataEditorWindow : EditorWindow
             data.RemoveData(key);
             LanguageDataEditorUtils.SaveData(language, fullKeyFileName, data);
         }
+        UnityEditor.AssetDatabase.Refresh();
     }
 
     #endregion

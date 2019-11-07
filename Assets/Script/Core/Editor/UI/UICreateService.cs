@@ -14,6 +14,7 @@ public class UICreateService
         EditorExpand.AddSortLayerIfNotExist("Fixed");
         EditorExpand.AddSortLayerIfNotExist("Normal");
         EditorExpand.AddSortLayerIfNotExist("TopBar");
+        EditorExpand.AddSortLayerIfNotExist("Upper");
         EditorExpand.AddSortLayerIfNotExist("PopUp");
 
         //UIManager
@@ -45,7 +46,7 @@ public class UICreateService
         //UIcamera
         GameObject cameraGo = new GameObject("UICamera");
         cameraGo.transform.SetParent(canvas.transform);
-        cameraGo.transform.localPosition = new Vector3(0, 0, -1000);
+        cameraGo.transform.localPosition = new Vector3(0, 0, -5000);
         Camera camera = cameraGo.AddComponent<Camera>();
         camera.cullingMask = LayerMask.GetMask("UI");
         camera.orthographic = true;
@@ -124,6 +125,17 @@ public class UICreateService
         uICameraData.m_NormalLayerParent = goTmp.transform;
 
         goTmp = new GameObject("TopBar");
+        goTmp.layer = LayerMask.NameToLayer("UI");
+        goTmp.transform.SetParent(canvas.transform);
+        goTmp.transform.localScale = Vector3.one;
+        rtTmp = goTmp.AddComponent<RectTransform>();
+        rtTmp.anchorMax = new Vector2(1, 1);
+        rtTmp.anchorMin = new Vector2(0, 0);
+        rtTmp.anchoredPosition3D = Vector3.zero;
+        rtTmp.sizeDelta = Vector2.zero;
+        uICameraData.m_TopbarLayerParent = goTmp.transform;
+
+        goTmp = new GameObject("Upper");
         goTmp.layer = LayerMask.NameToLayer("UI");
         goTmp.transform.SetParent(canvas.transform);
         goTmp.transform.localScale = Vector3.one;

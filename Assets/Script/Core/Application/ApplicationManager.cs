@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using FrameWork.SDKManager;
 
 public class ApplicationManager : MonoBehaviour 
 {
@@ -23,6 +24,8 @@ public class ApplicationManager : MonoBehaviour
 
     public bool m_useAssetsBundle = false;
 
+
+
     public static AppMode AppMode
     {
         get
@@ -36,7 +39,7 @@ public class ApplicationManager : MonoBehaviour
 #else
             return instance.m_AppMode;
 #endif
-        }
+        } 
     }
 
     public bool UseAssetsBundle
@@ -59,6 +62,22 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
+    public static SystemLanguage Langguage
+    {
+        get
+        {
+            if (Application.isPlaying)
+                return instance.langguage;
+            else
+                return Application.systemLanguage;
+        }
+
+        set
+        {
+            instance.langguage = value;
+        }
+    }
+
     [Tooltip("是否记录输入到本地")]
     public bool m_recordInput = true;
 
@@ -72,6 +91,11 @@ public class ApplicationManager : MonoBehaviour
     public List<string> m_globalLogic;
     [HideInInspector]
     public string currentStatus;
+
+    /// <summary>
+    /// 语言
+    /// </summary>
+    public SystemLanguage langguage = SystemLanguage.ChineseSimplified;
     /// <summary>
     /// 显示括号标识多语言转换的字段
     /// </summary>
@@ -88,8 +112,11 @@ public class ApplicationManager : MonoBehaviour
     public void AppLaunch()
     {
         DontDestroyOnLoad(gameObject);
+        Application.runInBackground = true;
+        Screen.sleepTimeout = SleepTimeout.NeverSleep;
+
         SetResourceLoadType();               //设置资源加载类型
-        //ResourcesConfigManager.Initialize(); //资源路径管理器启动
+
         AudioPlayManager.Init();
         MemoryManager.Init();                //内存管理初始化
         Timer.Init();                        //计时器启动
@@ -103,6 +130,8 @@ public class ApplicationManager : MonoBehaviour
 
         ApplicationStatusManager.Init();     //游戏流程状态机初始化
         GlobalLogicManager.Init();           //初始化全局逻辑
+
+        SDKManager.Init();                   //初始化SDKManger
 
         if (AppMode != AppMode.Release)
         {
@@ -157,11 +186,11 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-    /*
-     * 强制暂停时，先 OnApplicationPause，后 OnApplicationFocus
-     * 重新“启动”游戏时，先OnApplicationFocus，后 OnApplicationPause
-     */
-    void OnApplicationPause(bool pauseStatus)
+/*
+ * 强制暂停时，先 OnApplicationPause，后 OnApplicationFocus
+ * 重新“启动”游戏时，先OnApplicationFocus，后 OnApplicationPause
+ */
+void OnApplicationPause(bool pauseStatus)
     {
         if (s_OnApplicationPause != null)
         {
@@ -233,11 +262,11 @@ public class ApplicationManager : MonoBehaviour
     {
         if (UseAssetsBundle)
         {
-            ResourceManager.m_gameLoadType = ResLoadLocation.Streaming;
+            ResourceManager.LoadType =  AssetsLoadType.AssetBundle;
         }
         else
         {
-            ResourceManager.m_gameLoadType = ResLoadLocation.Resource;
+            ResourceManager.LoadType = AssetsLoadType.Resources;
         }
     }
 

@@ -19,4 +19,10 @@ public enum StoreName
     WinRT = 8,
     TizenStore = 9,
     FacebookStore = 10,
+    WX = 11,
+    AliPay = 12,  //支付宝
+    IAppPay = 13, //爱贝
+    m4399 = 14,//4399
+    OPPO = 15,
+    VIVO = 16,
 }

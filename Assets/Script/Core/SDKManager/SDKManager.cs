@@ -9,7 +9,16 @@ namespace FrameWork.SDKManager
 {
     public static class SDKManager
     {
+        static bool isInit = false;
+
+#if UNITY_ANDROID
+        public const string c_ConfigName = "SDKConfig_Android";
+#elif UNITY_IOS
+        public const string c_ConfigName = "SDKConfig_IOS";
+#else
         public const string c_ConfigName = "SDKConfig";
+#endif
+
         public const string c_KeyName = "SDKInfo";
 
         static List<LoginInterface> s_loginServiceList = null;
@@ -17,26 +26,16 @@ namespace FrameWork.SDKManager
         static List<ADInterface> s_ADServiceList = null;
         static List<LogInterface> s_logServiceList = null;
         static List<OtherSDKInterface> s_otherServiceList = null;
-
-        private static LoginCallBack s_loginCallBack;
         private static PayCallBack s_payCallBack;
+        private static ADCallBack s_adCallBack;
+
+        static Dictionary<string, OtherCallBack> s_callBackDict = new Dictionary<string, OtherCallBack>();
 
         static bool s_useNewSDKManager = false; //是否使用新版本SDKManager
 
         #region 属性
 
-        public static LoginCallBack LoginCallBack
-        {
-            get
-            {
-                return s_loginCallBack;
-            }
-
-            set
-            {
-                s_loginCallBack = value;
-            }
-        }
+        public static LoginCallBack LoginCallBack { get; set; }
 
         public static PayCallBack PayCallBack
         {
@@ -48,6 +47,18 @@ namespace FrameWork.SDKManager
             set
             {
                 s_payCallBack = value;
+            }
+        }
+        public static ADCallBack ADCallBack
+        {
+            get
+            {
+                return s_adCallBack;
+            }
+
+            set
+            {
+                s_adCallBack = value;
             }
         }
 
@@ -62,29 +73,95 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void Init()
         {
-            try
+            if (!isInit)
             {
-                if (ConfigManager.GetIsExistConfig(c_ConfigName))
+                isInit = true;
+
+                try
                 {
-                    SchemeData data = LoadGameSchemeConfig();
-
-                    s_useNewSDKManager = data.UseNewSDKManager;
-
-                    if (s_useNewSDKManager)
+                    if (ConfigManager.GetIsExistConfig(c_ConfigName))
                     {
-                        SDKManagerNew.Init();
-                    }
-                    else
-                    {
+                        SchemeData data = LoadGameSchemeConfig();
+
+                        s_useNewSDKManager = data.UseNewSDKManager;
+
+                        if (s_useNewSDKManager)
+                        {
+                            SDKManagerNew.Init();
+                        }
+
+                        Debug.Log("SDKManager Init");
                         LoadService(data);
-
                         InitSDK();
+                        AutoListenerInit();
                     }
                 }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager Init Exception: " + e.ToString());
+                }
             }
-            catch (Exception e)
+        }
+
+        /// <summary>
+        /// 额外初始化，SDKName == null时初始化全体
+        /// </summary>
+        public static void ExtraInit(SDKType type, string sdkName = null, string tag = null)
+        {
+            if (sdkName != null)
             {
-                Debug.LogError("SDKManager Init Exception: " + e.ToString());
+                switch (type)
+                {
+                    case SDKType.AD:
+                        GetADService(sdkName).ExtraInit(tag); break;
+                    case SDKType.Log:
+                        GetLogService(sdkName).ExtraInit(tag); break;
+                    case SDKType.Login:
+                        GetLoginService(sdkName).ExtraInit(tag); break;
+                    case SDKType.Other:
+                        GetOtherService(sdkName).ExtraInit(tag); break;
+                    case SDKType.Pay:
+                        GetPayService(sdkName).ExtraInit(tag); break;
+                }
+            }
+            else
+            {
+                switch (type)
+                {
+                    case SDKType.AD:
+                        AllExtraInit(s_ADServiceList, tag); break;
+                    case SDKType.Log:
+                        AllExtraInit(s_logServiceList, tag); break;
+                    case SDKType.Login:
+                        AllExtraInit(s_loginServiceList, tag); break;
+                    case SDKType.Other:
+                        AllExtraInit(s_otherServiceList, tag); break;
+                    case SDKType.Pay:
+                        AllExtraInit(s_payServiceList, tag); break;
+                }
+            }
+        }
+
+        static void AllExtraInit<T>(List<T> list, string tag = null) where T : SDKInterfaceBase
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                try
+                {
+                    list[i].ExtraInit(tag);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("AllExtraInit Exception " + list[i].m_SDKName + " " + e.ToString());
+                }
+            }
+        }
+
+        static void CheckInit()
+        {
+            if(!isInit)
+            {
+                throw new Exception("SDKManager not init !");
             }
         }
 
@@ -124,7 +201,7 @@ namespace FrameWork.SDKManager
 
         public static PayInterface GetPayService(int index)
         {
-            if(s_payServiceList.Count <= index)
+            if (s_payServiceList.Count <= index)
             {
                 throw new Exception("GetPayService error index->" + index + " count->" + s_payServiceList.Count);
             }
@@ -202,9 +279,9 @@ namespace FrameWork.SDKManager
             {
                 try
                 {
-                    list[i].m_SDKName = list[i].GetType().Name;
+                    //list[i].m_SDKName = list[i].GetType().Name;
                     list[i].Init();
-                    s_loginCallBack += list[i].m_callBack;
+                    //s_loginCallBack += list[i].m_callBack;
                 }
                 catch (Exception e)
                 {
@@ -218,7 +295,7 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void Login(string tag = "")
         {
-            if(s_useNewSDKManager)
+            if (s_useNewSDKManager)
             {
                 SDKManagerNew.Login();
             }
@@ -238,11 +315,11 @@ namespace FrameWork.SDKManager
         /// <summary>
         /// 登陆
         /// </summary>
-        public static void LoginBySDKName(string SDKName,string tag = "")
+        public static void LoginBySDKName(string SDKName, string tag = "")
         {
             if (s_useNewSDKManager)
             {
-                SDKManagerNew.Login(SDKName,tag);
+                SDKManagerNew.Login(SDKName, tag);
             }
             else
             {
@@ -252,9 +329,84 @@ namespace FrameWork.SDKManager
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("SDKManager Login Exception: " + e.ToString());
+                    Debug.LogError("SDKManager Login Exception: " + SDKName + "===" + e.ToString());
                 }
             }
+        }
+        /// <summary>
+        /// 登陆
+        /// </summary>
+        public static void LoginByPlatform(LoginPlatform loginPlatform, string tag = "")
+        {
+            try
+            {
+                bool isHave = false;
+                foreach (var item in s_loginServiceList)
+                {
+                    if (item.GetPlatform().Contains(Application.platform) && item.GetLoginPlatform() == loginPlatform)
+                    {
+                        item.Login(tag);
+                        isHave = true;
+                    }
+                }
+
+                if (!isHave)
+                {
+                    if (s_useNewSDKManager)
+                    {
+                        SDKManagerNew.Login(loginPlatform.ToString(), tag);
+                    }
+                    else
+                    {
+                        Debug.LogError("SDKManager Login dont find class by platform:" + Application.platform + " loginPlatform:" + loginPlatform);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager Login Exception: " + e.ToString());
+            }
+        }
+        public static List<LoginPlatform> GetSupportLoginPlatform()
+        {
+            List<LoginPlatform> platforms = new List<LoginPlatform>();
+
+            try
+            {
+                foreach (var item in s_loginServiceList)
+                {
+                    if (item.GetPlatform().Contains(Application.platform))
+                    {
+                        platforms.Add(item.GetLoginPlatform());
+                    }
+                }
+
+                if (s_useNewSDKManager)
+                {
+                    List<LoginPlatform> newList = SDKManagerNew.GetSupportLoginPlatform();
+
+                    for (int i = 0; i < newList.Count; i++)
+                    {
+                        if (!platforms.Contains(newList[i]))
+                        {
+                            platforms.Add(newList[i]);
+                        }
+                    }
+                }
+
+                if (platforms.Count == 0)
+                {
+                    Debug.LogError("SDKManager Login dont find class by platform:" + Application.platform + " please check config");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager Login Exception: " + e.ToString());
+            }
+
+
+
+            return platforms;
         }
 
         #endregion
@@ -267,9 +419,9 @@ namespace FrameWork.SDKManager
             {
                 try
                 {
-                    list[i].m_SDKName = list[i].GetType().Name;
+                    //list[i].m_SDKName = list[i].GetType().Name;
                     list[i].Init();
-                      list[i].m_PayResultCallBack= s_payCallBack;
+                    //list[i].m_PayResultCallBack= s_payCallBack;
                     Debug.Log("初始化支付回调");
                 }
                 catch (Exception e)
@@ -282,44 +434,56 @@ namespace FrameWork.SDKManager
         /// <summary>
         /// 支付,默认访问第一个接口
         /// </summary>
-        public static void Pay(string goodsID, string tag = "",GoodsType goodsType = GoodsType.NORMAL, string orderID = null)
+        public static void Pay(PayInfo payInfo)
         {
-            if(s_useNewSDKManager)
-            {
-                SDKManagerNew.Pay(goodsID, tag, goodsType, orderID);
-            }
-            else
+            //优先使用本地配置的SDK
+            if (s_payServiceList.Count > 0)
             {
                 try
                 {
-                    GetPayService(0).Pay(goodsID, tag);
+                    GetPayService(0).Pay(payInfo.goodsID, payInfo.tag);
                 }
                 catch (Exception e)
                 {
                     Debug.LogError("SDKManager Pay Exception: " + e.ToString());
                 }
+            }
+            else if (s_useNewSDKManager)
+            {
+                SDKManagerNew.Pay(payInfo);
+            }
+            else
+            {
+                Debug.Log("支付SDK 没有配置！ ");
             }
         }
 
         /// <summary>
         /// 支付
         /// </summary>
-        public static void Pay(string SDKName, string goodsID,string tag ,GoodsType goodsType = GoodsType.NORMAL, string orderID = null)
+        public static void Pay(string SDKName, PayInfo payInfo )
         {
-            if (s_useNewSDKManager)
-            {
-                SDKManagerNew.Pay(SDKName,goodsID, tag, goodsType, orderID);
-            }
-            else
+            Debug.Log("Pay  SDKname " + SDKName + " GetHasSDKService " + GetHasSDKService(s_payServiceList, SDKName));
+
+            //优先使用本地配置的SDK
+            if (GetHasSDKService(s_payServiceList, SDKName))
             {
                 try
                 {
-                    GetPayService(SDKName).Pay(goodsID, tag);
+                    GetPayService(SDKName).Pay(payInfo.goodsID, payInfo.tag);
                 }
                 catch (Exception e)
                 {
                     Debug.LogError("SDKManager Pay Exception: " + e.ToString());
                 }
+            }
+            else if (s_useNewSDKManager)
+            {
+                SDKManagerNew.Pay(SDKName, payInfo);
+            }
+            else
+            {
+                Debug.LogError("支付SDK 没有配置！ ");
             }
         }
 
@@ -331,6 +495,7 @@ namespace FrameWork.SDKManager
             try
             {
                 GetPayService(0).ConfirmPay(orderID, tag);
+               
             }
             catch (Exception e)
             {
@@ -353,6 +518,60 @@ namespace FrameWork.SDKManager
             }
         }
 
+        public static LocalizedGoodsInfo GetGoodsInfo(string goodsID, string tag = "")
+        {
+            try
+            {
+                return GetPayService(0).GetGoodsInfo(goodsID);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+            }
+            return null;
+        }
+
+        public static LocalizedGoodsInfo GetGoodsInfo(string SDKName, string goodsID, string tag = "")
+        {
+            try
+            {
+                return GetPayService(SDKName).GetGoodsInfo(goodsID);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+            }
+
+            return null;
+        }
+
+        public static List<LocalizedGoodsInfo> GetAllGoodsInfo(string tag = "")
+        {
+            try
+            {
+                return GetPayService(0).GetAllGoodsInfo();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+            }
+            return null;
+        }
+
+        public static List<LocalizedGoodsInfo> GetAllGoodsInfo(string SDKName, string tag = "")
+        {
+            try
+            {
+                return GetPayService(SDKName).GetAllGoodsInfo();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+            }
+
+            return null;
+        }
+
         #endregion
 
         #region 广告
@@ -362,19 +581,19 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void LoadAD(ADType adType, string tag = "")
         {
-            if(s_useNewSDKManager)
+            if (s_ADServiceList.Count > 0)
             {
-                SDKManagerNew.LoadAD(adType, tag);
+                GetADService(0).LoadAD(adType, tag);
             }
             else
             {
-                try
+                if (s_useNewSDKManager)
                 {
-                    GetADService(0).LoadAD(adType, tag);
+                    SDKManagerNew.LoadAD(adType, tag);
                 }
-                catch (Exception e)
+                else
                 {
-                    Debug.LogError("SDKManager LoadAD Exception: " + e.ToString());
+                    Debug.LogError("SDKManager LoadAD s_ADServiceList count is 0");
                 }
             }
         }
@@ -402,23 +621,78 @@ namespace FrameWork.SDKManager
         }
 
         /// <summary>
-        /// 显示广告
+        /// 广告已加载成功,默认访问第一个接口
         /// </summary>
-        public static void PlayAD(ADType adType, string tag = "")
+        public static bool ADIsLoaded(ADType adType, string tag = "")
         {
-            if(s_useNewSDKManager)
+            if (s_useNewSDKManager)
             {
-                SDKManagerNew.PlayAD(adType, tag);
+                return true;
             }
             else
             {
                 try
                 {
-                    GetADService(0).PlayAD(adType, tag);
+                    return GetADService(0).IsLoaded(adType, tag);
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("SDKManager PlayAD Exception: " + e.ToString());
+                    Debug.LogError("SDKManager LoadAD Exception: " + e.ToString());
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 加载广告成功
+        /// </summary>
+        public static bool ADIsLoaded(string SDKName, ADType adType, string tag = "")
+        {
+            try
+            {
+                if (GetHasSDKService(s_ADServiceList, SDKName))
+                {
+                    return GetADService(SDKName).IsLoaded(adType, tag);
+                }
+                else
+                {
+                    if (s_useNewSDKManager)
+                    {
+                        //TODO 
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.LogError("SDKManager ADIsLoaded Not find: " + SDKName);
+                        return false;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager ADIsLoaded Exception: " + e.ToString());
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 显示广告
+        /// </summary>
+        public static void PlayAD(ADType adType, string tag = "")
+        {
+            if (s_ADServiceList.Count > 0)
+            {
+                GetADService(0).PlayAD(adType, tag);
+            }
+            else
+            {
+                if (s_useNewSDKManager)
+                {
+                    SDKManagerNew.PlayAD(adType, tag);
+                }
+                else
+                {
+                    Debug.LogError("SDKManager PlayAD s_ADServiceList count is 0");
                 }
             }
         }
@@ -428,20 +702,27 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void PlayAD(string SDKName, ADType adType, string tag = "")
         {
-            if (s_useNewSDKManager)
+            try
             {
-                SDKManagerNew.PlayAD(SDKName, adType, tag);
-            }
-            else
-            {
-                try
+                if (GetHasSDKService(s_ADServiceList, SDKName))
                 {
                     GetADService(SDKName).PlayAD(adType, tag);
                 }
-                catch (Exception e)
+                else
                 {
-                    Debug.LogError("SDKManager PlayAD Exception: " + e.ToString());
+                    if (s_useNewSDKManager)
+                    {
+                        SDKManagerNew.PlayAD(SDKName, adType, tag);
+                    }
+                    else
+                    {
+                        Debug.LogError("SDKManager PlayAD Not find: " + SDKName);
+                    }
                 }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManager PlayAD Exception: " + e.ToString());
             }
         }
 
@@ -451,19 +732,19 @@ namespace FrameWork.SDKManager
         /// <param name="adType"></param>
         public static void CloseAD(ADType adType, string tag = "")
         {
-            if(s_useNewSDKManager)
+            if (s_ADServiceList.Count > 0)
             {
-                SDKManagerNew.CloseAD(adType, tag);
+                GetADService(0).CloseAD(adType, tag);
             }
             else
             {
-                try
+                if (s_useNewSDKManager)
                 {
-                    GetADService(0).CloseAD(adType, tag);
+                    SDKManagerNew.CloseAD(adType, tag);
                 }
-                catch (Exception e)
+                else
                 {
-                    Debug.LogError("SDKManager CloseAD Exception: " + e.ToString());
+                    Debug.LogError("SDKManager CloseAD s_ADServiceList count is 0");
                 }
             }
         }
@@ -474,19 +755,19 @@ namespace FrameWork.SDKManager
         /// <param name="adType"></param>
         public static void CloseAD(string SDKName, ADType adType, string tag = "")
         {
-            if (s_useNewSDKManager)
+            if (GetHasSDKService(s_ADServiceList, SDKName))
             {
-                SDKManagerNew.CloseAD(SDKName,adType, tag);
+                GetADService(SDKName).CloseAD(adType, tag);
             }
             else
             {
-                try
+                if (s_useNewSDKManager)
                 {
-                    GetADService(SDKName).CloseAD(adType, tag);
+                    SDKManagerNew.CloseAD(SDKName, adType, tag);
                 }
-                catch (Exception e)
+                else
                 {
-                    Debug.LogError("SDKManager CloseAD Exception: " + e.ToString());
+                    Debug.LogError("SDKManager CloseAD Not find: " + SDKName);
                 }
             }
         }
@@ -501,47 +782,265 @@ namespace FrameWork.SDKManager
         /// <param name="data"></param>
         public static void Log(string eventID, Dictionary<string, string> data)
         {
-            if(s_useNewSDKManager)
+            CheckInit();
+
+            if (s_useNewSDKManager)
             {
                 SDKManagerNew.Log(eventID, data);
             }
+
+            for (int i = 0; i < s_logServiceList.Count; i++)
+            {
+                try
+                {
+                    s_logServiceList[i].Log(eventID, data);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager Log Exception: " + e.ToString());
+                }
+            }
+        }
+
+        public static void LogLogin(string accountID, Dictionary<string, string> data = null)
+        {
+            CheckInit();
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.LogLogin(accountID, data);
+            }
+
+            for (int i = 0; i < s_logServiceList.Count; i++)
+            {
+                try
+                {
+                    s_logServiceList[i].LogLogin(accountID, data);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager LogLogin Exception: " + e.ToString());
+                }
+            }
+        }
+
+        public static void LogLoginOut(string accountID)
+        {
+            CheckInit();
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.LogLoginOut(accountID);
+            }
+
+            for (int i = 0; i < s_logServiceList.Count; i++)
+            {
+                try
+                {
+                    s_logServiceList[i].LogLoginOut(accountID);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager LogLoginOut Exception: " + e.ToString());
+                }
+            }
+        }
+
+        public static void LogPay(string orderID, string goodsID,int count, float price, string currency, string payment)
+        {
+            CheckInit();
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.LogPay(orderID, goodsID, count, price, currency,payment);
+            }
+
+            for (int i = 0; i < s_logServiceList.Count; i++)
+            {
+                try
+                {
+                    s_logServiceList[i].LogPay(orderID, goodsID, count, price, currency, payment);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager LogPay Exception: " + e.ToString());
+                }
+            }
+        }
+
+        public static void LogPaySuccess(string orderID)
+        {
+            CheckInit();
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.LogPaySuccess(orderID);
+            }
+
+            for (int i = 0; i < s_logServiceList.Count; i++)
+            {
+                try
+                {
+                    s_logServiceList[i].LogPaySuccess(orderID);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager LogPaySuccess Exception: " + e.ToString());
+                }
+            }
+        }
+
+        //以下三个配合使用，用于追踪虚拟物品的产出消耗
+        public static void LogRewardVirtualCurrency(float count, string reason)
+        {
+            CheckInit();
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.LogRewardVirtualCurrency(count, reason);
+            }
+
+            for (int i = 0; i < s_logServiceList.Count; i++)
+            {
+                try
+                {
+                    s_logServiceList[i].LogRewardVirtualCurrency(count, reason);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager RewardVirtualCurrency Exception: " + e.ToString());
+                }
+            }
+        }
+
+        public static void LogPurchaseVirtualCurrency(string goodsID, int num, float price)
+        {
+            CheckInit();
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.LogPurchaseVirtualCurrency(goodsID,  num,  price);
+            }
+
+            for (int i = 0; i < s_logServiceList.Count; i++)
+            {
+                try
+                {
+                    s_logServiceList[i].LogPurchaseVirtualCurrency(goodsID, num, price);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager PurchaseVirtualCurrency Exception: " + e.ToString());
+                }
+            }
+        }
+
+        public static void LogUseItem(string goodsID, int num)
+        {
+            CheckInit();
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.LogUseItem(goodsID, num);
+            }
+
+            for (int i = 0; i < s_logServiceList.Count; i++)
+            {
+                try
+                {
+                    s_logServiceList[i].LogUseItem(goodsID, num);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager LogUseItem Exception: " + e.ToString());
+                }
+            }
+        }
+
+        #endregion
+
+        #region 其他SDK
+
+        public static void ToClipboard(string content)
+        {
+#if UNITY_EDITOR
+            GUIUtility.systemCopyBuffer = content;
+
+#elif UNITY_ANDROID
+
+            SDKManagerNew.ToClipboard(content);
+#elif UNITY_IOS
+            ClipboardManager.ToClipboard(content);
+#endif
+        }
+
+        public static void DownloadApk(string url = null)
+        {
+#if UNITY_ANDROID
+
+            SDKManagerNew.DownloadApk(url);
+#endif
+        }
+
+        public static void GetAPKSize(string url = null)
+        {
+#if UNITY_ANDROID
+
+            SDKManagerNew.GetAPKSize(url);
+#endif
+        }
+
+        /// <summary>
+        /// 读取注入配置
+        /// </summary>
+        public static string GetProperties(string key,string defaultValue = "")
+        {
+           return GetProperties(SDKInterfaceDefine.FileName_ChannelProperties,key, defaultValue);
+        }
+
+        /// <summary>
+        /// 读取注入配置
+        /// </summary>
+        public static string GetProperties(string properties, string key, string defaultValue)
+        {
+            return SDKManagerNew.GetProperties(properties, key, defaultValue);
+        }
+
+        #region 事件监听
+
+            public static void AddOtherCallBackListener(string functionName, OtherCallBack callBack)
+        {
+            if (s_callBackDict.ContainsKey(functionName))
+            {
+                s_callBackDict[functionName] += callBack;
+            }
             else
             {
-                if (s_logServiceList == null)
-                {
-                    throw new Exception("logServiceList is null ,please check SDKManager Init");
-                }
-
-                for (int i = 0; i < s_logServiceList.Count; i++)
-                {
-                    try
-                    {
-                        s_logServiceList[i].Log(eventID, data);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError("SDKManager Log Exception: " + e.ToString());
-                    }
-                }
+                s_callBackDict.Add(functionName, callBack);
             }
-        }
 
-        public static void LogString(string eventID, string ev_json)
-        {
-            Dictionary<string, object> en_dic = (Dictionary<string, object>)Json.Deserialize(ev_json);
-
-            Dictionary<string, string> send_info = new Dictionary<string, string>();
-
-            foreach (string item in en_dic.Keys)
+            if(s_useNewSDKManager)
             {
-                send_info[item] = en_dic[item].ToString();
+                SDKManagerNew.AddOtherCallBackListener(functionName, callBack);
+            }
+        }
+
+        public static void RemoveOtherCallBackListener(string functionName, OtherCallBack callBack)
+        {
+            if (s_callBackDict.ContainsKey(functionName))
+            {
+                s_callBackDict[functionName] -= callBack;
+            }
+            else
+            {
+                Debug.LogError("RemoveOtherCallBackListener 不存在的 function Name ->" + functionName + "<-");
             }
 
-            Log(eventID, send_info);
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.RemoveOtherCallBackListener(functionName, callBack);
+            }
         }
+
+
         #endregion
 
         #endregion
+
+    #endregion
 
         #region 加载SDK设置
 
@@ -552,12 +1051,12 @@ namespace FrameWork.SDKManager
         /// <returns></returns>
         public static SchemeData LoadGameSchemeConfig()
         {
-            if (ConfigManager.GetIsExistConfig(SDKManager.c_ConfigName))
+            if (ConfigManager.GetIsExistConfig(c_ConfigName))
             {
                 Debug.Log("LoadGameSchemeConfig");
 
-                Dictionary<string, SingleField> configData = ConfigManager.GetData(SDKManager.c_ConfigName);
-                return JsonUtility.FromJson<SchemeData>(configData[SDKManager.c_KeyName].GetString());
+                Dictionary<string, SingleField> configData = ConfigManager.GetData(c_ConfigName);
+                return JsonUtility.FromJson<SchemeData>(configData[c_KeyName].GetString());
             }
             else
             {
@@ -631,7 +1130,7 @@ namespace FrameWork.SDKManager
             }
         }
 
-        #endregion
+#endregion
 
         #region 初始化SDK
 
@@ -658,7 +1157,7 @@ namespace FrameWork.SDKManager
             //Debug.Log("s_loginServiceList: " + s_loginServiceList.Count);
         }
 
-        #endregion
+#endregion
 
         #region 功能函数
 
@@ -675,6 +1174,19 @@ namespace FrameWork.SDKManager
             throw new Exception("GetSDKService " + typeof(T).Name + " Exception dont find ->" + name + "<-");
         }
 
+        static bool GetHasSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                if (list[i].m_SDKName == name)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         static void InitSDKList<T>(List<T> list) where T : SDKInterfaceBase
         {
             for (int i = 0; i < list.Count; i++)
@@ -682,7 +1194,6 @@ namespace FrameWork.SDKManager
                 try
                 {
                     list[i].m_SDKName = list[i].GetType().Name;
-                    //Debug.Log("list[i].m_SDKName " + list[i].GetType().Name);
                     list[i].Init();
                 }
                 catch (Exception e)
@@ -693,12 +1204,38 @@ namespace FrameWork.SDKManager
         }
 
         #endregion
+
+        #region 自动监听上报
+
+        /// <summary>
+        /// 自动上报监听初始化
+        /// </summary>
+        static void AutoListenerInit()
+        {
+            PayCallBack += OnPayCallBackListener;
+        }
+
+
+        /// <summary>
+        /// 自动上报支付
+        /// </summary>
+        static void OnPayCallBackListener(OnPayInfo info)
+        {
+            if (info.isSuccess)
+            {
+                LogPay(info.orderID,info.goodsId,1,info.price,info.currency, info.storeName.ToString());
+            }
+        }
+
+        #endregion
     }
 
     #region 声明
 
     public delegate void LoginCallBack(OnLoginInfo info);
     public delegate void PayCallBack(OnPayInfo info);
+    public delegate void ADCallBack(OnADInfo info);
+    public delegate void OtherCallBack(OnOtherInfo info);
 
     public class SchemeData
     {
@@ -719,5 +1256,14 @@ namespace FrameWork.SDKManager
         public string SDKContent;
     }
 
-    #endregion
+    public enum SDKType
+    {
+        Log,
+        Login,
+        AD,
+        Pay,
+        Other,
+    }
+
+#endregion
 }

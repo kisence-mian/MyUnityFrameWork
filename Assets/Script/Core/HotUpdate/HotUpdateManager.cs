@@ -1,4 +1,5 @@
-﻿using System;
+﻿using FrameWork.SDKManager;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -34,6 +35,7 @@ public class HotUpdateManager
     static HotUpdateCallBack s_UpdateCallBack;
 
     static string s_versionFileCache;
+    static byte[] s_versionByteCache;
 
     static AssetBundleManifest s_ManifestCache;
     static byte[] s_ManifestByteCache;
@@ -45,11 +47,11 @@ public class HotUpdateManager
         Init();
 
         //检查Streaming版本和Persistent版本哪一个更新
-        if(!CheckLocalVersion())
+        if (!CheckLocalVersion())
         {
             return;
         }
-        
+
         //开始热更新
         ApplicationManager.Instance.StartCoroutine(HotUpdateProgress());
     }
@@ -87,7 +89,7 @@ public class HotUpdateManager
                 string StreamVersionContent = text.text;
 
                 ab.Unload(true);
-
+                Debug.Log("Streaming版本:" + StreamVersionContent);
                 //stream版本
                 Dictionary<string, object> StreamVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(StreamVersionContent);
 
@@ -100,11 +102,13 @@ public class HotUpdateManager
 
                     RecordManager.CleanRecord(c_HotUpdateRecordName);
                     Init();
+                    AssetsManifestManager.LoadAssetsManifest();
                 }
                 return true;
             }
             else
             {
+                Debug.Log("没有使用Bundle 无需更新");
                 UpdateDateCallBack(HotUpdateStatusEnum.NoUpdate, 0);
                 return false;
             }
@@ -122,12 +126,10 @@ public class HotUpdateManager
     {
         if(s_versionConfig == null)
         {
-            return "0.0";
+            s_versionConfig = (Dictionary<string, object>)FrameWork.Json.Deserialize(ReadVersionContent());
         }
-        else
-        {
-            return GetInt(s_versionConfig[c_largeVersionKey]) + "." + GetInt(s_versionConfig[c_smallVersonKey]);
-        }
+
+        return GetInt(s_versionConfig[c_largeVersionKey]) + "." + GetInt(s_versionConfig[c_smallVersonKey]);
     }
 
     static IEnumerator CheckVersion()
@@ -136,7 +138,7 @@ public class HotUpdateManager
         //取得服务器版本文件
         WWW www = new WWW(s_versionFileDownLoadPath);
 
-        //Debug.Log("服务器获取版本文件 ：" + s_versionFileDownLoadPath);
+        Debug.Log("服务器获取版本文件 ：" + s_versionFileDownLoadPath);
         //yield return www;
 
         while (!www.isDone)
@@ -148,22 +150,17 @@ public class HotUpdateManager
         if (www.error != null && www.error != "")
         {
             //下载失败
-            //Debug.LogError("Version File DownLoad Error URL:" + s_versionFileDownLoadPath + " error:" + www.error);
+            Debug.LogError("Version File DownLoad Error URL:" + s_versionFileDownLoadPath + " error:" + www.error);
 
             UpdateDateCallBack(HotUpdateStatusEnum.VersionFileDownLoadFail, 0);
             yield break;
         }
 
         s_versionFileCache = www.assetBundle.LoadAsset<TextAsset>(c_versionFileName).text;
-
+        s_versionByteCache = www.bytes;
         www.assetBundle.Unload(true);
 
         UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingVersionFile, GetHotUpdateProgress(false, false, 1));
-
-        //Debug.Log("Version File :text: " + m_versionFileCatch);
-
-        Debug.Log("Service Version File :text: " + s_versionFileCache);
-        Debug.Log("local Version  : " + GetInt(s_versionConfig[c_largeVersionKey]) + " " + GetInt(s_versionConfig[c_smallVersonKey]));
 
         Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(s_versionFileCache);
 
@@ -260,9 +257,6 @@ public class HotUpdateManager
 
             if (!sHash.Equals(lHash))
             {
-                //Debug.Log("sHash" + sHash);
-                //Debug.Log("lHash" + lHash);
-
                 DownLoadData data = new DownLoadData();
                 data.name = allServiceBundle[i];
                 data.md5 = sHash;
@@ -273,7 +267,6 @@ public class HotUpdateManager
     }
 
     static List<DownLoadData> s_downLoadList = new List<DownLoadData>();
-    //static List<ResourcesConfig> s_deleteList = new List<ResourcesConfig>();
 
     static IEnumerator StartDownLoad()
     {
@@ -321,17 +314,19 @@ public class HotUpdateManager
 
         //保存版本信息
         //保存文件信息
-        //ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath()+ c_versionFileName , s_versionByteCache);
+        ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath() + c_versionFileName, s_versionByteCache);
         ResourceIOTool.CreateFile(PathTool.GetAssetsBundlePersistentPath() + AssetsManifestManager.c_ManifestFileName, s_ManifestByteCache);
 
         //从stream读取配置
         RecordManager.SaveRecord(c_HotUpdateRecordName, c_useHotUpdateRecordKey, true);
 
-        UpdateDateCallBack(HotUpdateStatusEnum.UpdateSuccess, 1);
-
         //重新生成资源配置
         ResourcesConfigManager.LoadResourceConfig();
         AssetsManifestManager.LoadAssetsManifest();
+        ResourceManager.ReleaseAll(false);
+        UpdateDateCallBack(HotUpdateStatusEnum.UpdateSuccess, 1);
+
+        
     }
 
     static void Init()
@@ -339,25 +334,41 @@ public class HotUpdateManager
         s_versionConfig   = (Dictionary<string,object>) FrameWork.Json.Deserialize(ReadVersionContent());
         s_hotUpdateConfig = ConfigManager.GetData(c_HotUpdateConfigName);
 
+        //获取下载地址
+        //优先从注入数据中查询
         string downLoadServicePath = null;
-        bool isTest = s_hotUpdateConfig[c_UseTestDownLoadPathKey].GetBool();
-
-        //使用测试下载地址
-        if(isTest)
+        if (ApplicationManager.AppMode == AppMode.Release)
         {
-            downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
+            if(string.IsNullOrEmpty(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "")))
+            {
+                downLoadServicePath = s_hotUpdateConfig[c_downLoadPathKey].GetString();
+            }
+            else
+            {
+                downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "");
+            }
         }
         else
         {
-            downLoadServicePath = s_hotUpdateConfig[c_downLoadPathKey].GetString();
+            if (string.IsNullOrEmpty(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_TestUpdateDownLoadPath, "")))
+            {
+                downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
+            }
+            else
+            {
+                downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_TestUpdateDownLoadPath, "");
+            }
+
+            downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
         }
 
         string downLoadPath = downLoadServicePath + "/" + platform + "/" + Application.version + "/";
-        Debug.Log("=====>"+downLoadPath);
-
+        
         s_versionFileDownLoadPath   = downLoadPath + c_versionFileName.ToLower() ;
         s_ManifestFileDownLoadPath  = downLoadPath + AssetsManifestManager.c_ManifestFileName;
         s_resourcesFileDownLoadPath = downLoadPath;
+
+        Debug.Log("=====>" + s_versionFileDownLoadPath);
     }
 
     static void UpdateDateCallBack(HotUpdateStatusEnum status, float progress)
@@ -420,7 +431,7 @@ public class HotUpdateManager
     {
         string dataJson = "";
 
-        if (ResourceManager.m_gameLoadType == ResLoadLocation.Resource)
+        if (ResourceManager.LoadType == AssetsLoadType.Resources)
         {
             dataJson = ResourceIOTool.ReadStringByResource(
                 c_versionFileName + "." + ConfigManager.c_expandName);
@@ -438,6 +449,7 @@ public class HotUpdateManager
                 TextAsset text = ab.LoadAsset<TextAsset>(c_versionFileName);
                 dataJson = text.text;
                 ab.Unload(true);
+                Debug.Log("沙河路径版本："+dataJson);
             }
             else
             {
@@ -445,7 +457,9 @@ public class HotUpdateManager
                     TextAsset text = ab.LoadAsset<TextAsset>(c_versionFileName);
                     dataJson = text.text;
                     ab.Unload(true);
+                Debug.Log("Streaming路径版本：" + dataJson);
             }
+            
         }
 
         return dataJson;

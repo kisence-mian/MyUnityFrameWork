@@ -159,15 +159,16 @@ public class CameraFade : MonoBehaviour
 
     private void RunComplete(CameraFadeData data)
     {
-        if (data.completeCallBack != null)
-        {
-            data.completeCallBack();
-        }
         if (currentFadeDatas.Contains(data))
         {
             currentFadeDatas.Remove(data);
             cacheData.Add(data);
         }
+        if (data.completeCallBack != null)
+        {
+            data.completeCallBack();
+        }
+       
         if (FadeCompleteCallBack != null)
         {
             FadeCompleteCallBack();

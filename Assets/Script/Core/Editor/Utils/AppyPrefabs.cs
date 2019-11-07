@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class AppyPrefabs : Editor
 {
-    [@MenuItem("Tools/BatchExportPrefab")]
+    [@MenuItem("Tools/Prefab/BatchExportPrefab")]
     static void BatchExportPrefab()
     {
         GameObject[] objs = Selection.gameObjects;
@@ -32,7 +32,7 @@ public class AppyPrefabs : Editor
         AssetDatabase.Refresh();
     }
 
-    [@MenuItem("Tools/BatchRestPrefab")]
+    [@MenuItem("Tools/Prefab/BatchRestPrefab")]
     static void BatchRestPrefab()
     {
         GameObject[] objs = Selection.gameObjects;
