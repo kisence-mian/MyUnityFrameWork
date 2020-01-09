@@ -1,5 +1,4 @@
 ﻿using FrameWork.SDKManager;
-using HDJ.Framework.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -60,6 +59,7 @@ public class PayReSend  {
     /// </summary>
     public void AddPrePayID(OnPayInfo onPayInfo)
     {
+        onPayInfo.userID = SDKManager.UserID;
         localPayInfo.payInfos.Add(onPayInfo);
         WriteData();
         ReadData();
@@ -89,6 +89,7 @@ public class PayReSend  {
         {
             localPayInfo.payInfos.Remove(removeList[i]);
         }
+        WriteData();
         removeList.Clear();
     }
 
@@ -102,9 +103,13 @@ public class PayReSend  {
 
         for (int i = 0; i < localPayInfo.payInfos.Count; i++)
         {
-            Debug.LogWarning("重发购买+" + localPayInfo.payInfos[i].goodsId + "==receipt==" + localPayInfo.payInfos[i].receipt);
-            //发送消息
-            StoreBuyGoods2Server.SenBuyMsg(localPayInfo.payInfos[i].goodsId, 1, localPayInfo.payInfos[i].storeName, localPayInfo.payInfos[i].receipt);
+            OnPayInfo payInfo = localPayInfo.payInfos[i];
+            if (string.IsNullOrEmpty( payInfo.userID)||  payInfo.userID == SDKManager.UserID)
+            {
+                Debug.LogWarning("重发购买+" + payInfo.goodsId + "==receipt==" + payInfo.receipt);
+                //发送消息
+                StoreBuyGoods2Server.SenBuyMsg(payInfo.goodsId, 1, localPayInfo.payInfos[i].storeName, payInfo.receipt);
+            }
         }
     }
 

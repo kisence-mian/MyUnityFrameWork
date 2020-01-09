@@ -1,6 +1,4 @@
-﻿using FrameWork;
-using HDJ.Framework.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,15 +11,13 @@ using UnityEngine;
 public class JsonMessageProcessingController
 {
     public const string ErrorCodeMessage = "ErrorCodeMessage";
+
     public static void Init()
     {
         InputManager.AddAllEventListener<InputNetworkMessageEvent>(MessageReceiveCallBack);
- 
     }
 
-
     // static Deserializer deserializer = new Deserializer();
-
     private static void MessageReceiveCallBack(InputNetworkMessageEvent inputEvent)
     {
         //心跳包
@@ -30,7 +26,7 @@ public class JsonMessageProcessingController
             return;
         }
 
-        if (ApplicationManager.Instance.m_AppMode != AppMode.Release)
+        if (Log.isOpenLog)
             Debug.Log("MessageReceiveCallBack;" + JsonUtils.ToJson(inputEvent));
 
         Type type = Type.GetType(inputEvent.m_MessgaeType);
@@ -48,7 +44,6 @@ public class JsonMessageProcessingController
         if(msgInterface is CodeMessageBase)
         {
             CodeMessageBase codeMsg = (CodeMessageBase)msgInterface;
-
             GlobalEvent.DispatchEvent(ErrorCodeMessage, codeMsg);
         }
     }
@@ -67,7 +62,5 @@ public class JsonMessageProcessingController
         mesDic.Add("Content", content);
         NetworkManager.SendMessage(mt, mesDic);
     }
-
-  
 }
 

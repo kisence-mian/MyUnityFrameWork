@@ -35,7 +35,11 @@ public class LuaManager
         try
         {
             s_state.Start();
-            //LuaBinder.Bind(s_state);
+            LuaBinder.Bind(s_state);
+
+            LoadLua();
+            LaunchLua();
+
             ApplicationManager.s_OnApplicationUpdate += Update;
         }
         catch (Exception e)

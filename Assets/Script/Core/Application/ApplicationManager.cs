@@ -62,21 +62,6 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-    public static SystemLanguage Langguage
-    {
-        get
-        {
-            if (Application.isPlaying)
-                return instance.langguage;
-            else
-                return Application.systemLanguage;
-        }
-
-        set
-        {
-            instance.langguage = value;
-        }
-    }
 
     [Tooltip("是否记录输入到本地")]
     public bool m_recordInput = true;
@@ -105,7 +90,8 @@ public class ApplicationManager : MonoBehaviour
         instance = this;
         AppLaunch();
     }
-
+    [Tooltip("加载资源时是否使用缓存，Bundle加载不起作用(都为使用)")]
+    public bool useCacheWhenLoadResource = true;
     /// <summary>
     /// 程序启动
     /// </summary>
@@ -115,7 +101,7 @@ public class ApplicationManager : MonoBehaviour
         Application.runInBackground = true;
         Screen.sleepTimeout = SleepTimeout.NeverSleep;
 
-        SetResourceLoadType();               //设置资源加载类型
+        SetResourceLoadType(useCacheWhenLoadResource);               //设置资源加载类型
 
         AudioPlayManager.Init();
         MemoryManager.Init();                //内存管理初始化
@@ -146,7 +132,10 @@ public class ApplicationManager : MonoBehaviour
                 ApplicationStatusManager.EnterTestModel(m_Status);//可以从此处进入测试流程
             };
 
-            DevelopReplayManager.Init(m_quickLunch);   //开发者复盘管理器                              
+            DevelopReplayManager.Init(m_quickLunch);   //开发者复盘管理器
+
+            LanguageManager.Init();
+            LanguageManager.SetLanguage(langguage);
         }
         else
         {
@@ -157,6 +146,9 @@ public class ApplicationManager : MonoBehaviour
 #endif
             InitGlobalLogic();                             //全局逻辑
             ApplicationStatusManager.EnterStatus(m_Status);//游戏流程状态机，开始第一个状态
+
+            LanguageManager.Init();
+           
         }
     }
 
@@ -258,15 +250,16 @@ void OnApplicationPause(bool pauseStatus)
     /// <summary>
     /// 设置资源加载方式
     /// </summary>
-    void SetResourceLoadType()
+    void SetResourceLoadType(bool useCache)
     {
         if (UseAssetsBundle)
         {
-            ResourceManager.LoadType =  AssetsLoadType.AssetBundle;
+
+            ResourceManager.Initialize ( AssetsLoadType.AssetBundle,useCache);
         }
         else
         {
-            ResourceManager.LoadType = AssetsLoadType.Resources;
+            ResourceManager.Initialize(AssetsLoadType.Resources, useCache);
         }
     }
 

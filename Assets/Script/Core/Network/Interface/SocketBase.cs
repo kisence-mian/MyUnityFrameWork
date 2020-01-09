@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 
@@ -7,7 +8,7 @@ public abstract class SocketBase
 {
     public string m_IPaddress = "";
     public int m_port = 0;
-
+    public IPEndPoint endPoint;
     public bool isConnect = false;
 
     public ConnectStatusCallBack m_connectStatusCallback;
@@ -39,6 +40,7 @@ public abstract class SocketBase
     {
         m_IPaddress = IP;
         m_port = port;
+        endPoint = new IPEndPoint(IPAddress.Parse(m_IPaddress), port);
     }
 
     /// <summary>

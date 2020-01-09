@@ -17,27 +17,53 @@ public static class ResourceManager
             return loadType;
         }
 
-        set
-        {
-            ReleaseAll();
+        //set
+        //{
+        //    ReleaseAll();
 
-            loadType = value;
-            isInit = false;
-            Initialize();
-        }
+        //    loadType = value;
+        //    isInit = false;
+        //    Initialize();
+        //}
     }
-
+    public static bool UseCache
+    {
+        get;private set;
+    }
     private static AssetsLoadController loadAssetsController;
 
-    private static bool isInit = false;
+    //    private static bool isInit = false;
 #if UNITY_EDITOR
+        //UnityEditor模式下编译完成后自动初始化
     [UnityEditor.InitializeOnLoadMethod]
 #endif
     private static void Initialize()
     {
-        if (isInit)
-            return;
-        loadAssetsController = new AssetsLoadController(loadType);
+        Initialize(AssetsLoadType.Resources, false);
+    }
+    /// <summary>
+    /// 初始化
+    /// </summary>
+    /// <param name="loadType"></param>
+    /// <param name="useCache"></param>
+    public static void Initialize(AssetsLoadType loadType,bool useCache)
+    {
+        //if (isInit)
+        //    return;
+       
+        if(loadType== AssetsLoadType.AssetBundle)
+        {
+            useCache = true;
+        }
+        if (!Application.isPlaying)
+        {
+            useCache = false;
+        }
+        UseCache = useCache;
+        ResourceManager.loadType = loadType;
+        ReleaseAll();
+        loadAssetsController = new AssetsLoadController(loadType,useCache);
+        Debug.Log("ResourceManager初始化 AssetsLoadType:" + loadType + " useCache:" + useCache);
     }
 
     public static AssetsLoadController GetLoadAssetsController()
@@ -87,13 +113,13 @@ public static class ResourceManager
         }
         return res;
     }
-    public static T EditorLoad<T>(string name) where T : Object
-    {
-        T res = null;
-        string path = ResourcesConfigManager.GetLoadPath( AssetsLoadType.Resources, name);
-        res = Resources.Load<T>(path);
-        return res;
-    }
+    //public static T EditorLoad<T>(string name) where T : Object
+    //{
+    //    T res = null;
+    //    string path = ResourcesConfigManager.GetLoadPath( AssetsLoadType.Resources, name);
+    //    res = Resources.Load<T>(path);
+    //    return res;
+    //}
     public static string LoadText(string name)
     {
         TextAsset tex = Load<TextAsset>(name);
@@ -123,7 +149,7 @@ public static class ResourceManager
     /// <summary>
     /// 卸载所有资源
     /// </summary>
-    /// <param name="isForceAB">是否强制卸载bundle</param>
+    /// <param name="isForceAB">是否强制卸载bundle（true:bundle包和资源一起卸载；false：只卸载bundle包）</param>
     public static void ReleaseAll(bool isForceAB=true)
     {
         if (loadAssetsController != null)

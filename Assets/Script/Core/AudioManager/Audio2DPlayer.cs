@@ -27,7 +27,7 @@ public class Audio2DPlayer : AudioPlayerBase
         }
     }
 
-    public void PlayMusic(int channel, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f, string flag = "")
+    public AudioAsset PlayMusic(int channel, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f, string flag = "")
     {
         AudioAsset au;
 
@@ -42,6 +42,7 @@ public class Audio2DPlayer : AudioPlayerBase
         }
         au.musicChannel = channel;
         PlayMusicControl(au, audioName, isLoop, volumeScale, delay, fadeTime, flag);
+        return au;
     }
     public void PauseMusic(int channel, bool isPause, float fadeTime = 0.5f)
     {

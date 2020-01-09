@@ -15,6 +15,10 @@ public class LanguageSettingConfig
     /// 游戏存在的语言
     /// </summary>
     public List<SystemLanguage> gameExistLanguages = new List<SystemLanguage>();
+    /// <summary>
+    /// 当为true,自动匹配手机系统语言
+    /// </summary>
+    public bool useSystemLanguage = true;
     ///// <summary>
     ///// 所有多语言文件名字
     ///// </summary>

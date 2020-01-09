@@ -26,7 +26,8 @@ public class HotUpdateManager
 #if !UNITY_WEBGL
 
     static Dictionary<string, object> s_versionConfig;
-    static Dictionary<string, SingleField> s_hotUpdateConfig;
+    //static Dictionary<string, SingleField> s_hotUpdateConfig;
+    static string downLoadServicePath;
 
     static string s_versionFileDownLoadPath;
     static string s_ManifestFileDownLoadPath;
@@ -40,8 +41,10 @@ public class HotUpdateManager
     static AssetBundleManifest s_ManifestCache;
     static byte[] s_ManifestByteCache;
 
-    public static void StartHotUpdate(HotUpdateCallBack CallBack)
+    public static void StartHotUpdate(string hotUpdateURL, HotUpdateCallBack CallBack)
     {
+        downLoadServicePath = hotUpdateURL;
+
         s_UpdateCallBack = CallBack;
 
         Init();
@@ -95,11 +98,11 @@ public class HotUpdateManager
 
                 //Streaming版本如果比Persistent版本还要新，则更新Persistent版本
                 if ((GetInt(StreamVersion[c_largeVersionKey]) > GetInt(s_versionConfig[c_largeVersionKey])) ||
-                    (GetInt(StreamVersion[c_smallVersonKey]) > GetInt(s_versionConfig[c_smallVersonKey]))
-                    )
+                    (GetInt(StreamVersion[c_smallVersonKey]) > GetInt(s_versionConfig[c_smallVersonKey])
+                    ))
                 {
                     Debug.Log("Streaming版本比Persistent版本还要新");
-
+                    MemoryManager.FreeMemory();
                     RecordManager.CleanRecord(c_HotUpdateRecordName);
                     Init();
                     AssetsManifestManager.LoadAssetsManifest();
@@ -161,7 +164,7 @@ public class HotUpdateManager
         www.assetBundle.Unload(true);
 
         UpdateDateCallBack(HotUpdateStatusEnum.DownLoadingVersionFile, GetHotUpdateProgress(false, false, 1));
-
+        Debug.Log("服务器版本：" + s_versionFileCache);
         Dictionary<string, object> ServiceVersion = (Dictionary<string, object>)FrameWork.Json.Deserialize(s_versionFileCache);
 
         //服务器大版本比较大，需要整包更新
@@ -323,6 +326,8 @@ public class HotUpdateManager
         //重新生成资源配置
         ResourcesConfigManager.LoadResourceConfig();
         AssetsManifestManager.LoadAssetsManifest();
+        //延迟2秒卸载Bundle缓存，防止更新界面掉图（更新时间短时，卸载过快界面会掉图）
+        //yield return new WaitForSeconds(2);
         ResourceManager.ReleaseAll(false);
         UpdateDateCallBack(HotUpdateStatusEnum.UpdateSuccess, 1);
 
@@ -332,35 +337,35 @@ public class HotUpdateManager
     static void Init()
     {
         s_versionConfig   = (Dictionary<string,object>) FrameWork.Json.Deserialize(ReadVersionContent());
-        s_hotUpdateConfig = ConfigManager.GetData(c_HotUpdateConfigName);
+        //s_hotUpdateConfig = ConfigManager.GetData(c_HotUpdateConfigName);
 
-        //获取下载地址
-        //优先从注入数据中查询
-        string downLoadServicePath = null;
-        if (ApplicationManager.AppMode == AppMode.Release)
-        {
-            if(string.IsNullOrEmpty(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "")))
-            {
-                downLoadServicePath = s_hotUpdateConfig[c_downLoadPathKey].GetString();
-            }
-            else
-            {
-                downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "");
-            }
-        }
-        else
-        {
-            if (string.IsNullOrEmpty(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_TestUpdateDownLoadPath, "")))
-            {
-                downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
-            }
-            else
-            {
-                downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_TestUpdateDownLoadPath, "");
-            }
+        ////获取下载地址
+        ////优先从注入数据中查询
+        //string downLoadServicePath = null;
+        //if (ApplicationManager.AppMode == AppMode.Release)
+        //{
+        //    if(string.IsNullOrEmpty(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "")))
+        //    {
+        //        downLoadServicePath = s_hotUpdateConfig[c_downLoadPathKey].GetString();
+        //    }
+        //    else
+        //    {
+        //        downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_UpdateDownLoadPath, "");
+        //    }
+        //}
+        //else
+        //{
+        //    if (string.IsNullOrEmpty(SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_TestUpdateDownLoadPath, "")))
+        //    {
+        //        downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
+        //    }
+        //    else
+        //    {
+        //        downLoadServicePath = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_TestUpdateDownLoadPath, "");
+        //    }
 
-            downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
-        }
+        //    downLoadServicePath = s_hotUpdateConfig[c_testDownLoadPathKey].GetString();
+        //}
 
         string downLoadPath = downLoadServicePath + "/" + platform + "/" + Application.version + "/";
         

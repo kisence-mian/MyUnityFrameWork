@@ -10,8 +10,8 @@ public abstract class HeartBeatBase
     /// <summary>
     /// 接收线程循环间隔时间（毫秒）
     /// </summary>
-    public const int ReciveThreadSleepTime = 100;
-    public const int SendThreadSleepTime = 100;
+    public const int ReciveThreadSleepTime = 250;
+    public const int SendThreadSleepTime = 250;
     #region 属性
     //毫秒
     private float m_heatBeatSendSpaceTime = 3000f;
@@ -94,9 +94,8 @@ public abstract class HeartBeatBase
         {
             if (NetworkManager.IsConnect)
             {
-                if (NetworkManager.HasHeartBeatMessage())
+                if (NetworkManager.GetHeartBeatMessage())
                 {
-                    NetworkManager.GetHeartBeatMessage();
                     ResetReceviceTimer();
                 }
                 else
@@ -130,6 +129,8 @@ public abstract class HeartBeatBase
         {
             sendHBThread.Abort();
         }
+        reciveHBThread = null;
+        sendHBThread = null;
     }
 
     #endregion

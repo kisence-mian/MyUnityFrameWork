@@ -1,0 +1,140 @@
+LuaUIManager = {};
+LuaUIManager.t_UIs = {};
+
+function LuaUIManager.UIOnInit(UIWindow_window)
+
+	local t_UILuaScriptModle = _G[UIWindow_window.UIName];
+
+	if t_UILuaScriptModle ~= nil then
+
+		--创建Lua类
+		local t_UIWindow = t_UILuaScriptModle:New(UIWindow_window);
+		LuaUIManager.t_UIs[UIWindow_window.UIEventKey] = t_UIWindow;
+
+		--调用Init方法
+		t_UIWindow:OnInit();
+
+	else
+		error("没有找到 ->"..UIWindow_window.UIName.."<- 对应的Lua脚本!");
+	end
+end
+
+function LuaUIManager.UIOnOpen(UIWindow_window)
+
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnOpen();
+	else
+		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnShow(UIWindow_window)
+
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnShow();
+	else
+		error("UIOnShow Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnHide(UIWindow_window)
+
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnHide();
+	else
+		error("UIOnHide Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnEnterAnim(UIWindow_window)
+
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		return t_UI:EnterAnim();
+	else
+		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnCompleteEnterAnim(UIWindow_window)
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnCompleteEnterAnim();
+	else
+		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnRefresh(UIWindow_window)
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnRefresh();
+	else
+		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnClose(UIWindow_window)
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnClose();
+	else
+		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnExitAnim(UIWindow_window)
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		return t_UI:ExitAnim();
+	else
+		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnCompleteExitAnim(UIWindow_window)
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnCompleteExitAnim();
+	else
+		error("UIOnOpen Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager.UIOnDestroy(UIWindow_window)
+
+	local t_UI = LuaUIManager.t_UIs[UIWindow_window.UIEventKey];
+
+	if t_UI ~= nil then
+		t_UI:OnDestroy();
+		LuaUIManager.t_UIs[UIWindow_window.UIEventKey] = nil;
+	else
+		error("UIOnDestroy Error Not Find ->"..UIWindow_window.UIEventKey.."<- ");
+	end
+end
+
+function LuaUIManager:GetUITable(UIEvent_e)
+
+	if UIEvent_e ~= nil then
+		return LuaUIManager.t_UIs[UIEvent_e.m_name];
+	end
+end
+
+function LuaUIManager:GetUITableByKey(s_UIKey)
+
+	if s_UIKey ~= nil then
+		return LuaUIManager.t_UIs[s_UIKey];
+	end
+end

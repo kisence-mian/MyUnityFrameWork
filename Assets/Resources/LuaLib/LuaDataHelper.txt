@@ -1,0 +1,14 @@
+function GetLuaDataList( DataTable_data )
+	local t_result = {};
+	local n_index = 1;
+
+	local idList = DataTable_data.TableIDs;
+
+	for i=1,idList.Count do
+		-- print(idList:get_Item(i-1))
+
+		t_result[i] = idList:get_Item(i-1);
+	end
+
+	return t_result;
+end

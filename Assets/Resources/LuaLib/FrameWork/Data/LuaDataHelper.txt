@@ -1,0 +1,45 @@
+--数据量不大的Dict才建议使用这个函数
+function Dict2Table(Dict_data)
+   local content = JsonLuaHelper.Dict2Json(Dict_data);
+   return json.decode(content);
+end
+
+function Table2Dict(t_data)
+   local content = json.encode(t_data);
+   return JsonLuaHelper.Json2Dict(content);
+end
+
+function ToJson(t_data)
+   local content = json.encode(t_data);
+   return content;
+end
+
+function GetLuaDataList( DataTable_data )
+	local t_result = {};
+	local n_index = 1;
+
+	local idList = DataTable_data.TableIDs;
+
+	for i=1,idList.Count do
+		t_result[i] = idList:get_Item(i-1);
+	end
+
+	return t_result;
+end
+
+function GetLuaDataKeyList( DataTable_data )
+	local t_result = {};
+	local n_index = 1;
+
+	local idList = DataTable_data.TableKeys;
+
+	for i=1,idList.Count do
+		t_result[i] = idList:get_Item(i-1);
+	end
+
+	return t_result;
+end
+
+function SendMessage( t_data )
+   JsonLuaHelper.SendMessage(json.encode(t_data));
+end

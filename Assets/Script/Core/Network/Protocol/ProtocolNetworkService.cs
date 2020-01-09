@@ -375,6 +375,8 @@ public class ProtocolNetworkService : INetworkInterface
             throw new Exception("protocol msg.m_data is null !");
         }
 
+
+
         return msg;
     }
 

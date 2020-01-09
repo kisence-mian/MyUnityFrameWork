@@ -11,7 +11,7 @@ public class UITextStyleComponent : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
        
-        SystemLanguage language = LanguageManager.s_currentLanguage;
+        SystemLanguage language = LanguageManager.CurrentLanguage;
 
         SetTextStyleData(language);
 

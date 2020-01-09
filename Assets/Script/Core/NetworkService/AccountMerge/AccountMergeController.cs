@@ -68,7 +68,8 @@ public class AccountMergeController
     {
         //if (!e.alreadyExistAccount)
         //    return;
-        Debug.Log("要绑定的账户已存在：" + e.mergeAccount.userID);
+        if (e.code == 0)
+            Debug.Log("要绑定的账户已存在：" + e.mergeAccount.userID);
         if (OnMergeAccountExist != null)
         {
             OnMergeAccountExist(e);
@@ -135,7 +136,7 @@ public class AccountMergeController
         {
             accountID = accountID.Trim();
             pw = pw.Trim();
-            string pwMd5 = HDJ.Framework.Utils.MD5Utils.GetObjectMD5(pw);
+            string pwMd5 = MD5Utils.GetObjectMD5(pw);
             tag = accountID + "|" + pwMd5;
         }
         SDKManager.LoginByPlatform(loginPlatform, tag);

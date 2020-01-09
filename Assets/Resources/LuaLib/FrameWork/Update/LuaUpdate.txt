@@ -1,0 +1,146 @@
+local n_100msTimerNum  = 0; --用来计算是否触发100ms事件
+local n_500msTimerNum  = 0; --用来计算是否触发500ms事件
+local n_700msTimerNum  = 0; --用来计算是否触发700ms事件
+local n_1000msTimerNum = 0; --用来计算是否触发1000ms事件
+
+local c_timerMaxTime   = 0.01;
+local t_yieldCallBackList     = {}; --所有延时调用的函数储存在此处
+local t_nextFrameCallBackList = {}; --所有下帧调用的函数储存在此处
+local n_yieldStartIndex   = 1;
+local n_yieldEndIndex     = 1;
+
+n_timerTime = 0; --游戏运行的总时间 单位毫秒
+n_lastGCTime = 0;
+local b_isStop = false;
+local n_timeTmp = 0;
+
+--接受定时器事件,该事件100ms左右触发一次
+--参数为上一次本事件触发于这一次事件触发的时间间隔，单位为毫秒
+function LuaUpdate(n_timeDelta)
+	n_timerTime = n_timerTime + n_timeDelta;
+
+	if b_isStop == false then
+		judge_1000msEvent(n_timeDelta);
+		judge_700msEvent(n_timeDelta);
+		judge_500msEvent(n_timeDelta);
+		judge_100msEvent(n_timeDelta);
+
+		judge_yieldCallBack(n_timeDelta);
+
+		E:Dispatch(FrameWorkEvent.timer_everyFrame,n_timeDelta);
+	end
+end
+
+--用于触发100ms事件
+function judge_100msEvent(n_timeDelta)
+	n_100msTimerNum   = n_100msTimerNum  + n_timeDelta;
+
+	while n_100msTimerNum > 100 do	
+
+		n_100msTimerNum = n_100msTimerNum - 100;
+		E:Dispatch(FrameWorkEvent.timer_100ms);
+	end
+end
+
+--用于触发500ms事件
+function judge_500msEvent(n_timeDelta)
+	n_500msTimerNum   = n_500msTimerNum  + n_timeDelta;
+
+	while n_500msTimerNum > 500 do	
+
+		n_500msTimerNum = n_500msTimerNum - 500;
+		E:Dispatch(FrameWorkEvent.timer_500ms);
+	end
+end
+
+--用于触发700ms事件
+function judge_700msEvent(n_timeDelta)
+	n_700msTimerNum   = n_700msTimerNum  + n_timeDelta;
+
+	while n_700msTimerNum > 700 do	
+
+		n_700msTimerNum = n_700msTimerNum - 700;
+		E:Dispatch(FrameWorkEvent.timer_700ms);
+	end
+end
+
+--用于触发1000ms事件
+function judge_1000msEvent(n_timeDelta)
+	n_1000msTimerNum  = n_1000msTimerNum + n_timeDelta;
+	while n_1000msTimerNum > 1000 do
+		n_1000msTimerNum = n_1000msTimerNum - 1000;
+		E:Dispatch(FrameWorkEvent.timer_1000ms);
+	end
+end
+
+--用于延时调用的函数
+	--第一个参数是要延时调用的函数
+	--第二个参数是延时多久以毫秒为单位
+	--第三个参数是要传入的参数
+function yieldCallBack(function_func,n_time,data)
+	local t_yieldCallBackInfo = {};
+	t_yieldCallBackInfo.func = function_func;
+	t_yieldCallBackInfo.data = data;
+	t_yieldCallBackInfo.time = n_time;
+
+	table.insert(t_yieldCallBackList,t_yieldCallBackInfo);
+	
+end
+
+--用于下一帧调用的函数(分散单帧压力，减少卡顿)
+	--第一个参数是要延时调用的函数
+	--第二个参数是要传入的参数
+function nextFrameCallBack(function_func,data,fun_name)
+	
+	local t_nextCallBackInfo   = {};
+	t_nextCallBackInfo.func    = function_func;
+	t_nextCallBackInfo.data    = data;
+	t_nextCallBackInfo.n_frame = 2; --等待两帧
+	t_nextCallBackInfo.name = fun_name
+
+	table.insert(t_nextFrameCallBackList,t_nextCallBackInfo);
+end
+
+--用于处理延时消息
+function judge_yieldCallBack(n_timeDelta)
+	for k,v in pairs(t_yieldCallBackList) do
+	    -- if (os.clock() - n_timeTmp) > c_timerMaxTime then
+	    -- 	print(os.clock() . " " .n_timeTmp." ".c_timerMaxTime)
+	    -- 	break;
+	    -- end
+		v.time = v.time - n_timeDelta;
+		if v.time <= 0 then
+			t_yieldCallBackList[k] = nil;
+			local r, msg = pcall(v.func,v.data)
+		    if not r then
+		        error("judge_yieldCallBack error !:"..tostring(msg));
+		    end
+		end
+	end
+
+	for k,v in pairs(t_nextFrameCallBackList) do
+	    if (os.clock() - n_timeTmp) > c_timerMaxTime then
+	    	break;
+	    end
+		v.n_frame = v.n_frame - 1;
+		if v.n_frame <=0 then
+			t_nextFrameCallBackList[k] = nil;
+
+			local r, msg = pcall(v.func,v.data)
+		    if not r then
+		        error("judge_nextFrame error !:"..tostring(msg));
+		    end
+		end
+	end
+
+end
+
+function clearAllYieldEvent_timer()
+	t_yieldCallBackList     = {}; --所有延时调用的函数储存在此处
+	t_nextFrameCallBackList = {}; --所有下帧调用的函数储存在此处
+end
+
+function TimerSwitch()
+	b_isStop = not b_isStop;
+	warn("b_isStop: "..tostring(b_isStop));
+end

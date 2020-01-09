@@ -1,0 +1,12 @@
+function Main( ... )
+
+	print("hello print");
+	warn("hello warn");
+
+	UIManager.OpenUIWindow("AAAWindow",nil);
+
+	
+	warn("warn");
+	error("error");
+
+end

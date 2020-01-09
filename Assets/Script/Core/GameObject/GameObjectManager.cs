@@ -218,6 +218,7 @@ public class GameObjectManager
     /// <param name="isSetInactive">是否将放入的物体设为不激活状态（obj.SetActive(false)）</param>
     public static void DestroyGameObjectByPool(GameObject go, bool isSetInactive = true)
     {
+
         if (go == null)
             return;
 

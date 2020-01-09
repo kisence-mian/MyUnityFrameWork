@@ -20,6 +20,11 @@ public class LoginInterface : SDKInterfaceBase
 
     }
 
+    public virtual void LoginOut(string tag)
+    {
+
+    }
+
     protected void LoginCallBack(OnLoginInfo info)
     {
         info.loginPlatform = GetLoginPlatform();

@@ -5,7 +5,6 @@ using System.Reflection;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
-using HDJ.Framework.Utils;
 using System.Net;
 using UnityEditor.Animations;
 
@@ -935,12 +934,30 @@ public class EditorDrawGUIUtil
     /// <returns></returns>
     public static string DrawSearchField(string value, params GUILayoutOption[] options)
     {
+        return DrawSearchField(value,null,options);
+    }
+    /// <summary>
+    /// 绘制搜索框
+    /// </summary>
+    /// <param name="value"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public static string DrawSearchField(string value,CallBack valueChangeCallBack, params GUILayoutOption[] options)
+    {
+        string res = value;
         MethodInfo info = typeof(EditorGUILayout).GetMethod("ToolbarSearchField", BindingFlags.NonPublic | BindingFlags.Static, null, new System.Type[] { typeof(string), typeof(GUILayoutOption[]) }, null);
         if (info != null)
         {
-            value = (string)info.Invoke(null, new object[] { value, options });
+            res = (string)info.Invoke(null, new object[] { value, options });
+            if (res != value)
+            {
+                if (valueChangeCallBack != null)
+                {
+                    valueChangeCallBack();
+                }
+            }
         }
-        return value;
+        return res;
     }
     /// <summary>
     /// 根据Type 和name 组合显示数据类型描述 如 ： frame(List<int>)   Count:10

@@ -114,7 +114,7 @@ public class InputUIEventProxy : IInputProxyBase
     {
         InputDragRegisterInfo info = HeapObjectPool<InputDragRegisterInfo>.GetObject();
 
-        info.eventKey = InputUIOnDragEvent.GetEventKey(UIName, ComponentName);
+        info.eventKey = InputUIOnDragEvent.GetEventKey(UIName, ComponentName,parm);
         info.callBack = callback;
         info.m_acceptor = acceptor;
         info.m_OnDrag = (data) =>
@@ -129,7 +129,7 @@ public class InputUIEventProxy : IInputProxyBase
     {
         InputBeginDragRegisterInfo info = HeapObjectPool<InputBeginDragRegisterInfo>.GetObject();
 
-        info.eventKey = InputUIOnBeginDragEvent.GetEventKey(UIName, ComponentName);
+        info.eventKey = InputUIOnBeginDragEvent.GetEventKey(UIName, ComponentName, parm);
         info.callBack = callback;
         info.m_acceptor = acceptor;
         info.m_OnBeginDrag = (data) =>
@@ -144,7 +144,7 @@ public class InputUIEventProxy : IInputProxyBase
     {
         InputEndDragRegisterInfo info = HeapObjectPool<InputEndDragRegisterInfo>.GetObject();
 
-        info.eventKey = InputUIOnEndDragEvent.GetEventKey(UIName, ComponentName);
+        info.eventKey = InputUIOnEndDragEvent.GetEventKey(UIName, ComponentName, parm);
         info.callBack = callback;
         info.m_acceptor = acceptor;
         info.m_OnEndDrag = (data) =>

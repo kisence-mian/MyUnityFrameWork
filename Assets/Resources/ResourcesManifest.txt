@@ -16,16 +16,22 @@ langdata_chinesesimplified	data/language/langdata_chinesesimplified
 guidedata	data/guidedata
 item	data/item
 testdata	data/testdata
-gameobject 1	prefab/gameobject 1
-gameobject 2	prefab/gameobject 2
+luamain	lua/luamain
+luadatahelper	lualib/framework/data/luadatahelper
+luastatusmanager	lualib/framework/status/luastatusmanager
+luastatusmetatable	lualib/framework/status/luastatusmetatable
+luauimanager	lualib/framework/ui/luauimanager
+luauiwindowmetatable	lualib/framework/ui/luauiwindowmetatable
+luaupdate	lualib/framework/update/luaupdate
+luaframeworkeventname	lualib/framework/luaframeworkeventname
+luaunitydefine	lualib/unity/luaunitydefine
+luaeventdispatcher	lualib/luaeventdispatcher
+luaformattools	lualib/luaformattools
+luajson	lualib/luajson
+luaprinttable	lualib/luaprinttable
+luastringhelper	lualib/luastringhelper
 gameobject	prefab/gameobject
 gogo	prefab/gogo
-uitest 1	prefab/uitest 1
-uitest 2	prefab/uitest 2
-uitest 3	prefab/uitest 3
-uitest 4	prefab/uitest 4
-uitest 5	prefab/uitest 5
-uitest 6	prefab/uitest 6
 uitest	prefab/uitest
 dl_01	sprite/dl_01
 dl_01.png	sprite/dl_01.png
@@ -55,13 +61,8 @@ test02window	ui/test02window/test02window
 test2window	ui/test2window/test2window
 image_item	ui/testwindow/image_item
 testwindow	ui/testwindow/testwindow
+testwindowwindow	ui/testwindowwindow/testwindowwindow
 uimanager	ui/uimanager
 gameobject_adasd	gameobject_adasd
-new material 2	new material 2
-new material 3	new material 3
-new material 4	new material 4
-new material 5	new material 5
-new material 6	new material 6
-new material	new material
 resourcesmanifest	resourcesmanifest
 version	version

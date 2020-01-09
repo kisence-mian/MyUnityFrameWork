@@ -23,15 +23,20 @@ public class IAppPayClass : PayInterface
     }
     public override void Init()
     {
-        m_SDKName = StoreName.IAppPay.ToString();
+        if ((StoreName)Enum.Parse(typeof(StoreName), SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"))
+            == StoreName.IAppPay)
+        {
 
-        Debug.LogWarning("=========IAppPayClass Init===========");
-        //SDKManagerNew.OnPayCallBack += SetPayResult;
-        GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
+            m_SDKName = StoreName.IAppPay.ToString();
 
-        appid = SDKManager.GetProperties(StoreName.IAppPay.ToString(), "AppID", appid);
-        mchID = SDKManager.GetProperties(StoreName.IAppPay.ToString(), "MchID", mchID);
-        appSecret = SDKManager.GetProperties(StoreName.IAppPay.ToString(), "AppSecret", appSecret);
+            Debug.LogWarning("=========IAppPayClass Init===========");
+            //SDKManagerNew.OnPayCallBack += SetPayResult;
+            GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
+
+            appid = SDKManager.GetProperties(StoreName.IAppPay.ToString(), "AppID", appid);
+            mchID = SDKManager.GetProperties(StoreName.IAppPay.ToString(), "MchID", mchID);
+            appSecret = SDKManager.GetProperties(StoreName.IAppPay.ToString(), "AppSecret", appSecret);
+        }
     }
 
     /// <summary>
@@ -69,9 +74,9 @@ public class IAppPayClass : PayInterface
     /// <param name="tag"></param>
     /// <param name="goodsType"></param>
     /// <param name="orderID"></param>
-    public override void Pay(string goodsID, string tag, FrameWork.SDKManager.GoodsType goodsType = FrameWork.SDKManager.GoodsType.NORMAL, string orderID = null)
+    public override void Pay(PayInfo payInfo)
     {
-        this.goodsID = goodsID;
+        this.goodsID = payInfo.goodsID;
         
         Debug.LogWarning("send IAppPay----message-----" + goodsID);
         //给服务器发消息1
@@ -87,7 +92,7 @@ public class IAppPayClass : PayInterface
         this.mch_orderID = mch_orderID;
 
         string tag = mch_orderID;
-        PayInfo payInfo = new PayInfo(goodID, "", tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, 0, GetGoodsInfo(goodsID).isoCurrencyCode);
+        PayInfo payInfo = new PayInfo(goodID, GetGoodsInfo(goodID).localizedTitle, tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, 0, GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID());
 
         SDKManagerNew.Pay(StoreName.IAppPay.ToString(), payInfo);
     }

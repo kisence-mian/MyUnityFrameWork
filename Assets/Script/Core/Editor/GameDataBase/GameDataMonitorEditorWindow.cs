@@ -9,7 +9,9 @@ public class GameDataMonitorEditorWindow : EditorWindow
     [MenuItem("Window/游戏数据查看器", priority = 400)]
     public static void ShowWindow()
     {
-        EditorWindow.GetWindow(typeof(GameDataMonitorEditorWindow));
+        GameDataMonitorEditorWindow win= GetWindow<GameDataMonitorEditorWindow>();
+        win.autoRepaintOnSceneChange = true;
+        
     }
     
     void OnGUI()
@@ -38,14 +40,19 @@ public class GameDataMonitorEditorWindow : EditorWindow
     #region View
 
     Vector2 m_scrollPos = new Vector2();
-    Dictionary<string, bool> m_foldDict = new Dictionary<string, bool>();
+    //Dictionary<string, bool> m_foldDict = new Dictionary<string, bool>();
     void ViewGUI()
     {
+        GUILayout.Space(6);
         m_scrollPos = GUILayout.BeginScrollView(m_scrollPos);
 
         foreach(var obj in GameDataMonitor.GameData)
         {
-            ViewItemGUI(obj.Key,obj.Value);
+            EditorDrawGUIUtil.DrawFoldout(obj.Value, obj.Key+":"+obj.Value.description, () =>
+            {
+                EditorDrawGUIUtil.DrawClassData(obj.Key,obj.Value.showValue);
+            });
+           // ViewItemGUI(obj.Key,obj.Value);
         }
 
         GUILayout.EndScrollView();
@@ -53,20 +60,22 @@ public class GameDataMonitorEditorWindow : EditorWindow
 
     void ViewItemGUI(string key,object obj)
     {
-        if (!m_foldDict.ContainsKey(key))
-        {
-            m_foldDict.Add(key,false);
-        }
+        //if (!m_foldDict.ContainsKey(key))
+        //{
+        //    m_foldDict.Add(key,false);
+        //}
 
-        m_foldDict[key] = EditorGUILayout.Foldout(m_foldDict[key], key + ":");
+        //m_foldDict[key] = EditorGUILayout.Foldout(m_foldDict[key], key + ":");
 
-        if (m_foldDict[key])
-        {
-            EditorGUI.indentLevel++;
-            EditorUtilGUI.DrawClassData(obj, key);
+        //if (m_foldDict[key])
 
-            EditorGUI.indentLevel--;
-        }
+       
+        //{
+        //    EditorGUI.indentLevel++;
+        //    EditorUtilGUI.DrawClassData(obj, key);
+
+        //    EditorGUI.indentLevel--;
+        //}
     }
 
     #endregion

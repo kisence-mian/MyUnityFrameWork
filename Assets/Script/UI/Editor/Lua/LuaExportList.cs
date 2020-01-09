@@ -30,6 +30,8 @@ public class LuaExportList
         _GT(typeof(Vector4)),
         _GT(typeof(Vector2)),
         _GT(typeof(Color)),
+
+        _GT(typeof(Debug)),
     #endregion
 
     #region UGUI

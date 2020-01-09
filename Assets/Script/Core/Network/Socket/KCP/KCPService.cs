@@ -45,8 +45,8 @@ public class KCPService : SocketBase
         try
         {
             mUdpClient.Connect(mSvrEndPoint);
-            m_connectStatusCallback(NetworkState.Connected);
             isConnect = true;
+            m_connectStatusCallback(NetworkState.Connected);
         }
         catch(Exception e)
         {

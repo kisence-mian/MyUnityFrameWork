@@ -85,6 +85,15 @@ public abstract class IApplicationStatus
         }
         return null;
     }
+    public T GetUI<T>() where T : UIWindowBase
+    {
+        foreach (var item in m_uiList)
+        {
+            if (item.name == typeof(T).Name)
+                return (T)item;
+        }
+        return default(T);
+    }
 
     public T OpenUI<T>() where T: UIWindowBase
     {
@@ -112,17 +121,28 @@ public abstract class IApplicationStatus
         });
     }
 
-    public void CloseUI<T>() where T:UIWindowBase
+    public void CloseUI<T>(bool isPlayAnim = true) where T:UIWindowBase
     {
         UIWindowBase ui = UIManager.GetUI<T>();
-        m_uiList.Remove(ui);
-        UIManager.CloseUIWindow(ui);
+        if (ui == null)
+        {
+            Debug.LogError("UI window no open from status :" + typeof(T));
+        }
+        CloseUI(ui,isPlayAnim);
     }
 
-    public void CloseUI(UIWindowBase ui)
+    public void CloseUI(UIWindowBase ui, bool isPlayAnim = true)
     {
-        m_uiList.Remove(ui);
-        UIManager.CloseUIWindow(ui);
+        if (ui!=null && m_uiList.Contains(ui))
+        {
+            m_uiList.Remove(ui);
+            UIManager.CloseUIWindow(ui);
+        }
+        else
+        {
+            Debug.LogError("UI window no open from status :" + ui);
+        }
+
     }
 
     public bool IsUIOpen<T>() where T : UIWindowBase

@@ -48,6 +48,8 @@ public class AssetBundleLoader : LoaderBase
     {
         //Debug.Log("Load Path :" + path);
         AssetBundle ab = LoadAssetBundle(path);
+        if (ab == null)
+            return null;
         UnityEngine.Object[] ass = ab.LoadAllAssets();
         AssetsData ad = new AssetsData(path);
         ad.Assets = ass;

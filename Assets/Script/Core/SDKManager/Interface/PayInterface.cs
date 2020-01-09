@@ -1,5 +1,4 @@
 ﻿using FrameWork.SDKManager;
-using HDJ.Framework.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,7 +19,9 @@ namespace FrameWork.SDKManager
         {
             if (!string.IsNullOrEmpty(tag))
             {
+                //Debug.Log("PayInterface:" + tag);
                 productDefinitions = JsonUtils.FromJson<List<LocalizedGoodsInfo>>(tag);
+                //Debug.Log("After PayInterface:" + JsonUtils.ToJson(productDefinitions));
             }
             ExtraInit();
         }
@@ -29,7 +30,7 @@ namespace FrameWork.SDKManager
 
         }
 
-        virtual public void Pay(string goodsID, string tag, GoodsType goodsType = GoodsType.NORMAL, string orderID = null)
+        virtual public void Pay(PayInfo payInfo)
         {
 
         }
@@ -45,11 +46,16 @@ namespace FrameWork.SDKManager
             {
                 if(productDefinitions[i].goodsID == goodsID)
                 {
+                    Debug.LogWarning("======goodsID========" + productDefinitions[i].localizedPriceString);
                     return productDefinitions[i];
                 }
             }
 
             return null;
+        }
+        virtual public string GetUserID()
+        {
+            return "userID";
         }
 
         virtual public List<LocalizedGoodsInfo> GetAllGoodsInfo()
@@ -103,12 +109,12 @@ namespace FrameWork.SDKManager
         public LocalizedGoodsInfo()
         {
         }
-        public LocalizedGoodsInfo(string goodsID, GoodsType goodsType, float price,string isoCurrencyCode = "CNY")
+        public LocalizedGoodsInfo(string goodsID, GoodsType goodsType, float price,string isoCurrencyCode = "CNY",string goodName= "")
         {
             this.goodsID = goodsID;
             this.goodsType = goodsType;
             this.localizedPrice = price;
-
+            this.localizedTitle = goodName;
             this.isoCurrencyCode = isoCurrencyCode; //默认人民币
         }
 

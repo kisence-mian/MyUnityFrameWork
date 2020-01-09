@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using System;
-using HDJ.Framework.Utils;
 
 public class String2MD5Window : EditorWindow
 {

@@ -3,22 +3,20 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace HDJ.Framework.Tools
+
+[GeneratedCode("simple-json", "1.0.0"), EditorBrowsable(EditorBrowsableState.Never)]
+internal class JsonArray : List<object>
 {
-	[GeneratedCode("simple-json", "1.0.0"), EditorBrowsable(EditorBrowsableState.Never)]
-	internal class JsonArray : List<object>
-	{
-		public JsonArray()
-		{
-		}
+    public JsonArray()
+    {
+    }
 
-		public JsonArray(int capacity) : base(capacity)
-		{
-		}
+    public JsonArray(int capacity) : base(capacity)
+    {
+    }
 
-		public override string ToString()
-		{
-			return SimpleJsonTool.SerializeObject(this) ?? string.Empty;
-		}
-	}
+    public override string ToString()
+    {
+        return SimpleJsonTool.SerializeObject(this) ?? string.Empty;
+    }
 }

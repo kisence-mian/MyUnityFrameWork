@@ -25,4 +25,16 @@ public enum StoreName
     m4399 = 14,//4399
     OPPO = 15,
     VIVO = 16,
+    HuaWei = 17,
+    UC = 18,
+    Baidu = 19,
+    m360 = 20,
+    BiLiBiLi = 21,//  哔哩哔哩
+    Meizu = 22, // 魅族
+    Coolpad = 23,//  酷派
+    Lenovo = 24,// 联想
+    Gionee = 25,// 金立
+    Huluxia = 26,// 葫芦侠
+    YSDK = 27,   //应用宝
+    HuaWei3 = 28,//华为3.0
 }

@@ -32,7 +32,6 @@ public class JsonTool
 
     //目前unity的json不支持List 和 Dictionary 在此用MINIjson做了封装
     //不支持嵌套
-
     #region List
 
     public static List<T> Json2List<T>(string jsonData)

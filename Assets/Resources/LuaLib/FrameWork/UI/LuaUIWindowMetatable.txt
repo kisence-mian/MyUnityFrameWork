@@ -1,0 +1,58 @@
+UIWindowMetaTable = {};
+UIWindowMetaTable.UIWindow_ui = nil; --UIWindowLuaHelper
+UIWindowMetaTable.__index = UIWindowMetaTable;
+
+function UIWindowMetaTable:New(UIWindow_window)
+
+	local t_ui = {}
+	setmetatable(t_ui, self);
+	self.__index = self;
+	t_ui.UIWindow_ui = UIWindow_window;
+	return t_ui;
+end
+
+function UIWindowMetaTable:OnInit()
+	-- print(self.UIWindow_ui.UIEventKey." OnInit");
+end
+
+function UIWindowMetaTable:OnOpen()
+	-- print(self.UIWindow_ui.UIEventKey." OnOpen");
+end
+
+function UIWindowMetaTable:OnShow()
+	-- print(self.UIWindow_ui.UIEventKey." OnShow");
+end
+
+function UIWindowMetaTable:OnHide()
+	-- print(self.UIWindow_ui.UIEventKey." OnHide");
+end
+
+function UIWindowMetaTable:EnterAnim()
+	-- print(self.UIWindow_ui.UIEventKey." EnterAnim");
+	return 0;
+end
+
+function UIWindowMetaTable:OnCompleteEnterAnim()
+	-- print(self.UIWindow_ui.UIEventKey." OnCompleteEnterAnim");
+end
+
+function UIWindowMetaTable:OnRefresh()
+	-- print(self.UIWindow_ui.UIEventKey." OnRefresh");
+end
+
+function UIWindowMetaTable:OnClose()
+	-- print(self.UIWindow_ui.UIEventKey." OnClose");
+end
+
+function UIWindowMetaTable:ExitAnim()
+	-- print(self.UIWindow_ui.UIEventKey." ExitAnim");
+	return 0;
+end
+
+function UIWindowMetaTable:OnCompleteExitAnim()
+	-- print(self.UIWindow_ui.UIEventKey." OnCompleteExitAnim");
+end
+
+function UIWindowMetaTable:OnDestroy()
+	-- print(self.UIWindow_ui.UIEventKey." OnDestroy");
+end

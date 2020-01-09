@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 using System;
@@ -660,6 +661,13 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         m_EndDragEvents.Add(info);
     }
 
+    public void AddOnDragListener(string compName, InputEventHandle<InputUIOnDragEvent> callback, string parm = null)
+    {
+        InputEventRegisterInfo<InputUIOnDragEvent> info = InputUIEventProxy.GetOnDragListener(GetDragComp(compName), UIEventKey, compName, parm, callback);
+        info.AddListener();
+        m_DragEvents.Add(info);
+    }
+
     public void AddEventListener(Enum EventEnum, EventHandle handle)
     {
         EventHandRegisterInfo info = new EventHandRegisterInfo();
@@ -1160,7 +1168,7 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         return obj;
     }
     /// <summary>
-    /// 新手引导获得动态创建Item  格式为：PetItem[0].Use（PetItem的Item上挂有UIBase脚本， [0] 该名字的第几个Item，Use：拖到PetItem上的GameObject）
+    /// 新手引导获得动态创建Item  格式为：PetItem[0].Use（PetItem的Item上挂有UIBase脚本， [0] 该名字的第几个Item，Use：拖到PetItem上的GameObject），当index小于0，则表示动态创建的列表List.Count-index(如-1：表示List.Count-1)
     /// </summary>
     /// <param name="itemName"></param>
     /// <returns></returns>
@@ -1183,6 +1191,10 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
 
             int index = int.Parse(firstName.SplitExtend("[", "]")[0]);
+            if (index < 0)
+            {
+                index = m_ChildList.Count + index;
+            }
             int tempIndex0 = firstName.IndexOf("[");
             firstName = firstName.Replace(firstName.Substring(tempIndex0), "");
             Debug.Log("UIBase : Index :" + index + "  firstName :" + firstName + " m_ChildList:"+ m_ChildList.Count);

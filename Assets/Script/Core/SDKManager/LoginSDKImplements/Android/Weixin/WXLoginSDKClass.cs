@@ -23,6 +23,7 @@ public class WXLoginSDKClass : LoginInterface
 
     public override void Login(string tage)
     {
+        Debug.LogWarning(tage);
         SDKManagerNew.Login("WeiXin", "");
     }
 

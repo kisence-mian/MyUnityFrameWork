@@ -37,8 +37,9 @@ public class MemoryInfo  {
 #if UNITY_ANDROID ||UNITY_IPHONE || UNITY_IOS
         return getMemInfo();
 
-#endif
+#else
         return true;
+#endif
     }
 
 #if UNITY_ANDROID
@@ -115,6 +116,10 @@ public class MemoryInfo  {
 
 		private static bool getMemInfo(){
 		
+     if (Application.isEditor)
+        {
+             return false;
+        }
 			long rt;
 
 			rt = minf.memfree = GetAvailableMemory();//free
@@ -140,7 +145,7 @@ public class MemoryInfo  {
     /// <returns></returns>
     static public float GetMemoryLimit()
     {
-        //getMemInfo();
+       
         if (Application.platform == RuntimePlatform.IPhonePlayer)
         {
             long allMemory = minf.memtotal / 1024 / 1024;

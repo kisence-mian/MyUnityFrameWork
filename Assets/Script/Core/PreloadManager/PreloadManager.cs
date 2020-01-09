@@ -1,5 +1,4 @@
-﻿using HDJ.Framework.Utils;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,6 +23,10 @@ public class PreloadManager:MonoBehaviour
     /// 进度显示 ：当前数量：最大数量
     /// </summary>
     public static CallBack<int,int> progressCallBack;
+    /// <summary>
+    /// 预加载完成
+    /// </summary>
+    public static CallBack completedCallBack;
 
     public static void StartLoad(List<PreloadResourcesDataGenerate> otherResList=null)
     {
@@ -127,7 +130,7 @@ public class PreloadManager:MonoBehaviour
             }
             PreloadResourcesDataGenerate da = queueRes[currentNum];
             currentNum++;
-            Debug.Log("预加载：" + da.m_key);
+            //Debug.Log("预加载：" + da.m_key);
             try
             {
                 string typeStr = da.m_ResType.ToString().Replace("_", ".");
@@ -157,16 +160,18 @@ public class PreloadManager:MonoBehaviour
                     }
                     else
                         ResourceManager.DestoryAssetsCounter(da.m_key);
-                }             
+                }
                 RunCallBack();
-               // LoadQueue();
-               
+                if (currentNum >= count)
+                {
+                    Destroy();
+                    break;
+                }
 
             }
             catch (Exception e)
             {
                 Debug.LogError(e);
-               // LoadQueue();
             }
             yield return new WaitForEndOfFrame();
         }
@@ -176,6 +181,12 @@ public class PreloadManager:MonoBehaviour
     {
         if (progressCallBack != null)
             progressCallBack(currentNum, count);
+
+        if(count==0|| currentNum>= count)
+        {
+            if (completedCallBack != null)
+                completedCallBack();
+        }
     }
     //private void Update()
     //{
@@ -225,8 +236,6 @@ public class PreloadManager:MonoBehaviour
 
     private void Destroy()
     {
-        ;
-        ;
         Destroy(instance.gameObject);
     }
 }

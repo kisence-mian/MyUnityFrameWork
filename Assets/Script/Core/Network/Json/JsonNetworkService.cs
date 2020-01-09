@@ -27,13 +27,21 @@ public class JsonNetworkService : INetworkInterface
         EncryptionService.Init();
 
         m_msgCode = 0;
+        m_buffer = new StringBuilder();
+
         base.Connect();
     }
 
+    Queue<string> mesQueue = new Queue<string>(); //消息队列
+
     public override void SpiltMessage(byte[] data, ref int offset, int length)
     {
-        DealMessage(Encoding.UTF8.GetString(data, offset, length));
-        offset = 0;
+        lock(mesQueue)
+        {
+            mesQueue.Enqueue(Encoding.UTF8.GetString(data, offset, length));
+            DealMessage(mesQueue.Dequeue());
+            offset = 0;
+        }
     }
 
     //发送消息
@@ -83,15 +91,16 @@ public class JsonNetworkService : INetworkInterface
     StringBuilder m_buffer = new StringBuilder();
     public void DealMessage(string s)
     {
-        bool isEnd = false;
-
-        if(s.Substring(s.Length-1,1) == c_endChar.ToString())
-        { 
-            isEnd = true;
-        }
-
         lock(m_buffer)
         {
+            //Debug.Log("DealMessage s ->" + s);i
+
+            bool isEnd = false;
+            if (s.Substring(s.Length - 1, 1) == c_endChar.ToString())
+            {
+                isEnd = true;
+            }
+
             m_buffer.Append(s);
 
             string buffer = m_buffer.ToString();
@@ -123,6 +132,8 @@ public class JsonNetworkService : INetworkInterface
 
     public void CallBack(string s)
     {
+        //Debug.Log("CallBack s ->" + s);
+
         try
         {
             if(s != null && s != "")

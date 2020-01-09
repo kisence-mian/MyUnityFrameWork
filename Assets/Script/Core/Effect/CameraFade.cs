@@ -124,7 +124,7 @@ public class CameraFade : MonoBehaviour
 
         if (data.delay > 0)
         {
-            data.delay -= Time.deltaTime;
+            data.delay -= Time.unscaledDeltaTime;
             return;
         }
 
@@ -136,7 +136,7 @@ public class CameraFade : MonoBehaviour
                 RunComplete(data);
                 return;
             }
-            data.tempFadeCaculateTime += Time.deltaTime;
+            data.tempFadeCaculateTime += Time.unscaledDeltaTime;
 
 
         }
@@ -150,7 +150,7 @@ public class CameraFade : MonoBehaviour
             }
 
 
-            data.tempFadeCaculateTime -= Time.deltaTime;
+            data.tempFadeCaculateTime -= Time.unscaledDeltaTime;
         }
         alpha = data.tempFadeCaculateTime / data.fadeTime;
 
@@ -182,7 +182,7 @@ public class CameraFade : MonoBehaviour
     {
         tempColor.a = alpha;
         GUI.color = tempColor;
-        if (crossfadeTexture != null)
+        if (crossfadeTexture != null && alpha!=0)
         {
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), crossfadeTexture);
         }

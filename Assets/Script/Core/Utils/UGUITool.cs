@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -35,21 +36,19 @@ public class UGUITool
             Debug.LogError("set_icon Image 不能为 null !");
             return;
         }
-
-        Sprite sp = ResourceManager.Load<Sprite>(name);// LoadSprite(name);
-        if (sp != null)
+        try
         {
-            img.overrideSprite = sp;// Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), Vector3.zero);
+            Sprite sp = ResourceManager.Load<Sprite>(name);
+            img.overrideSprite = sp;
             img.sprite = img.overrideSprite;
-               
+
             if (is_nativesize)
                 img.SetNativeSize();
         }
-        else
+        catch (Exception e)
         {
-            Debug.LogError("SetImageSprite 加载失败，查看资源是否存在，图片格式是否正确:" + name);
+            Debug.LogError("SetImageSprite 加载失败，查看资源是否存在，图片格式是否正确:" + name+"\n"+e);
         }
-       
     }
 
     static public void SetSpriteRender(GameObject go, string name)
@@ -60,14 +59,15 @@ public class UGUITool
 
     public static Sprite LoadSprite(string resName)
     {
-        Texture2D texture = ResourceManager.Load<Texture2D>(resName);
-        if (texture)
+        try
         {
+            Texture2D texture = ResourceManager.Load<Texture2D>(resName);
+
             return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
         }
-        else
+        catch (Exception e)
         {
-            Debug.LogError("加载图片失败：" + resName);
+            Debug.LogError("加载图片失败：" + resName+"\n"+e);
             return null;
         }
     }

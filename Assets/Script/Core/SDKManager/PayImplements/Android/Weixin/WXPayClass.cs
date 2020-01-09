@@ -7,6 +7,7 @@ using UnityEngine;
 
 public class WXPayClass : PayInterface
 {
+    PayInfo payInfo;
     public string appid;
     public string mchID;
     public string appSecret;
@@ -23,13 +24,17 @@ public class WXPayClass : PayInterface
     }
     public override void Init()
     {
-        Debug.LogWarning("=========WXPayClass Init===========");
-        //SDKManagerNew.OnPayCallBack += SetPayResult;
-        GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
+        if ((StoreName)Enum.Parse(typeof(StoreName), SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"))
+            == StoreName.WX)
+        {
+            Debug.LogWarning("=========WXPayClass Init===========");
+            //SDKManagerNew.OnPayCallBack += SetPayResult;
+            GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
 
-        appid = SDKManager.GetProperties("WeiXin","AppID", appid);
-        mchID = SDKManager.GetProperties("WeiXin","MchID", mchID);
-        appSecret = SDKManager.GetProperties("WeiXin", "AppSecret", appSecret);
+            appid = SDKManager.GetProperties("WeiXin", "AppID", appid);
+            mchID = SDKManager.GetProperties("WeiXin", "MchID", mchID);
+            appSecret = SDKManager.GetProperties("WeiXin", "AppSecret", appSecret);
+        }
     }
 
     /// <summary>
@@ -59,8 +64,10 @@ public class WXPayClass : PayInterface
         onPayInfo.goodsId = e.goodsID;
         onPayInfo.storeName = StoreName.WX;
         onPayInfo.receipt = e.mch_orderID;
+        onPayInfo.price = payInfo.price;
+        onPayInfo.goodsName = payInfo.goodsName;
         PayReSend.Instance.AddPrePayID(onPayInfo);
-        IndentListener(e.goodsID, e.mch_orderID, e.prepay_id, nonceStr, timeStamp, sign);
+        IndentListener(e.goodsID, e.mch_orderID, e.prepay_id, nonceStr, timeStamp, sign, payInfo.price);
     }
 
     /// <summary>
@@ -70,28 +77,29 @@ public class WXPayClass : PayInterface
     /// <param name="tag"></param>
     /// <param name="goodsType"></param>
     /// <param name="orderID"></param>
-    public override void Pay(string goodsID, string tag, FrameWork.SDKManager.GoodsType goodsType = FrameWork.SDKManager.GoodsType.NORMAL, string orderID = null)
+    public override void Pay(PayInfo l_payInfo)
     {
-        this.goodsID = goodsID;
-        
-        Debug.LogWarning("send WXpay----message-----" + goodsID);
+        payInfo = l_payInfo;
+        this.goodsID = payInfo.goodsID;
+        //this.price = payInfo.price;
+        Debug.LogWarning("send WXpay----message-----" + goodsID + "price" + l_payInfo.price);
         //给服务器发消息1
-        PrePay2Service.SendPrePayMsg(StoreName.WX, goodsID);
+        PrePay2Service.SendPrePayMsg(StoreName.WX, l_payInfo.goodsID);
     }
 
 
     /// <summary>
     /// 消息1 的监听， 获得订单信息，然后调支付sdk
     /// </summary>
-    private void IndentListener(string goodID,string mch_orderID,string prepay_id, string nonceStr ,string timeStamp , string sign)
+    private void IndentListener(string goodID,string mch_orderID,string prepay_id, string nonceStr ,string timeStamp , string sign,float price)
     {
         this.mch_orderID = mch_orderID;
 
         string tag = mch_orderID;
 
-        PayInfo payInfo = new PayInfo(goodID, "", tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, 0, GetGoodsInfo(goodsID).isoCurrencyCode);
+        PayInfo l_payInfo = new PayInfo(goodID, payInfo.goodsName, tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, price, GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID());
 
-        SDKManagerNew.Pay("WeiXin", payInfo);
+        SDKManagerNew.Pay("WeiXin", l_payInfo);
     }
 
     /// <summary>

@@ -52,6 +52,62 @@ public enum LoginPlatform
     /// VIVO
     /// </summary>
     VIVO,
+    /// <summary>
+    /// 华为
+    /// </summary>
+    HuaWei,
+    /// <summary>
+    /// 华为3.0
+    /// </summary>
+    HuaWei3,
+    /// <summary>
+    /// UC
+    /// </summary>
+    UC,
 
+    /// <summary>
+    /// 百度
+    /// </summary>
+    Baidu,
+
+    /// <summary>
+    /// 360
+    /// </summary>    
+    m360,
+
+    /// <summary>
+    ///  哔哩哔哩
+    /// </summary>
+    BiLiBiLi,
+
+    /// <summary>
+    /// 魅族
+    /// </summary>
+    Meizu,
+
+    /// <summary>
+    ///  酷派
+    /// </summary>
+    Coolpad,
+
+    /// <summary>
+    /// 联想
+    /// </summary>
+    Lenovo,
+
+    /// <summary>
+    /// 金立
+    /// </summary>
+    Gionee,
+
+    /// <summary>
+    /// 葫芦侠
+    /// </summary>
+    Huluxia,
+
+    /// <summary>
+    /// 应用宝
+    /// </summary>
+    YSDK,
 }
 

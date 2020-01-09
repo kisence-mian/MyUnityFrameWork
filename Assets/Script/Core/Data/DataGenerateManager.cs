@@ -109,5 +109,9 @@ public abstract class DataGenerateBase
     {
 
     }
+    public virtual void LoadData(DataTable table, string key)
+    {
+        Debug.LogError("默认方法不能加载数据！");
+    }
 }
 

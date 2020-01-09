@@ -6,8 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 
-namespace HDJ.Framework.Utils
-{
     public class FileUtils
     {
 
@@ -208,4 +206,3 @@ namespace HDJ.Framework.Utils
 
         }
     }
-}

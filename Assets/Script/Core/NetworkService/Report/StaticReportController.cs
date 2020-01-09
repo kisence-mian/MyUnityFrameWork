@@ -21,6 +21,8 @@ public class StaticReportController
     {
         if (t.reloginState)
             return;
+        if (t.code != 0)
+            return;
         SendDeviceInfo(t.user.userID);
     }
 

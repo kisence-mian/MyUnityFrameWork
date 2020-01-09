@@ -39,7 +39,7 @@ public class AutoReconnectController
         }
     }
 
-    private static float delayTime = 2;
+    private static float delayTime = 3;
     /// <summary>
     /// 开始重连
     /// </summary>
@@ -85,6 +85,7 @@ public class AutoReconnectController
     private static bool isBreakConenct = false;
     private static void OnNetworkConenctStatus(InputNetworkConnectStatusEvent msg)
     {
+        Debug.Log("OnNetworkConenctStatus :" + msg.m_status);
         if (msg.m_status == NetworkState.FaildToConnect || msg.m_status == NetworkState.ConnectBreak)
         {
             if (!isBreakConenct)
@@ -110,7 +111,7 @@ public class AutoReconnectController
         {
             isBreakConenct = false;
 
-            Debug.Log("OnNetworkConenctStatus :" + msg.m_status);
+           
             startReconenct = false;
             if (Open && EndReconnect != null)
             {

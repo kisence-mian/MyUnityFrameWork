@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using UnityEngine;
 
@@ -19,7 +20,6 @@ public class SocketService : SocketBase
     {
         m_acb = new AsyncCallback(EndReceive);
     }
-
 
     public override void Close()
     {
@@ -82,13 +82,13 @@ public class SocketService : SocketBase
             IPAddress ip = IPAddress.Parse(m_IPaddress);
 
             IPEndPoint ipe = new IPEndPoint(ip, m_port);
-            //mSocket.
-            //m_Socket.NoDelay = false;
+
             m_Socket.Connect(ipe);
 
-            isConnect = true;
+            m_offset = 0;
             StartReceive();
 
+            isConnect = true;
             m_connectStatusCallback(NetworkState.Connected);
         }
         catch (Exception e)
@@ -120,6 +120,8 @@ public class SocketService : SocketBase
     {
         if (m_byteCallBack != null)
         {
+            //Debug.Log("DealByte " + Encoding.UTF8.GetString(data, offset, length));
+
             m_byteCallBack(m_readData, ref m_offset, length);
         }
     }

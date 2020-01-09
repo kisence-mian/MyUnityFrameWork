@@ -21,6 +21,5 @@ public abstract class SDKInterfaceBase
     /// </summary>
     public virtual void ExtraInit(string tag )
     {
-
     }
 }

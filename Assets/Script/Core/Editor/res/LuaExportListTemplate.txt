@@ -115,7 +115,7 @@ public class LuaExportList
     #region Custom
     	//要导出的C#类文件请放在这里 
     	//格式： _GT(typeof(类名)),
-
+		 
     #endregion
 
     #region Note

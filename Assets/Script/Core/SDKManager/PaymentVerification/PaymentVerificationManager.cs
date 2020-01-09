@@ -28,7 +28,7 @@ public class PaymentVerificationManager
         }
         else
         {
-            Debug.LogWarning("PaymentVerificationManager PayCallBack=========" + info.goodsId);
+            Debug.Log("PaymentVerificationManager info.goodsId " + info.goodsId);
             int code = info.isSuccess ? 0 : -1;
             OnVerificationResult(code, info.goodsId,false,info.receipt);
         }
@@ -44,7 +44,7 @@ public class PaymentVerificationManager
     {
         if (onVerificationResultCallBack != null)
         {
-            Debug.LogWarning("验证回调code=========" + code + "-------goodsID=========" + goodsID);
+            Debug.Log("验证回调 code " + code + " goodsID " + goodsID);
             onVerificationResultCallBack(code, goodsID);
         }
        

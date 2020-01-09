@@ -1,5 +1,4 @@
 ﻿using FrameWork.SDKManager;
-using HDJ.Framework.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +12,7 @@ public static class StorePayController
 {
     public const int c_PayCode_repeate = 20203; //重复订单
 
-
+    private static User user;
     /// <summary>
     /// 支付完成回调（code码，物品ID）
     /// </summary>
@@ -24,6 +23,7 @@ public static class StorePayController
 
     public static void Init(List<LocalizedGoodsInfo> productDefinitions)
     {
+        Debug.Log("商店初始化：" + JsonUtils.ToJson(productDefinitions));
         //初始化支付凭据验证管理器
         NetworkVerificationImplement implement = new NetworkVerificationImplement();
         PaymentVerificationManager.Init(implement);
@@ -33,23 +33,6 @@ public static class StorePayController
 
         StorePayController.productDefinitions = productDefinitions;
         Debug.Log("支付商店初始化");
-
-        LoginGameController.OnUserLogin += UserLogin;
-        ApplicationManager.s_OnApplicationFocus += OnGameFocus;
-    }
-
-    private static void UserLogin(UserLogin2Client t)
-    {
-        PayReSend.Instance.ReSendPay();
-    }
-
-    private static void OnGameFocus(bool focus)
-    {
-        if (focus) //唤醒时
-        {
-            //PayReSend.Instance.ReSendPay();
-        }
-
     }
 
     private static void OnVerificationResultCallBack(int t, string t1)
@@ -61,6 +44,11 @@ public static class StorePayController
 
     private static void OnUserLogin(UserLogin2Client t)
     {
+        if (t.code != 0)
+            return;
+
+        user = t.user;
+        PayReSend.Instance.ReSendPay();
         //第一次登陆，非重连
         if (!t.reloginState)
         {
@@ -75,10 +63,39 @@ public static class StorePayController
             //Debug.Log("small ->" + SDKManager.GetGoodsInfo("small").localizedPrice + " json " + JsonUtils.ToJson(productDefinitions));
         }
     }
-
-    public static void Pay(string goodID,float price,string goodsName,string currency)
+    public static LocalizedGoodsInfo GetGoodsInfo(string goodID)
     {
-        PayInfo payInfo = new PayInfo(goodID, goodsName, "", FrameWork.SDKManager.GoodsType.NORMAL, "", price, currency);
+        LocalizedGoodsInfo info = SDKManager.GetGoodsInfo(goodID);
+        if (info == null)
+        {
+            foreach (var item in productDefinitions)
+            {
+                if(item.goodsID == goodID)
+                {
+                    info = item;
+                    break;
+                }
+            }
+        }
+        return info;
+    }
+    public static void Pay(string goodID)
+    {
+        if (user == null)
+        {
+            Debug.LogError("未登录，不能支付！");
+            if (OnPayCallBack != null)
+            {
+                OnPayCallBack(ErrorCodeDefine.StroePay_NoLogin, goodID);
+            }
+            return;
+        }
+       LocalizedGoodsInfo info=  SDKManager.GetGoodsInfo(goodID);
+        Pay(goodID, info.localizedPrice, info.localizedTitle, info.isoCurrencyCode, user.userID);
+    }
+    public static void Pay(string goodID,float price,string goodsName,string currency,string userID)
+    {
+        PayInfo payInfo = new PayInfo(goodID, goodsName, "", FrameWork.SDKManager.GoodsType.NORMAL, "", price, currency, userID);
         NetworkVerificationImplement.SetBuyResendMessage(new StoreBuyGoods2Server(), true);
         if (Application.platform == RuntimePlatform.Android)
         {

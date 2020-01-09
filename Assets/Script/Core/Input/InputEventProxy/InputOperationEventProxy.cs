@@ -5,7 +5,6 @@ using System;
 
 public class InputOperationEventProxy : IInputProxyBase
 {
-
     static List<IInputOperationEventCreater> s_creates = new List<IInputOperationEventCreater>();
 
     public static void Init()
@@ -66,7 +65,5 @@ public class InputOperationEventProxy : IInputProxyBase
             InputManager.Dispatch(eventName, inputOperationEventBase);
         }
     }
-
-
 
 }

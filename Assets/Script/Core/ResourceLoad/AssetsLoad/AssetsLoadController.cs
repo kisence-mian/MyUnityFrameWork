@@ -11,9 +11,11 @@ public class AssetsLoadController
     private Dictionary<string, AssetsData> assetsCaches = new Dictionary<string, AssetsData>();
     private LoaderBase loader;
     private AssetsLoadType loadType;
-    public AssetsLoadController(AssetsLoadType loadType)
+    private bool useCache;
+    public AssetsLoadController(AssetsLoadType loadType,bool useCache)
     {
         this.loadType = loadType;
+        this.useCache = useCache;
         if (loadType == AssetsLoadType.Resources)
         {
 
@@ -81,27 +83,37 @@ public class AssetsLoadController
             if (assets == null)
             {
                 Debug.LogError("资源加载失败：" + path);
-            }
-            if (assetsCaches.ContainsKey(path))
-            {
-                List<Object> asList = new List<Object>(assetsCaches[path].Assets);
-                foreach (var item in assets.Assets)
-                {
-                    if (!asList.Contains(item))
-                    {
-                        asList.Add(item);
-                    }
-                }
-                assetsCaches[path].Assets = asList.ToArray();
-                assets = assetsCaches[path];
+                return assets;
             }
             else
             {
-                assetsCaches.Add(path, assets);
+                if (assetsCaches.ContainsKey(path))
+                {
+                    List<Object> asList = new List<Object>(assetsCaches[path].Assets);
+                    foreach (var item in assets.Assets)
+                    {
+                        if (!asList.Contains(item))
+                        {
+                            asList.Add(item);
+                        }
+                    }
+                    assetsCaches[path].Assets = asList.ToArray();
+                    assets = assetsCaches[path];
+                }
+                else
+                {
+                    if (useCache)
+                    {
+                        assetsCaches.Add(path, assets);
+                    }
+                }
             }
         }
-        assets.refCount++;
-        AssetsUnloadHandler.MarkUseAssets(assets, loader.IsHaveDependencies(path));
+        if (useCache)
+        {
+            assets.refCount++;
+            AssetsUnloadHandler.MarkUseAssets(assets, loader.IsHaveDependencies(path));
+        }
         return assets;
     }
     private void LoadAssetsDependencie(string path)
@@ -131,8 +143,11 @@ public class AssetsLoadController
         if (assetsCaches.ContainsKey(path))
         {
             AssetsData assets = assetsCaches[path];
-            assets.refCount++;
-            AssetsUnloadHandler.MarkUseAssets(assets, loader.IsHaveDependencies(path));
+            if (useCache)
+            {
+                assets.refCount++;
+                AssetsUnloadHandler.MarkUseAssets(assets, loader.IsHaveDependencies(path));
+            }
             if (callBack != null)
             {
                 callBack(assets.Assets[0]);
@@ -142,10 +157,15 @@ public class AssetsLoadController
         {
             yield return loader.LoadAssetsIEnumerator(path, assetType, (assets) =>
             {
-                assetsCaches.Add(path, assets);
-
-                assets.refCount++;
-                AssetsUnloadHandler.MarkUseAssets(assets, loader.IsHaveDependencies(path));
+                if (useCache)
+                {
+                    assetsCaches.Add(path, assets);
+                }
+                if (useCache)
+                {
+                    assets.refCount++;
+                    AssetsUnloadHandler.MarkUseAssets(assets, loader.IsHaveDependencies(path));
+                }
                 if (callBack != null)
                 {
                     callBack(assets.Assets[0]);
@@ -200,7 +220,11 @@ public class AssetsLoadController
         }
         else
         {
-            Debug.LogError("未加载资源，不能Destroy ：" + path);
+            if (useCache)
+            {
+                Debug.LogError("未加载资源，不能Destroy ：" + path);
+            }
+           
         }
        
 
@@ -227,17 +251,20 @@ public class AssetsLoadController
             {
                 UnloadAssets(assets,true);
                 assetsCaches.Remove(path);
+                Debug.LogWarning("彻底释放" + path);
             }
         }
     }
 
     public void UnloadAssets(AssetsData assets, bool isForceAB)
     {
-        if (assets.Assets != null)
+        if (!useCache)
+            return;
+        if (assets.Assets != null&& isForceAB)
         {
-
             foreach (var item in assets.Assets)
             {
+                Debug.LogWarning("释放资源" + item);
                 UnloadObject(item);
             }
             assets.Assets = null;

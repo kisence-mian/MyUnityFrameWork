@@ -1,5 +1,4 @@
-﻿using HDJ.Framework.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,31 +7,31 @@ using UnityEngine;
 public class LanguageDataUtils
 {
     public const string SavePathDir = "Assets/Resources/Data/Language/";
-    public static LanguageSettingConfig LoadEditorConfig()
-    {
+    //public static LanguageSettingConfig LoadEditorConfig()
+    //{
 
-        if(ResourcesConfigManager.GetIsExitRes(LanguageManager.c_configFileName))
-        {
-            LanguageSettingConfig config;
+    //    if(ResourcesConfigManager.GetIsExitRes(LanguageManager.c_configFileName))
+    //    {
+    //        LanguageSettingConfig config;
 
-            string json = ResourceManager.EditorLoad<TextAsset>(LanguageManager.c_configFileName).text;
+    //        string json = ResourceManager.Load<TextAsset>(LanguageManager.c_configFileName).text; 
 
-            if (!string.IsNullOrEmpty(json))
-                config = JsonUtils.FromJson<LanguageSettingConfig>(json);
-            else
-            {
-                config = null;
+    //        if (!string.IsNullOrEmpty(json))
+    //            config = JsonUtils.FromJson<LanguageSettingConfig>(json);
+    //        else
+    //        {
+    //            config = null;
 
-                //config.defaultLanguage = SystemLanguage.ChineseSimplified;
-                //config.gameExistLanguages.Add(SystemLanguage.ChineseSimplified);
-            }
-            return config;
-        }
-        else
-        {
-            return null;
-        }
-    }
+    //            //config.defaultLanguage = SystemLanguage.ChineseSimplified;
+    //            //config.gameExistLanguages.Add(SystemLanguage.ChineseSimplified);
+    //        }
+    //        return config;
+    //    }
+    //    else
+    //    {
+    //        return null;
+    //    }
+    //}
     public static LanguageSettingConfig LoadRuntimeConfig()
     {
 

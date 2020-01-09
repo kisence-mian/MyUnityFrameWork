@@ -86,7 +86,7 @@ public class UISystemEvent
     {
         if (UI == null)
         {
-            Debug.LogError("Dispatch l_UI is null!");
+            Debug.LogError("Dispatch UI is null!");
 
             return;
         }

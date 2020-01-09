@@ -1,0 +1,87 @@
+LuaStatusManager = {};
+LuaStatusManager.s_currentStatus = nil;
+LuaStatusManager.t_statusDict    = {};
+LuaStatusManager.Current         = nil;
+
+function LuaStatusManager:EnterStatus(s_StatusName)
+	
+	if self.s_currentStatus ~= nil then
+		self:ExitStatus(LuaStatusManager.s_currentStatus);
+	end
+
+	if self.t_statusDict[s_StatusName] == nil then
+
+		local t_LuaStatusMetaTable = _G[s_StatusName];
+		if t_LuaStatusMetaTable ~= nil then
+			--创建Lua类
+			local t_status = t_LuaStatusMetaTable:New();
+			self.t_statusDict[s_StatusName] = t_status;
+			self.Current = t_status;
+			--调用Init方法
+			t_status:OnStatusInit();
+		else
+			error("EnterStatus 没有找到 ->"..tostring(s_StatusName).."<- Status");
+		end
+	end
+
+	self.s_currentStatus = s_StatusName;
+	self.t_statusDict[s_StatusName]:OnEnterStatus();
+
+end
+
+function LuaStatusManager:ExitStatus(s_StatusName)
+	
+	local t_status = self.t_statusDict[s_StatusName];
+
+	if t_status ~= nil then
+		self.s_currentStatus = nil;
+		self.Current = nil;
+		t_status:CloseALLUIWindow();
+		t_status:OnExitStatus();
+	else
+		error("ExitStatus 没有找到 ->"..tostring(s_StatusName).."<- Status");
+	end
+
+end
+
+
+function LuaStatusManager:DestroyStatus(s_StatusName)
+
+	local t_status = self.t_statusDict[s_StatusName];
+
+	if t_status ~= nil then
+
+		if self.s_currentStatus == s_StatusName then
+			self:ExitStatus(s_StatusName);
+		end
+
+		t_status:OnStatusDestroy();
+		self.t_statusDict[s_StatusName] = nil;
+	else
+		error("DestroyStatus 没有找到 ->"..tostring(s_StatusName).."<- Status");
+	end
+
+end
+
+function LuaStatusManager:GetStatus(s_StatusName)
+	
+	local t_status = self.t_statusDict[s_StatusName];
+
+	if t_status ~= nil then
+
+		return t_status;
+	else
+		error("GetStatus 没有找到 ->"..tostring(s_StatusName).."<- Status");
+	end
+
+end
+
+
+function LuaStatusManager:GetCurrentStatus()
+	
+	if self.Current == nil then
+		error("GetCurrentStatus error : 没有找到当前Status!");
+	end
+
+	return self.current;
+end

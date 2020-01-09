@@ -3,6 +3,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using System.Net;
 
 public abstract class INetworkInterface 
 {
@@ -21,9 +22,9 @@ public abstract class INetworkInterface
         m_socketService = null;
     }
 
-    public virtual void GetIPAddress()
+    public virtual IPEndPoint GetIPAddress()
     {
-
+        return m_socketService.endPoint;
     }
 
     public virtual void SetIPAddress(string IP, int port)

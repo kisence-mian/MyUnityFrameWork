@@ -1,0 +1,99 @@
+function sec2time( second )
+ 	local timeDay=math.floor(second/86400)
+	local timeHour=math.fmod(math.floor(second/3600), 24)
+	local timeMinute=math.fmod(math.floor(second/60), 60)
+	local timeSecond=math.fmod(second, 60)
+	return timeDay, timeHour, timeMinute, timeSecond
+end
+
+function sec2string(sec)
+	local d,h,m,s = sec2time(sec)
+	local str = ""
+	if d>0 then	str = d..":" end
+	if h>0 then
+		h = h<=9 and "0"..h or h
+		str = str=="" and h or str..":"..h
+	end
+	
+	if tonumber(d)>0 or tonumber(h)>0 or tonumber(m)>0 then
+		m = m<=9 and "0"..m or m
+		str = str=="" and m or str..":"..m
+	end
+
+	s = s<=9 and "0"..s or s
+	str = str=="" and s or str..":"..s
+
+	return str
+end
+
+--返回字符长度包括中文
+function get_str_len(str)
+	if str==nil then return 0 end
+	local _, count = string.gsub(str, "[^\128-\193]", "")
+	return count
+end
+
+--加string split
+function string.split (szFullString, szSeparator)
+	local nFindStartIndex = 1
+	local nSplitIndex = 1
+	local nSplitArray = {}
+	while true do
+	   local nFindLastIndex = string.find(szFullString, szSeparator, nFindStartIndex)--找到第几个
+	   if not nFindLastIndex then
+	    nSplitArray[nSplitIndex] = string.sub(szFullString, nFindStartIndex, string.len(szFullString))
+	    break
+	   end
+	   nSplitArray[nSplitIndex] = string.sub(szFullString, nFindStartIndex, nFindLastIndex - 1)
+	   nFindStartIndex = nFindLastIndex + string.len(szSeparator)
+	   nSplitIndex = nSplitIndex + 1
+	end
+	return nSplitArray
+end
+--替换Allstr中的所有str为nstr
+function string.replace (allstr,str,nstr)
+	return (string.gsub(allstr,str,nstr))--没有括号会返回替换次数
+end
+--替换所有$[num].. 为 {..}中的个数值
+function string.replace_tbl (...)
+	local allstr = "replace tbl no succ!"
+	local tmp = {...}
+	if tmp == nil then return allstr end
+	for i,v in ipairs(tmp) do
+		if i == 1 then
+			allstr = v
+		end
+		if allstr~=nil and i>1 then
+			allstr = (string.replace(allstr,tostring("$"..(i-1)),v))
+		end
+	end
+	return allstr
+end
+
+function string.trim(str)
+    if str == nil then
+        return nil, "the string parameter is nil"
+    end
+    str = string.gsub(str, " ", "")
+    return str
+end
+
+function string.check_name(str,len)
+	local _cango = true
+	local _acc = string.trim(str)
+	local _error = ""
+	if _acc=="请输入您的账号" then 
+		_error = "请输入您的账号"
+		_cango = false 
+	end
+	if get_str_len(_acc)>len then
+		_error = "名字长度超了"
+		_cango = false
+	end
+	if get_str_len(_acc)==0 or _acc==nil or _acc=="" then
+		_error = "名字不能为空"
+		_cango = false
+	end
+	if not _cango then _acc = _error end
+	return _cango,_acc
+end

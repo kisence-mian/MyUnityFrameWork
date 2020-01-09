@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-using HDJ.Framework.Utils;
-
 public class TableDataEditor 
 {
     private const string FontPlayerPrefKey = "DataEditorWindow.FontKey";
@@ -333,6 +331,12 @@ public class TableDataEditor
 
         for (int i = 2; i < heightItemList.Count; i++)
         {
+            if (!string.IsNullOrEmpty(searchValue))
+            {
+                if (showSearchValueIndexList != null && !showSearchValueIndexList.Contains(i))
+                    continue;
+            }
+
             Rect dragR = new Rect(r.x, tempHeight, wWith, heightItemList[i]);
             Rect maxR = new Rect(r.x, tempHeight, wWith, position.height);
             dragR = EditorDrawGUIUtility.DrawCanDragArea(dragR, maxR, null, EditorCanDragAreaSide.Bottom);
@@ -438,6 +442,11 @@ public class TableDataEditor
     private int MaxButtonFontSize = 40;
 
     private string searchValue = "";
+    /// <summary>
+    /// 用于搜索时记录只显示对于行的Index
+    /// </summary>
+    private List<int> showSearchValueIndexList = new List<int>();
+    private List<int> saveSearchValueIndexList = new List<int>();
     private void GridTopFunctionGUI()
     {
        
@@ -499,7 +508,11 @@ public class TableDataEditor
 
         nowButtonFontSize = EditorGUILayout.IntSlider("字体大小", nowButtonFontSize, oldButtonFontSize / 2, MaxButtonFontSize);
         GUILayout.FlexibleSpace();
-        searchValue = EditorDrawGUIUtil.DrawSearchField(searchValue);
+        searchValue = EditorDrawGUIUtil.DrawSearchField(searchValue,()=>
+        {
+            saveSearchValueIndexList.Clear();
+            showSearchValueIndexList = null;
+        });
         GUILayout.EndHorizontal();
     }
 
@@ -562,12 +575,11 @@ public class TableDataEditor
        });
 
     }
-
     /// <summary>
     /// 绘制每个数据格子
     /// </summary>
     /// <param name="startPos"></param>
-    private void DrawGridItem(Vector2 startPos,int heightStartIndex,int heightEndIndex)
+    private void DrawGridItem(Vector2 startPos, int heightStartIndex, int heightEndIndex)
     {
         helpBoxStyle.fontSize = nowButtonFontSize;
         float tempHeight = 0;
@@ -578,10 +590,15 @@ public class TableDataEditor
 
         for (int i = heightStartIndex; i < heightEndIndex; i++)
         {
+            if (!string.IsNullOrEmpty(searchValue))
+            {
+                if (showSearchValueIndexList != null && !showSearchValueIndexList.Contains(i))
+                    continue;
+            }
             float h = heightItemList[i];
             float tempWith = 0;
 
-          
+
             for (int j = 0; j < withItemList.Count; j++)
             {
                 float w = withItemList[j];
@@ -595,14 +612,14 @@ public class TableDataEditor
                 string field = m_currentData.TableKeys[j];
                 FieldType fieldValueType = GetFieldType(j, field);
                 string enumType = GetEnumType(fieldValueType, field);
-       
+                DataFieldAssetType fieldAssetType = GetDataFieldAssetType(field);
                 string defaultValue = GetDefaultValue(fieldValueType, enumType, field);
 
 
                 if (i == 0)
                 {
                     GUI.color = Color.yellow;
-                  
+
                     showStr = EditorDrawGUIUtil.GetFormatName(field, DataConfigUtils.ConfigFieldValueType2Type(fieldValueType, enumType), "red");
                 }
                 else if (i == 1)
@@ -619,7 +636,21 @@ public class TableDataEditor
                 }
                 else
                 {
-                    SingleData data = m_currentData[m_currentData.TableIDs[i - 3]];
+
+                    SingleData data = null;
+                    try
+                    {
+                        data = m_currentData[m_currentData.TableIDs[i - 3]];
+                    }
+                    catch (Exception e)
+                    {
+                        for (int m = 0; m < m_currentData.TableIDs.Count; m++)
+                        {
+                            Debug.Log(" index :" + i + " m:" + m + " item:" + m_currentData.TableIDs[m]);
+                        }
+                        Debug.LogError("error:" + e);
+                        continue;
+                    }
 
                     bool isDefault = false;
                     if (data.ContainsKey(field))
@@ -632,40 +663,77 @@ public class TableDataEditor
                         {
                             showStr = defaultValue;
                             isDefault = true;
-                        }      
+                        }
                     }
                     else
                     {
                         showStr = defaultValue;
                         isDefault = true;
                     }
-                    DataFieldAssetType fieldAssetType = GetDataFieldAssetType(field);
+                   
                     if (fieldAssetType == DataFieldAssetType.LocalizedLanguage)
                     {
                         string k = showStr;
-                        if (k!="null"&& langKeys.Contains(k))
+                        if (k != "null" && langKeys.Contains(k))
                         {
                             showStr = LanguageManager.GetContentByKey(k);
                         }
                     }
                     if (!string.IsNullOrEmpty(searchValue))
-                        showStr = ShowContainsChar(showStr, searchValue);
+                    {
+                        bool isContainsSearchKeyWards = false;
+                        showStr = ShowContainsChar(showStr, searchValue, ref isContainsSearchKeyWards);
+                        if (isContainsSearchKeyWards)
+                        {
+                            if (!saveSearchValueIndexList.Contains(i))
+                                saveSearchValueIndexList.Add(i);
+                        }
+                    }
 
                     if (isDefault)
                         showStr = "<color=green>" + showStr + "</color>";
                 }
-              
+                Rect rect = new Rect(pos, size);
                 if (i == 1 || i == 2)
                 {
-                    GUI.Button(new Rect(pos, size), showStr, helpBoxStyle);
+                    GUI.Button(rect, showStr, helpBoxStyle);
                 }
                 else
                 {
                     if (selectColumnIndexs.Contains(j))
                         GUI.color = Color.magenta;
-                    if (selectRowIndexs .Contains(i))
+                    if (selectRowIndexs.Contains(i))
                         GUI.color = Color.cyan;
-                    if (GUI.Button(new Rect(pos, size), showStr, helpBoxStyle))
+
+                    object modofyValue = null;
+                    if (i > 0)
+                    {
+                        SingleData data = null;
+                        try
+                        {
+                            data = m_currentData[m_currentData.TableIDs[i - 3]];
+                        }
+                        catch (Exception e)
+                        {
+                            for (int m = 0; m < m_currentData.TableIDs.Count; m++)
+                            {
+                                Debug.Log(" index :" + i + " m:" + m + " item:" + m_currentData.TableIDs[m]);
+                            }
+                            Debug.LogError("error:" + e);
+                            continue;
+                        }
+                       
+
+                        if (data.ContainsKey(field))
+                            defaultValue = data[field];
+                        value = DataConfigUtils.TableString2ObjectValue(defaultValue, fieldValueType, enumType);
+
+                        if (fieldAssetType == DataFieldAssetType.Data && !fieldValueType.ToString().Contains("Array")) {
+                            modofyValue = DrawValueEitorGUI.DrawValue(rect, value, helpBoxStyle);
+                        }
+                      
+                    }
+                     if (modofyValue==null&& GUI.Button(rect, showStr, helpBoxStyle))
                     {
                         modifiIndex = new Vector2Int(i - 2, j);
                         if (i == 0)
@@ -679,15 +747,73 @@ public class TableDataEditor
                             f.fieldAssetType = GetDataFieldAssetType(field);
                             value = f;
                         }
+                        //else
+                        //{
+                        //    SingleData data = m_currentData[m_currentData.TableIDs[i - 3]];
+
+                        //    if (data.ContainsKey(field))
+                        //        defaultValue = data[field];
+                        //    value = DataConfigUtils.TableString2ObjectValue(defaultValue, fieldValueType, enumType);
+                        //}
+                        GeneralDataModificationWindow.OpenWindow(editorWindow, "修改数据", value, DrawModifiValueGUI, CheckModifiValueCallBack, ModificationCompleteCallBack);
+                    }
+                    if (modofyValue!=null)
+                    {
+                        int index = i - 3;
+                        string valueStr = DataConfigUtils.ObjectValue2TableString(modofyValue);
+                        SingleData data = m_currentData[m_currentData.TableIDs[index]];
+                        if (j == 0)
+                        {
+                            if (m_currentData.TableIDs[index] != valueStr)
+                            {
+                                bool repeat = false;
+                                bool isNull = false;
+                                for (int m = 0; m < m_currentData.TableIDs.Count; m++)
+                                {
+                                    if (m != index && m_currentData.TableIDs[m] == valueStr)
+                                    {
+                                        repeat = true;
+                                        break;
+                                    }
+                                }
+                                if (string.IsNullOrEmpty(valueStr) || "null".Equals(valueStr.ToLower()))
+                                {
+                                    isNull = true;
+                                }
+                                if (repeat|| isNull)
+                                {
+                                    if (repeat)
+                                    {
+                                        for (int m = 0; m < m_currentData.TableIDs.Count; m++)
+                                        {
+                                            Debug.Log(" index :" + index + " m:" + m + " item:" + m_currentData.TableIDs[m]);
+                                        }
+                                        Debug.LogError("重复的Key:" + valueStr);
+                                    }
+                                    if (isNull)
+                                    {
+                                        Debug.LogError("Key 不能为null或空");
+                                    }
+                                }
+                                else
+                                {
+                                    m_currentData.TableIDs[index] = valueStr;
+                                    data[field] = valueStr;
+                                    List<string> keys = new List<string>(m_currentData.Keys);
+                                    List<SingleData> values = new List<SingleData>(m_currentData.Values);
+                                    keys[index] = valueStr;
+                                    m_currentData.Clear();
+                                    for (int n = 0; n < keys.Count; n++)
+                                    {
+                                        m_currentData.Add(keys[n], values[n]);
+                                    }
+                                }
+                            }
+                        }
                         else
                         {
-                            SingleData data = m_currentData[m_currentData.TableIDs[i - 3]];
-
-                            if (data.ContainsKey(field))
-                                defaultValue = data[field];
-                            value = DataConfigUtils.TableString2ObjectValue(defaultValue, fieldValueType, enumType);
+                            data[field] = valueStr;
                         }
-                        GeneralDataModificationWindow.OpenWindow(editorWindow, "修改数据", value, DrawModifiValueGUI, CheckModifiValueCallBack, ModificationCompleteCallBack);
                     }
                 }
 
@@ -700,13 +826,23 @@ public class TableDataEditor
             tempHeight += h;
         }
         helpBoxStyle.fontSize = oldButtonFontSize;
+
+        if (!string.IsNullOrEmpty(searchValue))
+        {
+            showSearchValueIndexList = saveSearchValueIndexList;
+            showSearchValueIndexList.Add(0);
+            showSearchValueIndexList.Add(1);
+            showSearchValueIndexList.Add(2);
+        }
     }
-    private string ShowContainsChar(string value,string searchValue)
+    private string ShowContainsChar(string value,string searchValue,ref bool isContainsSearchKeyWards)
     {
         string res = value;
+        isContainsSearchKeyWards = false;
         if (value.Contains(searchValue))
         {
            res= value.Replace(searchValue, "<color=red>" + searchValue + "</color>");
+            isContainsSearchKeyWards = true;
         }
 
         return res;
@@ -954,10 +1090,16 @@ public class TableDataEditor
     private string tableKey = "";
     private object DrawTableGUI(string text, object defultValue)
     {
+        defultValue = EditorDrawGUIUtil.DrawBaseValue(text, defultValue);
+        
         string value = defultValue.ToString();
-        GUILayout.Label(text + " : " + value);
+        if ( "null".Equals(value.ToLower()))
+        {
+            return value;
+        }
+            GUILayout.Label(text + " : " + value);
 
-        if(string.IsNullOrEmpty(tableName) && !string.IsNullOrEmpty(value))
+        if( !string.IsNullOrEmpty(value))
         {
             string[] tempStrs = value.Split('/');
             if(tempStrs.Length==3)
@@ -974,12 +1116,13 @@ public class TableDataEditor
             fieldNames.Clear();
             DataTable d = DataManager.GetData(tName);
             fieldNames.AddRange(d.TableKeys);
+            tableKeys.Clear();
             tableKeys.AddRange(d.TableIDs);
         });
         
-        fieldName = EditorDrawGUIUtil.DrawPopup("字段名", fieldName, fieldNames);
+        
         tableKey = EditorDrawGUIUtil.DrawPopup("表格数据key", tableKey, tableKeys);
-
+        fieldName = EditorDrawGUIUtil.DrawPopup("字段名", fieldName, fieldNames);
         defultValue = tableName + "/" + fieldName + "/" + tableKey;
         return defultValue;
     }
@@ -998,9 +1141,7 @@ public class TableDataEditor
             GUILayout.Space(8);
             if (GUILayout.Button("打开编辑当前多语言字段"))
             {
-                LanguageDataEditorWindow w = LanguageDataEditorWindow.ShowWindow();
-                w.searchValue = value.ToString();
-                w.toolbarOption = 1;
+                 LanguageDataEditorWindow.OpenAndSearchValue(value.ToString());
             }
         }
         else
@@ -1044,7 +1185,7 @@ public class TableDataEditor
             //ResourcesConfigManager.Initialize();
             if (ResourcesConfigManager.GetIsExitRes(content))
             {
-                GameObject obj = ResourceManager.EditorLoad<GameObject>(content);
+                GameObject obj = ResourceManager.Load<GameObject>(content);
                 if (obj)
                 {
 
@@ -1103,7 +1244,7 @@ public class TableDataEditor
             //ResourcesConfigManager.Initialize();
             if (ResourcesConfigManager.GetIsExitRes(content))
             {
-                Texture2D obj = ResourceManager.EditorLoad<Texture2D>(content);
+                Texture2D obj = ResourceManager.Load<Texture2D>(content);
                 if (obj)
                 {
 
@@ -1147,8 +1288,8 @@ public class TableDataEditor
                 RenameField(m_currentData, field, temp.fieldName);
                 field = temp.fieldName;
             }
-           // SingleData data = m_currentData[m_currentData.TableIDs[modifiIndex.y]];
-            m_currentData.m_defaultValue[field] = DataConfigUtils.ObjectValue2TableString(temp.defultValue);
+            // SingleData data = m_currentData[m_currentData.TableIDs[modifiIndex.y]];
+         
 
             if (m_currentData.m_noteValue.ContainsKey(field))
                 m_currentData.m_noteValue[field] = temp.description;
@@ -1175,6 +1316,23 @@ public class TableDataEditor
                     m_currentData.m_tableEnumTypes.Add(field, temp.enumType);
             }
             m_currentData.m_fieldAssetTypes[field] = temp.fieldAssetType;
+
+            string oldDefaultValue = m_currentData.m_defaultValue[field];
+            m_currentData.m_defaultValue[field] = DataConfigUtils.ObjectValue2TableString(temp.defultValue);
+          
+            if (oldDefaultValue!= m_currentData.m_defaultValue[field])
+            {
+                string newDefultValue = m_currentData.m_defaultValue[field];
+                foreach (var id in m_currentData.TableIDs)
+                {
+                    SingleData data = m_currentData[id];
+                   if (data.ContainsKey(field) && data[field] == oldDefaultValue)
+                    {
+                        m_currentData[id][field] = newDefultValue;
+                    }
+                }
+            }
+                
         }
         else
         {

@@ -9,9 +9,6 @@ public class AssetsManifestManager
     static bool s_isInit = false;
     static AssetBundleManifest s_manifest;
 
-
-    //static Dictionary<string, bool> s_relayData = new Dictionary<string, bool>();
-
     static void Initialize()
     {
         if (!s_isInit)
@@ -33,7 +30,7 @@ public class AssetsManifestManager
             type = ResLoadLocation.Persistent;
 
             //更新资源存放在Application.persistentDataPath+"/Resources/"目录下
-            path = PathTool.GetAssetsBundlePersistentPath() + c_ManifestFileName ;
+            path = PathTool.GetAssetsBundlePersistentPath() + c_ManifestFileName;
         }
         else
         {
@@ -48,20 +45,14 @@ public class AssetsManifestManager
     }
     public static Hash128 GetHash(string bundleName)
     {
-        if(!s_isInit)
-        {
-            Initialize();
-        }
+        Initialize();
 
         return s_manifest.GetAssetBundleHash(bundleName);
     }
 
     public static AssetBundleManifest GetManifest()
     {
-        if (!s_isInit)
-        {
-            Initialize();
-        }
+        Initialize();
 
         return s_manifest;
     }
@@ -69,7 +60,7 @@ public class AssetsManifestManager
     #region New Res Use
     private static Dictionary<string, string[]> dependenciePathsDic = new Dictionary<string, string[]>();
 
-    public static Dictionary<string,string[]> GetDependencieNamesDic()
+    public static Dictionary<string, string[]> GetDependencieNamesDic()
     {
         Dictionary<string, string[]> dic = new Dictionary<string, string[]>();
 
@@ -93,7 +84,7 @@ public class AssetsManifestManager
     private static void LoadDependenciePaths()
     {
         dependenciePathsDic.Clear();
-       
+
 
         string[] sArr = s_manifest.GetAllAssetBundles();
         for (int i = 0; i < sArr.Length; i++)
@@ -120,7 +111,7 @@ public class AssetsManifestManager
             {
                 foreach (var item in depList)
                 {
-                    if(item == assetPath)
+                    if (item == assetPath)
                     {
                         hasDep = true;
                         hasDependenciesPathList.Add(assetPath);

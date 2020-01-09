@@ -144,7 +144,7 @@ public class UICreateService
         rtTmp.anchorMin = new Vector2(0, 0);
         rtTmp.anchoredPosition3D = Vector3.zero;
         rtTmp.sizeDelta = Vector2.zero;
-        uICameraData.m_TopbarLayerParent = goTmp.transform;
+        uICameraData.m_UpperParent = goTmp.transform;
 
         goTmp = new GameObject("PopUp");
         goTmp.layer = LayerMask.NameToLayer("UI");

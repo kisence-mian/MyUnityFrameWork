@@ -1,5 +1,4 @@
-﻿using HDJ.Framework.Utils;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -81,6 +80,7 @@ public class ResendMessageManager
     private static void Update()
     {
         //Debug.Log(msgs.Count+" :"+ startResend+" :"+ tempResendTime);
+
         if (msgs.Count == 0)
             return;
         if (!startResend)

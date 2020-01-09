@@ -16,6 +16,7 @@ namespace FrameWork.SDKManager
         public const string ParameterName_IsSuccess = "IsSuccess";
         public const string ParameterName_Error     = "Error";
         public const string ParameterName_Content   = "Content";
+        public const string ParameterName_UserID    = "UserID";
 
         public const string ModuleName_Init     = "Init";
         public const string ModuleName_Dispose  = "Dispose";
@@ -42,17 +43,22 @@ namespace FrameWork.SDKManager
         public const string LifeCycle_FunctionName_OnApplicationQuit = "OnApplicationQuit";
 
         //Login相关参数
-        public const string FunctionName_Logout = "Logout";
+        public const string Login_FunctionName_Login    = "Login";
+        public const string Login_FunctionName_LoginOut = "LoginOut";
 
         public const string Login_ParameterName_Device = "Device";
         public const string Login_ParameterName_AccountId = "AccountId";
         public const string Login_ParameterName_loginPlatform = "loginPlatform";
 
         //Pay相关参数
+        public const string Pay_FunctionName_OnPay = "OnPay";//支付回调
+        public const string Pay_FunctionName_GetGoodsInfo = "GetGoodsInfo";//获取商品信息回调
+        public const string Pay_FunctionName_ClearPurchase = "ClearPurchase";//擦除购买记录（已正常发货）
         public const string Pay_ParameterName_GoodsID     = "GoodsID";
         public const string Pay_ParameterName_GoodsType   = "GoodsType";
         public const string Pay_ParameterName_Count       = "Count";
         public const string Pay_ParameterName_GoodsName   = "GoodsName";
+        public const string Pay_ParameterName_GoodsDescription = "GoodsDescription";
         public const string Pay_ParameterName_CallBackUrl = "CallBackUrl";
         public const string Pay_ParameterName_CpOrderID   = "CpOrderID";//第三方支付ID
         public const string Pay_ParameterName_OrderID     = "OrderID";  //我们自己的支付ID
@@ -60,12 +66,19 @@ namespace FrameWork.SDKManager
         public const string Pay_ParameterName_Currency    = "Currency";  //货币
         public const string Pay_ParameterName_Payment     = "Payment";   //支付途径
         public const string Pay_ParameterName_Receipt     = "Receipt";   //支付回执
+        public const string Pay_ParameterName_LocalizedPriceString = "localizedPriceString";//本地货币类型与数目
 
         public const string Pay_GoodsTypeEnum_ONCE_ONLY = "ONCE_ONLY";
         public const string Pay_GoodsTypeEnum_NORMAL    = "NORMAL";
         public const string Pay_GoodsTypeEnum_RIGHTS    = "RIGHTS";
 
         //AD相关参数
+        public const string AD_ParameterName_ADType = "ADType";
+
+        public const string AD_FunctionName_LoadAD = "LoadAD";
+        public const string AD_FunctionName_PlayAD = "PlayAD";
+        public const string AD_FunctionName_CloseAD = "CloseAD";
+        public const string AD_FunctionName_ADIsLoaded = "ADIsLoaded";
 
         //Log相关参数
         public const string Log_FunctionName_Login    = "LogLogin";
@@ -106,14 +119,19 @@ namespace FrameWork.SDKManager
 
         //Properties
         public const string FileName_ChannelProperties = "Channel";
-
         public const string PropertiesKey_IsLog = "IsLog";                           //是否输出日志
+        public const string PropertiesKey_SelectNetworkPath = "SelectNetworkPath";  //选服配置下载地址
         public const string PropertiesKey_UpdateDownLoadPath = "UpdateDownLoadPath"; //热更新下载地址(最后没有斜线)
         public const string PropertiesKey_TestUpdateDownLoadPath = "TestUpdateDownLoadPath"; //热更新下载测试地址(最后没有斜线)
         public const string PropertiesKey_ChannelName = "ChannelName";               //渠道名称
         public const string PropertiesKey_StoreName   = "StoreName";                 //商店名称
         public const string PropertiesKey_LoginPlatform = "LoginPlatform";           //登录平台
+        public const string PropertiesKey_ADPlatform = "ADPlatform";                 //广告平台
         public const string PropertiesKey_NetworkID = "NetworkID";                   //服务器选择
-        public const string PropertiesKey_QQGroup   = "QQGroup";                     //服务器选择
+        public const string PropertiesKey_QQGroup   = "QQGroup";                     //玩家QQ群
+        public const string PropertiesKey_DirectlyLogin = "DirectlyLogin";           //是否直接登录，不选择登录模式
+        public const string PropertiesKey_CloseHealthGamePact = "CloseHealthGamePact";//关闭健康游戏公约
+
+        public const string PropertiesKey_SelectServerURL = "SelectServerURL";       //选服服务器地址(废弃)
     }
 }

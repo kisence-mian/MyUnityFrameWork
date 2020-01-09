@@ -531,8 +531,14 @@ namespace FrameWork.GuideSystem
         }
         protected virtual void CloseGuideWindow( GuideWindowBase m_guideWindowBase)
         {
+            Debug.Log("guide window =>" + m_guideWindowBase);
+            //Debug.Log("==>>" + UIManager.GetUI<GuideWindow>());
             if (m_guideWindowBase != null)
                 UIManager.CloseUIWindow(m_guideWindowBase);
+            else
+            {
+                Debug.LogError("Guide Window is null");
+            }
         }
       protected  void NextGuide()
         {

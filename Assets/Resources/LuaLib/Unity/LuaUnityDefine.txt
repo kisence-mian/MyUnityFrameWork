@@ -1,0 +1,8 @@
+Vector4 = UnityEngine.Vector4
+Vector3 = UnityEngine.Vector3
+Vector2 = UnityEngine.Vector2
+
+Color = UnityEngine.Color
+GameObject = UnityEngine.GameObject
+print = UnityEngine.MonoBehaviour.print
+warn = UnityEngine.Debug.LogWarning

@@ -24,6 +24,8 @@ public class AssetsUnloadHandler
     /// <param name="assets"></param>
     public static void MarkUseAssets(AssetsData assets, bool isHaveDependencies)
     {
+        if (assets == null)
+            return;
         UnloadAssetInfo info= MakeUseLogic(assets.assetName, assets, isHaveDependencies);
 
         //无依赖的资源进入卸载Bundle压缩包的队列
@@ -40,12 +42,15 @@ public class AssetsUnloadHandler
     /// <param name="assets"></param>
     public static void MarkUseAssets(string assetsName)
     {
+        if (!ResourceManager.UseCache)
+            return ;
         if (usedAssetsDic.ContainsKey(assetsName))
             MakeUseLogic(assetsName);
     }
 
     private static UnloadAssetInfo MakeUseLogic(string assetName, AssetsData assets=null, bool isHaveDependencies=true)
     {
+
         UnloadAssetInfo info = null;
         if (noUsedAssetsDic.ContainsKey(assetName))
         {
@@ -137,14 +142,27 @@ public class AssetsUnloadHandler
     {
         if (unloadBundleQue.Count > 0)
         {
-            foreach (var item in unloadBundleQue.Values)
+            foreach (var keyValue in unloadBundleQue)
             {
-                item.unloadBundleTime -= Time.deltaTime;
-                if (item.unloadBundleTime <= 0)
+                var item = keyValue.Value;
+                if (item != null)
                 {
-                    item.assets.AssetBundle.Unload(false);
-                    item.assets.AssetBundle = null;
-                    unloadBundleQue.Remove(item.assetsName);
+                    item.unloadBundleTime -= Time.deltaTime;
+                    if (item.unloadBundleTime <= 0)
+                    {
+                        if (item.assets != null && item.assets.AssetBundle != null)
+                        {
+                            item.assets.AssetBundle.Unload(false);
+                            item.assets.AssetBundle = null;
+                        }
+                        unloadBundleQue.Remove(keyValue.Key);
+                        break;
+                    }
+                }
+                else
+                {
+                    unloadBundleQue.Remove(keyValue.Key);
+                    Debug.LogError("Unload res is null .name:" + keyValue.Key);
                     break;
                 }
             }

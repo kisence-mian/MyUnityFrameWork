@@ -10,9 +10,10 @@ public class Log
 {
     //日志输出线程
     static LogOutPutThread s_LogOutPutThread = new LogOutPutThread();
-
-	public static void Init(bool isOpenLog = true)
+    public static bool isOpenLog= false;
+    public static void Init(bool isOpenLog = true)
     {
+        Log.isOpenLog = isOpenLog;
 #if UNITY_2017_1_OR_NEWER
         Debug.unityLogger.logEnabled = isOpenLog;
 #else

@@ -104,9 +104,9 @@ public class AudioPlayManager : MonoBehaviour
 
     #region 播放接口
 
-    public static void PlayMusic2D(string name, int channel, float volumeScale = 1, bool isLoop = true, float fadeTime = 0.5f, float delay = 0f, string flag = "")
+    public static AudioAsset PlayMusic2D(string name, int channel, float volumeScale = 1, bool isLoop = true, float fadeTime = 0.5f, float delay = 0f, string flag = "")
     {
-        a2DPlayer.PlayMusic(channel, name, isLoop, volumeScale, delay, fadeTime, flag);
+        return a2DPlayer.PlayMusic(channel, name, isLoop, volumeScale, delay, fadeTime, flag);
     }
     public static void PauseMusic2D(int channel, bool isPause, float fadeTime = 0.5f)
     {

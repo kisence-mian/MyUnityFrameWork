@@ -17,6 +17,7 @@ public class NetworkVerificationImplement : PaymentVerificationInterface
         msg.receipt = info.receipt;
         msg.id = info.goodsId;
         SetBuyResendMessage(msg, false);
+        Debug.LogWarning(info.storeName);
        // JsonMessageProcessingController.SendMessage(msg);
         Debug.Log(" 当前游戏服务器验证");
     }

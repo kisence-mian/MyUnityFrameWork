@@ -102,32 +102,29 @@ public static class ResourcesConfigManager
         else
         {
             ResLoadLocation type = ResLoadLocation.Streaming;
-            if (RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(c_ManifestFileName.ToLower(), "null") != "null")
+            string r_path = null;
+            if ( RecordManager.GetData(HotUpdateManager.c_HotUpdateRecordName).GetRecord(c_ManifestFileName.ToLower(), "null") != "null")
             {
                 Debug.Log("LoadResourceConfig 读取沙盒路径");
 
                 type = ResLoadLocation.Persistent;
                 //更新资源存放在Application.persistentDataPath+"/Resources/"目录下
-                string persistentPath = PathTool.GetAssetsBundlePersistentPath() + c_ManifestFileName.ToLower();
-  
-                AssetBundle ab = AssetBundle.LoadFromFile(persistentPath);
-
-                TextAsset text = (TextAsset)ab.LoadAsset<TextAsset>(c_ManifestFileName);
-                data = text.text;
+                r_path = PathTool.GetAssetsBundlePersistentPath() + c_ManifestFileName.ToLower();
 
             }
             else
             {
-                //Debug.Log("LoadResourceConfig 读取stream路径");
+                Debug.Log("LoadResourceConfig 读取stream路径");
 
-                string path = PathTool.GetAbsolutePath(type, c_ManifestFileName.ToLower());
-                AssetBundle ab = AssetBundle.LoadFromFile(path);
-
-                TextAsset text = ab.LoadAsset<TextAsset>(c_ManifestFileName);
-                data = text.text;
-
-                ab.Unload(true);
+                 r_path = PathTool.GetAbsolutePath(type, c_ManifestFileName.ToLower());
+              
             }
+            AssetBundle ab = AssetBundle.LoadFromFile(r_path);
+
+            TextAsset text = ab.LoadAsset<TextAsset>(c_ManifestFileName);
+            data = text.text;
+
+            ab.Unload(true);
         }
 
         s_config = DataTable.Analysis(data);

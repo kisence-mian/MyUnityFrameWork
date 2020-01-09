@@ -65,7 +65,10 @@ public class RandomString : MonoBehaviour {
             }
             if(l_addChar != null && l_addChar.Length> i)
             {
-                result += l_addChar[i];
+                if (l_addChar[i] != "NoValue")
+                {
+                    result += l_addChar[i];
+                }
             }
 
             

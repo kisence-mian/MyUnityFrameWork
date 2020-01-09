@@ -120,14 +120,14 @@ public class PayUnityIAPImplement : PayInterface
 
     }
 
-    public override void Pay(string goodsID, string tag, FrameWork.SDKManager.GoodsType goodsType = FrameWork.SDKManager.GoodsType.NORMAL, string orderID = null)
+    public override void Pay(PayInfo info)
     {
         if (Application.isEditor)
         {
-            ConfirmPay(goodsID,tag);
+            ConfirmPay(info.goodsID,info.tag);
         }
         else
-            listener.PurchaseProduct(goodsID);
+            listener.PurchaseProduct(info.goodsID);
     }
 
     public override void ConfirmPay(string goodsID,  string tag)

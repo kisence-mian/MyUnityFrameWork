@@ -33,21 +33,21 @@ public static class ConfigManager
         string dataJson = "";
 
         //#if UNITY_EDITOR
-        if (!Application.isPlaying)
-        {
-            dataJson = ResourceIOTool.ReadStringByResource(
-                PathTool.GetRelativelyPath(c_directoryName,
-                            ConfigName,
-                            c_expandName));
-        }
+        //if (!Application.isPlaying)
+        //{
+        //    dataJson = ResourceIOTool.ReadStringByResource(
+        //        PathTool.GetRelativelyPath(c_directoryName,
+        //                    ConfigName,
+        //                    c_expandName));
+        //}
 
-        //#else
-        else
-        {
-            dataJson = ResourceManager.LoadText(ConfigName);
-        }
+        ////#else
+        //else
+        //{
+        //    dataJson = ResourceManager.LoadText(ConfigName);
+        //}
         //#endif
-
+        dataJson = ResourceManager.LoadText(ConfigName);
 
         if (dataJson == "")
         {

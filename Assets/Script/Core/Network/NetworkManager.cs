@@ -9,7 +9,7 @@ using System.Net;
 public class NetworkManager
 {
     static INetworkInterface s_network;
-    static HeartBeatBase s_heatBeat;
+    public static HeartBeatBase s_heatBeat;
 
     public static bool IsConnect
     {
@@ -88,6 +88,7 @@ public class NetworkManager
 
         ApplicationManager.s_OnApplicationUpdate += Update;
         ApplicationManager.s_OnApplicationQuit += DisConnect;
+        ApplicationManager.s_OnApplicationQuit += Dispose;
     }
     /// <summary>
     /// 
@@ -108,12 +109,16 @@ public class NetworkManager
     {
         InputManager.UnLoadDispatcher<InputNetworkConnectStatusEvent>();
         InputManager.UnLoadDispatcher<InputNetworkMessageEvent>();
-
-        s_network.Dispose();
-        s_network = null;
-
-        s_heatBeat.Dispose();
-        s_heatBeat = null;
+        if (s_network != null)
+        {
+            s_network.Dispose();
+            s_network = null;
+        }
+        if (s_heatBeat != null)
+        {
+            s_heatBeat.Dispose();
+            s_heatBeat = null;
+        }
 
         ApplicationManager.s_OnApplicationUpdate -= Update;
     }
@@ -150,6 +155,7 @@ public class NetworkManager
     {
         Debug.Log("断开连接");
         s_network.Close();
+       
     }
 
     public static void SendMessage(byte[] msg)
@@ -270,18 +276,10 @@ public class NetworkManager
     static List<NetWorkMessage> s_messageListHeartBeat = new List<NetWorkMessage>();
     const int MaxDealCount = 2000;
     /// <summary>
-    /// 是否有心跳消息过来
-    /// </summary>
-    /// <returns></returns>
-    public static bool HasHeartBeatMessage()
-    {
-        return s_messageListHeartBeat.Count > 0;
-    }
-    /// <summary>
     /// 取出心跳消息
     /// </summary>
     /// <returns></returns>
-    public static NetWorkMessage GetHeartBeatMessage()
+    public static bool GetHeartBeatMessage()
     {
         NetWorkMessage msg = default(NetWorkMessage);
         lock (s_messageListHeartBeat)
@@ -290,9 +288,10 @@ public class NetworkManager
             {
                 msg = s_messageListHeartBeat[0];
                 s_messageListHeartBeat.RemoveAt(0);
+                return true;
             }
         }
-        return msg;
+        return false;
     }
     //将消息的处理并入主线程
     static void Update()

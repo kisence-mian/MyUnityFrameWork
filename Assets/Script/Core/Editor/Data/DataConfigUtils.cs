@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using UnityEngine;
-using HDJ.Framework.Utils;
 
 
 public static class DataConfigUtils
@@ -320,6 +319,47 @@ public static class DataConfigUtils
         }
 
         content += "\t}\n";
+        content += "\n";
+
+        content += "\t public override void LoadData(DataTable table,string key) \n";
+        content += "\t{\n";
+
+        content += "\t\tSingleData data = table[key];\n\n";
+
+        content += "\t\tm_key = key;\n";
+
+        if (type.Count > 0)
+        {
+            for (int i = 1; i < data.TableKeys.Count; i++)
+            {
+                string key = data.TableKeys[i];
+
+                content += "\t\t";
+
+                string enumType = null;
+
+                if (data.m_tableEnumTypes.ContainsKey(key))
+                {
+                    enumType = data.m_tableEnumTypes[key];
+                }
+
+                if (data.m_tableTypes.ContainsKey(key))
+                {
+                    content += "m_" + key + " = data." + OutPutFieldFunction(data.m_tableTypes[key], enumType) + "(\"" + key + "\")";
+                }
+                //默认字符类型
+                else
+                {
+                    content += "m_" + key + " = data." + OutPutFieldFunction(FieldType.String, enumType) + "(\"" + key + "\")";
+                    Debug.LogWarning("字段 " + key + "没有配置类型！");
+                }
+
+                content += ";\n";
+            }
+        }
+
+        content += "\t}\n";
+
         content += "}\n";
 
         string SavePath = Application.dataPath + "/Script/DataClassGenerate/" + className + ".cs";
