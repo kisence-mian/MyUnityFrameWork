@@ -6,7 +6,7 @@ function Main( ... )
 	UIManager.OpenUIWindow("AAAWindow",nil);
 
 	
-	warn("warn");
-	error("error");
+	--warn("warn");
+	--error("error");
 
 end

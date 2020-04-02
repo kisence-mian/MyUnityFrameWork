@@ -13,7 +13,7 @@ public static class ReportController
     /// <param 具体数据 ="datas"></param>
     public static void ReportEvent(string eventName,Dictionary<string,string> datas)
     {
-        CitentReport2Server msg = new CitentReport2Server();
+        ClientReport2Server msg = new ClientReport2Server();
         msg.eventName = eventName;
 
         msg.datas = KeyValueData.Dictionary2KeyValueDataList(datas);

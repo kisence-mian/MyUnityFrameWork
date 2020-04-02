@@ -238,6 +238,8 @@ public class UIManager : MonoBehaviour
 
     public static UIWindowBase CreateUIWindow(string UIName)
     {
+        Debug.Log("CreateUIWindow " + UIName);
+
         GameObject UItmp = GameObjectManager.CreateGameObjectByPool(UIName, UIManagerGo);
         UIWindowBase UIWIndowBase = UItmp.GetComponent<UIWindowBase>();
         UISystemEvent.Dispatch(UIWIndowBase, UIEvent.OnInit);  //派发OnInit事件

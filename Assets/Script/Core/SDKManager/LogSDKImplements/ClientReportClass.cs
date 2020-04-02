@@ -8,7 +8,7 @@ public class CitentReportClass : LogInterface
 {
     public override void Log(string eventID, Dictionary<string, string> data)
     {
-        CitentReport2Server msg = new CitentReport2Server();
+        ClientReport2Server msg = new ClientReport2Server();
         msg.eventName = eventID;
 
         msg.datas = KeyValueData.Dictionary2KeyValueDataList(data);
