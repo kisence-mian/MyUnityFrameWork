@@ -29,6 +29,7 @@ public class Timer
                 if (e.m_isDone)
                 {
                     m_timers.Remove(e);
+                    i--;
                 }
             }
         }
