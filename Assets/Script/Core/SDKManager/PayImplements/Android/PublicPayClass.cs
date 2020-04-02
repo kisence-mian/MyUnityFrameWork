@@ -11,7 +11,7 @@ public class PublicPayClass : PayInterface
     string goodsID;
     string mch_orderID;
     GameObject androidListener;
-    StoreName storeName = StoreName.WX;
+    StoreName storeName = StoreName.None;
     string userID;
 
     public override List<RuntimePlatform> GetPlatform()
@@ -22,10 +22,11 @@ public class PublicPayClass : PayInterface
     {
         return storeName;
     }
+
     public override void Init()
     {
         m_SDKName = "PublicPayClass";
-        storeName =(StoreName)Enum.Parse( typeof(StoreName),SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"));
+        //storeName =(StoreName)Enum.Parse( typeof(StoreName),SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"));
         
         //有其他的payClass符合就不启动public pay
         if(!SDKManager.GetHasPayService(storeName.ToString()))
@@ -34,8 +35,6 @@ public class PublicPayClass : PayInterface
 
             Debug.Log("PublicPayClass Init m_SDKName:>" + m_SDKName + "<");
         }
-
-        GlobalEvent.AddEvent(StoreName.WX, null);
 
         //GlobalEvent.DispatchEvent("Fight",)
 
@@ -46,6 +45,7 @@ public class PublicPayClass : PayInterface
         });
 
         SDKManager.GoodsInfoCallBack += OnGoodsInfoCallBack;
+        StorePayController.OnPayCallBack += OnPayResultCallBack;
     }
 
     /// <summary>
@@ -87,26 +87,25 @@ public class PublicPayClass : PayInterface
     /// <param name="args"></param>
     private void OnPrePay(PrePay2Client e, object[] args)
     {
-        if (e.storeName != GetStoreName())
-        {
-            return;
-        }
-
         Debug.LogWarning("OnPrePay=========：" + e.prepay_id + "=partnerId==");
 
         //判断是否需要重发支付
-        if(SDKManager.GetReSendPay(storeName.ToString()))
+        if(SDKManager.GetReSendPay(e.storeName.ToString()))
         {
             OnPayInfo onPayInfo = new OnPayInfo();
             onPayInfo.isSuccess = true;
             onPayInfo.goodsId = e.goodsID;
-            onPayInfo.storeName = GetStoreName();
+            onPayInfo.storeName = e.storeName;
             onPayInfo.receipt = e.mch_orderID;
             onPayInfo.price = payInfo.price;
             PayReSend.Instance.AddPrePayID(onPayInfo);
         }
 
-        IndentListener(e.goodsID, e.mch_orderID, e.prepay_id, payInfo.price);
+        payInfo.orderID = mch_orderID;
+        payInfo.prepay_id = e.prepay_id;
+
+        SDKManagerNew.Pay(payInfo);
+        StartLongTimeNoResponse();
     }
 
     /// <summary>
@@ -121,28 +120,29 @@ public class PublicPayClass : PayInterface
         userID = payInfo.userID;
         this.payInfo = payInfo;
         this.goodsID = this.payInfo.goodsID;
-        Debug.Log("send publicPay message storeName" + GetStoreName() + " goodsID " + payInfo.goodsID);
+        Debug.Log("send publicPay message storeName" + payInfo.storeName + " goodsID " + payInfo.goodsID);
         //给服务器发y预支付消息
-        PrePay2Service.SendPrePayMsg(GetStoreName(), payInfo.goodsID);
+        PrePay2Service.SendPrePayMsg((StoreName)Enum.Parse(typeof(StoreName), payInfo.storeName), payInfo.goodsID);
     }
 
 
-    /// <summary>
-    /// 消息1 的监听， 获得订单信息，然后调支付sdk
-    /// </summary>
-    private void IndentListener(string goodID,string mch_orderID,string prepay_id,float price)
-    {
-        PayInfo payInfo = new PayInfo(
-            goodID,
-            GetGoodsInfo(goodsID).localizedTitle, 
-            prepay_id, 
-            FrameWork.SDKManager.GoodsType.NORMAL,
-            mch_orderID,
-            price, 
-            GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID());
+    ///// <summary>
+    ///// 消息1 的监听， 获得订单信息，然后调支付sdk
+    ///// </summary>
+    //private void IndentListener(string goodID,string mch_orderID,string prepay_id,float price)
+    //{
+    //    PayInfo payInfo = new PayInfo(
+    //        goodID,
+    //        GetGoodsInfo(goodsID).localizedTitle, 
+    //        prepay_id, 
+    //        FrameWork.SDKManager.GoodsType.NORMAL,
+    //        mch_orderID,
+    //        price, 
+    //        GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID(),
+    //        storeName);
 
-        SDKManagerNew.Pay(storeName.ToString(), payInfo);
-    }
+    //    SDKManagerNew.Pay( payInfo);
+    //}
 
     public override LocalizedGoodsInfo GetGoodsInfo(string goodsID)
     {
@@ -154,17 +154,49 @@ public class PublicPayClass : PayInterface
     /// </summary>
     /// <param name="goodsID"></param>
     /// <param name="mch_orderID"></param>
-    public override void ConfirmPay(string goodsID, string mch_orderID)
+    public override void ConfirmPay(string goodsID, string mch_orderID,string SDKName)
     {
         PayReSend.Instance.ClearPrePayID(mch_orderID);
-
+        Debug.Log("ConfirmPay  : " + goodsID);
         //擦除sdk记录
-        SDKManagerNew.ClearPurchaseBySDK(null, goodsID, mch_orderID);
-
+        SDKManagerNew.ClearPurchaseBySDK(SDKName, goodsID, mch_orderID);
     }
 
     public override string GetUserID()
     {
         return userID;
+    }
+
+
+    /// <summary>  
+    /// 是否得到订单的支付响应
+    /// </summary>
+    bool payResponse = false;
+
+    /// <summary>
+    /// 长时间未响应
+    /// </summary>
+    private void StartLongTimeNoResponse()
+    {
+        payResponse = false;
+
+        Debug.LogWarning("======StartLongTimeNoResponse=====  start  ===" + Time.timeSinceLevelLoad);
+
+        Timer.DelayCallBack(5, (o) =>
+        {
+            Debug.LogWarning("======StartLongTimeNoResponse=====  end  ===" + payResponse + "=============" + Time.timeSinceLevelLoad);
+
+            if (!payResponse)
+            {
+                PayCallBack(new OnPayInfo(payInfo, false, (StoreName)Enum.Parse(typeof(StoreName), payInfo.storeName)));
+            }
+        });
+    }
+
+
+    //正常订单回调
+    private void OnPayResultCallBack(PayResult result)
+    {
+        payResponse = true;
     }
 }

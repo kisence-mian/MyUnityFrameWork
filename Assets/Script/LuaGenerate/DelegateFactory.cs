@@ -28,6 +28,7 @@ public static class DelegateFactory
 		dict.Add(typeof(InputEventHandle<InputUILongPressEvent>), InputEventHandle_InputUILongPressEvent);
 		dict.Add(typeof(InputEventHandle<InputUIOnBeginDragEvent>), InputEventHandle_InputUIOnBeginDragEvent);
 		dict.Add(typeof(InputEventHandle<InputUIOnEndDragEvent>), InputEventHandle_InputUIOnEndDragEvent);
+		dict.Add(typeof(InputEventHandle<InputUIOnDragEvent>), InputEventHandle_InputUIOnDragEvent);
 		dict.Add(typeof(EventHandle), EventHandle);
 		dict.Add(typeof(UIAnimCallBack), UIAnimCallBack);
 		dict.Add(typeof(UICallBack), UICallBack);
@@ -671,6 +672,53 @@ public static class DelegateFactory
 		{
 			InputEventHandle_InputUIOnEndDragEvent_Event target = new InputEventHandle_InputUIOnEndDragEvent_Event(func, self);
 			InputEventHandle<InputUIOnEndDragEvent> d = target.CallWithSelf;
+			target.method = d.Method;
+			return d;
+		}
+	}
+
+	class InputEventHandle_InputUIOnDragEvent_Event : LuaDelegate
+	{
+		public InputEventHandle_InputUIOnDragEvent_Event(LuaFunction func) : base(func) { }
+		public InputEventHandle_InputUIOnDragEvent_Event(LuaFunction func, LuaTable self) : base(func, self) { }
+
+		public void Call(InputUIOnDragEvent param0)
+		{
+			func.BeginPCall();
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+
+		public void CallWithSelf(InputUIOnDragEvent param0)
+		{
+			func.BeginPCall();
+			func.Push(self);
+			func.PushObject(param0);
+			func.PCall();
+			func.EndPCall();
+		}
+	}
+
+	public static Delegate InputEventHandle_InputUIOnDragEvent(LuaFunction func, LuaTable self, bool flag)
+	{
+		if (func == null)
+		{
+			InputEventHandle<InputUIOnDragEvent> fn = delegate(InputUIOnDragEvent param0) { };
+			return fn;
+		}
+
+		if(!flag)
+		{
+			InputEventHandle_InputUIOnDragEvent_Event target = new InputEventHandle_InputUIOnDragEvent_Event(func);
+			InputEventHandle<InputUIOnDragEvent> d = target.Call;
+			target.method = d.Method;
+			return d;
+		}
+		else
+		{
+			InputEventHandle_InputUIOnDragEvent_Event target = new InputEventHandle_InputUIOnDragEvent_Event(func, self);
+			InputEventHandle<InputUIOnDragEvent> d = target.CallWithSelf;
 			target.method = d.Method;
 			return d;
 		}

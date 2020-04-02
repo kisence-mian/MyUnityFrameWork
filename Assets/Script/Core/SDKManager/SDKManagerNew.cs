@@ -23,6 +23,8 @@ namespace FrameWork.SDKManager
         {
             if(!isInit)
             {
+                Debug.Log("SDKManagerNew Init");
+
                 GameObject go = new GameObject(c_callBackObjectName);
                 s_callBackListener = go.AddComponent<SDKCallBackListener>();
                 s_callBackListener.sdkCallBack = OnSDKCallBack;
@@ -143,25 +145,27 @@ namespace FrameWork.SDKManager
 
         #region 支付
 
+        ///// <summary>
+        ///// 支付,默认访问第一个接口
+        ///// </summary>
+        //public static void Pay(PayInfo payInfo)
+        //{
+        //    Pay(null, payInfo);
+        //}
+
         /// <summary>
         /// 支付,默认访问第一个接口
         /// </summary>
         public static void Pay(PayInfo payInfo)
         {
-            Pay(null, payInfo);
-        }
-
-        /// <summary>
-        /// 支付,默认访问第一个接口
-        /// </summary>
-        public static void Pay(string SDKName, PayInfo payInfo)
-        {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            if (SDKName != null)
+            if (payInfo.storeName != null)
             {
-                data.Add(SDKInterfaceDefine.SDKName, SDKName);
+                data.Add(SDKInterfaceDefine.SDKName, payInfo.storeName);
             }
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Pay); //支付不传FunctionName
+
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Pay_FunctionName_OnPay);
 
             data.Add(SDKInterfaceDefine.Pay_ParameterName_GoodsID, payInfo.goodsID);
             data.Add(SDKInterfaceDefine.Pay_ParameterName_GoodsType, payInfo.goodsType.ToString());
@@ -171,6 +175,8 @@ namespace FrameWork.SDKManager
             data.Add(SDKInterfaceDefine.Pay_ParameterName_Currency, payInfo.currency);
             data.Add(SDKInterfaceDefine.ParameterName_UserID, payInfo.userID);
             data.Add(SDKInterfaceDefine.Tag, payInfo.tag);
+            data.Add(SDKInterfaceDefine.Pay_ParameterName_PrepayID, payInfo.prepay_id);
+
 
             Call(data);
         }
@@ -516,6 +522,131 @@ namespace FrameWork.SDKManager
 
         #endregion
 
+        #region 实名制
+
+        /// <summary>
+        /// 实名制状态
+        /// </summary>
+        static public RealNameStatus GetRealNameType(string SDKName, string tag)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
+
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_GetRealNameType);
+
+            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            data.Add(SDKInterfaceDefine.Tag, tag);
+            string result = CallString(data, RealNameStatus.NotNeed.ToString());
+
+            try
+            {
+                return (RealNameStatus)Enum.Parse(typeof(RealNameStatus), result);
+
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("GetRealNameType error:" + e);
+                return RealNameStatus.NotNeed;
+            }
+        }
+
+        /// <summary>
+        /// 是否成年
+        /// </summary>
+        /// <returns></returns>
+        static public bool IsAdult(string SDKName, string tag)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
+
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_IsAdult);
+
+            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            data.Add(SDKInterfaceDefine.Tag, tag);
+            bool result = CallBool(data, true);
+
+            return result;
+        }
+
+        /// <summary>
+        /// 今日在线时长
+        /// </summary>
+        /// <returns></returns>
+        static public int GetTodayOnlineTime(string SDKName, string tag)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
+
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_GetTodayOnlineTime);
+
+            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            data.Add(SDKInterfaceDefine.Tag, tag);
+
+            int result = CallInt(data, -1);
+
+            return result;
+        }
+
+        /// <summary>
+        /// 开始实名制
+        /// </summary>
+        static public void StartRealNameAttestation(string SDKName,string tag)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
+
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_StartRealNameAttestation);
+            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            data.Add(SDKInterfaceDefine.Tag, tag);
+
+            Call(data);
+
+        }
+
+        /// <summary>
+        /// 检测支付是否受限
+        /// </summary>
+        /// <returns></returns>
+        static public bool CheckPayLimit(string SDKName, int payAmount,string tag)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
+
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_CheckPayLimit);
+            data.Add(SDKInterfaceDefine.Tag, tag);
+            data.Add(SDKInterfaceDefine.RealName_ParameterName_PayAmount, payAmount.ToString());
+
+            bool result = CallBool(data, false);
+
+            return result;
+        }
+
+        /// <summary>
+        /// 上报支付金额
+        /// </summary>
+        /// <param 支付金额="payAmount"></param>
+        static public void LogPayAmount(string SDKName,int payAmount, string tag)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
+
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_LogPayAmount);
+
+            data.Add(SDKInterfaceDefine.RealName_ParameterName_PayAmount, payAmount.ToString());
+
+            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            data.Add(SDKInterfaceDefine.Tag, tag);
+            Call(data);
+        }
+
+        #endregion
+
         #region 其他
 
         public static void Exit()
@@ -591,6 +722,7 @@ namespace FrameWork.SDKManager
 
         #endregion 特殊回调
 
+        #region 游戏关闭
         /// <summary>
         /// 游戏关闭
         /// </summary>
@@ -602,9 +734,6 @@ namespace FrameWork.SDKManager
 
             Call(data);
         }
-
-        #region 
-
         #endregion
 
         #endregion
@@ -648,6 +777,9 @@ namespace FrameWork.SDKManager
                     break;
                 case SDKInterfaceDefine.ModuleName_Log:
                     OnLog(data);
+                    break;
+                case SDKInterfaceDefine.ModuleName_RealName:
+                    OnRealName(data);
                     break;
                 case SDKInterfaceDefine.ModuleName_Other:
                     OnOther(data);
@@ -702,11 +834,108 @@ namespace FrameWork.SDKManager
             }
         }
 
-#endregion
+        static int CallInt(Dictionary<string, string> data, int defaultValue)
+        {
+            try
+            {
+#if UNITY_EDITOR
+                Debug.LogWarning("SDKManagerNew Call 目前是在 Editor 下运行 ->");
+                return defaultValue;
+
+#elif UNITY_ANDROID
+            string content = Serializer.Serialize(data);
+            if (androidInterface == null)
+            {
+                androidInterface = new AndroidJavaClass("sdkInterface.SdkInterface");
+            }
+
+            if (androidInterface != null)
+            {
+                return androidInterface.CallStatic<int>("UnityRequestFunctionInt", content);
+            }
+            return defaultValue;
+
+#elif UNITY_IOS
+                return defaultValue;
+#endif
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManagerNew Call Error " + e);
+                return defaultValue;
+            }
+        }
+
+
+        static bool CallBool(Dictionary<string, string> data, bool defaultValue)
+        {
+            try
+            {
+#if UNITY_EDITOR
+                Debug.LogWarning("SDKManagerNew Call 目前是在 Editor 下运行 ->");
+                return defaultValue;
+
+#elif UNITY_ANDROID
+            string content = Serializer.Serialize(data);
+            if (androidInterface == null)
+            {
+                androidInterface = new AndroidJavaClass("sdkInterface.SdkInterface");
+            }
+
+            if (androidInterface != null)
+            {
+                return androidInterface.CallStatic<bool>("UnityRequestFunctionBool", content);
+            }
+            return defaultValue;
+
+
+#elif UNITY_IOS
+                return defaultValue;
+#endif
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManagerNew Call Error " + e);
+                return defaultValue;
+            }
+        }
+
+        static string CallString(Dictionary<string, string> data, string defaultValue)
+        {
+            try
+            {
+#if UNITY_EDITOR
+                Debug.LogWarning("SDKManagerNew Call 目前是在 Editor 下运行 ->");
+                return defaultValue;
+
+#elif UNITY_ANDROID
+            string content = Serializer.Serialize(data);
+            if (androidInterface == null)
+            {
+                androidInterface = new AndroidJavaClass("sdkInterface.SdkInterface");
+            }
+
+            if (androidInterface != null)
+            {
+                return androidInterface.CallStatic<string>("UnityRequestFunctionString", content);
+            }
+            return defaultValue;
+#elif UNITY_IOS
+                return defaultValue;
+#endif
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("SDKManagerNew Call Error " + e);
+                return defaultValue;
+            }
+        }
+
+        #endregion
 
         #region 回调处理
 
-#region Debug
+        #region Debug
 
         static void OnDebug(Dictionary<string, string> data)
         {
@@ -731,7 +960,27 @@ namespace FrameWork.SDKManager
             bool isSuccess = bool.Parse(data[SDKInterfaceDefine.ParameterName_IsSuccess]);
             string accountId = data[SDKInterfaceDefine.Login_ParameterName_AccountId];
 
+
+
             OnLoginInfo info = new OnLoginInfo();
+
+            if(!isSuccess)
+            {
+                if(data.ContainsKey(SDKInterfaceDefine.ParameterName_Error))
+                {
+                    info.error = LoginErrorEnum.SDKError;
+                    info.sdkError = data[SDKInterfaceDefine.ParameterName_Error];
+                }
+            }
+
+            if (data.ContainsKey(SDKInterfaceDefine.Login_ParameterName_NickName))
+            {
+                info.nickName = data[SDKInterfaceDefine.Login_ParameterName_NickName];
+            }
+            if (data.ContainsKey(SDKInterfaceDefine.Login_ParameterName_HeadPortrait))
+            {
+                info.headPortrait = data[SDKInterfaceDefine.Login_ParameterName_HeadPortrait];
+            }
             info.isSuccess = isSuccess;
             info.accountId = accountId;
 
@@ -757,10 +1006,11 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region Pay
+        #region Pay
 
         static void OnPay(Dictionary<string, string> data)
         {
+            OnPayInfo info = new OnPayInfo();
             bool isSuccess = bool.Parse(data[SDKInterfaceDefine.ParameterName_IsSuccess]);
 
             StoreName storeName = (StoreName)Enum.Parse(typeof(StoreName), data[SDKInterfaceDefine.Pay_ParameterName_Payment]);
@@ -772,7 +1022,11 @@ namespace FrameWork.SDKManager
             float price = float.Parse(data[SDKInterfaceDefine.Pay_ParameterName_Price]);
             GoodsType goodsType =(GoodsType) Enum.Parse(typeof(GoodsType), data[SDKInterfaceDefine.Pay_ParameterName_GoodsType]);
 
-            OnPayInfo info = new OnPayInfo();
+            if (data.ContainsKey(SDKInterfaceDefine.ParameterName_Error))
+            {
+                info.error = data[SDKInterfaceDefine.ParameterName_Error];
+            }
+
             info.isSuccess = isSuccess;
             info.storeName = storeName;
             info.goodsId = goodsId;
@@ -825,21 +1079,82 @@ namespace FrameWork.SDKManager
 
         static void OnAD(Dictionary<string, string> data)
         {
+            string functionName = data[SDKInterfaceDefine.FunctionName];
 
+            switch(functionName)
+            {
+                case SDKInterfaceDefine.AD_FunctionName_OnAD:
+                    OnADCallBack(data);
+                    break;
+            }
+        }
+
+        static void OnADCallBack(Dictionary<string, string> data)
+        {
+            try
+            {
+                OnADInfo info = new OnADInfo();
+
+                info.aDType = (ADType)Enum.Parse(typeof(ADType), data[SDKInterfaceDefine.AD_ParameterName_ADType]);
+                info.result = (ADResult)Enum.Parse(typeof(ADResult), data[SDKInterfaceDefine.AD_ParameterName_ADResult]);
+                info.tag = data[SDKInterfaceDefine.Tag];
+
+                if (SDKManager.ADCallBack != null)
+                {
+                    SDKManager.ADCallBack(info);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("OnPayCallBack Error" + e.ToString() + e.StackTrace);
+            }
         }
 
 #endregion
 
-#region Log
+        #region Log
 
         static void OnLog(Dictionary<string, string> data)
         {
 
         }
 
-#endregion
+        #endregion
 
-#region Other
+        #region RealName
+
+        static void OnRealName(Dictionary<string, string> data)
+        {
+            string functionName = data[SDKInterfaceDefine.FunctionName];
+            switch (functionName)
+            {
+                case SDKInterfaceDefine.RealName_FunctionName_RealNameCallBack:
+                    OnRealNameCallBack(data);
+                    break;
+            }
+        }
+
+        static void OnRealNameCallBack(Dictionary<string, string> data)
+        {
+            try
+            {
+                RealNameData realNameData = new RealNameData();
+                realNameData.isAdult = bool.Parse( data[SDKInterfaceDefine.RealName_FunctionName_IsAdult]);
+                realNameData.realNameStatus = (RealNameStatus)Enum.Parse(typeof(RealNameStatus), data[SDKInterfaceDefine.RealName_ParameterName_RealNameStatus]);
+
+                if (SDKManager.RealNameCallBack != null)
+                {
+                    SDKManager.RealNameCallBack(realNameData);
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("OnRealNameCallBack Error" + e.ToString() + e.StackTrace);
+            }
+        }
+        #endregion
+
+        #region Other
 
         static void OnOther(Dictionary<string, string> data)
         {
@@ -906,7 +1221,6 @@ namespace FrameWork.SDKManager
 
 #endregion
     }
-
         #region 声明
 
     public class SDKCallBackListener : MonoBehaviour
@@ -927,6 +1241,7 @@ namespace FrameWork.SDKManager
     {
         //必填
         public bool isSuccess;
+        public string error; //错误信息
         public string goodsId;
         public string orderID;
         public StoreName storeName;
@@ -944,7 +1259,7 @@ namespace FrameWork.SDKManager
         /// </summary>
         public string userID;
 
-        public OnPayInfo(PayInfo payInfo,bool isSuccess, StoreName storeName)
+        public OnPayInfo(PayInfo payInfo, bool isSuccess, StoreName storeName)
         {
             this.isSuccess = isSuccess;
             this.goodsId = payInfo.goodsID;
@@ -956,6 +1271,7 @@ namespace FrameWork.SDKManager
             this.receipt = null;
             this.goodsType = payInfo.goodsType;
             userID = null;
+            error = null;
         }
     }
 
@@ -992,7 +1308,21 @@ namespace FrameWork.SDKManager
     public struct OnADInfo
     {
         public ADType aDType;
+        public ADResult result;
+
         public string tag;
+    }
+
+    public enum ADResult
+    {
+        Load_Success,
+        Load_Failure,
+
+        Show_Start,
+        Show_Click,
+        Show_Failed,
+        Show_Skipped,
+        Show_Finished
     }
 
     public struct OnLoginInfo
@@ -1003,7 +1333,9 @@ namespace FrameWork.SDKManager
         public string headPortrait;
         public string password;
         public LoginPlatform loginPlatform;
+
         public LoginErrorEnum error;
+        public string sdkError;
     }
 
     public struct OnOtherInfo
@@ -1026,6 +1358,7 @@ namespace FrameWork.SDKManager
         /// 没有安装相应的app
         /// </summary>
         NoInstallApp,
+        SDKError // SDK 传入的错误
     }
 
     public struct PayInfo
@@ -1033,13 +1366,15 @@ namespace FrameWork.SDKManager
         public string userID;
         public string goodsID;
         public string goodsName;
+        public string storeName;
+        public string prepay_id;
         public string tag;
         public GoodsType goodsType ;
         public string orderID ;
         public float price ;
         public string currency;   //货币类型
 
-        public PayInfo(string goodsID, string goodsName, string tag, GoodsType goodsType, string orderID, float price,string currency,string userID)
+        public PayInfo(string goodsID, string goodsName, string tag, GoodsType goodsType, string orderID, float price,string currency,string userID,string storeName)
         {
             this.userID = userID;
             this.goodsID = goodsID;
@@ -1049,6 +1384,8 @@ namespace FrameWork.SDKManager
             this.orderID = orderID;
             this.price = price;
             this.currency = currency;
+            this.storeName = storeName;
+            prepay_id = null;
         }
     }
 

@@ -1,0 +1,20 @@
+Key	HotupdatePath	Description
+type	String	String
+note	热跟新地址	描述
+default	null	null
+GameCenter	https://ellrland.oss-cn-qingdao.aliyuncs.com	苹果IOS客户端和PC编辑器默认热更新地址
+EllrLand_First	https://ellrland-first.oss-cn-qingdao.aliyuncs.com/TapTap	
+HaoYouKuaiBao	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/HaoYouKuaiBao	
+OPPO	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/OPPO	
+EllrLand_WLWQ	https://ellrland-first.oss-cn-qingdao.aliyuncs.com	
+UC	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/UC	
+TMGP	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/TMGP	
+HLX	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/HLX	
+XiaoMi	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/XiaoMi	
+Baidu	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/BaiDu	
+360	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/360	
+Meizu	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/Meizu	
+Duoku	https://ellrland-ty.oss-cn-qingdao.aliyuncs.com/Duoku	
+Google	https://hongkong-oss-sghd.oss-cn-hongkong.aliyuncs.com/ellrland/Google	
+HarmonyOS	https://hongkong-oss-sghd.oss-cn-hongkong.aliyuncs.com/ellrland/HarmonyOS	
+Steam	https://hongkong-oss-sghd.oss-cn-hongkong.aliyuncs.com/ellrland/Steam	Steam

@@ -35,12 +35,12 @@ public class Audio3DPlayer : AudioPlayerBase
         }
     }
 
-    public void PlayMusic(GameObject owner, string audioName, int channel = 0, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f, string flag = "")
+    public AudioAsset PlayMusic(GameObject owner, string audioName, int channel = 0, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f, string flag = "")
     {
         if (owner == null)
         {
             Debug.LogError("can not play 3d player, owner is null");
-            return;
+            return null;
         }
         AudioAsset au;
         Dictionary<int, AudioAsset> tempDic;
@@ -64,6 +64,7 @@ public class Audio3DPlayer : AudioPlayerBase
         }
 
         PlayMusicControl(au, audioName, isLoop, volumeScale, delay, fadeTime,flag);
+        return au;
     }
     public void PauseMusic(GameObject owner, int channel, bool isPause, float fadeTime = 0.5f)
     {

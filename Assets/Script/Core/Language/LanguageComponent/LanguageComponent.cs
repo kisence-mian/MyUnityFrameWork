@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+[RequireComponent(typeof(Text))]
 public class LanguageComponent : MonoBehaviour
 {
     public string languageKey = "";
@@ -39,10 +40,17 @@ public class LanguageComponent : MonoBehaviour
     {
         if (string.IsNullOrEmpty(languageKey))
             return;
-
-        string value = LanguageManager.GetContentByKey(languageKey).ToString();
-        value = value.Replace("\\n", "\n");
-        m_text.text = value;
+        try
+        {
+            string value = LanguageManager.GetContentByKey(languageKey).ToString();
+            value = value.Replace("\\n", "\n");
+            m_text.text = value;
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("设置语言出错！m_text：" + m_text +"\n"+e);
+        }
+     
     }
 
 }

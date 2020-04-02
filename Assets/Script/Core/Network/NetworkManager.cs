@@ -41,19 +41,29 @@ public class NetworkManager
     {
         Init(networkInterfaceName, "SocketService");
     }
-
     /// <summary>
     /// 网络初始化
     /// </summary>
     /// <typeparam name="TProtocol">协议处理类</typeparam>
     /// <typeparam name="TSocket">Socket类</typeparam>
     /// <param name="protocolType">通讯协议</param>
-    public static void Init<TProtocol, TSocket>(ProtocolType protocolType = ProtocolType.Tcp) where TProtocol : INetworkInterface, new() where TSocket : SocketBase, new()
+    public static void Init<TProtocol, TSocket>( ProtocolType protocolType = ProtocolType.Tcp) where TProtocol : INetworkInterface, new() where TSocket : SocketBase, new()
+    {
+
+        Init<TProtocol, TSocket>(null, protocolType);
+    }
+    /// <summary>
+    /// 网络初始化
+    /// </summary>
+    /// <typeparam name="TProtocol">协议处理类</typeparam>
+    /// <typeparam name="TSocket">Socket类</typeparam>
+    /// <param name="protocolType">通讯协议</param>
+    public static void Init<TProtocol, TSocket>(MsgCompressBase msgCompress, ProtocolType protocolType = ProtocolType.Tcp) where TProtocol : INetworkInterface, new() where TSocket : SocketBase, new()
     {
 
         s_network = new TProtocol();
         s_network.m_socketService = new TSocket();
-
+        s_network.msgCompress = msgCompress;
         Debug.Log("protocolType " + s_network.m_socketService.m_protocolType);
 
         s_network.m_socketService.m_protocolType = protocolType;

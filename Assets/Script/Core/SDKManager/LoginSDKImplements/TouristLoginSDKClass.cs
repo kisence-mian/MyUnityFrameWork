@@ -9,11 +9,21 @@ public class TouristLoginSDKClass : LoginInterface
     {
         return  LoginPlatform.Tourist;
     }
+
+    //List<RuntimePlatform> platforms = new List<RuntimePlatform>();
+
+    //public override List<RuntimePlatform> GetPlatform()
+    //{
+    //    return platforms;
+    //}
+
     public override void Init()
     {
+        //platforms.Add(RuntimePlatform.Android);
+        //platforms.Add(RuntimePlatform.IPhonePlayer);
+        //platforms.Add(RuntimePlatform.WindowsPlayer);
+
         base.Init();
-
-
     }
 
 

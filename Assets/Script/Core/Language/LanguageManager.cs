@@ -172,7 +172,11 @@ public class LanguageManager
             {
                 try
                 {
-                    s_languageDataDict.Add(fullFileName + "/" + item, data[item].GetString(c_valueKey));
+                    if(!s_languageDataDict.ContainsKey(fullFileName + "/" + item))
+                    {
+                        s_languageDataDict.Add(fullFileName + "/" + item, data[item].GetString(c_valueKey));
+                    }
+
                 }
                 catch (Exception e)
                 {
@@ -260,7 +264,6 @@ public class LanguageManager
         return GetContentByKey(fullkey,contentParams);
     }
     
-
     public static string GetLanguageDataName(SystemLanguage langeuageName, string fullkeyFileName)
     {
         string modelName = fullkeyFileName.Replace('/', '_');
@@ -277,6 +280,13 @@ public class LanguageManager
             ResourceManager.DestoryAssetsCounter(item.Key, item.Value);
         }
         loadTextFileTimesDic.Clear();
+    }
+
+    //当前语言是否是汉语
+    public static bool CurrentLanguageIsChinese()
+    {
+        bool isChinese = LanguageManager.CurrentLanguage == SystemLanguage.ChineseSimplified || LanguageManager.CurrentLanguage == SystemLanguage.ChineseTraditional || LanguageManager.CurrentLanguage == SystemLanguage.Chinese;
+        return isChinese;
     }
 }
 

@@ -10,6 +10,7 @@ public abstract class INetworkInterface
     public MessageCallBack m_messageCallBack;
     public SocketBase m_socketService;
 
+    public MsgCompressBase msgCompress;
     public virtual void Init()
     {
     }

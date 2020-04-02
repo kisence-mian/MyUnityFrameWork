@@ -112,4 +112,28 @@ public class ErrorCodeDefine
 	 * 该兑换码不是激活码功能
 	 */
     public const int RedeemCode_NotActivationCode = 30008;
+
+    //=================通用商店===============//
+    /***
+	 * 没有商店逻辑
+	 */
+    public const int GeneralGameShop_NoLogic = 30100;
+    /***
+	 * 达到购买数量上限
+	 */
+    public const int GeneralGameShop_NumberLimit = 30101;
+    /***
+	 * 当前时间段不能购买(不在能购买的时间段内)
+	 */
+    public const int GeneralGameShop_TimeRangeLimit = 30102;
+
+    /***
+	 * 货币数目不足不能购买
+	 */
+    public const int GeneralGameShop_CoinNotEnough = 30103;
+
+    /***
+	 * 商店购买出错
+	 */
+    public const int GeneralGameShop_Error = 30104;
 }

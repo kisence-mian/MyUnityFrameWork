@@ -14,6 +14,10 @@ public class UserLogin2Client :CodeMessageBase
     /// 标记是否是重连
     /// </summary>
     public bool reloginState = false;
+    /// <summary>
+    /// 服务器是否支持消息压缩
+    /// </summary>
+    public bool supportCompressMsg = false;
     public override void DispatchMessage()
     {
         GlobalEvent.DispatchTypeEvent(this);

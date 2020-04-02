@@ -97,7 +97,7 @@ public static class GamePrepareFlowController
    /// </summary>
    /// <param name="isTestMode"></param>
    /// <param name="testURL"></param>
-    public static void SetGamePrepareFlowTestMode(bool isTestMode,string testURL=null)
+    public static void SetServerTestMode(bool isTestMode,string testURL=null)
     {
         int intState = isTestMode ? 1 : 0;
         PlayerPrefs.SetInt(UseTestMode, intState);

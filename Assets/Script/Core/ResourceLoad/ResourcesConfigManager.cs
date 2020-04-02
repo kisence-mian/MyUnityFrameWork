@@ -207,9 +207,9 @@ public static class ResourcesConfigManager
                 sd.Add(c_MainKey, fileName.ToLower());
                 sd.Add(c_PathKey, relativePath.ToLower());
 
-                if(fileName.Contains(" "))
+                if(fileName.EndsWith(" "))
                 {
-                    Debug.LogError("文件名中有空格！ ->" + fileName + "<-");
+                    Debug.LogError("文件名尾部中有空格！ ->" + fileName + "<-");
                 }
                 else
                 {

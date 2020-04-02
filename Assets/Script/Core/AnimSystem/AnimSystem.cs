@@ -1036,12 +1036,15 @@ public class AnimSystem : MonoBehaviour
     /// <param name="isCallBack">是否触发回调</param>
     public static void StopAnim(AnimData animData, bool isCallBack = false)
     {
-        if (isCallBack)
+        if(GetInstance().animList.Contains(animData))
         {
-            animData.ExecuteCallBack();
-        }
+            if (isCallBack)
+            {
+                animData.ExecuteCallBack();
+            }
 
-        GetInstance().animList.Remove(animData);
+            GetInstance().animList.Remove(animData);
+        }
     }
 
     /// <summary>

@@ -11,6 +11,7 @@ public class UIBaseWrap
 		L.RegFunction("Init", Init);
 		L.RegFunction("Dispose", Dispose);
 		L.RegFunction("HaveObject", HaveObject);
+		L.RegFunction("GetHasGameObject", GetHasGameObject);
 		L.RegFunction("GetGameObject", GetGameObject);
 		L.RegFunction("GetRectTransform", GetRectTransform);
 		L.RegFunction("GetUIBase", GetUIBase);
@@ -38,6 +39,7 @@ public class UIBaseWrap
 		L.RegFunction("AddLongPressListener", AddLongPressListener);
 		L.RegFunction("AddBeginDragListener", AddBeginDragListener);
 		L.RegFunction("AddEndDragListener", AddEndDragListener);
+		L.RegFunction("AddOnDragListener", AddOnDragListener);
 		L.RegFunction("AddEventListener", AddEventListener);
 		L.RegFunction("GetClickRegisterInfo", GetClickRegisterInfo);
 		L.RegFunction("RemoveOnClickListener", RemoveOnClickListener);
@@ -82,6 +84,8 @@ public class UIBaseWrap
 		L.RegFunction("SetSelfGuideMode", SetSelfGuideMode);
 		L.RegFunction("CancelGuideModel", CancelGuideModel);
 		L.RegFunction("ClearGuideModel", ClearGuideModel);
+		L.RegFunction("AddAnimData", AddAnimData);
+		L.RegFunction("CleanAnim", CleanAnim);
 		L.RegFunction("ClearObject", ClearObject);
 		L.RegFunction("WorldPosToUIPos", WorldPosToUIPos);
 		L.RegFunction("UIPosToWorldPos", UIPosToWorldPos);
@@ -155,6 +159,24 @@ public class UIBaseWrap
 			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
 			string arg0 = ToLua.CheckString(L, 2);
 			bool o = obj.HaveObject(arg0);
+			LuaDLL.lua_pushboolean(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetHasGameObject(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			string arg0 = ToLua.CheckString(L, 2);
+			bool o = obj.GetHasGameObject(arg0);
 			LuaDLL.lua_pushboolean(L, o);
 			return 1;
 		}
@@ -707,6 +729,37 @@ public class UIBaseWrap
 
 			string arg2 = ToLua.CheckString(L, 4);
 			obj.AddEndDragListener(arg0, arg1, arg2);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int AddOnDragListener(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 4);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			string arg0 = ToLua.CheckString(L, 2);
+			InputEventHandle<InputUIOnDragEvent> arg1 = null;
+			LuaTypes funcType3 = LuaDLL.lua_type(L, 3);
+
+			if (funcType3 != LuaTypes.LUA_TFUNCTION)
+			{
+				 arg1 = (InputEventHandle<InputUIOnDragEvent>)ToLua.CheckObject(L, 3, typeof(InputEventHandle<InputUIOnDragEvent>));
+			}
+			else
+			{
+				LuaFunction func = ToLua.ToLuaFunction(L, 3);
+				arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUIOnDragEvent>), func) as InputEventHandle<InputUIOnDragEvent>;
+			}
+
+			string arg2 = ToLua.CheckString(L, 4);
+			obj.AddOnDragListener(arg0, arg1, arg2);
 			return 0;
 		}
 		catch(Exception e)
@@ -1683,6 +1736,39 @@ public class UIBaseWrap
 			ToLua.CheckArgsCount(L, 1);
 			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
 			obj.ClearGuideModel();
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int AddAnimData(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			AnimData arg0 = (AnimData)ToLua.CheckObject(L, 2, typeof(AnimData));
+			obj.AddAnimData(arg0);
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int CleanAnim(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 1);
+			UIBase obj = (UIBase)ToLua.CheckObject(L, 1, typeof(UIBase));
+			obj.CleanAnim();
 			return 0;
 		}
 		catch(Exception e)

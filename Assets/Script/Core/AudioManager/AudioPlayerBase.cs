@@ -317,7 +317,7 @@ public class AudioPlayerBase
         float oldVolume = data.tempVolume;
 
         float speed = data.au.GetMaxRealVolume() / data.fadeTime * 2f;
-        oldVolume = oldVolume + speed * Time.deltaTime;
+        oldVolume = oldVolume + speed * Time.unscaledDeltaTime;
         //Debug.Log("FadeIn:data.au.Volume " + data.au.Volume + "  dowm :" + oldVolume);
         data.au.Volume = oldVolume;
         data.tempVolume = oldVolume;
@@ -344,7 +344,7 @@ public class AudioPlayerBase
         float oldVolume = data.tempVolume;
 
         float speed = data.au.GetMaxRealVolume() / data.fadeTime;
-        oldVolume = oldVolume - speed * Time.deltaTime;
+        oldVolume = oldVolume - speed * Time.unscaledDeltaTime;
         //Debug.Log("FadeOut:data.au.Volume " + data.au.Volume+"  dowm :"+ oldVolume);
         //Debug.Log(" FadeOut fade State :" + data.fadeState);
         data.au.Volume = oldVolume;
@@ -377,7 +377,7 @@ public class AudioPlayerBase
         }
         else if (data.fadeState == VolumeFadeStateType.Delay)
         {
-            data.delayTime -= Time.deltaTime;
+            data.delayTime -= Time.unscaledDeltaTime;
             if (data.delayTime <= 0)
             {
                 data.fadeState = VolumeFadeStateType.FadeIn;

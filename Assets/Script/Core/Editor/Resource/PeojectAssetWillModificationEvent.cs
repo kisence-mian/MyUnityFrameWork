@@ -104,7 +104,6 @@ public class PeojectAssetWillModificationEvent : UnityEditor.AssetModificationPr
         }
 
         OnMoveAssetP = new object[] { result, oldPath, newPath };
-
         return result;
     }
     public static CallBackR<AssetDeleteResult, string, RemoveAssetOptions> OnWillDeleteAssetCallBack;

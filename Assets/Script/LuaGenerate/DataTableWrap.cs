@@ -14,6 +14,7 @@ public class DataTableWrap
 		L.RegFunction("Serialize", Serialize);
 		L.RegFunction("ConvertStringArray", ConvertStringArray);
 		L.RegFunction("GetFieldType", GetFieldType);
+		L.RegFunction("GetArraySplitFormat", GetArraySplitFormat);
 		L.RegFunction("SetFieldType", SetFieldType);
 		L.RegFunction("SetAssetTypes", SetAssetTypes);
 		L.RegFunction("GetLineFromKey", GetLineFromKey);
@@ -31,6 +32,7 @@ public class DataTableWrap
 		L.RegVar("m_defaultValue", get_m_defaultValue, set_m_defaultValue);
 		L.RegVar("m_noteValue", get_m_noteValue, set_m_noteValue);
 		L.RegVar("m_tableTypes", get_m_tableTypes, set_m_tableTypes);
+		L.RegVar("m_ArraySplitFormat", get_m_ArraySplitFormat, set_m_ArraySplitFormat);
 		L.RegVar("m_tableEnumTypes", get_m_tableEnumTypes, set_m_tableEnumTypes);
 		L.RegVar("TableKeys", get_TableKeys, set_TableKeys);
 		L.RegVar("TableIDs", get_TableIDs, set_TableIDs);
@@ -173,6 +175,24 @@ public class DataTableWrap
 			DataTable obj = (DataTable)ToLua.CheckObject(L, 1, typeof(DataTable));
 			string arg0 = ToLua.CheckString(L, 2);
 			FieldType o = obj.GetFieldType(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetArraySplitFormat(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			DataTable obj = (DataTable)ToLua.CheckObject(L, 1, typeof(DataTable));
+			string arg0 = ToLua.CheckString(L, 2);
+			char[] o = obj.GetArraySplitFormat(arg0);
 			ToLua.Push(L, o);
 			return 1;
 		}
@@ -455,6 +475,25 @@ public class DataTableWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int get_m_ArraySplitFormat(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			DataTable obj = (DataTable)o;
+			System.Collections.Generic.Dictionary<string,char[]> ret = obj.m_ArraySplitFormat;
+			ToLua.PushObject(L, ret);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_ArraySplitFormat on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
 	static int get_m_tableEnumTypes(IntPtr L)
 	{
 		object o = null;
@@ -603,6 +642,25 @@ public class DataTableWrap
 		catch(Exception e)
 		{
 			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_tableTypes on a nil value" : e.Message);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_m_ArraySplitFormat(IntPtr L)
+	{
+		object o = null;
+
+		try
+		{
+			o = ToLua.ToObject(L, 1);
+			DataTable obj = (DataTable)o;
+			System.Collections.Generic.Dictionary<string,char[]> arg0 = (System.Collections.Generic.Dictionary<string,char[]>)ToLua.CheckObject(L, 2, typeof(System.Collections.Generic.Dictionary<string,char[]>));
+			obj.m_ArraySplitFormat = arg0;
+			return 0;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e, o == null ? "attempt to index m_ArraySplitFormat on a nil value" : e.Message);
 		}
 	}
 

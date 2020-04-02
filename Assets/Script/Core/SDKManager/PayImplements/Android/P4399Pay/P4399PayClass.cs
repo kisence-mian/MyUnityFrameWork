@@ -44,8 +44,7 @@ public class P4399PayClass : PayInterface
 
     public override void Init()
     {
-        if ((StoreName)Enum.Parse(typeof(StoreName), SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"))
-            == StoreName.m4399)
+        if (SDKManager.IncludeThePayPlatform(StoreName.m4399))
         {
             Debug.Log("=========4399 PayClass Init===========");
             StorePayController.OnPayCallBack += OnPayResultCallBack;
@@ -58,11 +57,11 @@ public class P4399PayClass : PayInterface
         StartLongTimeNoResponse();
 
         Debug.Log("DefaultIAPImplement.Pay :" + l_payInfo.goodsID);
-        SDKManagerNew.Pay(StoreName.m4399.ToString(), l_payInfo);
+        SDKManagerNew.Pay( l_payInfo);
     }
 
     //正常订单回调
-    private void OnPayResultCallBack(int t, string t1)
+    private void OnPayResultCallBack(PayResult result)
     {
         payResponse = true;
     }

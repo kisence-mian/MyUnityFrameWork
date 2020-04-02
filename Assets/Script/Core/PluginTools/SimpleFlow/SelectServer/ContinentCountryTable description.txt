@@ -1,0 +1,14 @@
+亚洲:Asia 
+欧洲：Europe 
+非洲：Africa 
+南美洲/拉丁美洲：South America/Latin America 
+北美洲：North America 
+大洋洲：Oceania 
+南极洲：Antarctica 
+
+缩写：[AF]非洲, [EU]欧洲, [AS]亚洲, [OA]大洋洲, [NA]北美洲, [SA]南美洲, [AN]南极洲
+
+大西洋: Atlantic Ocean 
+太平洋：Pacific Ocean 
+印度洋：Indian Ocean 
+北冰洋：Arctic Ocean

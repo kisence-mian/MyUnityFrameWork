@@ -9,7 +9,7 @@ using System.Text;
 public enum StoreName
 {
     None=0,
-    GooglePlay = 1,
+    GooglePay = 1,
     AmazonAppStore = 2,
     CloudMoolah = 3,
     SamsungApps = 4,
@@ -37,4 +37,7 @@ public enum StoreName
     Huluxia = 26,// 葫芦侠
     YSDK = 27,   //应用宝
     HuaWei3 = 28,//华为3.0
+    Payssion = 29,//港澳台支付
+    HuaWei4 = 30,//华为4.0
+    OKJOY = 31,
 }

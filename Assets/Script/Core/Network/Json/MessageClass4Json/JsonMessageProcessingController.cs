@@ -26,7 +26,7 @@ public class JsonMessageProcessingController
             return;
         }
 
-        if (Log.isOpenLog)
+        if (Debug.unityLogger.logEnabled)
             Debug.Log("MessageReceiveCallBack;" + JsonUtils.ToJson(inputEvent));
 
         Type type = Type.GetType(inputEvent.m_MessgaeType);

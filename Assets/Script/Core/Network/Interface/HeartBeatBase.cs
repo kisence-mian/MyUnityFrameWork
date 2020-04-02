@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-public abstract class HeartBeatBase
+public  class HeartBeatBase
 {
     public const string c_HeartBeatMT = "HB";
     /// <summary>

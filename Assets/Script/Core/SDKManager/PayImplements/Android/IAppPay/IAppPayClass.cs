@@ -23,8 +23,7 @@ public class IAppPayClass : PayInterface
     }
     public override void Init()
     {
-        if ((StoreName)Enum.Parse(typeof(StoreName), SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"))
-            == StoreName.IAppPay)
+        if (SDKManager.IncludeThePayPlatform(StoreName.IAppPay))
         {
 
             m_SDKName = StoreName.IAppPay.ToString();
@@ -53,18 +52,17 @@ public class IAppPayClass : PayInterface
         Debug.LogWarning("OnPrePay=========：" + e.prepay_id + "=prepay_id==");
         //DateTime dt1970 = new DateTime(1970, 1, 1, 0, 0, 0, 0);
 
-        string nonceStr = "";
-        string timeStamp = "";
-
-        string sign = "";
-
         OnPayInfo onPayInfo = new OnPayInfo();
         onPayInfo.isSuccess = true;
         onPayInfo.goodsId = e.goodsID;
         onPayInfo.storeName = StoreName.IAppPay;
         onPayInfo.receipt = e.mch_orderID;
         PayReSend.Instance.AddPrePayID(onPayInfo);
-        IndentListener(e.goodsID,e.mch_orderID, e.prepay_id, nonceStr, timeStamp, sign);
+        //IndentListener(e.goodsID,e.mch_orderID, e.prepay_id, nonceStr, timeStamp, sign);
+        PayInfo payInfo = new PayInfo(e.goodsID, GetGoodsInfo(e.goodsID).localizedTitle, "", FrameWork.SDKManager.GoodsType.NORMAL, mch_orderID, 0, GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID(), StoreName.IAppPay.ToString());
+        payInfo.prepay_id = e.prepay_id;
+
+        SDKManagerNew.Pay(payInfo);
     }
 
     /// <summary>
@@ -84,18 +82,18 @@ public class IAppPayClass : PayInterface
     }
 
 
-    /// <summary>
-    /// 消息1 的监听， 获得订单信息，然后调支付sdk
-    /// </summary>
-    private void IndentListener(string goodID, string mch_orderID,string prepay_id, string nonceStr ,string timeStamp , string sign)
-    {
-        this.mch_orderID = mch_orderID;
+    ///// <summary>
+    ///// 消息1 的监听， 获得订单信息，然后调支付sdk
+    ///// </summary>
+    //private void IndentListener(string goodID, string mch_orderID,string prepay_id, string nonceStr ,string timeStamp , string sign)
+    //{
+    //    this.mch_orderID = mch_orderID;
 
-        string tag = mch_orderID;
-        PayInfo payInfo = new PayInfo(goodID, GetGoodsInfo(goodID).localizedTitle, tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, 0, GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID());
+    //    string tag = mch_orderID;
+    //    PayInfo payInfo = new PayInfo(goodID, GetGoodsInfo(goodID).localizedTitle, tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, 0, GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID());
 
-        SDKManagerNew.Pay(StoreName.IAppPay.ToString(), payInfo);
-    }
+    //    SDKManagerNew.Pay(StoreName.IAppPay.ToString(), payInfo);
+    //}
 
     /// <summary>
     /// 从sdk返回支付结果
@@ -131,7 +129,7 @@ public class IAppPayClass : PayInterface
         PayCallBack(payInfo);
     }
 
-    public override void ConfirmPay(string goodsID, string mch_orderID)
+    public override void ConfirmPay(string goodsID, string mch_orderID,string StoreName)
     {
         PayReSend.Instance.ClearPrePayID(mch_orderID);
     }

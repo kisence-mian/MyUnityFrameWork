@@ -62,6 +62,8 @@ public static class ResourceManager
         UseCache = useCache;
         ResourceManager.loadType = loadType;
         ReleaseAll();
+        GameInfoCollecter.AddAppInfoValue("AssetsLoadType", loadType);
+
         loadAssetsController = new AssetsLoadController(loadType,useCache);
         Debug.Log("ResourceManager初始化 AssetsLoadType:" + loadType + " useCache:" + useCache);
     }
@@ -96,6 +98,14 @@ public static class ResourceManager
         string path = ResourcesConfigManager.GetLoadPath(loadType, name);
         loadAssetsController.LoadAsync(path, resType, callBack);
     }
+
+    /// <summary>
+    /// 加载资源
+    /// 注意释放资源，方法： DestoryAssetsCounter
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static T Load<T>(string name) where T : Object
     {
         T res =null;
@@ -128,6 +138,11 @@ public static class ResourceManager
         return tex.text;
     }
 
+    /// <summary>
+    /// 释放资源 （通过 ResourceManager.Load<>() 加载出来的）
+    /// </summary>
+    /// <param name="unityObject"></param>
+    /// <param name="times"></param>
     public static void DestoryAssetsCounter(Object unityObject, int times = 1)
     {
         DestoryAssetsCounter(unityObject.name, times);

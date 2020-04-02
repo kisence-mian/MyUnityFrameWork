@@ -32,6 +32,7 @@ public class SelectSeverController  {
         {
             if (www == null || www.isDone)
             {
+                Debug.Log("下载选服配置地址：" + downLoadFilePath);
                 www = new WWW(downLoadFilePath);
                 yield return www;
                 if (!string.IsNullOrEmpty(www.error))
@@ -70,6 +71,14 @@ public class SelectSeverController  {
                    else if (platform == (RuntimePlatform.IPhonePlayer))
                     {
                         if ( StringArrayHaveItem(cc.m_iosVersion, version))
+                        {
+                            selectConfig.Add(cc);
+                        }
+                    }else if(platform == RuntimePlatform.WindowsEditor|| platform== RuntimePlatform.WindowsPlayer
+                        || platform== RuntimePlatform.OSXEditor||platform== RuntimePlatform.OSXPlayer
+                        ||platform== RuntimePlatform.LinuxEditor || platform == RuntimePlatform.LinuxPlayer)
+                    {
+                        if (StringArrayHaveItem(cc.m_standaloneVersion, version))
                         {
                             selectConfig.Add(cc);
                         }

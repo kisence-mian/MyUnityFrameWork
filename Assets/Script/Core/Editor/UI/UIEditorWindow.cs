@@ -6,6 +6,8 @@ using System;
 using System.Reflection;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
+
 public class UIEditorWindow : EditorWindow
 {
     UIManager m_UIManager;
@@ -43,13 +45,13 @@ public class UIEditorWindow : EditorWindow
 
         UIManagerGUI();
 
-
-
         CreateUIGUI();
 
         UITemplate();
 
         UIStyleGUI();
+
+        UIToolGUI();
 
         EditorGUILayout.EndVertical();
     }
@@ -265,20 +267,22 @@ public class UIEditorWindow : EditorWindow
     void UIToolGUI()
     {
         EditorGUI.indentLevel = 0;
-        isFoldUITool = EditorGUILayout.Foldout(isFoldUImanager, "UITool:");
+        isFoldUITool = EditorGUILayout.Foldout(isFoldUITool, "UITool:");
         if (isFoldUITool)
         {
             EditorGUI.indentLevel = 1;
 
-            if (GUILayout.Button("重设UI sortLayer"))
-            {
-                ResetUISortLayer();
-            }
+            AutoAddLanguageFontComponemt();
 
-            if (GUILayout.Button("清除UI sortLayer"))
-            {
-                CleanUISortLayer();
-            }
+            //if (GUILayout.Button("重设UI sortLayer"))
+            //{
+            //    ResetUISortLayer();
+            //}
+
+            //if (GUILayout.Button("清除UI sortLayer"))
+            //{
+            //    CleanUISortLayer();
+            //}
         }
     }
 
@@ -290,6 +294,53 @@ public class UIEditorWindow : EditorWindow
     void ResetUISortLayer()
     {
 
+    }
+
+    bool isFoldAutoAddLanguageFont = false;
+    Font selectFont = null;
+    void AutoAddLanguageFontComponemt()
+    {
+        isFoldAutoAddLanguageFont = EditorGUILayout.Foldout(isFoldAutoAddLanguageFont, "自动添加字体组件:");
+        if (isFoldAutoAddLanguageFont)
+        {
+            EditorGUI.indentLevel = 2;
+            selectFont = (Font)EditorGUILayout.ObjectField(selectFont, typeof(Font),false);
+
+            if(GUILayout.Button("添加"))
+            {
+                foreach (var item in allUIPrefab.Values)
+                {
+                    if(item == null)
+                    {
+                        continue;
+                    }
+
+                    //Debug.Log("开始添加 " + item,item);
+
+                    Text[] comps = item.GetComponentsInChildren<Text>(true);
+
+                    for (int i = 0; i < comps.Length; i++)
+                    {
+                        if (comps[i].gameObject.GetComponent<LanguageFontComponent>() == null)
+                        {
+                            if (selectFont == null)
+                            {
+                                comps[i].gameObject.AddComponent<LanguageFontComponent>();
+                                Debug.Log("添加语言字体组件" + comps[i].gameObject, comps[i].gameObject);
+                            }
+                            else
+                            {
+                                if (comps[i].font == selectFont)
+                                {
+                                    comps[i].gameObject.AddComponent<LanguageFontComponent>();
+                                    Debug.Log("添加语言字体组件" + comps[i].gameObject, comps[i].gameObject);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     #endregion
@@ -318,8 +369,12 @@ public class UIEditorWindow : EditorWindow
             string oneUIPrefabName = FileTool.GetFileNameByPath(item);
             if (item.EndsWith(".prefab"))
             {
-                string oneUIPrefabPsth = path + "/" + oneUIPrefabName;
-                allUIPrefab.Add(oneUIPrefabName, AssetDatabase.LoadAssetAtPath("Assets/" + oneUIPrefabPsth, typeof(GameObject)) as GameObject);
+                string assetsPath = Regex.Split(path, "Assets/", RegexOptions.IgnoreCase)[1];
+
+                string UIPrefabPath = assetsPath + "/" + oneUIPrefabName;
+                allUIPrefab.Add(oneUIPrefabName, AssetDatabase.LoadAssetAtPath("Assets/" + UIPrefabPath, typeof(GameObject)) as GameObject);
+
+                //Debug.Log("添加UI ->" + oneUIPrefabName + "<->" + UIPrefabPath, allUIPrefab[oneUIPrefabName]);
             }
         }
 

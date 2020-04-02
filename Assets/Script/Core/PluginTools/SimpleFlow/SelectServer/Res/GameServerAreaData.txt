@@ -1,6 +1,7 @@
-﻿Key	Description	ClientHotUpdateURL	SelectServerURL	CountryCode	SpecialServerHost
-type	String	String	String	StringArray	String
-note	大区的描述	客户端热更新地址	该大区的选服列表	连接该大区的国家code（ ISO 3166-1 alpha-2 ）	选取大区中的一个服务器，用于不能获取IP归属地时使用Ping选大区
-default	null	null	null	null	null
-China_00	中国大区0	https://xxx	https://xxxx/SelectNetworkData.txt	CN	xxxx
-USA_00	美服大区0	https://xxxx	https://xxxx/SelectNetworkData.txt	AD|AE|AF|AG|AI|AL|AM|AO|AQ|AR|AS|AT|AU|AW|AX|AZ|BA|BB|BD|BE|BF|BG|BH|BI|BJ|BL|BM|BN|BO|BQ|BR|BS|BT|BV|BW|BY|BZ|CA|CC|CF|CH|CL|CM|CO|CR|CU|CV|CX|CY|CZ|DE|DJ|DK|DM|DO|DZ|EC|EE|EG|EH|ER|ES|FI|FJ|FK|FM|FO|FR|GA|GD|GE|GF|GH|GI|GL|GN|GP|GQ|GR|GS|GT|GU|GW|GY|HK|HM|HN|HR|HT|HU|ID|IE|IL|IM|IN|IO|IQ|IR|IS|IT|JE|JM|JO|JP|KH|KI|KM|KW|KY|LB|LI|LK|LR|LS|LT|LU|LV|LY|MA|MC|MD|ME|MF|MG|MH|MK|ML|MM|MO|MQ|MR|MS|MT|MV|MW|MX|MY|NA|NE|NF|NG|NI|NL|NO|NP|NR|OM|PA|PE|PF|PG|PH|PK|PL|PN|PR|PS|PW|PY|QA|RE|RO|RS|RU|RW|SB|SC|SD|SE|SG|SI|SJ|SK|SL|SM|SN|SO|SR|SS|ST|SV|SY|SZ|TC|TD|TG|TH|TK|TL|TN|TO|TR|TV|TZ|UA|UG|US|UY|VA|VE|VG|VI|VN|WF|WS|YE|YT|ZA|ZM|ZW|CG|CD|MZ|GG|GM|MP|ET|NC|VU|TF|NU|UM|CK|GB|TT|VC|TW|NZ|SA|LA|KP|KR|PT|KG|KZ|TJ|TM|UZ|KN|PM|SH|LC|MU|CI|KE|MN	xxxx
+Key	Description	ClientHotUpdateURL	SelectServerURL	CountryCode	SpecialServerHost	ContinentName
+type	String	String	String	StringArray	String	StringArray[]
+note	大区的描述	客户端热更新地址	该大区的选服列表	连接该大区的国家code（ ISO 3166-1 alpha-2 ）	选取大区中的一个服务器，用于不能获取IP归属地时使用Ping选大区	大洲英文缩写，用于直接使用大洲来划分大区，当此选项为空，则使用Countrycode来选择大区([AF]非洲, [EU]欧洲, [AS]亚洲, [OA]大洋洲, [NA]北美洲, [SA]南美洲, [AN]南极洲)
+default	null	null	null	null	null	null
+China_00	中国大区0		https://sghd-oss-api-test.oss-cn-qingdao.aliyuncs.com/Ellrland/Config_Steam/SelectNetworkDataList/China_00/SelectNetworkData.txt	CN	ellrland_steam.sghdservice.com	
+USA_00	美服大区0		https://sghd-oss-api-test.oss-cn-qingdao.aliyuncs.com/Ellrland/Config_Steam/SelectNetworkDataList/USA_00/SelectNetworkData.txt		service-us-01.sghdservice.com	NA|AF|EU|SA|AN
+Asion_00	亚洲大区		https://sghd-oss-api-test.oss-cn-qingdao.aliyuncs.com/Ellrland/Config_Steam/SelectNetworkDataList/Asia_00/SelectNetworkData.txt		ellrland_steam_hk.sghdservice.com	AS|OA

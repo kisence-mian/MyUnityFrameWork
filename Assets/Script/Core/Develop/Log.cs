@@ -10,15 +10,27 @@ public class Log
 {
     //日志输出线程
     static LogOutPutThread s_LogOutPutThread = new LogOutPutThread();
-    public static bool isOpenLog= false;
+    //public static bool isOpenLog= false;
     public static void Init(bool isOpenLog = true)
     {
-        Log.isOpenLog = isOpenLog;
-#if UNITY_2017_1_OR_NEWER
-        Debug.unityLogger.logEnabled = isOpenLog;
-#else
-        Debug.logger.logEnabled = isOpenLog;
-#endif
+        //        Log.isOpenLog = isOpenLog;
+        //#if UNITY_2017_1_OR_NEWER
+        //        Debug.unityLogger.logEnabled = isOpenLog;
+        //#else
+        //        Debug.logger.logEnabled = isOpenLog;
+        //#endif
+
+
+        if (Application.platform != RuntimePlatform.WindowsEditor &&
+            Application.platform != RuntimePlatform.LinuxEditor)
+        {
+            int status = PlayerPrefs.GetInt("Log", -1);
+            if (status != -1)
+            {
+                isOpenLog = status == 1 ? true : false;
+            }
+        }
+        PlayerPrefs.SetInt("Log", (isOpenLog ? 1 : 0));
 
         if (isOpenLog)
         {

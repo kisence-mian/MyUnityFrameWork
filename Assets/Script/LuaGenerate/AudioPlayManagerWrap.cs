@@ -83,8 +83,9 @@ public class AudioPlayManagerWrap
 			float arg4 = (float)LuaDLL.luaL_checknumber(L, 5);
 			float arg5 = (float)LuaDLL.luaL_checknumber(L, 6);
 			string arg6 = ToLua.CheckString(L, 7);
-			AudioPlayManager.PlayMusic2D(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
-			return 0;
+			AudioAsset o = AudioPlayManager.PlayMusic2D(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+			ToLua.PushObject(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{
@@ -209,8 +210,9 @@ public class AudioPlayManagerWrap
 			float arg5 = (float)LuaDLL.luaL_checknumber(L, 6);
 			float arg6 = (float)LuaDLL.luaL_checknumber(L, 7);
 			string arg7 = ToLua.CheckString(L, 8);
-			AudioPlayManager.PlayMusic3D(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-			return 0;
+			AudioAsset o = AudioPlayManager.PlayMusic3D(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+			ToLua.PushObject(L, o);
+			return 1;
 		}
 		catch(Exception e)
 		{

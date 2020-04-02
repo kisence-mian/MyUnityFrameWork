@@ -23,8 +23,7 @@ public class UCPayClass : PayInterface
 
     public override void Init()
     {
-        if ((StoreName)Enum.Parse(typeof(StoreName), SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"))
-            == StoreName.UC)
+        if (SDKManager.IncludeThePayPlatform(StoreName.UC))
         {
 
             Debug.Log("=========UC PayClass Init===========");
@@ -34,7 +33,7 @@ public class UCPayClass : PayInterface
     }
 
     //正常订单回调
-    private void OnPayResultCallBack(int t, string t1)
+    private void OnPayResultCallBack(PayResult result)
     {
         payResponse = true;
     }
@@ -82,8 +81,20 @@ public class UCPayClass : PayInterface
 
         StartLongTimeNoResponse();
 
-        IndentListener(e.goodsID, e.mch_orderID, e.prepay_id, price);
+        //IndentListener(e.goodsID, e.mch_orderID, e.prepay_id, price);
 
+        PayInfo payInfo = new PayInfo(
+            e.goodsID,
+            GetGoodsInfo(goodsID).localizedTitle,
+            "",
+            FrameWork.SDKManager.GoodsType.NORMAL,
+            mch_orderID,
+            price,
+            GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID(), e.storeName.ToString());
+        payInfo.prepay_id = e.prepay_id;
+
+
+        SDKManagerNew.Pay(payInfo);
     }
 
     /// <summary>  
@@ -111,22 +122,22 @@ public class UCPayClass : PayInterface
          });
     }
 
-    /// <summary>
-    /// 消息1 的监听， 获得订单信息，然后调支付sdk
-    /// </summary>
-    private void IndentListener(string goodID, string mch_orderID, string prepay_id, float price)
-    {
-        PayInfo payInfo = new PayInfo(
-            goodID,
-            GetGoodsInfo(goodsID).localizedTitle,
-            prepay_id,
-            FrameWork.SDKManager.GoodsType.NORMAL,
-            mch_orderID,
-            price,
-            GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID());
+    ///// <summary>
+    ///// 消息1 的监听， 获得订单信息，然后调支付sdk
+    ///// </summary>
+    //private void IndentListener(string goodID, string mch_orderID, string prepay_id, float price)
+    //{
+    //    PayInfo payInfo = new PayInfo(
+    //        goodID,
+    //        GetGoodsInfo(goodsID).localizedTitle,
+    //        prepay_id,
+    //        FrameWork.SDKManager.GoodsType.NORMAL,
+    //        mch_orderID,
+    //        price,
+    //        GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID());
 
-        SDKManagerNew.Pay(StoreName.UC.ToString(), payInfo);
-    }
+    //    SDKManagerNew.Pay(StoreName.UC.ToString(), payInfo);
+    //}
 
     public override string GetUserID()
     {

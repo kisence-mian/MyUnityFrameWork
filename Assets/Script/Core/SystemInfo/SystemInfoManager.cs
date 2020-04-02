@@ -81,24 +81,25 @@ public static class SystemInfoManager
         //infos = new List<SystemInfoData>();
         //systemInfos.Add(Network, infos);
 
-        try
-        {
-            infos = new List<SystemInfoData>();
-            systemInfos.Add(Storage, infos);
+        //暂时注释：在Unity2017.3.35f1上.net 4.6环境会引起停止运行时Unity崩溃，原因暂时不明
+        //try
+        //{
+        //    infos = new List<SystemInfoData>();
+        //    systemInfos.Add(Storage, infos);
 
-            System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
+        //    System.IO.DriveInfo[] drives = System.IO.DriveInfo.GetDrives();
 
-            foreach (System.IO.DriveInfo drive in drives)
-            {
-                float totalSize = drive.TotalSize / (1024 * 1024 * 1024f);
-                float totalFreeSpace = drive.TotalFreeSpace / (1024 * 1024 * 1024f);
-                infos.Add(new SystemInfoData(Storage, drive.Name, totalFreeSpace.ToString("f1") + "/" + totalSize.ToString("f1") + "GB"));
-            }
-        }
-        catch (Exception)
-        {
+        //    foreach (System.IO.DriveInfo drive in drives)
+        //    {
+        //        float totalSize = drive.TotalSize / (1024 * 1024 * 1024f);
+        //        float totalFreeSpace = drive.TotalFreeSpace / (1024 * 1024 * 1024f);
+        //        infos.Add(new SystemInfoData(Storage, drive.Name, totalFreeSpace.ToString("f1") + "/" + totalSize.ToString("f1") + "GB"));
+        //    }
+        //}
+        //catch (Exception)
+        //{
 
-        }
+        //}
 
     }
 

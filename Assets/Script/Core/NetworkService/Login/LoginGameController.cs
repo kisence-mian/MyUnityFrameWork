@@ -26,11 +26,19 @@ public static class LoginGameController
     /// <summary>
     /// 是否已登录
     /// </summary>
-    public static bool isLogin = false;
+    private static bool isLogin = false;
     /// <summary>
     /// 是否已点击登录按钮
     /// </summary>
     public static bool isClickLogin = false;
+    /// <summary>
+    /// 玩家登陆的SDk平台
+    /// </summary>
+    public static LoginPlatform PlayerLoginPlatform
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// 激活码
@@ -49,6 +57,14 @@ public static class LoginGameController
         }
     }
 
+    public static bool IsLogin
+    {
+        get
+        {
+            return isLogin;
+        }
+    }
+
     [RuntimeInitializeOnLoadMethod]
     private static void Init()
     {
@@ -61,6 +77,63 @@ public static class LoginGameController
         ApplicationManager.s_OnApplicationUpdate += LogonUpdate;
     }
 
+    /// <summary>
+    /// 检查是否要直接登录，如果是那就直接登录（默认选择筛选后的第0个登录）
+    /// </summary>
+    /// <param name="datas">返回可登录选项</param>
+    /// <returns></returns>
+    public static bool CheckAutoLoginOrGetLoginPlatforms(out List<LoginConfigData> datas)
+    {
+        datas = new List<LoginConfigData>();
+        List<LoginConfigData> allConfigs = DataGenerateManager<LoginConfigData>.GetAllDataList();
+
+        string sdkStr = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, "");
+        if (!string.IsNullOrEmpty(sdkStr))
+        {
+            string[] arrStr = sdkStr.Split('|');
+            foreach (var item in arrStr)
+            {
+                LoginConfigData con = DataGenerateManager<LoginConfigData>.GetData(item);
+                if (con != null)
+                {
+                    datas.Add(con);
+                }
+                else
+                {
+                    Debug.LogError("获取登录配置失败：" + item);
+                }
+
+            }
+        }
+        else
+        {
+            //Debug.LogError("获取登录配置失败：" + item);
+
+            foreach (var d in allConfigs)
+            {
+                List<string> platforms = null;
+                if (d.m_SupportPlatform == null)
+                    platforms = new List<string>();
+                else
+                    platforms = new List<string>(d.m_SupportPlatform);
+
+                if (d.m_UseItem || platforms.Contains(Application.platform.ToString()))
+                {
+                    datas.Add(d);
+                }
+            }
+        }
+
+        string directlyLoginStr = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_DirectlyLogin, "false");
+        bool directlyLogin = bool.Parse(directlyLoginStr);
+        if (directlyLogin)
+        {
+            LoginConfigData d = datas[0];
+            Login(d.m_loginName, "", "", d.m_CustomInfo);
+            return true;
+        }
+        return false;
+    }
 
 
     /// <summary>
@@ -109,7 +182,7 @@ public static class LoginGameController
     /// </summary>
     private static void LogonUpdate()
     {
-        if (isLogin)
+        if (IsLogin)
         {
             return;
         }
@@ -151,8 +224,8 @@ public static class LoginGameController
         ResendMessageManager.startResend = false;
         loginMsg = null;
 
-        SDKManager.LoginOut();
-
+        SDKManager.LoginOut(PlayerLoginPlatform.ToString());
+        GameInfoCollecter.AddPlayerInfoValue("IsLogin", IsLogin);
 
         if (OnUserLogout!=null)
         {
@@ -167,6 +240,14 @@ public static class LoginGameController
         {
             isLogin = true;
             GameDataMonitor.PushData("User", e.user, "玩家数据");
+            GameInfoCollecter.AddPlayerInfoValue("IsLogin", IsLogin);
+            GameInfoCollecter.AddPlayerInfoValue("UserID", e.user.userID);
+            GameInfoCollecter.AddPlayerInfoValue("LoginType", e.user.loginType);
+            GameInfoCollecter.AddPlayerInfoValue("NickName", e.user.nickName);
+            GameInfoCollecter.AddPlayerInfoValue("TypeKey", e.user.typeKey);
+            GameInfoCollecter.AddPlayerInfoValue("PlayTime", e.user.playTime);
+            GameInfoCollecter.AddPlayerInfoValue("TotalLoginDays", e.user.totalLoginDays);
+
             SDKManager.UserID = e.user.userID;
         }
 
@@ -200,6 +281,7 @@ public static class LoginGameController
         if (info.isSuccess)
         {
             isClickLogin = true;
+            PlayerLoginPlatform = info.loginPlatform;
             UserLogin2Server msg = UserLogin2Server.GetLoginMessage(info.loginPlatform, info.accountId, info.password,activationCode);
             SendLoginMsg(msg);
         }
@@ -223,7 +305,7 @@ public static class LoginGameController
                 return;
             else
             {
-                if (isLogin)
+                if (IsLogin)
                     reLoginState = true;
             }
         }

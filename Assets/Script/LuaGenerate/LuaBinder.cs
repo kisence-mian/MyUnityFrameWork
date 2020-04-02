@@ -52,6 +52,7 @@ public static class LuaBinder
 		L.RegFunction("InputEventHandle_InputUILongPressEvent", InputEventHandle_InputUILongPressEvent);
 		L.RegFunction("InputEventHandle_InputUIOnBeginDragEvent", InputEventHandle_InputUIOnBeginDragEvent);
 		L.RegFunction("InputEventHandle_InputUIOnEndDragEvent", InputEventHandle_InputUIOnEndDragEvent);
+		L.RegFunction("InputEventHandle_InputUIOnDragEvent", InputEventHandle_InputUIOnDragEvent);
 		L.RegFunction("EventHandle", EventHandle);
 		L.RegFunction("UIAnimCallBack", UIAnimCallBack);
 		L.RegFunction("UICallBack", UICallBack);
@@ -343,6 +344,33 @@ public static class LuaBinder
 			{
 				LuaTable self = ToLua.CheckLuaTable(L, 2);
 				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUIOnEndDragEvent>), func, self);
+				ToLua.Push(L, arg1);
+			}
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int InputEventHandle_InputUIOnDragEvent(IntPtr L)
+	{
+		try
+		{
+			int count = LuaDLL.lua_gettop(L);
+			LuaFunction func = ToLua.CheckLuaFunction(L, 1);
+
+			if (count == 1)
+			{
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUIOnDragEvent>), func);
+				ToLua.Push(L, arg1);
+			}
+			else
+			{
+				LuaTable self = ToLua.CheckLuaTable(L, 2);
+				Delegate arg1 = DelegateFactory.CreateDelegate(typeof(InputEventHandle<InputUIOnDragEvent>), func, self);
 				ToLua.Push(L, arg1);
 			}
 			return 1;

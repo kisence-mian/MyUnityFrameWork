@@ -138,9 +138,9 @@ public class AudioPlayManager : MonoBehaviour
 
     }
 
-    public static void PlayMusic3D(GameObject owner, string audioName, int channel = 0, float volumeScale = 1, bool isLoop = true, float fadeTime = 0.5f, float delay = 0f, string flag = "")
+    public static AudioAsset PlayMusic3D(GameObject owner, string audioName, int channel = 0, float volumeScale = 1, bool isLoop = true, float fadeTime = 0.5f, float delay = 0f, string flag = "")
     {
-        a3DPlayer.PlayMusic(owner, audioName, channel, isLoop, volumeScale, delay, fadeTime, flag);
+       return  a3DPlayer.PlayMusic(owner, audioName, channel, isLoop, volumeScale, delay, fadeTime, flag);
     }
     public static void PauseMusic3D(GameObject owner, int channel, bool isPause, float fadeTime = 0.5f)
     {

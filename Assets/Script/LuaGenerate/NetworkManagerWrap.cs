@@ -14,10 +14,10 @@ public class NetworkManagerWrap
 		L.RegFunction("Connect", Connect);
 		L.RegFunction("DisConnect", DisConnect);
 		L.RegFunction("SendMessage", SendMessage);
-		L.RegFunction("HasHeartBeatMessage", HasHeartBeatMessage);
 		L.RegFunction("GetHeartBeatMessage", GetHeartBeatMessage);
 		L.RegFunction("New", _CreateNetworkManager);
 		L.RegFunction("__tostring", ToLua.op_ToString);
+		L.RegVar("s_heatBeat", get_s_heatBeat, set_s_heatBeat);
 		L.RegVar("IsConnect", get_IsConnect, null);
 		L.EndClass();
 	}
@@ -180,12 +180,12 @@ public class NetworkManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int HasHeartBeatMessage(IntPtr L)
+	static int GetHeartBeatMessage(IntPtr L)
 	{
 		try
 		{
 			ToLua.CheckArgsCount(L, 0);
-			bool o = NetworkManager.HasHeartBeatMessage();
+			bool o = NetworkManager.GetHeartBeatMessage();
 			LuaDLL.lua_pushboolean(L, o);
 			return 1;
 		}
@@ -196,13 +196,11 @@ public class NetworkManagerWrap
 	}
 
 	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
-	static int GetHeartBeatMessage(IntPtr L)
+	static int get_s_heatBeat(IntPtr L)
 	{
 		try
 		{
-			ToLua.CheckArgsCount(L, 0);
-			NetWorkMessage o = NetworkManager.GetHeartBeatMessage();
-			ToLua.PushValue(L, o);
+			ToLua.PushObject(L, NetworkManager.s_heatBeat);
 			return 1;
 		}
 		catch(Exception e)
@@ -218,6 +216,21 @@ public class NetworkManagerWrap
 		{
 			LuaDLL.lua_pushboolean(L, NetworkManager.IsConnect);
 			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int set_s_heatBeat(IntPtr L)
+	{
+		try
+		{
+			HeartBeatBase arg0 = (HeartBeatBase)ToLua.CheckObject(L, 2, typeof(HeartBeatBase));
+			NetworkManager.s_heatBeat = arg0;
+			return 0;
 		}
 		catch(Exception e)
 		{

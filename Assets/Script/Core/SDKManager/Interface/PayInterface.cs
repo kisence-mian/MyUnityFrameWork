@@ -35,10 +35,21 @@ namespace FrameWork.SDKManager
 
         }
 
-        virtual public void ConfirmPay(string goodsID, string tag)
+        /// <summary>
+        /// 适用于多种store的方式
+        /// </summary>
+        /// <param name="goodsID"></param>
+        /// <param name="tag"></param>
+        /// <param name="StoreName"></param>
+        virtual public void ConfirmPay(string goodsID, string tag,string StoreName)
         {
 
         }
+
+        //virtual public void ConfirmPay(string goodsID, string tag)
+        //{
+
+        //}
 
         virtual public LocalizedGoodsInfo GetGoodsInfo(string goodsID)
         {
@@ -70,7 +81,7 @@ namespace FrameWork.SDKManager
 
         protected void PayCallBack(OnPayInfo info)
         {
-            info.storeName = GetStoreName();
+            //info.storeName = GetStoreName();
             if (SDKManager.PayCallBack != null)
                 SDKManager.PayCallBack(info);
         }

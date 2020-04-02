@@ -89,10 +89,11 @@ public class PayUnityIAPImplement : PayInterface
 
     private void OnPurchaseFailed(Product t, PurchaseFailureReason t1)
     {
-        Debug.Log("OnPurchaseFailed ! t:"+t+ " PurchaseFailureReason:"+t1);
+        Debug.LogError("OnPurchaseFailed ! t:"+t+ " PurchaseFailureReason:"+t1);
        
         OnPayInfo payInfo = new OnPayInfo();
         payInfo.isSuccess = false;
+        payInfo.storeName = storeName;
         if (t != null)
         {
             Debug.Log("OnPurchaseFailed ! t.definition:" + t.definition);
@@ -112,31 +113,60 @@ public class PayUnityIAPImplement : PayInterface
 
     private void OnInitializeFailed(InitializationFailureReason t)
     {
-
+        Debug.LogError("IAP初始化失败！:"+t);
     }
 
     private void OnInitialized()
     {
-
+        Debug.Log("IAP初始化成功！" );
     }
 
     public override void Pay(PayInfo info)
     {
+        if(listener==null|| listener.m_StoreController == null)
+        {
+            OnPayInfo payInfo = new OnPayInfo();
+            payInfo.isSuccess = false;
+            payInfo.storeName = storeName;
+            payInfo.goodsId = info.goodsID;
+            payInfo.userID = info.userID;
+            if (listener == null)
+            {
+                payInfo.error = "No Initialize";
+            }
+            else
+                payInfo.error = "Initialize Failed";
+
+            PayCallBack(payInfo);
+            return;
+        }
+
         if (Application.isEditor)
         {
-            ConfirmPay(info.goodsID,info.tag);
+            ConfirmPay(info.goodsID,info.tag,storeName.ToString());
         }
         else
             listener.PurchaseProduct(info.goodsID);
     }
 
-    public override void ConfirmPay(string goodsID,  string tag)
+    public override void ConfirmPay(string goodsID,  string tag, string StoreName)
     {
+        Debug.Log("IAP ConfirmPay:" + goodsID);
         listener.ConfirmPendingPurchase(goodsID);
     }
     public override List<LocalizedGoodsInfo> GetAllGoodsInfo()
     {
         List<LocalizedGoodsInfo> infos = new List<LocalizedGoodsInfo>();
+        if (listener == null)
+        {
+            Debug.LogError("IAP No Initialize!");
+            return infos;
+        }
+        if (listener.m_StoreController == null)
+        {
+            Debug.LogError("IAP Initialize Failed!");
+            return infos;
+        }
         foreach (var item in listener.m_StoreController.products.all)
         {
             if (item.definition == null)
@@ -157,6 +187,16 @@ public class PayUnityIAPImplement : PayInterface
 
     public override LocalizedGoodsInfo GetGoodsInfo(string goodsID)
     {
+        if (listener == null)
+        {
+            Debug.LogError("IAP No Initialize!");
+            return null;
+        }
+        if (listener.m_StoreController == null)
+        {
+            Debug.LogError("IAP Initialize Failed!");
+            return null;
+        }
         foreach (var item in listener.m_StoreController.products.all)
         {
             if (item.definition == null)

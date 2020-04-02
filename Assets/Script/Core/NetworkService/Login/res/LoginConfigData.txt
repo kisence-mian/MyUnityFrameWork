@@ -1,0 +1,24 @@
+key	loginName	UIIcon	UseItem	Description	LoginClassName	SupportPlatform	CustomInfo
+type	Enum|LoginPlatform	String&Texture	Bool	String&LocalizedLanguage	String	StringArray	String
+note	登录类型名称	UI上显示的图标	是否所有平台都启用当前登录	描述	对接SDK的class Name	支持平台(使用UnityEngine.RuntimePlatform)	传入的自定义文本
+default	Tourist	null	True	null	null	null	null
+Tourist		CLT_LoginWindow_Tourist		LoginConfigDescription/Tourist			
+WeiXin	WeiXin	CLT_LoginWindow_WeiXin	False	LoginConfigDescription/WeiXin	WXLoginSDKClass	Android|WindowsEditor	
+QQ	QQ	CLT_LoginWindow_QQ	False	LoginConfigDescription/QQ		Android|WindowsEditor	
+GameCenter	Apple	CLT_LoginWindow_GameCenter	False	LoginConfigDescription/GameCenter	GameCenterLoginSDKClass	IPhonePlayer|WindowsEditor	
+AccountLogin	AccountLogin	CLT_LoginWindow_Tourist	False	LoginConfigDescription/AccountLogin		WindowsEditor|Android	
+m4399	m4399	CLT_LoginWindow_4399	False	LoginConfigDescription/4399		WindowsEditor	
+OPPO	OPPO	CLT_LoginWindow_OPPO	False	LoginConfigDescription/OPPO			
+VIVO	VIVO	CLT_LoginWindow_VIVO	False	LoginConfigDescription/VIVO			
+HuaWei	HuaWei	CLT_LoginWindow_HuaWei	False	LoginConfigDescription/HuaWei			
+UC	UC	CLT_LoginWindow_UC	False	LoginConfigDescription/UC			
+XiaoMi	XiaoMi	CLT_LoginWindow_XiaoMi	False	LoginConfigDescription/XiaoMi			
+Baidu	Baidu	CLT_LoginWindow_BaiDu	False	LoginConfigDescription/BaiDu			
+Huluxia	Huluxia	CLT_LoginWindow_Huluxia	False	LoginConfigDescription/HLX			
+m360	m360	CLT_LoginWindow_360	False	LoginConfigDescription/360			
+Meizu	Meizu	CLT_LoginWindow_Meizu	False	LoginConfigDescription/Meizu			
+YSDK_WX	YSDK	CLT_LoginWindow_WeiXin	False	LoginConfigDescription/WeiXin			WX
+YSDK_QQ	YSDK	CLT_LoginWindow_QQ	False	LoginConfigDescription/QQ			QQ
+HuaWei3	HuaWei3	CLT_LoginWindow_HuaWei	False	LoginConfigDescription/HuaWei			
+Google	Google	CLT_LoginWindow_Google	False	LoginConfigDescription/Google			
+FaceBook	FaceBook	CLT_LoginWindow_Facebook	False	LoginConfigDescription/FaceBook			

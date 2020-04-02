@@ -194,6 +194,11 @@ public class GlobalEvent
         }
     }
 
+    internal static void AddEvent<T>(object onRequestRealNameResult)
+    {
+        throw new NotImplementedException();
+    }
+
     /// <summary>
     /// 移除某类事件的一个回调
     /// </summary>

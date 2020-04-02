@@ -24,8 +24,7 @@ public class WXPayClass : PayInterface
     }
     public override void Init()
     {
-        if ((StoreName)Enum.Parse(typeof(StoreName), SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"))
-            == StoreName.WX)
+        if (SDKManager.IncludeThePayPlatform(StoreName.WX))
         {
             Debug.LogWarning("=========WXPayClass Init===========");
             //SDKManagerNew.OnPayCallBack += SetPayResult;
@@ -35,6 +34,13 @@ public class WXPayClass : PayInterface
             mchID = SDKManager.GetProperties("WeiXin", "MchID", mchID);
             appSecret = SDKManager.GetProperties("WeiXin", "AppSecret", appSecret);
         }
+
+
+        //if ((StoreName)Enum.Parse(typeof(StoreName), SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"))
+        //    == StoreName.WX)
+        //{
+
+        //}
     }
 
     /// <summary>
@@ -97,9 +103,9 @@ public class WXPayClass : PayInterface
 
         string tag = mch_orderID;
 
-        PayInfo l_payInfo = new PayInfo(goodID, payInfo.goodsName, tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, price, GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID());
+        PayInfo l_payInfo = new PayInfo(goodID, payInfo.goodsName, tag, FrameWork.SDKManager.GoodsType.NORMAL, prepay_id, price, GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID(), "WeiXin");
 
-        SDKManagerNew.Pay("WeiXin", l_payInfo);
+        SDKManagerNew.Pay(l_payInfo);
     }
 
     /// <summary>
@@ -138,7 +144,7 @@ public class WXPayClass : PayInterface
         PayCallBack(payInfo);
     }
 
-    public override void ConfirmPay(string goodsID, string mch_orderID)
+    public override void ConfirmPay(string goodsID, string mch_orderID, string StoreName)
     {
         PayReSend.Instance.ClearPrePayID(mch_orderID);
     }

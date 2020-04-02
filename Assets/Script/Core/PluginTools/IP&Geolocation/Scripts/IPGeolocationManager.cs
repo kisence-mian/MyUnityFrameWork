@@ -58,10 +58,11 @@ public class IPGeolocationManager : MonoBehaviour {
         errorCallBackCount = 0;
         maxRequest = 0;
 
+       
         RunHttpQuest("https://ip.seeip.org/geoip", (detail, result) =>
         {
             //{"offset":"8","city":"Chengdu","region":"Sichuan","dma_code":"0","organization":"AS4134 No.31,Jin-rong Street","area_code":"0","timezone":"Asia\/Chongqing","longitude":104.0667,"country_code3":"CHN","ip":"182.138.139.116","continent_code":"AS","country":"China","region_code":"32","country_code":"CN","latitude":30.6667}
-            object temp = SimpleJsonTool.DeserializeObject(result);
+            object temp = FrameWork.Json.Deserialize(result);
             // Debug.Log("Type:" + temp.GetType());
             IDictionary<string, object> dic = temp as IDictionary<string, object>;
             detail.SetIP( DicGetString(dic, "ip"));
@@ -73,7 +74,7 @@ public class IPGeolocationManager : MonoBehaviour {
         RunHttpQuest("http://ip-api.com/json", (detail, result) =>
         {
             //{"status":"success","country":"China","countryCode":"CN","region":"SC","regionName":"Sichuan","city":"Chengdu","zip":"","lat":30.6667,"lon":104.0667,"timezone":"Asia/Shanghai","isp":"Chinanet","org":"Chinanet SC","as":"AS4134 No.31,Jin-rong Street","query":"182.138.139.116"}
-            object temp = SimpleJsonTool.DeserializeObject(result);
+            object temp = FrameWork.Json.Deserialize(result);
             //  Debug.Log("Type:" + temp.GetType());
             IDictionary<string, object> dic = temp as IDictionary<string, object>;
             if ("success".Equals(DicGetString(dic, "status")))
@@ -93,7 +94,7 @@ public class IPGeolocationManager : MonoBehaviour {
         RunHttpQuest("https://ip.nf/me.json", (detail,result) =>
          {
              //{"ip":{"ip":"182.138.139.116","asn":"AS4134 No.31,Jin-rong Street","netmask":14,"hostname":"","city":"Chengdu","post_code":"","country":"China","country_code":"CN","latitude":30.66670036315918,"longitude":104.06670379638672}}
-             object temp = SimpleJsonTool.DeserializeObject(result);
+             object temp = FrameWork.Json.Deserialize(result);
              // Debug.Log("Type:" + temp.GetType());
              IDictionary<string, object> dic0 = temp as IDictionary<string, object>;
 
@@ -108,7 +109,7 @@ public class IPGeolocationManager : MonoBehaviour {
         RunHttpQuest("https://api.ip.sb/geoip", (detail, result) =>
         {
             // { "longitude":104.0667,"city":"Chengdu","timezone":"Asia\/Shanghai","offset":28800,"region":"Sichuan","asn":4134,"organization":"No.31,Jin-rong Street","country":"China","ip":"182.138.139.116","latitude":30.6667,"continent_code":"AS","country_code":"CN","region_code":"SC"}
-            object temp = SimpleJsonTool.DeserializeObject(result);
+            object temp = FrameWork.Json.Deserialize(result);
             // Debug.Log("Type:" + temp.GetType());
             IDictionary<string, object> dic = temp as IDictionary<string, object>;
             detail.SetIP(DicGetString(dic, "ip"));
@@ -120,7 +121,7 @@ public class IPGeolocationManager : MonoBehaviour {
         RunHttpQuest("https://api.db-ip.com/v2/free/self", (detail, result) =>
         {
             // { "longitude":104.0667,"city":"Chengdu","timezone":"Asia\/Shanghai","offset":28800,"region":"Sichuan","asn":4134,"organization":"No.31,Jin-rong Street","country":"China","ip":"182.138.139.116","latitude":30.6667,"continent_code":"AS","country_code":"CN","region_code":"SC"}
-            object temp = SimpleJsonTool.DeserializeObject(result);
+            object temp = FrameWork.Json.Deserialize(result);
             // Debug.Log("Type:" + temp.GetType());
             IDictionary<string, object> dic = temp as IDictionary<string, object>;
             detail.SetIP(DicGetString(dic, "ipAddress"));
@@ -204,7 +205,7 @@ public class IPGeolocationManager : MonoBehaviour {
         }
        // Destroy(gameObject);
     }
-    private IEnumerator GetHttpResult(string uri,Action<HttpResult> callBack)
+    private IEnumerator GetHttpResult(string uri, Action<HttpResult> callBack)
     {
         HttpResult res = new HttpResult();
         res.uri = uri;
@@ -212,25 +213,18 @@ public class IPGeolocationManager : MonoBehaviour {
 
         string error = "";
         string result = "";
-        // Debug.Log("GetHttpResult==》" + uri);
-        //{
-        //    UnityWebRequest webRequest = UnityWebRequest.Get(uri);
 
-        //    yield return webRequest.SendWebRequest();
-
-        //    //异常处理，很多博文用了error!=null这是错误的，请看下文其他属性部分
-        //    if (webRequest.isHttpError || webRequest.isNetworkError)
-        //        error = webRequest.error;
-        //    else
-        //    {
-        //        result = webRequest.downloadHandler.text;
-        //    }
-        //}
+        if (string.IsNullOrEmpty(uri))
         {
+            res.error = "URI is null";
+        }
+        else
+        {
+
             WWW webRequest = new WWW(uri);
             yield return webRequest;
 
-            if(!string.IsNullOrEmpty(webRequest.error))
+            if (!string.IsNullOrEmpty(webRequest.error))
             {
                 error = webRequest.error;
             }

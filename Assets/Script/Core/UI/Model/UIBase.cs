@@ -77,6 +77,7 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     {
         ClearGuideModel();
         RemoveAllListener();
+        CleanAnim();
         CleanItem();
         CleanModelShowCameraList();
 
@@ -170,6 +171,30 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         bool has = false;
         has = m_objects.ContainsKey(name);
         return has;
+    }
+
+    public bool GetHasGameObject(string name)
+    {
+        if (m_objects == null)
+        {
+            CreateObjectTable();
+        }
+
+        if (m_objects.ContainsKey(name))
+        {
+            GameObject go = m_objects[name];
+
+            if (go == null)
+            {
+                return false;
+            }
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     public GameObject GetGameObject(string name)
@@ -887,7 +912,6 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
         {
             GetText(TextID).text = content.Replace("\\n", "\n");
         }
-
     }
 
     public void SetImageColor(string ImageID, Color color)
@@ -921,7 +945,7 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     /// 不再建议使用
     /// </summary>
     [Obsolete]
-    public void SetTextByLangeage(string textID, string contentID, params object[] objs)
+    public void SetTextByLanguage(string textID, string contentID, params object[] objs)
     {
         GetText(textID).text = LanguageManager.GetContent(LanguageManager.c_defaultModuleKey, contentID, objs);
     }
@@ -1315,6 +1339,25 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
         m_GuideList.Clear();
         m_CreateCanvasDict.Clear();
+    }
+
+    #endregion
+
+    #region 动画管理
+
+    List<AnimData> animDataList = new List<AnimData>();
+
+    public void AddAnimData(AnimData animData)
+    {
+        animDataList.Add(animData);
+    }
+
+    public void CleanAnim()
+    {
+        for (int i = 0; i < animDataList.Count; i++)
+        {
+            AnimSystem.StopAnim(animDataList[i]);
+        }
     }
 
     #endregion

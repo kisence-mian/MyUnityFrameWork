@@ -61,6 +61,10 @@ public enum LoginPlatform
     /// </summary>
     HuaWei3,
     /// <summary>
+    /// 华为4.0
+    /// </summary>
+    HuaWei4,
+    /// <summary>
     /// UC
     /// </summary>
     UC,
@@ -109,5 +113,14 @@ public enum LoginPlatform
     /// 应用宝
     /// </summary>
     YSDK,
+
+    /// <summary>
+    /// steam
+    /// </summary>
+    Steam,
+
+    OKJOY,
+
+    Play68,
 }
 

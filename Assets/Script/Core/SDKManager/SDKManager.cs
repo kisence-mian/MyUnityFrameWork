@@ -3,6 +3,7 @@ using FrameWork.SDKManager;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using UnityEngine;
 namespace FrameWork.SDKManager
@@ -27,14 +28,16 @@ namespace FrameWork.SDKManager
         static List<ADInterface> s_ADServiceList = null;
         static List<LogInterface> s_logServiceList = null;
         static List<OtherSDKInterface> s_otherServiceList = null;
+        static List<RealNameInterface> s_realNameServiceList = null;
         private static PayCallBack s_payCallBack;
         private static ADCallBack s_adCallBack;
         private static GoodsInfoCallBack s_goodsInfoCallBack;
+        private static RealNameCallBack s_realNameCallBack;
 
         static Dictionary<string, OtherCallBack> s_callBackDict = new Dictionary<string, OtherCallBack>();
 
         static bool s_useNewSDKManager = false; //是否使用新版本SDKManager
-
+        
         #region 属性
 
         public static LoginCallBack LoginCallBack { get; set; }
@@ -77,6 +80,18 @@ namespace FrameWork.SDKManager
             }
         }
 
+        public static RealNameCallBack RealNameCallBack
+        {
+            get
+            {
+                return s_realNameCallBack;
+            }
+            set
+            {
+                s_realNameCallBack = value;
+            }
+        }
+
         #endregion
 
         #region 外部调用
@@ -104,8 +119,8 @@ namespace FrameWork.SDKManager
                         {
                             SDKManagerNew.Init();
                         }
+                        Debug.Log("SDKManager Init");
 
-                        //Debug.Log("SDKManager Init");
                         LoadService(data);
                         InitSDK();
                         AutoListenerInit();
@@ -137,6 +152,8 @@ namespace FrameWork.SDKManager
                         GetOtherService(sdkName).ExtraInit(tag); break;
                     case SDKType.Pay:
                         GetPayService(sdkName).ExtraInit(tag); break;
+                    case SDKType.RealName:
+                        GetPayService(sdkName).ExtraInit(tag);break;
                 }
             }
             else
@@ -153,6 +170,8 @@ namespace FrameWork.SDKManager
                         AllExtraInit(s_otherServiceList, tag); break;
                     case SDKType.Pay:
                         AllExtraInit(s_payServiceList, tag); break;
+                    case SDKType.RealName:
+                        AllExtraInit(s_realNameServiceList, tag);break;
                 }
             }
         }
@@ -228,6 +247,16 @@ namespace FrameWork.SDKManager
 
             return s_payServiceList[index];
         }
+
+        public static RealNameInterface GetRealNameService(int index)
+        {
+            if (s_realNameServiceList.Count <= index)
+            {
+                throw new Exception("GetRealNameService error index->" + index + " count->" + s_realNameServiceList.Count);
+            }
+            return s_realNameServiceList[index];
+        }
+
 
         public static ADInterface GetADService<T>() where T : ADInterface
         {
@@ -379,28 +408,23 @@ namespace FrameWork.SDKManager
         {
             try
             {
-                bool isHave = false;
                 foreach (var item in s_loginServiceList)
                 {
                     if (item.GetPlatform().Contains(Application.platform) && item.GetLoginPlatform() == loginPlatform)
                     {
                         item.Login(tag);
-                        isHave = true;
+                        return;
                     }
                 }
 
-                if (!isHave)
+                if (s_useNewSDKManager)
                 {
-                    if (s_useNewSDKManager)
-                    {
-                        Debug.LogWarning(loginPlatform);
-                        SDKManagerNew.Login(loginPlatform.ToString(), tag);
-
-                    }
-                    else
-                    {
-                        Debug.LogError("SDKManager Login dont find class by platform:" + Application.platform + " loginPlatform:" + loginPlatform);
-                    }
+                    Debug.LogWarning(loginPlatform);
+                    SDKManagerNew.Login(loginPlatform.ToString(), tag);
+                }
+                else
+                {
+                    Debug.LogError("SDKManager Login dont find class by platform:" + Application.platform + " loginPlatform:" + loginPlatform);
                 }
             }
             catch (Exception e)
@@ -448,9 +472,46 @@ namespace FrameWork.SDKManager
             return platforms;
         }
 
+        /// <summary>
+        /// 获取支持的登录平台
+        /// </summary>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public static List<string> GetLoginPlatformsBySDKTool(List<string> defaultValue)
+        {
+            if (!Application.isEditor && Application.platform == RuntimePlatform.Android)
+            {
+                List<string> result = new List<string>();
+                string sdkStr = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, "");
+
+                if (string.IsNullOrEmpty(sdkStr))
+                {
+                    return defaultValue;
+                }
+                else
+                {
+                    string[] arrStr = sdkStr.Split('|');
+
+                    for (int i = 0; i < arrStr.Length; i++)
+                    {
+                        result.Add(arrStr[i]);
+                    }
+                    return result;
+                }
+            }
+            else
+            {
+                return defaultValue;
+            }
+
+
+        }
+
         #endregion
 
         #region 支付
+
+        static List<PayPlatformInfo> allPayPlatformInfos;
 
         static void InitPay(List<PayInterface> list)
         {
@@ -521,7 +582,7 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void Pay(string SDKName, PayInfo payInfo )
         {
-            Debug.Log("Pay  SDKname " + SDKName + " GetHasSDKService " + GetHasSDKService(s_payServiceList, SDKName));
+            Debug.Log("Pay  SDKname " + SDKName + " GetHasSDKService " + GetHasSDKService(s_payServiceList, SDKName)); 
 
             //优先使用本地配置的SDK
             if (GetHasSDKService(s_payServiceList, SDKName))
@@ -552,7 +613,7 @@ namespace FrameWork.SDKManager
                 }
                 else
                 {
-                    SDKManagerNew.Pay(SDKName, payInfo);
+                    SDKManagerNew.Pay( payInfo);
                 }
 
             }
@@ -562,30 +623,39 @@ namespace FrameWork.SDKManager
             }
         }
 
-        /// <summary>
-        /// 支付,默认访问第一个接口
-        /// </summary>
-        public static void ConfirmPay(string orderID, string tag = "")
-        {
-            try
-            {
-                GetPayService(0).ConfirmPay(orderID, tag);
+        ///// <summary>
+        ///// 支付,默认访问第一个接口
+        ///// </summary>
+        //public static void ConfirmPay(string orderID, string tag = "")
+        //{
+        //    try
+        //    {
+        //        Debug.Log("SDKManager ConfirmPay " + orderID);
+        //        GetPayService(0).ConfirmPay(orderID, tag);
                
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("SDKManager Pay Exception: " + e.ToString());
-            }
-        }
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Debug.LogError("SDKManager Pay Exception: " + e.ToString());
+        //    }
+        //}
 
         /// <summary>
         /// 支付
         /// </summary>
-        public static void ConfirmPay(string SDKName, string orderID, string tag = "")
+        public static void ConfirmPay(string SDKName, string goodID, string tag = "")
         {
             try
             {
-                GetPayService(SDKName).ConfirmPay(orderID, tag);
+                if (GetHasPayService(SDKName))
+                {
+                    GetPayService(SDKName).ConfirmPay(goodID, tag, SDKName);
+                }
+                else
+                {
+                    GetPayService<PublicPayClass>().ConfirmPay(goodID, tag, SDKName);
+                }
+
             }
             catch (Exception e)
             {
@@ -655,6 +725,43 @@ namespace FrameWork.SDKManager
         public static bool GetReSendPay(String SDKName)
         {
             return SDKManagerNew.GetReSendPay(SDKName);
+        }
+
+        /// <summary>
+        /// 获取所有支付平台信息
+        /// </summary>
+        /// <returns></returns>
+        public static List<PayPlatformInfo> GetAllPayPlatformInfos()
+        {
+            if (allPayPlatformInfos == null)
+            {
+                string payPlatformValueFromSDK = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None");
+
+                allPayPlatformInfos = PayPlatformInfo.GetAllPayPlatform(payPlatformValueFromSDK);
+            }
+
+            return allPayPlatformInfos;
+        }
+
+        /// <summary>
+        /// 判断当前支付配置是否包含某支付方式
+        /// </summary>
+        /// <param name="storeName"></param>
+        /// <returns></returns>
+        public static bool IncludeThePayPlatform(StoreName storeName)
+        {
+            List<PayPlatformInfo> allPayPlatforms = GetAllPayPlatformInfos();
+
+            for (int i = 0; i < allPayPlatforms.Count; i++)
+            {
+                if (allPayPlatforms[i].SDKName == storeName.ToString() )
+                {
+                    Debug.Log("IncludeThePayPlatform:" + storeName);
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         #endregion
@@ -992,6 +1099,219 @@ namespace FrameWork.SDKManager
 
         #endregion
 
+        #region 实名制
+
+        /// <summary>
+        /// 实名制状态
+        /// </summary>
+        static public RealNameStatus GetRealNameType(string SDKName = null, string tag = null)
+        {
+            //优先使用本地配置的SDK
+            if (s_realNameServiceList.Count > 0)
+            {
+                try
+                {
+                    return GetRealNameService(0).GetRealNameType();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager GetRealNameType Exception: " + e.ToString());
+                    return RealNameStatus.NotNeed;
+                }
+            }
+
+            else if (s_useNewSDKManager)
+            {
+                if (string.IsNullOrEmpty(SDKName))
+                {
+                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
+                }
+                return SDKManagerNew.GetRealNameType(SDKName,tag);
+            }
+            else
+            {
+                Debug.Log("realName SDK 没有配置！ ");
+                return RealNameStatus.NotNeed;
+            }
+        }
+
+        /// <summary>
+        /// 是否成年
+        /// </summary>
+        /// <returns></returns>
+        static public bool IsAdult(string SDKName = null, string tag = null)
+        {
+            //优先使用本地配置的SDK
+            if (s_realNameServiceList.Count > 0)
+            {
+                try
+                {
+                    return GetRealNameService(0).IsAdult();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager IsAdult Exception: " + e.ToString());
+                    return true;
+                }
+            }
+
+            else if (s_useNewSDKManager)
+            {
+                if (string.IsNullOrEmpty(SDKName))
+                {
+                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
+                }
+                return SDKManagerNew.IsAdult(SDKName,tag);
+
+
+            }
+            else
+            {
+                Debug.Log("realName SDK 没有配置！ ");
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// 今日在线时长
+        /// </summary>
+        /// <returns></returns>
+        static public int GetTodayOnlineTime(string SDKName = null, string tag = null)
+        {
+            //优先使用本地配置的SDK
+            if (s_realNameServiceList.Count > 0)
+            {
+                try
+                {
+                    return GetRealNameService(0).GetTodayOnlineTime();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager GetTodayOnlineTime Exception: " + e.ToString());
+                    return -1;
+                }
+            }
+
+            else if (s_useNewSDKManager)
+            {
+                if (string.IsNullOrEmpty(SDKName))
+                {
+                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
+                }
+                return SDKManagerNew.GetTodayOnlineTime(SDKName,tag);
+            }
+            else
+            {
+                Debug.Log("realName SDK 没有配置！ ");
+                return -1;
+            }
+        }
+
+        /// <summary>
+        /// 开始实名制
+        /// </summary>
+        static public void StartRealNameAttestation(string SDKName = null, string tag = null)
+        {
+            //优先使用本地配置的SDK
+            if (s_realNameServiceList.Count > 0)
+            {
+                try
+                {
+                    GetRealNameService(0).StartRealNameAttestation();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager StartRealNameAttestation Exception: " + e.ToString());
+
+                }
+            }
+
+            else if (s_useNewSDKManager)
+            {
+                if (string.IsNullOrEmpty(SDKName))
+                {
+                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
+                }
+                SDKManagerNew.StartRealNameAttestation(SDKName,tag);
+            }
+            else
+            {
+                Debug.Log("realName SDK 没有配置！ ");
+            }
+        }
+
+        /// <summary>
+        /// 检测支付是否受限
+        /// </summary>
+        /// <returns></returns>
+        static public bool CheckPayLimit(int payAmount, string SDKName = null,string tag =null)
+        {
+            //优先使用本地配置的SDK
+            if (s_realNameServiceList.Count > 0)
+            {
+                try
+                {
+                    return GetRealNameService(0).CheckPayLimit(payAmount);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager CheckPayLimit Exception: " + e.ToString());
+                    return false;
+                }
+            }
+
+            else if (s_useNewSDKManager)
+            {
+                if (string.IsNullOrEmpty(SDKName))
+                {
+                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
+                }
+                return SDKManagerNew.CheckPayLimit(SDKName, payAmount,tag);
+            }
+            else
+            {
+                Debug.Log("realName SDK 没有配置！ ");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// 上报支付金额
+        /// </summary>
+        /// <param 支付金额="payAmount"></param>
+        static public void LogPayAmount(int payAmount, string SDKName = null, string tag= null)
+        {
+            //优先使用本地配置的SDK
+            if (s_realNameServiceList.Count > 0)
+            {
+                try
+                {
+                    GetRealNameService(0).LogPayAmount(payAmount);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager CheckPayLimit Exception: " + e.ToString());
+                }
+            }
+
+            else if (s_useNewSDKManager)
+            {
+                if (string.IsNullOrEmpty(SDKName))
+                {
+                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
+                }
+                SDKManagerNew.LogPayAmount(SDKName,payAmount,tag);
+            }
+            else
+            {
+                Debug.Log("realName SDK 没有配置！ ");
+            }
+        }
+
+
+        #endregion
+
+
         #region 其他SDK
 
         public static void ToClipboard(string content)
@@ -1036,6 +1356,23 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static string GetProperties(string properties, string key, string defaultValue)
         {
+            //pc平台下读取 D:\UnityProjects\CardGame2018\Configs\{properties}.ini配置文件
+#if UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_WIN
+            string path = Environment.CurrentDirectory + "/Configs/" + properties + ".ini";
+            path = path.Replace('\\', '/');
+           // Debug.Log("ConfigPath:" + path);
+            if (File.Exists(path))
+            {
+                IniConfigTool tool = new IniConfigTool(path);
+              string res=  tool.GetString(key, defaultValue);
+                //Debug.Log("IniConfigTool res :" + res + " def:" + defaultValue);
+                return res;
+            }
+            else
+            {
+                return defaultValue;
+            }
+#endif
             return SDKManagerNew.GetProperties(properties, key, defaultValue);
         }
 
@@ -1044,10 +1381,18 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void QuitApplication()
         {
-            SDKManagerNew.QuitApplication();
+            Debug.Log("QuitApplication");
+            if (Application.platform == RuntimePlatform.Android )
+            {
+                SDKManagerNew.QuitApplication();
+            }
+            else
+            {
+                Application.Quit();
+            }
         }
 
-        #region 事件监听
+#region 事件监听
 
         public static void AddOtherCallBackListener(string functionName, OtherCallBack callBack)
         {
@@ -1084,202 +1429,213 @@ namespace FrameWork.SDKManager
         }
 
 
-        #endregion
+#endregion
 
-        #endregion
+#endregion
 
-    #endregion
+#endregion
 
         #region 加载SDK设置
 
-        /// <summary>
-        /// 读取当前游戏内的SDK配置
-        /// 找不到或者解析失败会返回Null
-        /// </summary>
-        /// <returns></returns>
-        public static SchemeData LoadGameSchemeConfig()
-        {
-            if (ConfigManager.GetIsExistConfig(c_ConfigName))
-            {
-                //Debug.Log("LoadGameSchemeConfig");
-
-                Dictionary<string, SingleField> configData = ConfigManager.GetData(c_ConfigName);
-                return JsonUtility.FromJson<SchemeData>(configData[c_KeyName].GetString());
-            }
-            else
-            {
-                Debug.Log("LoadGameSchemeConfig null");
-
-                return null;
-            }
-        }
-
-        public static void AnalyzeSchemeData(
-            SchemeData schemeData,
-
-            out List<LoginInterface> loginScheme,
-            out List<ADInterface> ADScheme,
-            out List<PayInterface> payScheme,
-            out List<LogInterface> logScheme,
-            out List<OtherSDKInterface> otherScheme
-            )
-        {
-            if (schemeData != null)
-            {
-                loginScheme = new List<LoginInterface>();
-                for (int i = 0; i < schemeData.LoginScheme.Count; i++)
+                /// <summary>
+                /// 读取当前游戏内的SDK配置
+                /// 找不到或者解析失败会返回Null
+                /// </summary>
+                /// <returns></returns>
+                public static SchemeData LoadGameSchemeConfig()
                 {
-                    loginScheme.Add((LoginInterface)AnalysisConfig(schemeData.LoginScheme[i]));
+                    if (ConfigManager.GetIsExistConfig(c_ConfigName))
+                    {
+                        //Debug.Log("LoadGameSchemeConfig");
+
+                        Dictionary<string, SingleField> configData = ConfigManager.GetData(c_ConfigName);
+                        return JsonUtility.FromJson<SchemeData>(configData[c_KeyName].GetString());
+                    }
+                    else
+                    {
+                        Debug.Log("LoadGameSchemeConfig null");
+
+                        return null;
+                    }
                 }
 
-                ADScheme = new List<ADInterface>();
-                for (int i = 0; i < schemeData.ADScheme.Count; i++)
+                public static void AnalyzeSchemeData(
+                    SchemeData schemeData,
+
+                    out List<LoginInterface> loginScheme,
+                    out List<ADInterface> ADScheme,
+                    out List<PayInterface> payScheme,
+                    out List<LogInterface> logScheme,
+                    out List<RealNameInterface> realNameScheme,
+                    out List<OtherSDKInterface> otherScheme
+                    )
                 {
-                    ADScheme.Add((ADInterface)AnalysisConfig(schemeData.ADScheme[i]));
+                    if (schemeData != null)
+                    {
+                        loginScheme = new List<LoginInterface>();
+                        for (int i = 0; i < schemeData.LoginScheme.Count; i++)
+                        {
+                            loginScheme.Add((LoginInterface)AnalysisConfig(schemeData.LoginScheme[i]));
+                        }
+
+                        ADScheme = new List<ADInterface>();
+                        for (int i = 0; i < schemeData.ADScheme.Count; i++)
+                        {
+                            ADScheme.Add((ADInterface)AnalysisConfig(schemeData.ADScheme[i]));
+                        }
+
+                        payScheme = new List<PayInterface>();
+                        for (int i = 0; i < schemeData.PayScheme.Count; i++)
+                        {
+                            payScheme.Add((PayInterface)AnalysisConfig(schemeData.PayScheme[i]));
+                        }
+
+                        logScheme = new List<LogInterface>();
+                        for (int i = 0; i < schemeData.LogScheme.Count; i++)
+                        {
+                            logScheme.Add((LogInterface)AnalysisConfig(schemeData.LogScheme[i]));
+                        }
+
+                        realNameScheme = new List<RealNameInterface>();
+                        for (int i = 0; i < schemeData.RealNameScheme.Count; i++)
+                        {
+                            realNameScheme.Add((RealNameInterface)AnalysisConfig(schemeData.RealNameScheme[i]));
+
+                        }
+
+                        otherScheme = new List<OtherSDKInterface>();
+                        for (int i = 0; i < schemeData.OtherScheme.Count; i++)
+                        {
+                            otherScheme.Add((OtherSDKInterface)AnalysisConfig(schemeData.OtherScheme[i]));
+                        }
+                    }
+                    else
+                    {
+                        loginScheme = new List<LoginInterface>();
+                        ADScheme = new List<ADInterface>();
+                        payScheme = new List<PayInterface>();
+                        logScheme = new List<LogInterface>();
+                        realNameScheme = new List<RealNameInterface>();
+                        otherScheme = new List<OtherSDKInterface>();
+                    }
                 }
 
-                payScheme = new List<PayInterface>();
-                for (int i = 0; i < schemeData.PayScheme.Count; i++)
+                static SDKInterfaceBase AnalysisConfig(SDKConfigData data)
                 {
-                    payScheme.Add((PayInterface)AnalysisConfig(schemeData.PayScheme[i]));
+                    if (data == null)
+                    {
+                        return new NullSDKInterface();
+                    }
+                    else
+                    {
+                        return (SDKInterfaceBase)JsonUtility.FromJson(data.SDKContent, Assembly.Load("Assembly-CSharp").GetType(data.SDKName));
+                    }
                 }
 
-                logScheme = new List<LogInterface>();
-                for (int i = 0; i < schemeData.LogScheme.Count; i++)
-                {
-                    logScheme.Add((LogInterface)AnalysisConfig(schemeData.LogScheme[i]));
-                }
-
-                otherScheme = new List<OtherSDKInterface>();
-                for (int i = 0; i < schemeData.OtherScheme.Count; i++)
-                {
-                    otherScheme.Add((OtherSDKInterface)AnalysisConfig(schemeData.OtherScheme[i]));
-                }
-            }
-            else
-            {
-                loginScheme = new List<LoginInterface>();
-                ADScheme = new List<ADInterface>();
-                payScheme = new List<PayInterface>();
-                logScheme = new List<LogInterface>();
-                otherScheme = new List<OtherSDKInterface>();
-            }
-        }
-
-        static SDKInterfaceBase AnalysisConfig(SDKConfigData data)
-        {
-            if (data == null)
-            {
-                return new NullSDKInterface();
-            }
-            else
-            {
-                return (SDKInterfaceBase)JsonUtility.FromJson(data.SDKContent, Assembly.Load("Assembly-CSharp").GetType(data.SDKName));
-            }
-        }
-
-#endregion
+        #endregion
 
         #region 初始化SDK
 
-        static void LoadService(SchemeData data)
-        {
-            AnalyzeSchemeData(
-                data,
-                out s_loginServiceList,
-                out s_ADServiceList,
-                out s_payServiceList,
-                out s_logServiceList,
-                out s_otherServiceList
-                );
-        }
+                static void LoadService(SchemeData data)
+                {
+                    AnalyzeSchemeData(
+                        data,
+                        out s_loginServiceList,
+                        out s_ADServiceList,
+                        out s_payServiceList,
+                        out s_logServiceList,
+                        out s_realNameServiceList,
+                        out s_otherServiceList
+                        );
+                }
 
-        static void InitSDK()
-        {
-            InitLogin(s_loginServiceList);
-            InitSDKList(s_ADServiceList);
-            InitPay(s_payServiceList);
-            InitSDKList(s_logServiceList);
-            InitSDKList(s_otherServiceList);
+                static void InitSDK()
+                {
+                    InitLogin(s_loginServiceList);
+                    InitSDKList(s_ADServiceList);
+                    InitPay(s_payServiceList);
+                    InitSDKList(s_logServiceList);
+                    InitSDKList(s_otherServiceList);
+                    InitSDKList(s_realNameServiceList);
 
-            //Debug.Log("s_loginServiceList: " + s_loginServiceList.Count);
-        }
+                    //Debug.Log("s_loginServiceList: " + s_loginServiceList.Count);
+                }
 
-#endregion
+        #endregion
 
         #region 功能函数
 
-        static T GetSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].m_SDKName == name)
+                static T GetSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
                 {
-                    return list[i];
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        if (list[i].m_SDKName == name)
+                        {
+                            return list[i];
+                        }
+                    }
+
+                    throw new Exception("GetSDKService " + typeof(T).Name + " Exception dont find ->" + name + "<-");
                 }
-            }
 
-            throw new Exception("GetSDKService " + typeof(T).Name + " Exception dont find ->" + name + "<-");
-        }
-
-        static bool GetHasSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                if (list[i].m_SDKName == name)
+                static bool GetHasSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
                 {
-                    return true;
-                }
-            }
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        if (list[i].m_SDKName == name)
+                        {
+                            return true;
+                        }
+                    }
 
-            return false;
-        }
+                    return false;
+                }
 
-        static void InitSDKList<T>(List<T> list) where T : SDKInterfaceBase
-        {
-            for (int i = 0; i < list.Count; i++)
-            {
-                try
+                static void InitSDKList<T>(List<T> list) where T : SDKInterfaceBase
                 {
-                    list[i].m_SDKName = list[i].GetType().Name;
-                    list[i].Init();
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        try
+                        {
+                            list[i].m_SDKName = list[i].GetType().Name;
+                            list[i].Init();
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError("Init " + typeof(T).Name + " SDK Exception:\n" + e.ToString());
+                        }
+                    }
                 }
-                catch (Exception e)
-                {
-                    Debug.LogError("Init " + typeof(T).Name + " SDK Exception:\n" + e.ToString());
-                }
-            }
-        }
 
         #endregion
 
         #region 自动监听上报
 
-        /// <summary>
-        /// 自动上报监听初始化
-        /// </summary>
-        static void AutoListenerInit()
-        {
-            PayCallBack += OnPayCallBackListener;
-        }
+                /// <summary>
+                /// 自动上报监听初始化
+                /// </summary>
+                static void AutoListenerInit()
+                {
+                    PayCallBack += OnPayCallBackListener;
+                }
 
 
-        /// <summary>
-        /// 自动上报支付
-        /// </summary>
-        static void OnPayCallBackListener(OnPayInfo info)
-        {
-            Debug.Log("自动上报支付 success >" + info.isSuccess + "<");
-            if (info.isSuccess)
-            {
-                LogPay(info.orderID, info.goodsId, 1, info.price, info.currency, info.storeName.ToString());
-            }
-        }
+                /// <summary>
+                /// 自动上报支付
+                /// </summary>
+                static void OnPayCallBackListener(OnPayInfo info)
+                {
+                    Debug.Log("自动上报支付 success >" + info.isSuccess + "<");
+                    if (info.isSuccess)
+                    {
+                        LogPay(info.orderID, info.goodsId, 1, info.price, info.currency, info.storeName.ToString());
+                    }
+                }
 
         #endregion
     }
 
-    #region 声明
+#region 声明
 
     public delegate void LoginCallBack(OnLoginInfo info);
     public delegate void PayCallBack(OnPayInfo info);
@@ -1287,6 +1643,7 @@ namespace FrameWork.SDKManager
     public delegate void OtherCallBack(OnOtherInfo info);
     public delegate void GoodsInfoCallBack(GoodsInfoFromSDK info);
     public delegate void ConsumePurchaseCallBack(ConsumePurchaseInfo info);
+    public delegate void RealNameCallBack(RealNameData info);
 
     public class SchemeData
     {
@@ -1298,6 +1655,7 @@ namespace FrameWork.SDKManager
         public List<SDKConfigData> LoginScheme = new List<SDKConfigData>();
         public List<SDKConfigData> ADScheme = new List<SDKConfigData>();
         public List<SDKConfigData> PayScheme = new List<SDKConfigData>();
+        public List<SDKConfigData> RealNameScheme = new List<SDKConfigData>();
         public List<SDKConfigData> OtherScheme = new List<SDKConfigData>();
     }
     [System.Serializable]
@@ -1313,7 +1671,91 @@ namespace FrameWork.SDKManager
         Login,
         AD,
         Pay,
+        RealName,
         Other,
+    }
+
+    /// <summary>
+    /// 支付平台信息
+    /// </summary>
+    public class PayPlatformInfo
+    {
+        /// <summary>
+        /// 所使用的SDK
+        /// </summary>
+        public string SDKName = "";
+        /// <summary>
+        /// 具体支付平台Tag
+        /// </summary>
+        public string payPlatformTag = "";
+
+
+        public PayPlatformInfo()
+        {
+            SDKName = "";
+            payPlatformTag = "";
+        }
+
+        public PayPlatformInfo(string sDKKey, string payPlatformTag)
+        {
+            SDKName = sDKKey;
+            this.payPlatformTag = payPlatformTag;
+        }
+
+        /// <summary>
+        /// 使用来自SDKInterface 的值进行构造  
+        /// 格式：Payssion@gash_HK  ( SDKKey = Payssion, payPlatformTag = gash_HK)
+        /// </summary>
+        /// <param name="valueFromSDKInterface"></param>
+        public PayPlatformInfo(string valueFromSDKInterface)
+        {
+            if (string.IsNullOrEmpty(valueFromSDKInterface))
+            {
+                Debug.LogError("PayPlatformInfo init error :" + valueFromSDKInterface);
+                return;
+            }
+            else
+            {
+                string[] result = valueFromSDKInterface.Split('@');
+                if (result.Length > 0)
+                {
+                    SDKName = result[0];
+                }
+                if (result.Length > 1)
+                {
+                    SDKName = result[0];
+                    payPlatformTag = result[1];
+                }
+            }
+        }
+
+
+
+        /// <summary>
+        /// 将来自sdkinterface 的支付平台信息，构造成类
+        /// 格式例如： GooglePay|Payssion@gash_tw|Payssion@gash_HK
+        /// </summary>
+        /// <param name="valueFromSDKInterface"></param>
+        /// <returns></returns>
+        public static List<PayPlatformInfo> GetAllPayPlatform(string valueFromSDKInterface)
+        {
+            List<PayPlatformInfo> result = new List<PayPlatformInfo>();
+            if (string.IsNullOrEmpty(valueFromSDKInterface))
+            {
+                Debug.LogError("GetAllPayPlatform valueFromSDKInterface is null");
+            }
+            else
+            {
+                string[] values = valueFromSDKInterface.Split('|');
+                for (int i = 0; i < values.Length; i++)
+                {
+                    PayPlatformInfo payPlatformInfo = new PayPlatformInfo(values[i]);
+                    result.Add(payPlatformInfo);
+                }
+            }
+            return result;
+        }
+
     }
 
 #endregion

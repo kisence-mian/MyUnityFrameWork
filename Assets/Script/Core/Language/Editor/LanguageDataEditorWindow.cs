@@ -39,7 +39,7 @@ public class LanguageDataEditorWindow : EditorWindow
             return;
         }
 
-        if (Application.isPlaying && currentLanguage== SystemLanguage.Unknown)
+        if (Application.isPlaying )
         {
             currentLanguage = LanguageManager.CurrentLanguage;
         }

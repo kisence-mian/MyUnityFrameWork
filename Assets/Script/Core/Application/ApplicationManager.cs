@@ -14,7 +14,6 @@ public class ApplicationManager : MonoBehaviour
             if (instance == null)
             {
               instance =  FindObjectOfType<ApplicationManager>();
-
             }
             return ApplicationManager.instance; }
         set { ApplicationManager.instance = value; }
@@ -80,14 +79,31 @@ public class ApplicationManager : MonoBehaviour
     /// <summary>
     /// 语言
     /// </summary>
-    public SystemLanguage langguage = SystemLanguage.ChineseSimplified;
+    //public SystemLanguage langguage = SystemLanguage.ChineseSimplified;
     /// <summary>
     /// 显示括号标识多语言转换的字段
     /// </summary>
     public bool showLanguageValue = false;
     public void Awake()
     {
+        Debug.Log("persistentDataPath:" + Application.persistentDataPath);
         instance = this;
+
+        GameInfoCollecter.AddAppInfoValue("Build App Mode", m_AppMode);
+        if (Application.platform != RuntimePlatform.WindowsEditor &&
+            Application.platform != RuntimePlatform.OSXEditor)
+        {
+            try
+            {
+                string modeStr = PlayerPrefs.GetString("AppMode", m_AppMode.ToString());
+                m_AppMode = (AppMode)Enum.Parse(typeof(AppMode), modeStr);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+       
         AppLaunch();
     }
     [Tooltip("加载资源时是否使用缓存，Bundle加载不起作用(都为使用)")]
@@ -119,6 +135,8 @@ public class ApplicationManager : MonoBehaviour
 
         SDKManager.Init();                   //初始化SDKManger
 
+        RealNameManager.GetInstance().Init();     //初始化实名制系统
+
         if (AppMode != AppMode.Release)
         {
             GUIConsole.Init(); //运行时Console
@@ -135,7 +153,8 @@ public class ApplicationManager : MonoBehaviour
             DevelopReplayManager.Init(m_quickLunch);   //开发者复盘管理器
 
             LanguageManager.Init();
-            LanguageManager.SetLanguage(langguage);
+            Debug.LogWarning("非 release 模式下，语言 受 ApplicationManager 控制");
+            //LanguageManager.SetLanguage(langguage);
         }
         else
         {
@@ -150,10 +169,18 @@ public class ApplicationManager : MonoBehaviour
             LanguageManager.Init();
            
         }
+
+        if (s_OnApplicationModuleInitEnd != null)
+        {
+            s_OnApplicationModuleInitEnd();
+        }
     }
 
     #region 程序生命周期事件派发
- 
+    /// <summary>
+    /// 框架模块初始化完成回调
+    /// </summary>
+    public static ApplicationVoidCallback s_OnApplicationModuleInitEnd = null;
     public static ApplicationVoidCallback s_OnApplicationQuit = null;
     public static ApplicationBoolCallback s_OnApplicationPause = null;
     public static ApplicationBoolCallback s_OnApplicationFocus = null;
@@ -254,7 +281,7 @@ void OnApplicationPause(bool pauseStatus)
     {
         if (UseAssetsBundle)
         {
-
+            HotUpdateManager.CheckLocalVersion();
             ResourceManager.Initialize ( AssetsLoadType.AssetBundle,useCache);
         }
         else

@@ -55,17 +55,13 @@ public class JsonNetworkService : INetworkInterface
             }
 
             string mes = Json.Serialize(data);
-            mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
+            //mes = mes.Replace(c_endChar.ToString(), c_endCharReplaceString);
 
-            //加密
-            if ( MessageType != HeartBeatBase.c_HeartBeatMT && EncryptionService.IsSecret)
-            {
-                mes = EncryptionService.Encrypt(mes);
-            }
+            SendMessage(MessageType, mes);
 
-            byte[] bytes = Encoding.UTF8.GetBytes(mes + c_endChar);
+            //byte[] bytes = Encoding.UTF8.GetBytes(mes + c_endChar);
 
-            m_socketService.Send(bytes);
+            //m_socketService.Send(bytes);
         }
         catch (Exception e)
         {
@@ -78,6 +74,23 @@ public class JsonNetworkService : INetworkInterface
         try
         {
             content = content.Replace(c_endChar.ToString(), c_endCharReplaceString);
+
+            try
+            {
+                if (msgCompress != null)
+                    content = msgCompress.CompressString(content);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+           
+
+            //加密
+            if (MessageType != HeartBeatBase.c_HeartBeatMT && EncryptionService.IsSecret)
+            {
+                content = EncryptionService.Encrypt(content);
+            }
             byte[] bytes = Encoding.UTF8.GetBytes(content + c_endChar);
 
             m_socketService.Send(bytes);
@@ -138,6 +151,19 @@ public class JsonNetworkService : INetworkInterface
         {
             if(s != null && s != "")
             {
+                if (msgCompress != null)
+                {
+                    try
+                    {
+                        s = msgCompress.DecompressString(s);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError(e);
+                    }
+                    
+                }
+
                 //解密
                 if(EncryptionService.IsSecret)
                 {

@@ -20,6 +20,7 @@ public class SingleDataWrap
 		L.RegFunction("GetVector3", GetVector3);
 		L.RegFunction("GetColor", GetColor);
 		L.RegFunction("GetStringArray", GetStringArray);
+		L.RegFunction("GetArray", GetArray);
 		L.RegFunction("New", _CreateSingleData);
 		L.RegFunction("__tostring", ToLua.op_ToString);
 		L.RegVar("data", get_data, set_data);
@@ -276,6 +277,24 @@ public class SingleDataWrap
 			SingleData obj = (SingleData)ToLua.CheckObject(L, 1, typeof(SingleData));
 			string arg0 = ToLua.CheckString(L, 2);
 			string[] o = obj.GetStringArray(arg0);
+			ToLua.Push(L, o);
+			return 1;
+		}
+		catch(Exception e)
+		{
+			return LuaDLL.toluaL_exception(L, e);
+		}
+	}
+
+	[MonoPInvokeCallbackAttribute(typeof(LuaCSFunction))]
+	static int GetArray(IntPtr L)
+	{
+		try
+		{
+			ToLua.CheckArgsCount(L, 2);
+			SingleData obj = (SingleData)ToLua.CheckObject(L, 1, typeof(SingleData));
+			string arg0 = ToLua.CheckString(L, 2);
+			System.Array o = obj.GetArray(arg0);
 			ToLua.Push(L, o);
 			return 1;
 		}

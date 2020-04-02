@@ -32,7 +32,10 @@ public class DataTable : Dictionary<string, SingleData>
     /// 储存每个字段是什么类型
     /// </summary>
     public Dictionary<string, FieldType> m_tableTypes = new Dictionary<string,FieldType>();
-
+    /// <summary>
+    /// 数组分割符号（字段名,分割字符）
+    /// </summary>
+    public Dictionary<string, char[]> m_ArraySplitFormat = new Dictionary<string, char[]>();
     /// <summary>
     /// 如果是枚举类型，这里储存二级类型
     /// </summary>
@@ -204,7 +207,16 @@ public class DataTable : Dictionary<string, SingleData>
 
                 try
                 {
-                    l_data.m_tableTypes.Add(field, (FieldType)Enum.Parse(typeof(FieldType), content[0]));
+                    string fieldType = content[0];
+                    if (fieldType.Contains("["))
+                    {
+                        string[] tempSS = fieldType.Split('[');
+                        fieldType = tempSS[0];
+                        string splitStr = tempSS[1].Replace("]", "");
+
+                        l_data.m_ArraySplitFormat.Add(field, splitStr.ToCharArray());
+                    }
+                    l_data.m_tableTypes.Add(field, (FieldType)Enum.Parse(typeof(FieldType), fieldType));
 
                     if (content.Length > 1)
                     {
@@ -263,6 +275,16 @@ public class DataTable : Dictionary<string, SingleData>
                 if (data.m_tableTypes.ContainsKey(key))
                 {
                     typeString = data.m_tableTypes[key].ToString();
+
+                    if (data.m_ArraySplitFormat.ContainsKey(key))
+                    {
+                        typeString += "[";
+                        foreach (var item in data.m_ArraySplitFormat[key])
+                        {
+                            typeString += item;
+                        }
+                        typeString += "]";
+                    }
 
                     if (data.m_tableEnumTypes.ContainsKey(key))
                     {
@@ -459,6 +481,14 @@ public class DataTable : Dictionary<string, SingleData>
             return FieldType.String;
         }
     }
+    public char[] GetArraySplitFormat(string key)
+    {
+        if (m_ArraySplitFormat.ContainsKey(key))
+        {
+            return m_ArraySplitFormat[key];
+        }
+        return new char[0];
+    }
 
     public void SetFieldType(string key,FieldType type ,string enumType)
     {
@@ -648,13 +678,13 @@ public class SingleData : Dictionary<string, string>
             if (this.ContainsKey(key))
             {
                 content = this[key];
-                return int.Parse(content);
+                return ParseTool.GetInt(content);
             }
 
             if (data.m_defaultValue.ContainsKey(key))
             {
                 content = data.m_defaultValue[key];
-                return int.Parse(content);
+                return ParseTool.GetInt(content);
             }
         }
         catch (Exception e)
@@ -697,12 +727,12 @@ public class SingleData : Dictionary<string, string>
         {
             if (this.ContainsKey(key))
             {
-                return float.Parse(this[key]);
+                return ParseTool.GetFloat(this[key]);
             }
 
             if (data.m_defaultValue.ContainsKey(key))
             {
-                return float.Parse(data.m_defaultValue[key]);
+                return ParseTool.GetFloat(data.m_defaultValue[key]);
             }
         }
         catch (Exception e)
@@ -744,13 +774,13 @@ public class SingleData : Dictionary<string, string>
             if (this.ContainsKey(key))
             {
                 content = this[key];
-                return bool.Parse(content);
+                return ParseTool.GetBool(content);
             }
 
             if (data.m_defaultValue.ContainsKey(key))
             {
                 content = data.m_defaultValue[key];
-                return bool.Parse(content);
+                return ParseTool.GetBool(content);
             }
         }
         catch (Exception e)
@@ -793,7 +823,7 @@ public class SingleData : Dictionary<string, string>
 #if Compatibility
                 return this[key];
 #else
-                return StringFilter(this[key]);
+                return ParseTool.GetString(this[key]);
 #endif
             }
 
@@ -802,7 +832,7 @@ public class SingleData : Dictionary<string, string>
 #if Compatibility
                 return data.m_defaultValue[key];
 #else
-                return StringFilter(data.m_defaultValue[key]);
+                return ParseTool.GetString(data.m_defaultValue[key]);
 #endif
             }
         }
@@ -987,6 +1017,33 @@ public class SingleData : Dictionary<string, string>
         catch (Exception e)
         {
             throw new Exception("SingleData GetStringArray Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
+        }
+
+        throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-");// throw  
+    }
+    public T[] GetArray<T>(string key)
+    {
+        return (T[])GetArray(key);
+    }
+        public Array GetArray(string key)
+    {
+        
+        try
+        {
+            if (this.ContainsKey(key))
+            {
+                return ParseTool.String2Array(data.GetFieldType(key), this[key], data.GetArraySplitFormat(key));
+            }
+
+            else if (data.m_defaultValue.ContainsKey(key))
+            {
+                return ParseTool.String2Array(data.GetFieldType(key), data.m_defaultValue[key], data.GetArraySplitFormat(key));
+            }
+
+        }
+        catch (Exception e)
+        {
+            throw new Exception("SingleData GetStringArray2 Error TableName is :->" + data.m_tableName + "<- key->" + key + "<-  singleDataName : ->" + m_SingleDataKey + "<- \n" + e.ToString());
         }
 
         throw new Exception("Don't Exist Value or DefaultValue by ->" + key + "<- TableName is : ->" + data.m_tableName + "<- singleDataName : ->" + m_SingleDataKey + "<-");// throw  

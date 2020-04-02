@@ -1,4 +1,5 @@
 ﻿using FrameWork.SDKManager;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,7 +22,11 @@ public class HuaWeiPayClass : PayInterface
 
     public override void Init()
     {
-        GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
+        if (SDKManager.IncludeThePayPlatform(StoreName.HuaWei))
+        {
+            GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
+        }
+
     }
 
     /// <summary>
@@ -56,33 +61,37 @@ public class HuaWeiPayClass : PayInterface
 
         Debug.LogWarning("OnPrePay=========：" + e.prepay_id + "=partnerId==");
 
-        //华为的支付重发意义不大
-        //OnPayInfo onPayInfo = new OnPayInfo();
-        //onPayInfo.isSuccess = true;
-        //onPayInfo.goodsId = e.goodsID;
-        //onPayInfo.storeName = StoreName.HuaWei;
-        //onPayInfo.receipt = e.mch_orderID;
-        //onPayInfo.price = price;
-        //PayReSend.Instance.AddPrePayID(onPayInfo);
-        IndentListener(e.goodsID, e.mch_orderID, e.prepay_id, price);
-    }
-
-    /// <summary>
-    /// 消息1 的监听， 获得订单信息，然后调支付sdk
-    /// </summary>
-    private void IndentListener(string goodID, string mch_orderID, string prepay_id, float price)
-    {
         PayInfo payInfo = new PayInfo(
-            goodID,
-            GetGoodsInfo(goodsID).localizedTitle, 
-            prepay_id, 
-            FrameWork.SDKManager.GoodsType.NORMAL,
-            mch_orderID,
-            price, 
-            GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID());
+             e.goodsID,
+             GetGoodsInfo(goodsID).localizedTitle,
+             "",
+             FrameWork.SDKManager.GoodsType.NORMAL,
+             mch_orderID,
+             price,
+             GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID(), e.storeName.ToString());
 
-        SDKManagerNew.Pay(StoreName.HuaWei.ToString(), payInfo);
+        payInfo.prepay_id = e.prepay_id;
+
+        SDKManagerNew.Pay(payInfo);
+
     }
+
+    ///// <summary>
+    ///// 消息1 的监听， 获得订单信息，然后调支付sdk
+    ///// </summary>
+    //private void IndentListener(string goodID, string mch_orderID, string prepay_id, float price)
+    //{
+    //    PayInfo payInfo = new PayInfo(
+    //        goodID,
+    //        GetGoodsInfo(goodsID).localizedTitle, 
+    //        prepay_id, 
+    //        FrameWork.SDKManager.GoodsType.NORMAL,
+    //        mch_orderID,
+    //        price, 
+    //        GetGoodsInfo(goodsID).isoCurrencyCode,GetUserID());
+
+    //    SDKManagerNew.Pay(StoreName.HuaWei.ToString(), payInfo);
+    //}
 
     public override string GetUserID()
     {
