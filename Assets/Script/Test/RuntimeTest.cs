@@ -67,6 +67,6 @@ public class RuntimeTest : MonoBehaviour
         //}
 	}
 
-    int loadCount = 0;
-    int callbackCount = 0;
+    //int loadCount = 0;
+    //int callbackCount = 0;
 }

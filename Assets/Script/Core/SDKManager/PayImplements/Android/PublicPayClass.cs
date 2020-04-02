@@ -8,8 +8,8 @@ using UnityEngine;
 public class PublicPayClass : PayInterface
 {
     PayInfo payInfo;
-    string goodsID;
-    string mch_orderID;
+    //string goodsID;
+    //string mch_orderID;
     GameObject androidListener;
     StoreName storeName = StoreName.None;
     string userID;
@@ -33,7 +33,7 @@ public class PublicPayClass : PayInterface
         {
             GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
 
-            Debug.Log("PublicPayClass Init m_SDKName:>" + m_SDKName + "<");
+            //Debug.Log("PublicPayClass Init m_SDKName:>" + m_SDKName + "<");
         }
 
         //GlobalEvent.DispatchEvent("Fight",)
@@ -101,7 +101,7 @@ public class PublicPayClass : PayInterface
             PayReSend.Instance.AddPrePayID(onPayInfo);
         }
 
-        payInfo.orderID = mch_orderID;
+        payInfo.orderID = e.mch_orderID;
         payInfo.prepay_id = e.prepay_id;
 
         SDKManagerNew.Pay(payInfo);
@@ -118,8 +118,8 @@ public class PublicPayClass : PayInterface
     public override void Pay(PayInfo payInfo)
     {
         userID = payInfo.userID;
-        this.payInfo = payInfo;
-        this.goodsID = this.payInfo.goodsID;
+        //mch_orderID = payInfo.orderID;
+        //this.goodsID = this.payInfo.goodsID;
         Debug.Log("send publicPay message storeName" + payInfo.storeName + " goodsID " + payInfo.goodsID);
         //给服务器发y预支付消息
         PrePay2Service.SendPrePayMsg((StoreName)Enum.Parse(typeof(StoreName), payInfo.storeName), payInfo.goodsID);

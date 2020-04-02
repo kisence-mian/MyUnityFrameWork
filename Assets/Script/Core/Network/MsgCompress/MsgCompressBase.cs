@@ -39,10 +39,10 @@ public abstract class MsgCompressBase
         try
         {
             int length = int.Parse(cMsg.Substring(0, 2));
-            string compressType = cMsg.Substring(2, length);
+            //string compressType = cMsg.Substring(2, length);
              msg = cMsg.Substring(2 + length);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return cMsg;
         }

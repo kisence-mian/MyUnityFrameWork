@@ -17,10 +17,6 @@ public class RealNameInterface : SDKInterfaceBase
     /// </summary>
     public virtual RealNameStatus GetRealNameType()
     {
-
-
-
-
         return RealNameStatus.NotNeed;
     }
 

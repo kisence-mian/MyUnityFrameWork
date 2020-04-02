@@ -11,7 +11,7 @@ public class IAppPayClass : PayInterface
     public string mchID;
     public string appSecret;
     string goodsID;
-    string mch_orderID;
+    //string mch_orderID;
     GameObject androidListener;
     public override List<RuntimePlatform> GetPlatform()
     {
@@ -59,7 +59,7 @@ public class IAppPayClass : PayInterface
         onPayInfo.receipt = e.mch_orderID;
         PayReSend.Instance.AddPrePayID(onPayInfo);
         //IndentListener(e.goodsID,e.mch_orderID, e.prepay_id, nonceStr, timeStamp, sign);
-        PayInfo payInfo = new PayInfo(e.goodsID, GetGoodsInfo(e.goodsID).localizedTitle, "", FrameWork.SDKManager.GoodsType.NORMAL, mch_orderID, 0, GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID(), StoreName.IAppPay.ToString());
+        PayInfo payInfo = new PayInfo(e.goodsID, GetGoodsInfo(e.goodsID).localizedTitle, "", FrameWork.SDKManager.GoodsType.NORMAL, e.mch_orderID, 0, GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID(), StoreName.IAppPay.ToString());
         payInfo.prepay_id = e.prepay_id;
 
         SDKManagerNew.Pay(payInfo);
@@ -115,7 +115,7 @@ public class IAppPayClass : PayInterface
         OnPayInfo payInfo = new OnPayInfo();
         payInfo.isSuccess = info.isSuccess;
         payInfo.goodsId = goodsID;
-        payInfo.orderID = mch_orderID;
+        payInfo.orderID = info.orderID;
         payInfo.goodsType = GetGoodType(goodsID);
         payInfo.storeName = StoreName.IAppPay;
 
@@ -124,7 +124,7 @@ public class IAppPayClass : PayInterface
 
         Debug.Log("SetPayResult " + payInfo.price + " goodsID " + goodsID);
 
-        payInfo.receipt = mch_orderID;
+        payInfo.receipt = info.orderID;
         
         PayCallBack(payInfo);
     }

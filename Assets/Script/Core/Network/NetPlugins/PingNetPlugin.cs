@@ -12,7 +12,7 @@ public class PingNetPlugin:NetPluginBase
     public long Ping { get; private set; }
 
     private IPEndPoint remoteIPEndPort;
-    private bool isConnect = false;
+    //private bool isConnect = false;
 
    
     public override void Update()

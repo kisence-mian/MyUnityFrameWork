@@ -124,6 +124,8 @@ namespace FrameWork.SDKManager
                         LoadService(data);
                         InitSDK();
                         AutoListenerInit();
+
+                        RealNameManager.GetInstance().Init();     //初始化实名制系统
                     }
                 }
                 catch (Exception e)
@@ -1372,8 +1374,9 @@ namespace FrameWork.SDKManager
             {
                 return defaultValue;
             }
-#endif
+#else
             return SDKManagerNew.GetProperties(properties, key, defaultValue);
+#endif
         }
 
         /// <summary>
@@ -1435,7 +1438,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-        #region 加载SDK设置
+#region 加载SDK设置
 
                 /// <summary>
                 /// 读取当前游戏内的SDK配置
@@ -1532,9 +1535,9 @@ namespace FrameWork.SDKManager
                     }
                 }
 
-        #endregion
+#endregion
 
-        #region 初始化SDK
+#region 初始化SDK
 
                 static void LoadService(SchemeData data)
                 {
@@ -1561,9 +1564,9 @@ namespace FrameWork.SDKManager
                     //Debug.Log("s_loginServiceList: " + s_loginServiceList.Count);
                 }
 
-        #endregion
+#endregion
 
-        #region 功能函数
+#region 功能函数
 
                 static T GetSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
                 {
@@ -1607,9 +1610,9 @@ namespace FrameWork.SDKManager
                     }
                 }
 
-        #endregion
+#endregion
 
-        #region 自动监听上报
+#region 自动监听上报
 
                 /// <summary>
                 /// 自动上报监听初始化
@@ -1632,7 +1635,7 @@ namespace FrameWork.SDKManager
                     }
                 }
 
-        #endregion
+#endregion
     }
 
 #region 声明

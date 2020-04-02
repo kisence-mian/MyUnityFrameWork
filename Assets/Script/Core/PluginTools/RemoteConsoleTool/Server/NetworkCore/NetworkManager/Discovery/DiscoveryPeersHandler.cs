@@ -32,7 +32,7 @@ namespace LiteNetLibManager
        
         public void Add(RemoteDeviceInfo deviceInfo, IPEndPoint remoteEndPoint)
         {
-            string ipPortString = remoteEndPoint.ToString();
+            //string ipPortString = remoteEndPoint.ToString();
             //Debug.Log("ipPortString:" + ipPortString);
             if (discoverPeerTimeoutDic.ContainsKey(deviceInfo))
             {

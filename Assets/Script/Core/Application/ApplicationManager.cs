@@ -86,7 +86,7 @@ public class ApplicationManager : MonoBehaviour
     public bool showLanguageValue = false;
     public void Awake()
     {
-        Debug.Log("persistentDataPath:" + Application.persistentDataPath);
+        //Debug.Log("persistentDataPath:" + Application.persistentDataPath);
         instance = this;
 
         GameInfoCollecter.AddAppInfoValue("Build App Mode", m_AppMode);
@@ -129,13 +129,8 @@ public class ApplicationManager : MonoBehaviour
 #else
         UIManager.InitAsync();               //异步加载UIManager
 #endif
-
         ApplicationStatusManager.Init();     //游戏流程状态机初始化
         GlobalLogicManager.Init();           //初始化全局逻辑
-
-        SDKManager.Init();                   //初始化SDKManger
-
-        RealNameManager.GetInstance().Init();     //初始化实名制系统
 
         if (AppMode != AppMode.Release)
         {
@@ -143,6 +138,7 @@ public class ApplicationManager : MonoBehaviour
 
             DevelopReplayManager.OnLunchCallBack += () =>
             {
+                SDKManager.Init();                   //初始化SDKManger
 #if USE_LUA
                 LuaManager.Init();
 #endif
@@ -153,13 +149,11 @@ public class ApplicationManager : MonoBehaviour
             DevelopReplayManager.Init(m_quickLunch);   //开发者复盘管理器
 
             LanguageManager.Init();
-            Debug.LogWarning("非 release 模式下，语言 受 ApplicationManager 控制");
-            //LanguageManager.SetLanguage(langguage);
         }
         else
         {
             Log.Init(false); //关闭 Debug
-
+            SDKManager.Init();                   //初始化SDKManger
 #if USE_LUA
             LuaManager.Init();
 #endif
@@ -167,7 +161,6 @@ public class ApplicationManager : MonoBehaviour
             ApplicationStatusManager.EnterStatus(m_Status);//游戏流程状态机，开始第一个状态
 
             LanguageManager.Init();
-           
         }
 
         if (s_OnApplicationModuleInitEnd != null)

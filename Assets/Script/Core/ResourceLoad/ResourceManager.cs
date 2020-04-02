@@ -65,7 +65,7 @@ public static class ResourceManager
         GameInfoCollecter.AddAppInfoValue("AssetsLoadType", loadType);
 
         loadAssetsController = new AssetsLoadController(loadType,useCache);
-        Debug.Log("ResourceManager初始化 AssetsLoadType:" + loadType + " useCache:" + useCache);
+        //Debug.Log("ResourceManager初始化 AssetsLoadType:" + loadType + " useCache:" + useCache);
     }
 
     public static AssetsLoadController GetLoadAssetsController()

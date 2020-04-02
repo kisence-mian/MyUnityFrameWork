@@ -10,17 +10,8 @@ public class Log
 {
     //日志输出线程
     static LogOutPutThread s_LogOutPutThread = new LogOutPutThread();
-    //public static bool isOpenLog= false;
     public static void Init(bool isOpenLog = true)
     {
-        //        Log.isOpenLog = isOpenLog;
-        //#if UNITY_2017_1_OR_NEWER
-        //        Debug.unityLogger.logEnabled = isOpenLog;
-        //#else
-        //        Debug.logger.logEnabled = isOpenLog;
-        //#endif
-
-
         if (Application.platform != RuntimePlatform.WindowsEditor &&
             Application.platform != RuntimePlatform.LinuxEditor)
         {
@@ -62,12 +53,6 @@ public class Log
 
     static void UnityLogCallBack(string log, string track, LogType type)
     {
-        //LogInfo l_logInfo = new LogInfo
-        //{
-        //    m_logContent = log,
-        //    m_logTrack = track,
-        //    m_logType = type
-        //};
     }
 }
 

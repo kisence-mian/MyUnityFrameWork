@@ -8,7 +8,7 @@ using UnityEngine;
 public class IniConfigTool
 {
     public Dictionary<string, string> configData;
-    string fullFileName;
+    //string fullFileName;
     public IniConfigTool(string filePath)
     {
         configData = new Dictionary<string, string>();
@@ -94,17 +94,17 @@ public class IniConfigTool
         else
             configData.Add(key, value);
     }
-    public void Save()
-    {
-        StreamWriter writer = new StreamWriter(fullFileName, false, Encoding.Default);
-        IDictionaryEnumerator enu = configData.GetEnumerator();
-        while (enu.MoveNext())
-        {
-            if (enu.Key.ToString().StartsWith("#"))
-                writer.WriteLine(enu.Key + "" + enu.Value);
-            else
-                writer.WriteLine(enu.Key + "=" + enu.Value);
-        }
-        writer.Close();
-    }
+    //public void Save()
+    //{
+    //    StreamWriter writer = new StreamWriter(fullFileName, false, Encoding.Default);
+    //    IDictionaryEnumerator enu = configData.GetEnumerator();
+    //    while (enu.MoveNext())
+    //    {
+    //        if (enu.Key.ToString().StartsWith("#"))
+    //            writer.WriteLine(enu.Key + "" + enu.Value);
+    //        else
+    //            writer.WriteLine(enu.Key + "=" + enu.Value);
+    //    }
+    //    writer.Close();
+    //}
 }

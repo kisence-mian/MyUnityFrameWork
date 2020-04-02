@@ -105,7 +105,7 @@ namespace LiteNetLibManager
                     Assembly[] assemblys = AppDomain.CurrentDomain.GetAssemblies();
                     for (int i = 0; i < assemblys.Length; i++)
                     {
-                        Assembly assembly = assemblys[i];
+                        //Assembly assembly = assemblys[i];
 //                        if (assembly == ass) continue;
 //                        //#if UNITY
 //                        if (assembly == Assembly_CSharp) continue;
@@ -176,7 +176,7 @@ namespace LiteNetLibManager
                         //Debug.Log("Activator.CreateInstance:" + type);
                         instance = Activator.CreateInstance(type);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         //error += e.ToString() + "\n";
                     }
@@ -205,7 +205,7 @@ namespace LiteNetLibManager
                                     parmsArr[j] = null;
                             }
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
 
                             //error += e.ToString() + "\n";
@@ -220,7 +220,7 @@ namespace LiteNetLibManager
                             else
                                 break;
                         }
-                        catch (Exception e)
+                        catch (Exception)
                         {
                             //error += e.ToString() + "\n";
                             continue;

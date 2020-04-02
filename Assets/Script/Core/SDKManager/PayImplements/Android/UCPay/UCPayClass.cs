@@ -9,7 +9,7 @@ public class UCPayClass : PayInterface
     PayInfo payInfo;
     string goodsID;
     float price;
-    string mch_orderID;
+    //string mch_orderID;
     string userID;
 
     public override List<RuntimePlatform> GetPlatform()
@@ -88,7 +88,7 @@ public class UCPayClass : PayInterface
             GetGoodsInfo(goodsID).localizedTitle,
             "",
             FrameWork.SDKManager.GoodsType.NORMAL,
-            mch_orderID,
+            e.mch_orderID,
             price,
             GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID(), e.storeName.ToString());
         payInfo.prepay_id = e.prepay_id;

@@ -21,7 +21,7 @@ public class HotupdateFlowItem : FlowItemBase
     public const string P_SelectHotUpdateTestPath = "SelectHotUpdateTestPath";
     protected override void OnFlowStart(params object[] paras)
     {
-        GameServerAreaData gameServerArea = flowManager.GetVariable<GameServerAreaData>(P_GameServerAreaData);
+        //GameServerAreaData gameServerArea = flowManager.GetVariable<GameServerAreaData>(P_GameServerAreaData);
 
         string hotupdateConfigUrl = null;
         try

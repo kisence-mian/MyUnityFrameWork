@@ -12,7 +12,7 @@ public class vivoPayClass : PayInterface
     public string appSecret;
     string goodsID;
     float price;
-    string mch_orderID;
+    //string mch_orderID;
     GameObject androidListener;
     public override List<RuntimePlatform> GetPlatform()
     {
@@ -61,7 +61,7 @@ public class vivoPayClass : PayInterface
         //IndentListener(e.goodsID,e.mch_orderID, e.prepay_id, onPayInfo.price);
 
 
-        PayInfo payInfo = new PayInfo(e.goodsID, GetGoodsInfo(e.goodsID).localizedTitle, "", FrameWork.SDKManager.GoodsType.NORMAL, mch_orderID, price, GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID(), e.storeName.ToString());
+        PayInfo payInfo = new PayInfo(e.goodsID, GetGoodsInfo(e.goodsID).localizedTitle, "", FrameWork.SDKManager.GoodsType.NORMAL, e.mch_orderID, price, GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID(), e.storeName.ToString());
         payInfo.prepay_id = e.prepay_id;
         SDKManagerNew.Pay(payInfo);
 
@@ -118,7 +118,7 @@ public class vivoPayClass : PayInterface
         OnPayInfo payInfo = new OnPayInfo();
         payInfo.isSuccess = info.isSuccess;
         payInfo.goodsId = goodsID;
-        payInfo.orderID = mch_orderID;
+        payInfo.orderID = info.orderID;
         payInfo.goodsType = GetGoodType(goodsID);
         payInfo.storeName = StoreName.VIVO;
 
@@ -127,7 +127,7 @@ public class vivoPayClass : PayInterface
 
         Debug.Log("SetPayResult " + payInfo.price + " goodsID " + goodsID);
 
-        payInfo.receipt = mch_orderID;
+        payInfo.receipt = info.orderID;
         
         PayCallBack(payInfo);
     }

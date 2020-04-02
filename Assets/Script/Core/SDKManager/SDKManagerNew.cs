@@ -795,7 +795,7 @@ namespace FrameWork.SDKManager
 
 #if UNITY_EDITOR
 
-        static AndroidJavaClass androidInterface = null;
+        //static AndroidJavaClass androidInterface = null;
 
 #elif UNITY_ANDROID
 

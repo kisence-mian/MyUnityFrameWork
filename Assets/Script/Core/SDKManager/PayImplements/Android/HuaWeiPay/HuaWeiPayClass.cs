@@ -40,7 +40,7 @@ public class HuaWeiPayClass : PayInterface
     {
         userID = payInfo.userID;
         this.goodsID = payInfo.goodsID;
-        this.goodsName = payInfo.goodsName;
+        //this.goodsName = payInfo.goodsName;
         price = payInfo.price;
         Debug.Log("send HuaWeiPay----message-----" + goodsID);
         //给服务器发消息
@@ -66,7 +66,7 @@ public class HuaWeiPayClass : PayInterface
              GetGoodsInfo(goodsID).localizedTitle,
              "",
              FrameWork.SDKManager.GoodsType.NORMAL,
-             mch_orderID,
+             e.mch_orderID,
              price,
              GetGoodsInfo(goodsID).isoCurrencyCode, GetUserID(), e.storeName.ToString());
 

@@ -9,11 +9,11 @@ namespace GameConsoleController
     {
 
         private Action OnTriggerBoot;
-        private GameConsolePanelSettingConfig config;
+        //private GameConsolePanelSettingConfig config;
 
         public void OnInit(GameConsolePanelSettingConfig config, Action OnTriggerBoot)
         {
-            this.config = config;
+            //this.config = config;
             this.OnTriggerBoot = OnTriggerBoot;
 
             Debug.Log("KeyboardBootConsole.init");

@@ -56,6 +56,8 @@ public class P4399PayClass : PayInterface
     {
         StartLongTimeNoResponse();
 
+        payInfo = l_payInfo;
+
         Debug.Log("DefaultIAPImplement.Pay :" + l_payInfo.goodsID);
         SDKManagerNew.Pay( l_payInfo);
     }

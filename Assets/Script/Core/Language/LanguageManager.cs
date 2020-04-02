@@ -34,14 +34,12 @@ public class LanguageManager
 
     public static bool IsInit
     {
-        get { return LanguageManager.isInit; }
+        get { return isInit; }
         set { isInit = value; }
     }
 
     public static void Init()
     {
-        //Debug.Log("1 当前语言: " + Application.systemLanguage + " isInit " + isInit);
-
         if (!isInit)
         {
             isInit = true;
@@ -53,13 +51,11 @@ public class LanguageManager
                 return;
             s_currentLanguage = SetConfig();
             Debug.Log("使用语言：" + s_currentLanguage);
-           // SetLanguage(SetConfig());
         }
     }
 
     private static SystemLanguage SetConfig()
     {
-
         SystemLanguage systemLanguage = Application.systemLanguage;
         if(systemLanguage== SystemLanguage.Chinese)
         {
@@ -114,8 +110,6 @@ public class LanguageManager
                 OnChangeLanguage(s_currentLanguage);
             }
         }
-
-       
     }
 
     ///// <summary>
@@ -263,7 +257,12 @@ public class LanguageManager
         string fullkey = moduleName.Replace('_', '/') + "/" + contentID;
         return GetContentByKey(fullkey,contentParams);
     }
-    
+    /// <summary>
+    /// 获得多语言保存的文件名
+    /// </summary>
+    /// <param name="langeuageName"></param>
+    /// <param name="fullkeyFileName"></param>
+    /// <returns></returns>
     public static string GetLanguageDataName(SystemLanguage langeuageName, string fullkeyFileName)
     {
         string modelName = fullkeyFileName.Replace('/', '_');
