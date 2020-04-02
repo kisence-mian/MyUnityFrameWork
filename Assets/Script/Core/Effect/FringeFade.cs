@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LiuHaiFade : MonoBehaviour {
+//刘海
+public class FringeFade : MonoBehaviour {
 
 
 	// Use this for initialization
