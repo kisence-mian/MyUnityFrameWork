@@ -33,6 +33,8 @@ namespace FrameWork.SDKManager
         private static ADCallBack s_adCallBack;
         private static GoodsInfoCallBack s_goodsInfoCallBack;
         private static RealNameCallBack s_realNameCallBack;
+        private static PayLimitCallBack s_payLimitCallBack;
+        private static RealNameLogoutCallBack s_RealNameLogoutCallBack;
 
         static Dictionary<string, OtherCallBack> s_callBackDict = new Dictionary<string, OtherCallBack>();
 
@@ -89,6 +91,32 @@ namespace FrameWork.SDKManager
             set
             {
                 s_realNameCallBack = value;
+            }
+        }
+
+        public static PayLimitCallBack PayLimitCallBack
+        {
+            get
+            {
+                return s_payLimitCallBack;
+            }
+
+            set
+            {
+                s_payLimitCallBack = value;
+            }
+        }
+
+        public static RealNameLogoutCallBack RealNameLogoutCallBack
+        {
+            get
+            {
+                return s_RealNameLogoutCallBack;
+            }
+
+            set
+            {
+                s_RealNameLogoutCallBack = value;
             }
         }
 
@@ -557,7 +585,7 @@ namespace FrameWork.SDKManager
 
             else if (s_useNewSDKManager)
             {
-                if (GetPrePay(""))
+                if (GetPrePay(payInfo.storeName.ToString()))
                 {
                     try
                     {
@@ -737,7 +765,29 @@ namespace FrameWork.SDKManager
         {
             if (allPayPlatformInfos == null)
             {
-                string payPlatformValueFromSDK = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None");
+
+                string defaultValue = "None";
+                if (s_payServiceList.Count > 0)
+                {
+                    defaultValue = "";
+                    for (int i = 0; i < s_payServiceList.Count; i++)
+                    {
+                        if ( s_payServiceList[i].GetType() == typeof(PublicPayClass))
+                        {
+                            continue;
+                        }
+                        if (!string.IsNullOrEmpty(defaultValue))
+                        {
+                            defaultValue += "|";
+                        }
+                        defaultValue += s_payServiceList[i].m_SDKName;
+                        Debug.LogWarning(defaultValue+ s_payServiceList[i].GetType());
+                    }
+                }
+
+                string payPlatformValueFromSDK = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, defaultValue);
+
+                Debug.Log("payPlatformValueFromSDK:" + payPlatformValueFromSDK + " defaultValue:" + defaultValue + "==" + s_payServiceList.Count);
 
                 allPayPlatformInfos = PayPlatformInfo.GetAllPayPlatform(payPlatformValueFromSDK);
             }
@@ -771,6 +821,21 @@ namespace FrameWork.SDKManager
         #region 广告
 
         /// <summary>
+        /// 获取将会调用的广告sdkName
+        /// </summary>
+        /// <returns></returns>
+        public static string GetNowADSDKName()
+        {
+            string sdkName = GetProperties(SDKInterfaceDefine.PropertiesKey_ADPlatform, null);
+            if (string.IsNullOrEmpty(sdkName) && s_ADServiceList.Count > 0)
+            {
+                return s_ADServiceList[0].m_SDKName;
+            }
+            return sdkName;
+
+        }
+
+        /// <summary>
         /// 加载广告,默认访问第一个接口
         /// </summary>
         public static void LoadAD(ADType adType, string tag = "")
@@ -786,7 +851,11 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void LoadAD(string SDKName, ADType adType, string tag = "")
         {
-            if (GetHasSDKService(s_ADServiceList, SDKName))
+            if (string.IsNullOrEmpty(SDKName) && s_ADServiceList.Count > 0)
+            {
+                s_ADServiceList[0].LoadAD(adType, tag);
+            }
+            else if (GetHasSDKService(s_ADServiceList, SDKName))
             {
                 try
                 {
@@ -826,7 +895,11 @@ namespace FrameWork.SDKManager
         {
             try
             {
-                if (GetHasSDKService(s_ADServiceList, SDKName))
+                if (string.IsNullOrEmpty(SDKName) && s_ADServiceList.Count > 0)
+                {
+                    return s_ADServiceList[0].IsLoaded(adType,tag);
+                }
+                else if (GetHasSDKService(s_ADServiceList, SDKName))
                 {
                     return GetADService(SDKName).IsLoaded(adType, tag);
                 }
@@ -866,7 +939,11 @@ namespace FrameWork.SDKManager
         {
             try
             {
-                if (GetHasSDKService(s_ADServiceList, SDKName))
+                if (string.IsNullOrEmpty(SDKName) && s_ADServiceList.Count > 0)
+                {
+                    s_ADServiceList[0].PlayAD(adType, tag);
+                }
+                else if (GetHasSDKService(s_ADServiceList, SDKName))
                 {
                     GetADService(SDKName).PlayAD(adType, tag);
                 }
@@ -904,7 +981,11 @@ namespace FrameWork.SDKManager
         /// <param name="adType"></param>
         public static void CloseAD(string SDKName, ADType adType, string tag = "")
         {
-            if (GetHasSDKService(s_ADServiceList, SDKName))
+            if (string.IsNullOrEmpty(SDKName) && s_ADServiceList.Count > 0)
+            {
+                s_ADServiceList[0].CloseAD(adType, tag);
+            }
+            else if (GetHasSDKService(s_ADServiceList, SDKName))
             {
                 GetADService(SDKName).CloseAD(adType, tag);
             }
@@ -1104,6 +1185,67 @@ namespace FrameWork.SDKManager
         #region 实名制
 
         /// <summary>
+        /// 登录
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="SDKName"></param>
+        /// <param name="tag"></param>
+        static public void RealNameLogin(string userID, string SDKName = null, string tag = null)
+        {
+            //优先使用本地配置的SDK
+            if (s_realNameServiceList.Count > 0)
+            {
+                try
+                {
+                    GetRealNameService(0).OnLogin(userID);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager RealNameLogin Exception: " + e.ToString());
+                }
+            }
+
+            else if (s_useNewSDKManager)
+            {
+                SDKManagerNew.RealNameOnLogin(userID, SDKName, tag);
+            }
+            else
+            {
+                Debug.Log("realName SDK 没有配置！ ");
+            }
+        }
+
+        /// <summary>
+        /// 登出
+        /// </summary>
+        /// <param name="SDKName"></param>
+        /// <param name="tag"></param>
+        static public void RealNameLogout(string SDKName = null, string tag = null)
+        {
+            //优先使用本地配置的SDK
+            if (s_realNameServiceList.Count > 0)
+            {
+                try
+                {
+                    GetRealNameService(0).OnLogout();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager RealNameLogout Exception: " + e.ToString());
+                }
+            }
+
+            else if (s_useNewSDKManager)
+            {
+                SDKManagerNew.RealNameOnLogout(SDKName, tag);
+            }
+            else
+            {
+                Debug.Log("realName SDK 没有配置！ ");
+            }
+        }
+
+        /// <summary>
         /// 实名制状态
         /// </summary>
         static public RealNameStatus GetRealNameType(string SDKName = null, string tag = null)
@@ -1124,10 +1266,6 @@ namespace FrameWork.SDKManager
 
             else if (s_useNewSDKManager)
             {
-                if (string.IsNullOrEmpty(SDKName))
-                {
-                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
-                }
                 return SDKManagerNew.GetRealNameType(SDKName,tag);
             }
             else
@@ -1159,10 +1297,6 @@ namespace FrameWork.SDKManager
 
             else if (s_useNewSDKManager)
             {
-                if (string.IsNullOrEmpty(SDKName))
-                {
-                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
-                }
                 return SDKManagerNew.IsAdult(SDKName,tag);
 
 
@@ -1196,10 +1330,6 @@ namespace FrameWork.SDKManager
 
             else if (s_useNewSDKManager)
             {
-                if (string.IsNullOrEmpty(SDKName))
-                {
-                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
-                }
                 return SDKManagerNew.GetTodayOnlineTime(SDKName,tag);
             }
             else
@@ -1230,10 +1360,6 @@ namespace FrameWork.SDKManager
 
             else if (s_useNewSDKManager)
             {
-                if (string.IsNullOrEmpty(SDKName))
-                {
-                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
-                }
                 SDKManagerNew.StartRealNameAttestation(SDKName,tag);
             }
             else
@@ -1243,37 +1369,33 @@ namespace FrameWork.SDKManager
         }
 
         /// <summary>
-        /// 检测支付是否受限
+        /// 检测支付是否受限 （SDKManager.PayLimitCallBack 回调结果）
         /// </summary>
         /// <returns></returns>
-        static public bool CheckPayLimit(int payAmount, string SDKName = null,string tag =null)
+        static public void CheckPayLimit(int payAmount, string SDKName = null,string tag =null)
         {
             //优先使用本地配置的SDK
             if (s_realNameServiceList.Count > 0)
             {
                 try
                 {
-                    return GetRealNameService(0).CheckPayLimit(payAmount);
+                    GetRealNameService(0).CheckPayLimit(payAmount);
                 }
                 catch (Exception e)
                 {
                     Debug.LogError("SDKManager CheckPayLimit Exception: " + e.ToString());
-                    return false;
+                    return ;
                 }
             }
 
             else if (s_useNewSDKManager)
             {
-                if (string.IsNullOrEmpty(SDKName))
-                {
-                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
-                }
-                return SDKManagerNew.CheckPayLimit(SDKName, payAmount,tag);
+                SDKManagerNew.CheckPayLimit(SDKName, payAmount,tag);
             }
             else
             {
                 Debug.Log("realName SDK 没有配置！ ");
-                return false;
+                return ;
             }
         }
 
@@ -1298,10 +1420,6 @@ namespace FrameWork.SDKManager
 
             else if (s_useNewSDKManager)
             {
-                if (string.IsNullOrEmpty(SDKName))
-                {
-                    SDKName = GetProperties(SDKInterfaceDefine.PropertiesKey_LoginPlatform, null);
-                }
                 SDKManagerNew.LogPayAmount(SDKName,payAmount,tag);
             }
             else
@@ -1346,11 +1464,23 @@ namespace FrameWork.SDKManager
         }
 
         /// <summary>
+        /// 本地注入配置
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name=""></param>
+        /// <param name=""></param>
+        public static void SetProperties(string key, string value)
+        {
+            SetPropertiesFromLocal(key, value);
+        }
+
+        /// <summary>
         /// 读取注入配置
         /// </summary>
         public static string GetProperties(string key,string defaultValue = "")
         {
-           return GetProperties(SDKInterfaceDefine.FileName_ChannelProperties,key, defaultValue);
+            defaultValue = GetPropertiesFromLocal(key, defaultValue);
+            return GetProperties(SDKInterfaceDefine.FileName_ChannelProperties,key, defaultValue);
         }
 
         /// <summary>
@@ -1379,6 +1509,7 @@ namespace FrameWork.SDKManager
 #endif
         }
 
+
         /// <summary>
         /// 游戏关闭
         /// </summary>
@@ -1395,7 +1526,54 @@ namespace FrameWork.SDKManager
             }
         }
 
-#region 事件监听
+        #region 内部工具
+
+
+        /// <summary>
+        /// 非经过重打包 本地设置的渠道参数
+        /// /// </summary>
+        public static Dictionary<string, string> propertiesNoRepackage = new Dictionary<string, string>();
+
+        /// <summary>
+        /// 从获取本地 设置的渠道参数
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        private static string GetPropertiesFromLocal(string key, string defaultValue)
+        {
+            if (propertiesNoRepackage.ContainsKey(key))
+            {
+                return propertiesNoRepackage[key];
+            }
+            else
+            {
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
+        /// 设置本地缓存的渠道参数
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        private static void SetPropertiesFromLocal(string key, string value)
+        {
+            if (propertiesNoRepackage.ContainsKey(key))
+            {
+                propertiesNoRepackage[key] = value;
+            }
+            else
+            {
+                propertiesNoRepackage.Add(key, value);
+            }
+        }
+
+
+
+        #endregion
+
+        #region 事件监听
 
         public static void AddOtherCallBackListener(string functionName, OtherCallBack callBack)
         {
@@ -1449,10 +1627,16 @@ namespace FrameWork.SDKManager
                 {
                     if (ConfigManager.GetIsExistConfig(c_ConfigName))
                     {
-                        //Debug.Log("LoadGameSchemeConfig");
-
-                        Dictionary<string, SingleField> configData = ConfigManager.GetData(c_ConfigName);
-                        return JsonUtility.FromJson<SchemeData>(configData[c_KeyName].GetString());
+                        try
+                        {
+                            Dictionary<string, SingleField> configData = ConfigManager.GetData(c_ConfigName);
+                            return JsonUtility.FromJson<SchemeData>(configData[c_KeyName].GetString());
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.LogError("LoadGameSchemeConfig error " + e.ToString());
+                            return null;
+                        }
                     }
                     else
                     {
@@ -1525,7 +1709,7 @@ namespace FrameWork.SDKManager
 
                 static SDKInterfaceBase AnalysisConfig(SDKConfigData data)
                 {
-                    if (data == null)
+                    if (data == null || string.IsNullOrEmpty( data.SDKName))
                     {
                         return new NullSDKInterface();
                     }
@@ -1647,6 +1831,8 @@ namespace FrameWork.SDKManager
     public delegate void GoodsInfoCallBack(GoodsInfoFromSDK info);
     public delegate void ConsumePurchaseCallBack(ConsumePurchaseInfo info);
     public delegate void RealNameCallBack(RealNameData info);
+    public delegate void PayLimitCallBack(bool isLimit,int payAmount);
+    public delegate void RealNameLogoutCallBack();
 
     public class SchemeData
     {

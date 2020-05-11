@@ -103,7 +103,7 @@ public class SchemeDataService
     /// <param name="schemeData"></param>
     public static void SaveGameSchemeConfig(SchemeData schemeData)
     {
-        Debug.Log("SaveGameSchemeConfig " + schemeData.LoginScheme.Count + " " + schemeData.SchemeName);
+        //Debug.Log("SaveGameSchemeConfig " + schemeData.LoginScheme.Count + " " + schemeData.SchemeName);
 
         if(schemeData != null)
         {

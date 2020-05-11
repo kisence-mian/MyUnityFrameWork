@@ -27,14 +27,10 @@ public class PublicPayClass : PayInterface
     {
         m_SDKName = "PublicPayClass";
         //storeName =(StoreName)Enum.Parse( typeof(StoreName),SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"));
-        
-        //有其他的payClass符合就不启动public pay
-        if(!SDKManager.GetHasPayService(storeName.ToString()))
-        {
-            GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
 
-            //Debug.Log("PublicPayClass Init m_SDKName:>" + m_SDKName + "<");
-        }
+        GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
+
+
 
         //GlobalEvent.DispatchEvent("Fight",)
 
@@ -87,7 +83,7 @@ public class PublicPayClass : PayInterface
     /// <param name="args"></param>
     private void OnPrePay(PrePay2Client e, object[] args)
     {
-        Debug.LogWarning("OnPrePay=========：" + e.prepay_id + "=partnerId==");
+        Debug.LogWarning("OnPrePay=======partnerId==：" + e.prepay_id + "==="+ e.storeName.ToString());
 
         //判断是否需要重发支付
         if(SDKManager.GetReSendPay(e.storeName.ToString()))
@@ -101,11 +97,14 @@ public class PublicPayClass : PayInterface
             PayReSend.Instance.AddPrePayID(onPayInfo);
         }
 
-        payInfo.orderID = e.mch_orderID;
-        payInfo.prepay_id = e.prepay_id;
+        if (SDKManager.GetPrePay(e.storeName.ToString()))
+        {
+            payInfo.orderID = e.mch_orderID;
+            payInfo.prepay_id = e.prepay_id;
 
-        SDKManagerNew.Pay(payInfo);
-        StartLongTimeNoResponse();
+            SDKManagerNew.Pay(payInfo);
+            StartLongTimeNoResponse();
+        }
     }
 
     /// <summary>

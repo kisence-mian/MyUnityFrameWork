@@ -81,7 +81,7 @@ public class AudioManagerWindow : EditorWindow {
         });
 
     }
-
+    private bool changedTime = false;
     private void ShowAudioAssetGUI(AudioAsset au,bool isShowAudioSource)
     {
         Color color = Color.white;
@@ -99,12 +99,25 @@ public class AudioManagerWindow : EditorWindow {
         }
         GUI.color = color;
         GUILayout.BeginVertical("box");
-        GUILayout.Label("Asset Name : " + au.assetName);
+        GUILayout.Label("Asset Name : " + au.AssetName);
         GUILayout.Label("Play State : " + au.PlayState);
+        GUILayout.Label("Loop : " + au.audioSource.loop);
         GUILayout.Label("flag : " + au.flag);
         EditorGUILayout.Slider("VolumeScale : ",au.VolumeScale, 0, 1);
-
-        //EditorGUILayout.Slider("Volume : ", au.Volume, 0, au.GetMaxRealVolume());
+        EditorGUILayout.Slider("Volume : ", au.GetMaxRealVolume(), 0, 1f);
+        changedTime = GUILayout.Toggle(changedTime, "Change Time");
+        GUILayout.BeginHorizontal();
+        if (au.audioSource != null && au.audioSource.clip != null)
+        {
+            float value = EditorGUILayout.Slider("Time:" + au.audioSource.clip.length, au.audioSource.time, 0, au.audioSource.clip.length);
+            if (changedTime)
+            {
+                au.audioSource.time = value;
+            }
+        }
+        
+        GUILayout.EndHorizontal();
+       
         if (isShowAudioSource)
             EditorGUILayout.ObjectField("AudioSource : ", au.audioSource, typeof(AudioSource), true);
         GUILayout.EndVertical();

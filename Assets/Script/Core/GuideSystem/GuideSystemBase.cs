@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System;
+using FrameWork.SDKManager;
 
 namespace FrameWork.GuideSystem
 {
@@ -309,6 +310,7 @@ namespace FrameWork.GuideSystem
             }
 
             string[] objnames = GetGuideObjectNames(m_currentGuideData);
+            Debug.Log(" objnames :" + objnames.Length);
             if (objnames.Length > 0)
             {
 
@@ -336,7 +338,7 @@ namespace FrameWork.GuideSystem
                 }
             }
             string[] itemNames = GetGuideItemNames(m_currentGuideData);
-            //Debug.Log(" itemNames :" + itemNames.Length);
+            Debug.Log(" itemNames :" + itemNames.Length);
             if (itemNames.Length>0)
             {
                
@@ -344,7 +346,7 @@ namespace FrameWork.GuideSystem
                 for (int i = 0; i < itemNames.Length; i++)
                 {
                     string itemName = GetObjName(itemNames[i]);
-
+                    Debug.Log("GuideClickFilter itemName:" + itemName);
                     if (e.EventKey.Contains(itemName))
                     {
                         isExist = true;
@@ -562,6 +564,7 @@ namespace FrameWork.GuideSystem
 
             //Debug.Log("NextGuide m_currentGuideData " + m_currentGuideData.m_SingleDataKey + " " + GuideCloseCondition() + " nextGuideData " + nextGuideData);
 
+            OnCurrentGuideFinish();
             //退出判断
             if (!GuideCloseCondition()
                 && nextGuideData != null)
@@ -576,6 +579,13 @@ namespace FrameWork.GuideSystem
             {
                 EndGuide();
             }
+        }
+        /// <summary>
+        /// 当前这一条引导结束
+        /// </summary>
+        protected virtual void OnCurrentGuideFinish()
+        {
+           
         }
 
         //引导逻辑
@@ -716,8 +726,19 @@ namespace FrameWork.GuideSystem
 
         #region 读取数据
 
+        /// <summary>
+        /// 新手引导开关
+        /// 若经过了重打包，则根据重打包设置（无设置=开启引导）；否则，走原有逻辑（读取本地配置）
+        /// </summary>
+        /// <returns></returns>
         protected bool GetGuideSwitch()
         {
+
+            if (SDKManagerNew.isRePackage)
+            {
+                return SDKManager.SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_CloseGuide, "false") == "false";
+            }
+
             return RecordManager.GetBoolRecord(c_guideRecordName, c_guideSwitchName,true);
         }
 

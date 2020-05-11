@@ -24,6 +24,7 @@ public class WXPayClass : PayInterface
     }
     public override void Init()
     {
+        base.Init();
         if (SDKManager.IncludeThePayPlatform(StoreName.WX))
         {
             Debug.LogWarning("=========WXPayClass Init===========");

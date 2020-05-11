@@ -41,7 +41,7 @@ public class LanguageFontComponent : MonoBehaviour {
         }
         catch (System.Exception e)
         {
-            Debug.LogError("设置语言出错！m_text：" + m_text + "\n" + e);
+            Debug.LogError("设置语言出错！m_text：" + languageFontKey + "\n" + e);
         }
     }
 }

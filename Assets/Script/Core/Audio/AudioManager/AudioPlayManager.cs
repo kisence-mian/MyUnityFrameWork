@@ -13,6 +13,10 @@ public class AudioPlayManager : MonoBehaviour
     ///  音乐播放完成 回调（参数 ：资源名，channel，flag（标识：用于在多个相同音频名称时分辨））
     /// </summary>
     public static CallBack<string, int, string> OnMusicStopCallBack;
+    /// <summary>
+    /// 音乐播放将要完成 回调，提前1秒回调，当clip时长不足1秒则在OnMusicStopCallBack前回调（参数 ：资源名，channel，flag（标识：用于在多个相同音频名称时分辨））
+    /// </summary>
+    public static CallBack<string, int, string> OnMusicPreStopCallBack;
 
     /// <summary>
     /// SFX播放完成 回调（参数 ：资源名，flag（标识：用于在多个相同音频名称时分辨））

@@ -23,6 +23,7 @@ public class IAppPayClass : PayInterface
     }
     public override void Init()
     {
+        base.Init();
         if (SDKManager.IncludeThePayPlatform(StoreName.IAppPay))
         {
 

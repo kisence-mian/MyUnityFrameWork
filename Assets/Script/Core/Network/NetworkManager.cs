@@ -41,6 +41,7 @@ public class NetworkManager
     {
         Init(networkInterfaceName, "SocketService");
     }
+
     /// <summary>
     /// 网络初始化
     /// </summary>
@@ -49,9 +50,9 @@ public class NetworkManager
     /// <param name="protocolType">通讯协议</param>
     public static void Init<TProtocol, TSocket>( ProtocolType protocolType = ProtocolType.Tcp) where TProtocol : INetworkInterface, new() where TSocket : SocketBase, new()
     {
-
         Init<TProtocol, TSocket>(null, protocolType);
     }
+
     /// <summary>
     /// 网络初始化
     /// </summary>
@@ -60,7 +61,6 @@ public class NetworkManager
     /// <param name="protocolType">通讯协议</param>
     public static void Init<TProtocol, TSocket>(MsgCompressBase msgCompress, ProtocolType protocolType = ProtocolType.Tcp) where TProtocol : INetworkInterface, new() where TSocket : SocketBase, new()
     {
-
         s_network = new TProtocol();
         s_network.m_socketService = new TSocket();
         s_network.msgCompress = msgCompress;
@@ -100,6 +100,7 @@ public class NetworkManager
         ApplicationManager.s_OnApplicationQuit += DisConnect;
         ApplicationManager.s_OnApplicationQuit += Dispose;
     }
+
     /// <summary>
     /// 
     /// </summary>

@@ -81,6 +81,7 @@ public class HotupdateFlowItem : FlowItemBase
                 m_HotupdatePath = testPath;
             }
             Debug.Log("Start hotUpdate in Channel:" + channel + "\nPath:" + m_HotupdatePath);
+
             if (ApplicationManager.Instance.UseAssetsBundle)
                 HotUpdateManager.StartHotUpdate(m_HotupdatePath, ReceviceUpdateStatus);
             else

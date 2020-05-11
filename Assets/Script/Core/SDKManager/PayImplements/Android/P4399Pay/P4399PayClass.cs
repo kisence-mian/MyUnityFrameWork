@@ -44,6 +44,7 @@ public class P4399PayClass : PayInterface
 
     public override void Init()
     {
+        base.Init();
         if (SDKManager.IncludeThePayPlatform(StoreName.m4399))
         {
             Debug.Log("=========4399 PayClass Init===========");

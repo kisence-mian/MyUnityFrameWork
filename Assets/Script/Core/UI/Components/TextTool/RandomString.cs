@@ -59,6 +59,7 @@ public class RandomString : MonoBehaviour {
         string result = null;
         for (int i = 0; i < l_subStringList.Length; i++)
         {
+            Debug.Log("l_subStringList==" + l_subStringList[i]);
             if (subStringsData.ContainsKey(l_subStringList[i]))
             {
                 result += GetSubString(subStringsData[l_subStringList[i]]);

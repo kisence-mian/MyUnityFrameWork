@@ -735,52 +735,56 @@ public class DevelopReplayManager
 
     static void DevelopHotKeyLogic()
     {
-        if (Input.GetKeyDown(KeyCode.F2))
+        if (Application.isEditor)
         {
-            s_isProfile = !s_isProfile;
-        }
-
-        if (Input.GetKeyDown(KeyCode.F3))
-        {
-            if (Time.timeScale != 0)
+            if (Input.GetKeyDown(KeyCode.F2))
             {
-                Time.timeScale = 0;
-            }
-            else
-            {
-                Time.timeScale = 1;
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.F4))
-        {
-            if (Time.timeScale == 0)
-            {
-                Time.timeScale = 1;
+                s_isProfile = !s_isProfile;
             }
 
-            Time.timeScale *= 2;
-        }
-
-        if (Input.GetKeyDown(KeyCode.F5))
-        {
-            Debug.Log("Time.timeScale " + Time.timeScale);
-
-            if (Time.timeScale == 0)
+            if (Input.GetKeyDown(KeyCode.F3))
             {
-                Time.timeScale = 1;
+                if (Time.timeScale != 0)
+                {
+                    Time.timeScale = 0;
+                }
+                else
+                {
+                    Time.timeScale = 1;
+                }
             }
 
-            Time.timeScale *= 0.5f;
-        }
+            if (Input.GetKeyDown(KeyCode.F4))
+            {
+                if (Time.timeScale == 0)
+                {
+                    Time.timeScale = 1;
+                }
 
-        if (Input.GetKeyDown(KeyCode.F10))
-        {
-            string name = GetScreenshotFileName();
-            Debug.Log("已保存 屏幕截图 " + name);
+                Time.timeScale *= 2;
+            }
 
-            SaveScreenShot(name);
+            if (Input.GetKeyDown(KeyCode.F5))
+            {
+                Debug.Log("Time.timeScale " + Time.timeScale);
+
+                if (Time.timeScale == 0)
+                {
+                    Time.timeScale = 1;
+                }
+
+                Time.timeScale *= 0.5f;
+            }
+
+            if (Input.GetKeyDown(KeyCode.F10))
+            {
+                string name = GetScreenshotFileName();
+                Debug.Log("已保存 屏幕截图 " + name);
+
+                SaveScreenShot(name);
+            }
         }
+        
     }
 
 #endregion

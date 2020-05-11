@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
+using System.Reflection;
 
 public class UIBase : MonoBehaviour , UILifeCycleInterface
 {
@@ -954,7 +955,7 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
     {
 
     }
-
+    [Obsolete]
     public void SetTextByLangeage(string textID, string moduleName, string contentID, params object[] objs)
     {
         GetText(textID).text = LanguageManager.GetContent(moduleName, contentID, objs);
@@ -1027,6 +1028,12 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
 
     #region 动态加载Sprite赋值
     private Dictionary<string, int> loadSpriteNames = new Dictionary<string, int>();
+    public void SetImageSprite(string imgName, string name, bool is_nativesize = false)
+    {
+        Image img = GetImage(imgName);
+        SetImageSprite(img, name, is_nativesize);
+    }
+
     public void SetImageSprite(Image img, string name, bool is_nativesize = false)
     {
         if(ResourcesConfigManager.GetIsExitRes(name))
@@ -1213,58 +1220,71 @@ public class UIBase : MonoBehaviour , UILifeCycleInterface
             UIBase uIBase = null;
             firstName = strArr[0];
 
-
-            int index = int.Parse(firstName.SplitExtend("[", "]")[0]);
-            if (index < 0)
+            //寻找继承UIbase的变量
+            if (!firstName.Contains("["))
             {
-                index = m_ChildList.Count + index;
+                //FieldInfo fieldInfo = GetType().GetField(firstName, BindingFlags.Public|BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly);
+              
+                // UIBase data=  (UIBase)fieldInfo.GetValue(this);
+                UIBase data= GetGameObject(firstName).GetComponent<UIBase>();
+                itemName = itemName.Replace(firstName + ".", "");
+                return data.GetGuideDynamicCreateItem(itemName);
             }
-            int tempIndex0 = firstName.IndexOf("[");
-            firstName = firstName.Replace(firstName.Substring(tempIndex0), "");
-            Debug.Log("UIBase : Index :" + index + "  firstName :" + firstName + " m_ChildList:"+ m_ChildList.Count);
-            int tempIndex = 0;
-            for (int i = 0; i < m_ChildList.Count; i++)
+            else
             {
-                UIBase cItem = m_ChildList[i];
-                Debug.Log("Item:" + cItem);
-                if (cItem.name == firstName)
-                {
-                    
-                    if (index == tempIndex)
-                    {
-                        uIBase = cItem;
-                        obj = uIBase.gameObject;
-                        break;
-                    }
-                    tempIndex++;
-                }
-            }
 
-            if (strArr.Length > 1)
-            {
-                childName = strArr[1];
-                Debug.Log("childName:" + childName);
-                if (childName.Contains("["))
+                int index = int.Parse(firstName.SplitExtend("[", "]")[0]);
+                if (index < 0)
                 {
-                    childName = itemName.Replace(strArr[0] + ".", "");
-                    Debug.Log("childName:" + childName);
-                    obj = uIBase.GetGuideDynamicCreateItem(childName);
+                    index = m_ChildList.Count + index;
                 }
-                else
+                int tempIndex0 = firstName.IndexOf("[");
+                firstName = firstName.Replace(firstName.Substring(tempIndex0), "");
+                Debug.Log("UIBase : Index :" + index + "  firstName :" + firstName + " m_ChildList:" + m_ChildList.Count);
+                int tempIndex = 0;
+                for (int i = 0; i < m_ChildList.Count; i++)
                 {
-                  string afterNames=  itemName.Replace(strArr[0] + ".", "");
-                    strArr = afterNames.Split('.');
-                    Debug.Log("afterNames :" + afterNames + "  UIBase:" + GetType().Name);
-                    for (int i = 0; i < strArr.Length; i++)
+                    UIBase cItem = m_ChildList[i];
+                    Debug.Log("Item:" + cItem);
+                    if (cItem.name == firstName)
                     {
-                        string findName = strArr[i];
-                        obj = uIBase.GetGameObject(findName);
-                        if (i < strArr[i].Length - 1)
+
+                        if (index == tempIndex)
                         {
-                            uIBase = obj.GetComponent<UIBase>();
+                            uIBase = cItem;
+                            obj = uIBase.gameObject;
+                            break;
                         }
+                        tempIndex++;
                     }
-                       
+                }
+
+                if (strArr.Length > 1)
+                {
+                    childName = strArr[1];
+                    Debug.Log("childName:" + childName);
+                    if (childName.Contains("["))
+                    {
+                        childName = itemName.Replace(strArr[0] + ".", "");
+                        Debug.Log("childName:" + childName);
+                        obj = uIBase.GetGuideDynamicCreateItem(childName);
+                    }
+                    else
+                    {
+                        string afterNames = itemName.Replace(strArr[0] + ".", "");
+                        strArr = afterNames.Split('.');
+                        Debug.Log("afterNames :" + afterNames + "  UIBase:" + GetType().Name);
+                        for (int i = 0; i < strArr.Length; i++)
+                        {
+                            string findName = strArr[i];
+                            obj = uIBase.GetGameObject(findName);
+                            if (i < strArr[i].Length - 1)
+                            {
+                                uIBase = obj.GetComponent<UIBase>();
+                            }
+                        }
+
+                    }
                 }
             }
         }

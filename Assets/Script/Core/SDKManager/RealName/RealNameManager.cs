@@ -31,7 +31,7 @@ public class RealNameManager  {
         }
         set
         {
-            Debug.Log("Set RealNameStatus:" + realNameStatus);
+            Debug.Log("Set RealNameStatus:" + value);
             realNameStatus = value;
         }
     }
@@ -94,15 +94,64 @@ public class RealNameManager  {
         {
             ApplicationManager.s_OnApplicationUpdate += OnUpdate;
             SDKManager.RealNameCallBack += OnRealNameCallBack;
+            SDKManager.PayLimitCallBack += OnPayLimitCallBack;
+            LoginGameController.OnUserLogin += OnLoginEvent;
+            LoginGameController.OnUserLogout += OnLogoutEvent;
+            SDKManager.RealNameLogoutCallBack += OnNeedLogout;
 
             AddNetEvent();
-            GlobalEvent.AddTypeEvent<CheckPayLimitEvent>(OnCheckPayLimit);
+
 
             //检测实名状态（但不触发实名）
-            TestRealNameStatus();
+            //TestRealNameStatus();
             InitOnlineTimer();
         }
+        GlobalEvent.AddTypeEvent<CheckPayLimitEvent>(OnCheckPayLimit);
     }
+
+
+    /// <summary>
+    /// 需要登出账号
+    /// </summary>
+    /// <returns></returns>
+    private void OnNeedLogout()
+    {
+        Debug.Log("========RealNameManager OnNeedLogout");
+        LoginGameController.Logout();
+    }
+
+
+
+    private void OnLogoutEvent(UserLogout2Client t)
+    {
+        SDKManager.RealNameLogout();
+        RealNameStatus = RealNameStatus.NotNeed;//已经登出，停止检测
+    }
+
+    private void OnLoginEvent(UserLogin2Client t)
+    {
+        Debug.LogError("RealNameManager OnLoginEvent" + t.code + t.reloginState);
+        if (t.code != 0||t.reloginState)
+            return;
+        SDKManager.RealNameLogin(t.user.userID);
+        TestRealNameStatus();
+    }
+
+    /// <summary>
+    /// 查询支付结果的回调
+    /// </summary>
+    /// <param name="isLimit"></param>
+    private void OnPayLimitCallBack(bool isLimit,int payAmount)
+    {
+        PayLimitType payLimitType = PayLimitType.None;
+        if (isLimit)
+        {
+            payLimitType = PayLimitType.ChildLimit;
+        }
+        Debug.Log("OnPayLimitCallBack from SDK:" + payLimitType);
+        CheckPayLimitResultEvent.Dispatch(payAmount, payLimitType);
+    }
+
 
     /// <summary>
     /// SDK 实名制认证回调
@@ -116,6 +165,7 @@ public class RealNameManager  {
         isAdult = info.isAdult;
     }
 
+
     /// <summary>
     /// 接收到询问支付限制的事件
     /// </summary>
@@ -124,6 +174,7 @@ public class RealNameManager  {
     private void OnCheckPayLimit(CheckPayLimitEvent e, object[] args)
     {
         PayLimitType payLimitType = PayLimitType.None;//默认不需要实名认证，无限制
+        Debug.LogWarning("OnCheckPayLimit====openRealName==" + openRealName);
         if (openRealName)
         {
             if (RealNameStatus == RealNameStatus.NotRealName)
@@ -139,14 +190,9 @@ public class RealNameManager  {
                 }
                 else //未成年
                 {
-                    if (CheckPayLimitBySDK(e.payAmount))
-                    {
-                        payLimitType = PayLimitType.ChildLimit;
-                    }
-                    else
-                    {
-                        payLimitType = PayLimitType.None;
-                    }
+                    CheckPayLimitBySDK(e.payAmount);
+                    Debug.LogWarning("CheckPayLimitBySDK");
+                    return;
                 }
             }
             else if (RealNameStatus == RealNameStatus.NotNeed)
@@ -225,6 +271,7 @@ public class RealNameManager  {
         string l_openRealName = SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_OpenRealName, "false");
         openRealName = (l_openRealName == "true");  //重打包工具控制总开关
         //上报服务器
+        Debug.Log("openRealName" + openRealName);
     }
 
     /// <summary>
@@ -245,6 +292,14 @@ public class RealNameManager  {
     /// </summary>
     private void AskServerOnlineTime()
     {
+        //未实名制，再询问一下sdk
+        if (RealNameStatus != RealNameStatus.IsRealName || !isAdult)
+        {
+            RealNameStatus = GetRealNameStatusFromSDK();
+
+            isAdult = SDKManager.IsAdult();
+        }
+
         Debug.LogWarning("AskServerOnlineTime" + RealNameStatus + isAdult);
         RequestRealNameState2Server.RequestRealName(RealNameStatus, isAdult);
     }
@@ -276,18 +331,18 @@ public class RealNameManager  {
     #region 未成年支付限制
 
     /// <summary>
-    /// 检测是否支付限制
+    /// 检测是否支付限制   PayLimitCallBack
     /// </summary>
     /// <param 本次支付金额（分）="payAmont"></param>
     /// <returns></returns>
-    public bool CheckPayLimitBySDK(int payAmont)
+    public void CheckPayLimitBySDK(int payAmont)
     {
         if (!openRealName)
         {
-            return false;
+            return ;
         }
 
-        return SDKManager.CheckPayLimit(payAmont);
+        SDKManager.CheckPayLimit(payAmont);
     }
 
     #endregion

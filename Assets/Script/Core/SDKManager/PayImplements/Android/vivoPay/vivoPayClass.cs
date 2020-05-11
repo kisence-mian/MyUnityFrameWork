@@ -24,6 +24,7 @@ public class vivoPayClass : PayInterface
     }
     public override void Init()
     {
+        base.Init();
         if (SDKManager.IncludeThePayPlatform(StoreName.VIVO))
         {
             Debug.LogWarning("=========vivoPayClass Init===========");

@@ -11,6 +11,21 @@ public class RealNameInterface : SDKInterfaceBase
     {
         base.Init();
     }
+    /// <summary>
+    /// 登录
+    /// </summary>
+    public virtual void OnLogin(string userID)
+    {
+
+    }
+
+    /// <summary>
+    /// 登出
+    /// </summary>
+    public virtual void OnLogout()
+    {
+
+    }
 
     /// <summary>
     /// 实名制状态
@@ -50,9 +65,12 @@ public class RealNameInterface : SDKInterfaceBase
     /// 检测支付是否受限
     /// </summary>
     /// <returns></returns>
-    public virtual bool CheckPayLimit(int payAmount)
+    public virtual void CheckPayLimit(int payAmount)
     {
-        return false;
+        if (SDKManager.PayLimitCallBack != null)
+        {
+            SDKManager.PayLimitCallBack(false, payAmount);
+        }
     }
 
     /// <summary>
@@ -62,6 +80,17 @@ public class RealNameInterface : SDKInterfaceBase
     public virtual void LogPayAmount(int payAmount)
     {
 
+    }
+
+    /// <summary>
+    /// 触发登出
+    /// </summary>
+    public virtual void RealNameLogoutCallBack()
+    {
+        if (SDKManager.RealNameLogoutCallBack != null)
+        {
+            SDKManager.RealNameLogoutCallBack();
+        }
     }
 
 }

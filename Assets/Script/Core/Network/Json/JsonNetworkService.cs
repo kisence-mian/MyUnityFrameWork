@@ -91,6 +91,7 @@ public class JsonNetworkService : INetworkInterface
             {
                 content = EncryptionService.Encrypt(content);
             }
+            //Debug.Log("Send Msg:" + content);
             byte[] bytes = Encoding.UTF8.GetBytes(content + c_endChar);
 
             m_socketService.Send(bytes);

@@ -23,6 +23,7 @@ public class UCPayClass : PayInterface
 
     public override void Init()
     {
+        base.Init();
         if (SDKManager.IncludeThePayPlatform(StoreName.UC))
         {
 

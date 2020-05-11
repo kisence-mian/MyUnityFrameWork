@@ -52,6 +52,10 @@ public class MaskWord : MonoBehaviour {
         if (SentiWords == null)
             return;
 
+        if (!LanguageManager.CurrentLanguageIsChinese())
+        {
+            return;
+        }
 
         if (string.IsNullOrEmpty(t))
         {

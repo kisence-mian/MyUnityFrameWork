@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 
-public class CitentReportClass : LogInterface
+public class ClientReportClass : LogInterface
 {
     public override void Log(string eventID, Dictionary<string, string> data)
     {
@@ -14,6 +14,8 @@ public class CitentReportClass : LogInterface
         msg.datas = KeyValueData.Dictionary2KeyValueDataList(data);
 
         JsonMessageProcessingController.SendMessage(msg);
+
+
     }
 }
 

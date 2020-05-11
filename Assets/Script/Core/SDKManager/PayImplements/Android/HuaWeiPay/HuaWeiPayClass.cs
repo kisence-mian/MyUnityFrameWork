@@ -22,6 +22,7 @@ public class HuaWeiPayClass : PayInterface
 
     public override void Init()
     {
+        base.Init();
         if (SDKManager.IncludeThePayPlatform(StoreName.HuaWei))
         {
             GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);

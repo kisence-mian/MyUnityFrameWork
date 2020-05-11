@@ -149,7 +149,7 @@ using UnityEngine;
                 stream.Write(_data, 0, _data.Length);
                 stream.Close();
 
-                Debug.Log("File written: " + path);
+                //Debug.Log("File written: " + path);
             }
             catch (Exception e)
             {

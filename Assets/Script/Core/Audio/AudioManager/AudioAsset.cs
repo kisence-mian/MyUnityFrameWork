@@ -19,10 +19,11 @@ public enum AudioSourceType
 }
 public class AudioAsset
 {
+    [NotJsonSerialized]
     public AudioSource audioSource;
     public AudioSourceType sourceType;
     public string flag = "";
-    public string assetName = "";
+    private string assetName = "";
     /// <summary>
     /// music，记录channel
     /// </summary>
@@ -92,12 +93,29 @@ public class AudioAsset
 
     }
 
-
+    public string AssetName {
+        get
+        {
+            if(audioSource!=null&& audioSource.clip != null)
+            {
+                if (string.IsNullOrEmpty(assetName))
+                {
+                    assetName = audioSource.clip.name;
+                }
+            }
+            return assetName;
+        }
+        set
+        {
+            assetName = value;
+        }
+    }
 
     public void SetPlayState(AudioPlayState state)
     {
         playState = state;
     }
+    private bool isCallPreStop;
     /// <summary>
     /// 检查音频是否播放完成
     /// </summary>
@@ -105,17 +123,27 @@ public class AudioAsset
     {
         if (playState == AudioPlayState.Stop)
             return;
+        //Debug.Log("audioSource.time:" + audioSource.time + " clip.lenth:" + audioSource.clip.length);
+        if (audioSource.clip.length>1&& audioSource.time >= (audioSource.clip.length - 1)&& !isCallPreStop)
+        {
+            isCallPreStop = true;
+            if (AudioPlayManager.OnMusicPreStopCallBack != null)
+                AudioPlayManager.OnMusicPreStopCallBack(AssetName, musicChannel, flag);
+        }
         if (audioSource == null || (!audioSource.isPlaying && playState != AudioPlayState.Pause))
         {
             Stop();
         }
 
+        
     }
 
     public void Play(float delay = 0f)
     {
         if (audioSource != null && audioSource.clip != null)
         {
+            isCallPreStop = false;
+            audioSource.time = 0;
             audioSource.PlayDelayed(delay);
             playState = AudioPlayState.Playing;
 
@@ -137,13 +165,20 @@ public class AudioAsset
 
         if(sourceType== AudioSourceType.Music)
         {
+            if(!isCallPreStop)
+            {
+                isCallPreStop = true;
+                if (AudioPlayManager.OnMusicPreStopCallBack != null)
+                    AudioPlayManager.OnMusicPreStopCallBack(AssetName, musicChannel, flag);
+            }
+
             if (AudioPlayManager.OnMusicStopCallBack != null)
-                AudioPlayManager.OnMusicStopCallBack(assetName, musicChannel, flag);
+                AudioPlayManager.OnMusicStopCallBack(AssetName, musicChannel, flag);
         }
         else
         {
             if (AudioPlayManager.OnSFXStopCallBack != null)
-                AudioPlayManager.OnSFXStopCallBack(assetName, flag);
+                AudioPlayManager.OnSFXStopCallBack(AssetName, flag);
         }
     }
 
@@ -152,7 +187,7 @@ public class AudioAsset
     /// </summary>
     public void ResetData()
     {
-        assetName = "";
+        AssetName = "";
         audioSource.pitch = 1;
         flag = "";
     }

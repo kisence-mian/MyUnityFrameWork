@@ -50,7 +50,7 @@ public class GameDataMonitorEditorWindow : EditorWindow
         {
             EditorDrawGUIUtil.DrawFoldout(obj.Value, obj.Key+":"+obj.Value.description, () =>
             {
-                EditorDrawGUIUtil.DrawClassData(obj.Key,obj.Value.showValue);
+                EditorDrawGUIUtil.DrawBaseValue(obj.Key,obj.Value.showValue);
             });
            // ViewItemGUI(obj.Key,obj.Value);
         }

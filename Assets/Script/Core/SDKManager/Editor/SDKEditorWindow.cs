@@ -197,14 +197,14 @@ public class SDKEditorWindow : EditorWindow
 
     int GetCurrentSelectIndex()
     {
-        Debug.Log("GetCurrentSelectIndex " + m_currentSchemeData );
+        //Debug.Log("GetCurrentSelectIndex " + m_currentSchemeData );
 
         if(m_currentSchemeData == null)
         {
             return 0;
         }
 
-        Debug.Log("m_currentSchemeData.SchemeName " + m_currentSchemeData.SchemeName);
+        //Debug.Log("m_currentSchemeData.SchemeName " + m_currentSchemeData.SchemeName);
 
         for (int i = 0; i < SchemeDataService.ConfigNameList.Count; i++)
         {

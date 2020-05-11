@@ -11,6 +11,7 @@ namespace FrameWork.SDKManager
         static bool isInit = false;
         static SDKCallBackListener s_callBackListener;
         static Dictionary<string, OtherCallBack> s_callBackDict = new Dictionary<string, OtherCallBack>();
+        public static bool isRePackage = false;//是否经过了重打包
 
         #region 外部调用
 
@@ -24,6 +25,7 @@ namespace FrameWork.SDKManager
             if(!isInit)
             {
                 Debug.Log("SDKManagerNew Init");
+                TestIsRePackage();
 
                 GameObject go = new GameObject(c_callBackObjectName);
                 s_callBackListener = go.AddComponent<SDKCallBackListener>();
@@ -36,6 +38,30 @@ namespace FrameWork.SDKManager
                 Call(data);
                 isInit = true;
             }
+        }
+
+        /// <summary>
+        /// 检测是否经过了重打包
+        /// </summary>
+        public static void TestIsRePackage()
+        {
+            AndroidJavaClass testAndroidInterface = null;
+
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                try
+                {
+
+                    testAndroidInterface = new AndroidJavaClass("sdkInterface.SdkInterface");
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("TestIsRePackage" + e);
+                }
+            }
+            isRePackage = testAndroidInterface != null;
+
+            Debug.Log("isRePackage:" + isRePackage);
         }
 
         public static void Dispose()
@@ -523,6 +549,50 @@ namespace FrameWork.SDKManager
         #endregion
 
         #region 实名制
+        /// <summary>
+        /// 登录
+        /// </summary>
+        /// <param name="userID"></param>
+        /// <param name="SDKName"></param>
+        /// <param name="tag"></param>
+        static public void RealNameOnLogin(string userID, string SDKName, string tag)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
+
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_OnLogin);
+
+            data.Add(SDKInterfaceDefine.ParameterName_UserID, userID);
+
+            if (SDKName != null)
+            {
+                data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            }
+
+            data.Add(SDKInterfaceDefine.Tag, tag);
+            Call(data);
+        }
+        /// <summary>
+        /// 登出
+        /// </summary>
+        /// <param name="SDKName"></param>
+        /// <param name="tag"></param>
+        static public void RealNameOnLogout(string SDKName, string tag)
+        {
+            Dictionary<string, string> data = new Dictionary<string, string>();
+
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
+
+            data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_OnLogout);
+
+            if (SDKName != null)
+            {
+                data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            }
+            data.Add(SDKInterfaceDefine.Tag, tag);
+            Call(data);
+        }
 
         /// <summary>
         /// 实名制状态
@@ -535,7 +605,10 @@ namespace FrameWork.SDKManager
 
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_GetRealNameType);
 
-            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            if (SDKName != null)
+            {
+                data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            }
             data.Add(SDKInterfaceDefine.Tag, tag);
             string result = CallString(data, RealNameStatus.NotNeed.ToString());
 
@@ -563,7 +636,10 @@ namespace FrameWork.SDKManager
 
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_IsAdult);
 
-            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            if (SDKName != null)
+            {
+                data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            }
             data.Add(SDKInterfaceDefine.Tag, tag);
             bool result = CallBool(data, true);
 
@@ -582,7 +658,10 @@ namespace FrameWork.SDKManager
 
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_GetTodayOnlineTime);
 
-            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            if (SDKName != null)
+            {
+                data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            }
             data.Add(SDKInterfaceDefine.Tag, tag);
 
             int result = CallInt(data, -1);
@@ -600,7 +679,10 @@ namespace FrameWork.SDKManager
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
 
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_StartRealNameAttestation);
-            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            if (SDKName != null)
+            {
+                data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            }
             data.Add(SDKInterfaceDefine.Tag, tag);
 
             Call(data);
@@ -608,22 +690,24 @@ namespace FrameWork.SDKManager
         }
 
         /// <summary>
-        /// 检测支付是否受限
+        /// 检测支付是否受限 （PayLimitCallBack 回调结果）
         /// </summary>
         /// <returns></returns>
-        static public bool CheckPayLimit(string SDKName, int payAmount,string tag)
+        static public void CheckPayLimit(string SDKName, int payAmount,string tag)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            if (SDKName != null)
+            {
+                data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            }
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
 
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_CheckPayLimit);
             data.Add(SDKInterfaceDefine.Tag, tag);
             data.Add(SDKInterfaceDefine.RealName_ParameterName_PayAmount, payAmount.ToString());
 
-            bool result = CallBool(data, false);
-
-            return result;
+            Call(data);
+            
         }
 
         /// <summary>
@@ -640,7 +724,10 @@ namespace FrameWork.SDKManager
 
             data.Add(SDKInterfaceDefine.RealName_ParameterName_PayAmount, payAmount.ToString());
 
-            data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            if (SDKName != null)
+            {
+                data.Add(SDKInterfaceDefine.SDKName, SDKName);
+            }
             data.Add(SDKInterfaceDefine.Tag, tag);
             Call(data);
         }
@@ -821,6 +908,7 @@ namespace FrameWork.SDKManager
 
             if (androidInterface != null)
             {
+                Debug.LogWarning("SDKManagerNew Call Success ->" );
                 androidInterface.CallStatic("UnityRequestFunction", content);
             }
 
@@ -917,6 +1005,7 @@ namespace FrameWork.SDKManager
 
             if (androidInterface != null)
             {
+                Debug.LogWarning("SDKManagerNew Call UnityRequestFunctionString -> androidInterface == null");
                 return androidInterface.CallStatic<string>("UnityRequestFunctionString", content);
             }
             return defaultValue;
@@ -1080,7 +1169,6 @@ namespace FrameWork.SDKManager
         static void OnAD(Dictionary<string, string> data)
         {
             string functionName = data[SDKInterfaceDefine.FunctionName];
-
             switch(functionName)
             {
                 case SDKInterfaceDefine.AD_FunctionName_OnAD:
@@ -1131,6 +1219,12 @@ namespace FrameWork.SDKManager
                 case SDKInterfaceDefine.RealName_FunctionName_RealNameCallBack:
                     OnRealNameCallBack(data);
                     break;
+                case SDKInterfaceDefine.RealName_FunctionName_PayLimitCallBack:
+                    OnPayLimitCallBack(data);
+                    break;
+                case SDKInterfaceDefine.RealName_FunctionName_RealNameLogout:
+                    OnRealNameLogout(data);
+                    break;
             }
         }
 
@@ -1139,7 +1233,7 @@ namespace FrameWork.SDKManager
             try
             {
                 RealNameData realNameData = new RealNameData();
-                realNameData.isAdult = bool.Parse( data[SDKInterfaceDefine.RealName_FunctionName_IsAdult]);
+                realNameData.isAdult = bool.Parse( data[SDKInterfaceDefine.RealName_ParameterName_IsAdult]);
                 realNameData.realNameStatus = (RealNameStatus)Enum.Parse(typeof(RealNameStatus), data[SDKInterfaceDefine.RealName_ParameterName_RealNameStatus]);
 
                 if (SDKManager.RealNameCallBack != null)
@@ -1152,6 +1246,34 @@ namespace FrameWork.SDKManager
                 Debug.LogError("OnRealNameCallBack Error" + e.ToString() + e.StackTrace);
             }
         }
+
+        /// <summary>
+        /// 支付限制的结果回调
+        /// </summary>
+        /// <param name="data"></param>
+        static void OnPayLimitCallBack(Dictionary<string, string> data)
+        {
+            bool isLimit = bool.Parse(data[SDKInterfaceDefine.RealName_ParameterName_IsPayLimit]);
+            int payAmount = int.Parse(data[SDKInterfaceDefine.RealName_ParameterName_PayAmount]);
+
+            if (SDKManager.PayLimitCallBack != null)
+            {
+                SDKManager.PayLimitCallBack(isLimit, payAmount);
+            }
+        }
+
+        /// <summary>
+        /// 实名制sdk触发 登出 （如切换账号等）
+        /// </summary>
+        /// <param name="data"></param>
+        static void OnRealNameLogout(Dictionary<string, string> data)
+        {
+            if (SDKManager.RealNameLogoutCallBack != null)
+            {
+                SDKManager.RealNameLogoutCallBack();
+            }
+        }
+
         #endregion
 
         #region Other
@@ -1190,6 +1312,13 @@ namespace FrameWork.SDKManager
             return defaultValue;
 
 #elif UNITY_ANDROID
+
+            if (!isRePackage)
+            {
+                Debug.Log("isRePackage == false, return defaultValue: "+ defaultValue);
+                return defaultValue;
+            }
+
             try
             {
                 if (androidInterface == null)
@@ -1217,9 +1346,9 @@ namespace FrameWork.SDKManager
 #endif
 
         }
-#endregion
+        #endregion
 
-#endregion
+        #endregion
     }
         #region 声明
 

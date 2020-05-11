@@ -6,7 +6,6 @@ public class MsgCompressGzip : MsgCompressBase
 {
     public override byte[] CompressBytes(byte[] data)
     {
-       
         return ZipUtils.CompressBytes(data);
     }
 

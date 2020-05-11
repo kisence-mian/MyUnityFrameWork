@@ -46,6 +46,11 @@ using System.Collections;
 
         void OnGUI()
         {
-            GUILayout.Label("FPS：" + fps.ToString());
+        GUIStyle style = new GUIStyle("Box");
+        style.fontSize = 20;
+        style.richText = true;
+        style.alignment = TextAnchor.UpperLeft;
+
+        GUILayout.Box("FPS：" + fps.ToString(), style);
         }
 	}

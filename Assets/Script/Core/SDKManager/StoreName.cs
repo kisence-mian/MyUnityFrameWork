@@ -40,4 +40,5 @@ public enum StoreName
     Payssion = 29,//港澳台支付
     HuaWei4 = 30,//华为4.0
     OKJOY = 31,
+    Play68,
 }

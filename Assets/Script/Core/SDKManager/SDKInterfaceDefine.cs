@@ -79,6 +79,7 @@ namespace FrameWork.SDKManager
         //AD相关参数
         public const string AD_ParameterName_ADType = "ADType";
         public const string AD_ParameterName_ADResult = "ADResult";   //广告播放结果
+        public const string AD_ParameterName_VideoADKey = "VideoADKey";//视频广告Key
 
         public const string AD_FunctionName_LoadAD = "LoadAD";
         public const string AD_FunctionName_PlayAD = "PlayAD";
@@ -109,16 +110,21 @@ namespace FrameWork.SDKManager
         public const string Log_ParameterName_EventMap   = "EventMap";
 
         //realName相关
-        public const string RealName_FunctionName_GetRealNameType = "GetRealNameType";//获得实名认证状态
-        public const string RealName_FunctionName_IsAdult ="IsAdult";//是否成年
-        public const string RealName_FunctionName_LogPayAmount ="LogPayAmount";//上报支付金额
-        public const string RealName_FunctionName_CheckPayLimit ="CheckPayLimit";//是否支付受限制
-        public const string RealName_FunctionName_GetTodayOnlineTime ="GetTodayOnlineTime";//获取今日在线时长
+        public const string RealName_FunctionName_OnLogin = "OnLogin";                                  //登录
+        public const string RealName_FunctionName_OnLogout = "OnLogout";                                //登出
+        public const string RealName_FunctionName_GetRealNameType = "GetRealNameType";                  //获得实名认证状态
+        public const string RealName_FunctionName_IsAdult ="IsAdult";                                   //是否成年
+        public const string RealName_FunctionName_LogPayAmount ="LogPayAmount";                         //上报支付金额
+        public const string RealName_FunctionName_CheckPayLimit ="CheckPayLimit";                       //查询是否支付受限制
+        public const string RealName_FunctionName_GetTodayOnlineTime ="GetTodayOnlineTime";             //获取今日在线时长
         public const string RealName_FunctionName_StartRealNameAttestation = "StartRealNameAttestation";//开始实名认证
-        public const string RealName_FunctionName_RealNameCallBack="RealNameCallBack";//实名认证完成后的回调
-        public const string RealName_ParameterName_RealNameStatus ="RealNameStatus";//实名认证的状态
-        public const string RealName_ParameterName_IsAdult = "IsAdult";//是否是成年人
-        public const string RealName_ParameterName_PayAmount = "PayAmount";//支付金额
+        public const string RealName_FunctionName_RealNameCallBack="RealNameCallBack";                  //实名认证完成后的回调
+        public const string RealName_FunctionName_PayLimitCallBack = "PayLimitCallBack";                //询问支付限制的回调
+        public const string RealName_FunctionName_RealNameLogout ="RealNameLogout";                     //实名系统 通知逻辑层退出登录
+        public const string RealName_ParameterName_RealNameStatus ="RealNameStatus";                    //实名认证的状态
+        public const string RealName_ParameterName_IsAdult = "IsAdult";                                 //是否是成年人
+        public const string RealName_ParameterName_IsPayLimit = "IsPayLimit";                           //是否被限制支付
+        public const string RealName_ParameterName_PayAmount = "PayAmount";                             //支付金额
 
         //Other相关参数
         public const string Other_FunctionName_Exit = "Exit";
@@ -135,7 +141,7 @@ namespace FrameWork.SDKManager
         public const string Other_ParameterName_Progress = "Progress";
         public const string Other_ParameterName_TotalProgress = "TotalProgress";
         public const string Other_ParameterName_Size = "Size";
-
+ 
         //Properties
         public const string FileName_ChannelProperties = "Channel";
         public const string PropertiesKey_IsLog = "IsLog";                           //是否输出日志
@@ -148,11 +154,17 @@ namespace FrameWork.SDKManager
         public const string PropertiesKey_ADPlatform = "ADPlatform";                 //广告平台
         public const string PropertiesKey_NetworkID = "NetworkID";                   //服务器选择
         public const string PropertiesKey_QQGroup   = "QQGroup";                     //玩家QQ群
+        public const string PropertiesKey_AllContact = "AllContact";                 //所有联系方式，竖线分割
         public const string PropertiesKey_DirectlyLogin = "DirectlyLogin";           //是否直接登录，不选择登录模式
         public const string PropertiesKey_CloseHealthGamePact = "CloseHealthGamePact";//关闭健康游戏公约
         public const string PropertiesKey_OpenRealName = "OpenRealName";              // 开启实名认证
         public const string PropertiesKey_IsExamine = "IsExamine";                    //审核版本
         public const string PropertiesKey_RedeemCode = "RedeemCode";                  //兑换码
+        public const string PropertiesKey_HideAllAD = "HideAllAD";                    //隐藏所有广告按钮
+        public const string PropertiesKey_CloseGuide = "CloseGuide";                  //关闭新手引导
+        public const string PropertiesKey_SDKLogo = "SDKLogo";                        //SDK logo 
+        public const string PropertiesKey_LogoShowTime = "LogoShowTime";              //显示下一组logo n 秒 ， 0 表示覆盖原本logo
+        public const string PropertiesKey_CanPay = "CanPay";                          //允许支付
 
         public const string PropertiesKey_SelectServerURL = "SelectServerURL";       //选服服务器地址(废弃)
     }

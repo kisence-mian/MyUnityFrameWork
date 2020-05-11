@@ -18,7 +18,12 @@ public class RandomLoopMusicData
         flag = GetHashCode().ToString();
         AudioPlayManager.OnMusicStopCallBack += OnMusicPlayComplete;
     }
-
+    /// <summary>
+    /// music播放完成，
+    /// </summary>
+    /// <param name="name"></param>
+    /// <param name="channal"></param>
+    /// <param name="flag">flag标识自生实例</param>
     private void OnMusicPlayComplete(string name, int channal, string flag)
     {
         if (this.flag == flag)

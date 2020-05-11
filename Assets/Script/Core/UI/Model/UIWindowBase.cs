@@ -8,7 +8,7 @@ public class UIWindowBase : UIBase
     [HideInInspector]
     public string cameraKey;
     public UIType m_UIType;
-
+    [HideInInspector]
     public WindowStatus windowStatus;
 
     public GameObject m_bgMask;

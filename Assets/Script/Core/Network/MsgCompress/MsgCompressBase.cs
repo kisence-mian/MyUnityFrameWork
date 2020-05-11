@@ -6,7 +6,8 @@ using System;
 public abstract class MsgCompressBase 
 {
     //限制字节长度
-    private static int compressLimit = 1024*5;
+    private static int compressLimit = 1024 * 5;
+
     /// <summary>
     /// 压缩方式，请使用小写
     /// </summary>
@@ -22,7 +23,7 @@ public abstract class MsgCompressBase
             byte[] compressAfterByte = CompressBytes(compressBeforeByte);
             string compressString = Convert.ToBase64String(compressAfterByte);
             string length = GetCompressType().Length > 9 ? GetCompressType().Length.ToString() : "0" + GetCompressType().Length;
-             result = length + GetCompressType() + compressString;
+            result = length + GetCompressType() + compressString;
         }
         else
         {
@@ -46,7 +47,6 @@ public abstract class MsgCompressBase
         {
             return cMsg;
         }
-
 
         //return ZipUtils.DecompressString(msg);
         //Debug.Log("length :" + length + " compressType:" + compressType + " msg:" + msg + "\n\n" + cMsg);

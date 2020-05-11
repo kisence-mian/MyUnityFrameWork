@@ -90,7 +90,7 @@ public class AudioPlayerBase
     {
         if (asset.audioSource.clip != null)
         {
-            string name = asset.assetName;
+            string name = asset.AssetName;
             asset.audioSource.clip = null;
             ResourceManager.DestoryAssetsCounter(name);
         }
@@ -106,8 +106,8 @@ public class AudioPlayerBase
         //if (au.PlayState == AudioPlayState.Playing)
         //    au.Stop();
         UnloadClip(au);
-        au.assetName = audioName;
-        AudioClip ac = GetAudioClip(au.assetName);
+        au.AssetName = audioName;
+        AudioClip ac = GetAudioClip(au.AssetName);
         au.audioSource.clip = ac;
         au.audioSource.loop = isLoop;
         au.audioSource.pitch = pitch;
@@ -119,8 +119,9 @@ public class AudioPlayerBase
     protected void PlayMusicControl(AudioAsset au, string audioName, bool isLoop = true, float volumeScale = 1, float delay = 0f, float fadeTime = 0.5f, string flag = "")
     {
        
-        if (au.assetName == audioName)
+        if (au.AssetName == audioName)
         {
+            au.audioSource.loop = isLoop;
             if (au.PlayState != AudioPlayState.Playing)
             {
                 AddFade(au, VolumeFadeType.FadeIn, fadeTime, delay,flag, null, null);
@@ -261,6 +262,7 @@ public class AudioPlayerBase
                 data = new VolumeFadeData();
             }
             fadeData.Add(au, data);
+            //data.tempVolume = 0;
             //Debug.Log("Add");
         }
         if (data.fadeOutCompleteCallBack != null)
@@ -283,22 +285,22 @@ public class AudioPlayerBase
         switch (data.fadeType)
         {
             case VolumeFadeType.FadeIn:
-                //   data.au.Volume = 0;
+                data.au.Volume = 0;
                 data.fadeState = VolumeFadeStateType.FadeIn;
                 break;
             case VolumeFadeType.FadeOut:
                 data.fadeState = VolumeFadeStateType.FadeOut;
-                //   data.au.ResetVolume();
+                data.au.ResetVolume();
                 break;
             case VolumeFadeType.FadeOut2In:
                 data.fadeState = VolumeFadeStateType.FadeOut;
-                // data.au.ResetVolume();
+                data.au.ResetVolume();
                 break;
         }
         data.tempVolume = data.au.Volume;
         data.delayTime = delay;
         //Debug.Log("AddFade:"+ data.fadeType);
-
+        //Debug.Log("Add  AddFade:" + JsonUtils.ToJson(data));
     }
 
     /// <summary>
@@ -309,16 +311,17 @@ public class AudioPlayerBase
     private bool FadeIn(VolumeFadeData data)
     {
         //Debug.Log("FadeIn");
-        if (string.IsNullOrEmpty(data.au.assetName))
+        if (data.au == null || data.au.audioSource == null || data.au.audioSource.clip == null)
         {
             data.au.ResetVolume();
+            data.tempVolume = 1;
             return true;
         }
         float oldVolume = data.tempVolume;
-
+        //Debug.Log("FadeIn:data.au.Volume " + data.au.Volume + "  dowm :" + oldVolume);
         float speed = data.au.GetMaxRealVolume() / data.fadeTime * 2f;
         oldVolume = oldVolume + speed * Time.unscaledDeltaTime;
-        //Debug.Log("FadeIn:data.au.Volume " + data.au.Volume + "  dowm :" + oldVolume);
+       
         data.au.Volume = oldVolume;
         data.tempVolume = oldVolume;
 
@@ -334,10 +337,11 @@ public class AudioPlayerBase
 
     public bool FadeOut(VolumeFadeData data)
     {
-        //Debug.Log("FadeOut");
-        if (string.IsNullOrEmpty(data.au.assetName))
+        //Debug.Log("FadeOut:"+ data.au.AssetName);
+        if (data.au==null||data.au.audioSource==null||data.au.audioSource.clip==null)
         {
             data.au.Volume = 0;
+            data.tempVolume = 0;
             return true;
         }
 
@@ -345,7 +349,7 @@ public class AudioPlayerBase
 
         float speed = data.au.GetMaxRealVolume() / data.fadeTime;
         oldVolume = oldVolume - speed * Time.unscaledDeltaTime;
-        //Debug.Log("FadeOut:data.au.Volume " + data.au.Volume+"  dowm :"+ oldVolume);
+        //Debug.Log("FadeOut:data.au.Volume " + data.au.Volume + "  dowm :" + oldVolume);
         //Debug.Log(" FadeOut fade State :" + data.fadeState);
         data.au.Volume = oldVolume;
         data.tempVolume = oldVolume;
@@ -362,7 +366,7 @@ public class AudioPlayerBase
 
     public bool FadeOut2In(VolumeFadeData data)
     {
-        //Debug.Log(" FadeOut2In :" + data.fadeTime);      
+        //Debug.Log("FadeOut2In:data.au.Volume " + data.au.Volume + "  dowm :" + data.tempVolume+ " data.fadeState:"+ data.fadeState+ "  data.fadeType：" + data.fadeType+" :"+JsonUtils.ToJson(data));
 
         if (data.fadeState == VolumeFadeStateType.FadeOut)
         {
@@ -378,6 +382,7 @@ public class AudioPlayerBase
         else if (data.fadeState == VolumeFadeStateType.Delay)
         {
             data.delayTime -= Time.unscaledDeltaTime;
+            //Debug.Log("Delay : data.delayTime:" + data.delayTime + "  Time.unscaledDeltaTime:" + Time.unscaledDeltaTime);
             if (data.delayTime <= 0)
             {
                 data.fadeState = VolumeFadeStateType.FadeIn;

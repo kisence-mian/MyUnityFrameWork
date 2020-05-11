@@ -22,7 +22,30 @@ public class UGUITool
             return true;
         return false;
     }
-    
+
+    /// <summary>
+    /// 判断是否点击到某物体上
+    /// </summary>
+    /// <param name="go"></param>
+    /// <returns></returns>
+    static public bool IsClickGameObject(GameObject go)
+    {
+        eventDatas.position = Input.mousePosition;
+        eventDatas.pressPosition = Input.mousePosition;
+        EventSystem.current.RaycastAll(eventDatas, hit);
+
+        for (int i = 0; i < hit.Count; i++)
+        {
+            if (hit[i].gameObject == go)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
     static public void SetImageSprite(Image img,string name,bool is_nativesize = false)
     {
         if(name == null)

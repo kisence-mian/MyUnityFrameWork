@@ -22,16 +22,16 @@ public class SelectServerFlowItem : FlowItemBase
         Debug.Log("开始选服");
         if (ApplicationManager.Instance.m_AppMode == AppMode.Release)
         {
+            Debug.Log(" Application.isMobilePlatform:" + Application.isMobilePlatform);
             RuntimePlatform platform = Application.platform;
-            //if (Application.isEditor)
-            //{
-            //    if (platform == RuntimePlatform.OSXEditor)
-            //        platform = RuntimePlatform.IPhonePlayer;
-            //    else
-            //    {
-            //        platform = RuntimePlatform.Android;
-            //    }
-            //}
+#if UNITY_ANDROID
+            platform = RuntimePlatform.Android;
+
+#elif UNITY_IPHONE
+             platform = RuntimePlatform.IPhonePlayer;
+
+#endif
+
 
             string defaultChannel = "GameCenter";
 

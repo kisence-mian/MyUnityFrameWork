@@ -57,7 +57,7 @@ namespace FrameWork.SDKManager
             {
                 if(productDefinitions[i].goodsID == goodsID)
                 {
-                    Debug.LogWarning("======goodsID========" + productDefinitions[i].localizedPriceString);
+                    //Debug.LogWarning("======goodsID========" + productDefinitions[i].localizedPriceString);
                     return productDefinitions[i];
                 }
             }
@@ -76,7 +76,7 @@ namespace FrameWork.SDKManager
 
         public override void Init()
         {
-
+            m_SDKName = GetStoreName().ToString();
         }
 
         protected void PayCallBack(OnPayInfo info)
@@ -127,7 +127,7 @@ namespace FrameWork.SDKManager
             this.localizedPrice = price;
             this.localizedTitle = goodName;
             this.isoCurrencyCode = isoCurrencyCode; //默认人民币
-        }
+            this.localizedPriceString = price.ToString();        }
 
         /// <summary>
         /// id

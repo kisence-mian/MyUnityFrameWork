@@ -19,7 +19,6 @@ public class LanguageDataEditorUtils
         string text = DataTable.Serialize(data);
 
         FileUtils.CreateTextFile(path, text);
-       
     }
   
     /// <summary>
@@ -65,7 +64,6 @@ public class LanguageDataEditorUtils
                 }
             }
         }
-
 
         return list;
     }

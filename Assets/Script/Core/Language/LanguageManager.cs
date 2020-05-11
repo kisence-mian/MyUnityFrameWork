@@ -129,7 +129,7 @@ public class LanguageManager
     //{
     //    return GetContent(c_defaultModuleKey, contentID, contentParams);
     //}
-
+    [Obsolete]
     public static string GetContent(string moduleName,string contentID, List<object> contentParams)
     {
         return GetContent(moduleName, contentID, contentParams.ToArray());
@@ -193,35 +193,44 @@ public class LanguageManager
         Init();
        
         string content = null;
-
-        if (ContainsFullKeyName(fullKeyName))
-        {
-            content = s_languageDataDict[fullKeyName];
-        }
-        else
-        {
-            Debug.LogError("LanguageManager => Error : no find key :" + fullKeyName);
-            return "";
-        }
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.Append(content);
-        if (contentParams != null && contentParams.Length > 0)
+        try
         {
-            for (int i = 0; i < contentParams.Length; i++)
+            if (ContainsFullKeyName(fullKeyName))
             {
-                object pars = contentParams[i];
-                if (pars == null)
-                    continue;
-                string replaceTmp = "{" + i + "}";
-                stringBuilder.Replace(replaceTmp, pars.ToString());
-                // content = content.Replace(replaceTmp, pars.ToString());
+                content = s_languageDataDict[fullKeyName];
+            }
+            else
+            {
+                Debug.LogError("LanguageManager => Error : no find key :" + fullKeyName);
+                return "";
+            }
+           
+            stringBuilder.Append(content);
+            if (contentParams != null && contentParams.Length > 0)
+            {
+                for (int i = 0; i < contentParams.Length; i++)
+                {
+                    object pars = contentParams[i];
+                    if (pars == null)
+                        continue;
+                    string replaceTmp = "{" + i + "}";
+                    stringBuilder.Replace(replaceTmp, pars.ToString());
+                    // content = content.Replace(replaceTmp, pars.ToString());
+                }
+            }
+            if (ApplicationManager.Instance != null && ApplicationManager.Instance.showLanguageValue && ApplicationManager.Instance.m_AppMode == AppMode.Developing)
+            {
+                stringBuilder.Insert(0, "[");
+                stringBuilder.Insert(stringBuilder.Length - 1, "]");
             }
         }
-        if (ApplicationManager.Instance != null && ApplicationManager.Instance.showLanguageValue && ApplicationManager.Instance.m_AppMode == AppMode.Developing)
+        catch (Exception e)
         {
-            stringBuilder.Insert(0, "[");
-            stringBuilder.Insert(stringBuilder.Length-1, "]");
+            Debug.LogError("多语言获取错误!" + fullKeyName + "\n" + e);
+            return null;
         }
+       
 
         return stringBuilder.ToString();
     }
@@ -252,6 +261,7 @@ public class LanguageManager
             return LanguageDataUtils.LoadFileData(language, fullFileName);
         }
     }
+    [Obsolete]
     public static string GetContent(string moduleName, string contentID, params object[] contentParams)
     {
         string fullkey = moduleName.Replace('_', '/') + "/" + contentID;

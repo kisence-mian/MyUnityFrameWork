@@ -44,19 +44,19 @@ public class MemoryManager
     
     static void GUI()
     {
-        StringBuilder showGUIStr = new StringBuilder();
-        showGUIStr.Append("总内存：" + (int)allMemory + "M"+ "\n");
-        showGUIStr.Append("使用内存：" + (int)usedMemory + "M" + "\n");
-        showGUIStr.Append("空闲内存：" + (int)freeMemory + "M" + "\n");
-        showGUIStr.Append("内存阈值：" + (int)MemoryInfo.GetMemoryLimit() + "M" + "\n");
-        showGUIStr.Append("已加载资源：" + AssetsUnloadHandler.usedAssetsDic.Count + "\n");
-        showGUIStr.Append("可回收资源：" + AssetsUnloadHandler .noUsedAssetsList.Count+ "\n");
-        GUIStyle style = new GUIStyle("Box");
-        style.fontSize = 20;
-        style.richText = true;
-        style.alignment = TextAnchor.UpperLeft;
+        //StringBuilder showGUIStr = new StringBuilder();
+        //showGUIStr.Append("总内存：" + (int)allMemory + "M"+ "\n");
+        //showGUIStr.Append("使用内存：" + (int)usedMemory + "M" + "\n");
+        //showGUIStr.Append("空闲内存：" + (int)freeMemory + "M" + "\n");
+        //showGUIStr.Append("内存阈值：" + (int)MemoryInfo.GetMemoryLimit() + "M" + "\n");
+        //showGUIStr.Append("已加载资源：" + AssetsUnloadHandler.usedAssetsDic.Count + "\n");
+        //showGUIStr.Append("可回收资源：" + AssetsUnloadHandler .noUsedAssetsList.Count+ "\n");
+        //GUIStyle style = new GUIStyle("Box");
+        //style.fontSize = 20;
+        //style.richText = true;
+        //style.alignment = TextAnchor.UpperLeft;
         
-        GUILayout.Box(showGUIStr.ToString(),style);
+        //GUILayout.Box(showGUIStr.ToString(),style);
     }
 
 

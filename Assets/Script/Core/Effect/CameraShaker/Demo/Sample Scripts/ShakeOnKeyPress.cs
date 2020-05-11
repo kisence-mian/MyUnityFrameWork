@@ -8,7 +8,7 @@ public class ShakeOnKeyPress : MonoBehaviour
 
 	void Update ()
     {
-	    if(Input.GetKeyDown(KeyCode.LeftShift))
+	    if(Input.GetKeyDown(KeyCode.LeftShift)&& Application.isEditor)
             CameraShakerManager.GetCameraShaker("Main Camera").ShakeOnce(Magnitude, Roughness, 0, FadeOutTime);
 	}
 }

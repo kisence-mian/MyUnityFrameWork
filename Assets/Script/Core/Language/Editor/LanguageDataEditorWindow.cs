@@ -80,12 +80,9 @@ public class LanguageDataEditorWindow : EditorWindow
             List<string> nowFullKeyNameList = LanguageDataEditorUtils.LoadLangusgeAllFileNames(nowLan);
             foreach (var fullKeyFileName in defaultFullKeyNameList)
             {
-               
-
                 DataTable dt = LanguageDataUtils.LoadFileData(config.defaultLanguage, fullKeyFileName);
                 if (!nowFullKeyNameList.Contains(fullKeyFileName))
                 {
-                   
                     Dictionary<string, string> dic = new Dictionary<string, string>();
                     foreach (var id in dt.TableIDs)
                     {
@@ -129,7 +126,7 @@ public class LanguageDataEditorWindow : EditorWindow
         Init();
     }
     public int toolbarOption = 0;
-    private string[] toolbarTexts = { "模块文件", "语言内容编辑", "语言设置" };
+    private string[] toolbarTexts = { "模块文件", "语言内容编辑", "语言设置","多语言工具" };
     private bool richText = false;
     void OnGUI()
     {
@@ -157,6 +154,9 @@ public class LanguageDataEditorWindow : EditorWindow
                 ConfigSettingGUI();
                 AddLanguageGUI();
                 DeleteLanguageGUI();
+                break;
+            case 3:
+                LanguageToolGUI();
                 break;
         }
 
@@ -267,6 +267,92 @@ public class LanguageDataEditorWindow : EditorWindow
         }
             GUILayout.EndHorizontal();
     }
+    #endregion
+
+    #region 多语言工具
+
+    bool isToggleMergeLanguage = false;
+    void LanguageToolGUI()
+    {
+        isToggleMergeLanguage = GUILayout.Toggle(isToggleMergeLanguage,"多语言合并");
+
+        if(isToggleMergeLanguage)
+        {
+            LanguageMergeGUI();
+        }
+    }
+
+    #region 多语言合并
+
+    string mergePath = "";
+    SystemLanguage mergeLanguage;
+
+    void LanguageMergeGUI()
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.Label("路径");
+        mergePath = GUILayout.TextField( mergePath);
+        GUILayout.EndHorizontal();
+
+        mergeLanguage = EditorDrawGUIUtil.DrawPopup("当前要合并的语言", currentLanguage, config.gameExistLanguages);
+
+        if (GUILayout.Button("合并"))
+        {
+            MergeLanguagePath(mergePath, mergeLanguage);
+        }
+    }
+
+    void MergeLanguagePath(string path, SystemLanguage language)
+    {
+        List<string> list =  FileTool.GetAllFileNamesByPath(path, new string[] { "txt" });
+
+        for (int i = 0; i < list.Count; i++)
+        {
+            MergeLanguage(list[i],language);
+        }
+    }
+
+    void MergeLanguage(string path, SystemLanguage language)
+    {
+        Debug.Log("MergeLanguage " + path);
+
+        string languageKey = FileTool.GetFileNameByPath(FileTool.RemoveExpandName( path)).Replace(LanguageManager.c_DataFilePrefix + language + "_", "").Replace("_", "/");
+
+        Debug.Log("languageKey " + languageKey);
+
+        string content = ResourceIOTool.ReadStringByFile(path);
+        DataTable aimLanguage = DataTable.Analysis(content);
+
+        DataTable localLanguage = LanguageDataUtils.LoadFileData(language, languageKey);
+
+        foreach (var key in aimLanguage.TableIDs)
+        {
+            string value = aimLanguage[key].GetString(LanguageManager.c_valueKey);
+
+            SingleData sd = new SingleData();
+            sd.Add(LanguageManager.c_mainKey, key);
+            sd.Add(LanguageManager.c_valueKey, value);
+
+            if (!localLanguage.TableIDs.Contains(key))
+            {
+                Debug.Log("新增字段 " + key + " -> " + value);
+                localLanguage.AddData(sd);
+            }
+            else
+            {
+                if(localLanguage[key].GetString(LanguageManager.c_valueKey) != value)
+                {
+                    Debug.Log("更新字段 key" + key +" Value >" + localLanguage[key].GetString(LanguageManager.c_valueKey) + "< newValue >" + value + "<");
+                    localLanguage[key] = sd;
+                }
+            }
+        }
+
+        LanguageDataEditorUtils.SaveData(language, languageKey, localLanguage);
+    }
+
+    #endregion
+
     #endregion
 
     #region 编辑语言字段

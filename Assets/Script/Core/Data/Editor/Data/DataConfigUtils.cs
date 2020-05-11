@@ -176,7 +176,7 @@ public static class DataConfigUtils
                 catch (Exception e)
                 {
                     t = Enum.GetValues(type).GetValue(0);
-                   // Debug.LogError("fieldValueType:" + fieldValueType + " enumType:" + enumType + " type:" + type + " v:" + v + "\n"+e);
+                    Debug.LogError("fieldValueType:" + fieldValueType + " enumType:" + enumType + " type:" + type + " v:" + v + "\n"+e);
                     throw e;
                 }
              

@@ -38,7 +38,7 @@ public class RealNameLimitEvent
             {
                 if (string.IsNullOrEmpty(describ))
                 {
-                    describ = "根据规定，未完成实名制的用户，最多体验本游戏1小时，继续游玩请完成实名制认证";
+                    describ = "根据相关法律法规，未实名的玩家每天只能体验1个小时哦，请前往实名认证吧";
                 }
                 //未实名制，游戏体验上限1小时
                 return RealNameLimitType.NoRealNameMaxTimeLimit;
@@ -49,7 +49,7 @@ public class RealNameLimitEvent
                 {
                     if (string.IsNullOrEmpty(describ))
                     {
-                        describ = "根据规定，22时至次日8时，不得对未成年提供游戏服务，请合理安排作息";
+                        describ = "晚上10点过了就要休息咯，请明天早上8点之后再来吧";
                     }
                     //深夜， 22时至次日8时 不得为未成年人提供游戏服务
                     return RealNameLimitType.ChildNightLimit;
@@ -58,7 +58,7 @@ public class RealNameLimitEvent
                 {
                     if (string.IsNullOrEmpty(describ))
                     {
-                        describ = "根据规定，未成年人法定节假日每日在线时长不得超过3小时，其他日期1.5小时，请合理安排作息";
+                        describ = "您今天的游玩时间已经超过了1.5小时哦（节假日3小时），请明天再来吧";
                     }
                     //未成年人，每日在线时长不得超过x小时（法定节假日3小时，其他日期1.5小时）
                     return RealNameLimitType.ChildTimeLimit;

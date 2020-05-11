@@ -44,7 +44,7 @@ public class StaticReportController
         //Debug.Log("OnLoginEvent : " + e.state + "  Error: " + e.error);
         string[] deviceInfo = SystemInfo.deviceModel.Split(' ');
 
-       string cc=  SDKManager.GetProperties(SDKInterfaceDefine.FileName_ChannelProperties, channel);
+       string cc=  SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_ChannelName, channel);
 
         datas.Add("channel", cc);
         datas.Add("brand", deviceInfo[0]);

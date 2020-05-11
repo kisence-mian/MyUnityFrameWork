@@ -15,7 +15,7 @@ public class ShakeDemo : MonoBehaviour
 
 	void OnGUI()
     {
-        if (Input.GetKeyDown(KeyCode.R))
+        if (Input.GetKeyDown(KeyCode.R) && Application.isEditor)
         {
             //Application.LoadLevel(Application.loadedLevel);
         }
