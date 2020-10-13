@@ -14,7 +14,7 @@ public class ResendMessageManager
     /// 开始重发，一般是登陆后
     /// </summary>
     public static bool startResend = false;
-    //private static int indexCode = 0;
+    public static Action<MessageClassInterface> ReceiveMsgCallBack;
     public static void Init()
     {
         ApplicationManager.s_OnApplicationUpdate += Update;
@@ -45,7 +45,7 @@ public class ResendMessageManager
                 Debug.Log("移除重发：" + m.removeMT);
                 msgs.Remove(m);
                 SaveRecord();
-                if (m.callBack != null)
+                if( ReceiveMsgCallBack != null)
                 {
                     MessageClassInterface msgInterface = null;
                     Type type = Type.GetType(inputEvent.m_MessgaeType);
@@ -61,7 +61,7 @@ public class ResendMessageManager
                         msgInterface = (MessageClassInterface)dataObj;
                     }
 
-                    m.callBack(msgInterface);
+                    ReceiveMsgCallBack(msgInterface);
                 }
                 break;
             }
@@ -72,6 +72,8 @@ public class ResendMessageManager
     {
         if (user == null)
             return;
+
+        msgs.Clear();
         List<ResendMessage> list = GetData<ResendMessage>(user.userID);
         if (list != null)
         {
@@ -83,14 +85,12 @@ public class ResendMessageManager
             {
                 msgs = list;
             }
-           
-
         }
       
-        list = GetData<ResendMessage>("0");
-        if (list != null)
-            msgs.AddRange(list);
-        RecordManager.SaveRecord(ResendMsgFile, "0", "");
+        //list = GetData<ResendMessage>("0");
+        //if (list != null)
+        //    msgs.AddRange(list);
+        //RecordManager.SaveRecord(ResendMsgFile, "0", "");
         Debug.Log("加载重发记录：" + msgs.Count);
     }
 
@@ -141,10 +141,10 @@ public class ResendMessageManager
     static List<ResendMessage> msgs = new List<ResendMessage>();
 
 
-    public static void AddResendMessage<T>(T data,string removeMT,CallBack<MessageClassInterface> callBack, bool noSend=false)
+    public static void AddResendMessage<T>(T data, string removeMT, bool noSend = false)
     {
         string content = JsonUtils.ToJson(data);
-        string mt = typeof(T).Name;
+        string mt = typeof(T).FullName;
         ResendMessage msgResnd = null;
         foreach (ResendMessage m in msgs)
         {
@@ -154,19 +154,16 @@ public class ResendMessageManager
                 break;
             }
         }
-          
-        //Debug.LogError("noSend:" + noSend);
         if (msgResnd != null)
         {
             msgResnd.removeMT = removeMT;
             msgResnd.content = content;
-            msgResnd.callBack = callBack;
             msgResnd.noSend = noSend;
             //Debug.LogError("msgResnd.noSend:" + msgResnd.noSend);
         }
         else
         {
-            ResendMessage msg = new ResendMessage(removeMT, mt, content, callBack, noSend);
+            ResendMessage msg = new ResendMessage(removeMT, mt, content, noSend);
             msgs.Add(msg);
         }
         SaveRecord();
@@ -181,14 +178,12 @@ public class ResendMessageManager
         /// 不发消息（也不重发），只监听接收
         /// </summary>
         public bool noSend = false;
-        public CallBack<MessageClassInterface> callBack;
         public ResendMessage() { }
-        public ResendMessage(string removeMT, string mt, string content,CallBack<MessageClassInterface> callBack, bool noSend)
+        public ResendMessage(string removeMT, string mt, string content, bool noSend)
         {
             this.removeMT = removeMT;
             this.mt = mt;
             this.content = content;
-            this.callBack = callBack;
             this.noSend = noSend;
         }
     }

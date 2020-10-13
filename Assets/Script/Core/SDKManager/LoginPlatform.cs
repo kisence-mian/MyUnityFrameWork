@@ -122,5 +122,10 @@ public enum LoginPlatform
     OKJOY,
 
     Play68,
+
+    /// <summary>
+    /// 微软- MG
+    /// </summary>
+    MG,
 }
 

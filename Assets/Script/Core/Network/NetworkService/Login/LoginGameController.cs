@@ -225,7 +225,6 @@ public static class LoginGameController
         loginMsg = null;
 
         SDKManager.LoginOut(PlayerLoginPlatform.ToString());
-        GameInfoCollecter.AddPlayerInfoValue("IsLogin", IsLogin);
 
         if (OnUserLogout!=null)
         {
@@ -240,13 +239,6 @@ public static class LoginGameController
         {
             isLogin = true;
             GameDataMonitor.PushData("User", e.user, "玩家数据");
-            GameInfoCollecter.AddPlayerInfoValue("IsLogin", IsLogin);
-            GameInfoCollecter.AddPlayerInfoValue("UserID", e.user.userID);
-            GameInfoCollecter.AddPlayerInfoValue("LoginType", e.user.loginType);
-            GameInfoCollecter.AddPlayerInfoValue("NickName", e.user.nickName);
-            GameInfoCollecter.AddPlayerInfoValue("TypeKey", e.user.typeKey);
-            GameInfoCollecter.AddPlayerInfoValue("PlayTime", e.user.playTime);
-            GameInfoCollecter.AddPlayerInfoValue("TotalLoginDays", e.user.totalLoginDays);
 
             SDKManager.UserID = e.user.userID;
         }

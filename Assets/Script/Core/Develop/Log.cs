@@ -12,16 +12,18 @@ public class Log
     static LogOutPutThread s_LogOutPutThread = new LogOutPutThread();
     public static void Init(bool isOpenLog = true)
     {
-        if (Application.platform != RuntimePlatform.WindowsEditor &&
-            Application.platform != RuntimePlatform.LinuxEditor)
-        {
-            int status = PlayerPrefs.GetInt("Log", -1);
-            if (status != -1)
-            {
-                isOpenLog = status == 1 ? true : false;
-            }
-        }
-        PlayerPrefs.SetInt("Log", (isOpenLog ? 1 : 0));
+        //if (Application.platform != RuntimePlatform.WindowsEditor &&
+        //    Application.platform != RuntimePlatform.LinuxEditor)
+        //{
+        //    int status = PlayerPrefs.GetInt("Log", -1);
+        //    if (status != -1)
+        //    {
+        //        isOpenLog = status == 1 ? true : false;
+        //    }
+        //}
+        //PlayerPrefs.SetInt("Log", (isOpenLog ? 1 : 0));
+        SetUnityDebugSwitch(isOpenLog);
+
 
         if (isOpenLog)
         {
@@ -31,7 +33,14 @@ public class Log
             Application.logMessageReceived += UnityLogCallBack;
         }
     }
-
+    private static void SetUnityDebugSwitch(bool open)
+    {
+#if UNITY_2017_1_OR_NEWER
+        Debug.unityLogger.logEnabled = open;
+#else
+        Debug.logger.logEnabled = open;
+#endif
+    }
     private static void OnApplicationQuit()
     {
         Application.logMessageReceivedThreaded -= UnityLogCallBackThread;

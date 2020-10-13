@@ -17,6 +17,7 @@ public class LongPressAcceptor : MonoBehaviour ,IPointerDownHandler,IPointerUpHa
 
     bool isPress = false;
     bool isDispatch = false;
+    bool isLongPress = false;
 
     public InputUIEventLongPressCallBack OnLongPress;
     //public InputEventHandle<InputUIOnClickEvent> OnPointerDown;
@@ -33,6 +34,7 @@ public class LongPressAcceptor : MonoBehaviour ,IPointerDownHandler,IPointerUpHa
         isPress = false;
         isDispatch = false;
         m_Timer = 0;
+        isLongPress = false;
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -47,12 +49,17 @@ public class LongPressAcceptor : MonoBehaviour ,IPointerDownHandler,IPointerUpHa
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        ResetAcceptor();
 
         if (OnLongPress != null)
         {
             OnLongPress(InputUIEventType.PressUp);
+
+            if (!isLongPress)
+            {
+                OnLongPress(InputUIEventType.Click);
+            }
         }
+        ResetAcceptor();
     }
 
     void Update()
@@ -68,6 +75,7 @@ public class LongPressAcceptor : MonoBehaviour ,IPointerDownHandler,IPointerUpHa
                 isDispatch = true;
                 if (OnLongPress != null)
                 {
+                    isLongPress = true;
                     OnLongPress(InputUIEventType.LongPress);
                 }
             }

@@ -1,5 +1,6 @@
-﻿using LiteNetLib;
-using LiteNetLibManager;
+﻿
+using SimpleNetManager;
+using SimpleNetCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,26 +17,26 @@ public class TestNetworkServer : MonoBehaviour
     {
         string name = Application.productName + "[" + Application.version + "]";
 
-        LitNetServer.SetNetworkServerManager(name, port);
+        //LitNetServer.SetNetworkServerManager(name, port);
 
 
-        LitNetServer.ServiceManager.Add<LoginService>();
+        NetServer.ServiceManager.Add<LoginService>();
 
-        LitNetServer.Start();
+        NetServer.Start(port);
     }
 
 
 
     private void Update()
     {
-        LitNetServer.Update(Time.deltaTime);
+        NetServer.Update(Time.deltaTime);
     }
     private void OnPeerNetworkError(IPEndPoint arg1, SocketError arg2)
     {
         
     }
 
-    private void OnPeerDisconnected(long arg1, DisconnectInfo arg2)
+    private void OnPeerDisconnected(long arg1, EDisconnectInfo arg2)
     {
        
     }

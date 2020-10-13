@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
-using LiteNetLib.Utils;
 using System.Collections.Generic;
 using System;
-using LiteNetLibManager;
+using SimpleNetManager;
+using SimpleNetCore;
 
 namespace UnityRemoteConsole
 {
@@ -36,7 +36,7 @@ namespace UnityRemoteConsole
             writer.Put(paraName);
             writer.Put(paraTypeFullName);
             writer.Put(defaultValueStr);
-            writer.PutArray(selectItemValues);
+            writer.Put(selectItemValues);
         }
         public Type GetParamValueType()
         {
@@ -74,7 +74,7 @@ namespace UnityRemoteConsole
             classFullName = reader.GetString();
             methodName = reader.GetString();
 
-            paramsDatas = NetDataReaderExtend.GetListData<ParamsData>(reader);
+            paramsDatas = NetDataReaderExtension.GetListData<ParamsData>(reader);
         }
 
         public void Serialize(NetDataWriter writer)
@@ -85,7 +85,7 @@ namespace UnityRemoteConsole
 
             writer.Put(classFullName);
             writer.Put(methodName);
-            NetDataWriterExtend.PutListData(writer, paramsDatas);
+            NetDataWriterExtension.PutListData(writer, paramsDatas);
 
         }
     }

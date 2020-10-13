@@ -14,8 +14,6 @@ public class ClientReportClass : LogInterface
         msg.datas = KeyValueData.Dictionary2KeyValueDataList(data);
 
         JsonMessageProcessingController.SendMessage(msg);
-
-
     }
 }
 

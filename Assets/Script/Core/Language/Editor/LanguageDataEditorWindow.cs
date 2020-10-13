@@ -32,14 +32,14 @@ public class LanguageDataEditorWindow : EditorWindow
     private void Init()
     {
         win = this;
-       config= LanguageDataUtils.LoadRuntimeConfig();
+        config= LanguageDataUtils.LoadRuntimeConfig();
 
-        if(config == null)
+        if (config == null)
         {
             return;
         }
 
-        if (Application.isPlaying )
+        if (Application.isPlaying)
         {
             currentLanguage = LanguageManager.CurrentLanguage;
         }
@@ -61,6 +61,8 @@ public class LanguageDataEditorWindow : EditorWindow
         treeView.dblclickItemCallBack = ModuleFileDblclickItemCallBack;
         treeView.selectCallBack = ModuleFileFolderSelectCallBack;
     }
+
+
     /// <summary>
     /// 检查修复多语言完整性
     /// </summary>

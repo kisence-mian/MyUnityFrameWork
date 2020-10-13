@@ -89,7 +89,6 @@ public class ApplicationManager : MonoBehaviour
         //Debug.Log("persistentDataPath:" + Application.persistentDataPath);
         instance = this;
 
-        GameInfoCollecter.AddAppInfoValue("Build App Mode", m_AppMode);
         if (Application.platform != RuntimePlatform.WindowsEditor &&
             Application.platform != RuntimePlatform.OSXEditor)
         {
@@ -147,7 +146,6 @@ public class ApplicationManager : MonoBehaviour
             };
 
             DevelopReplayManager.Init(m_quickLunch);   //开发者复盘管理器
-
             LanguageManager.Init();
         }
         else
@@ -162,6 +160,7 @@ public class ApplicationManager : MonoBehaviour
 
             LanguageManager.Init();
         }
+
 
         if (s_OnApplicationModuleInitEnd != null)
         {
@@ -182,6 +181,7 @@ public class ApplicationManager : MonoBehaviour
     public static ApplicationVoidCallback s_OnApplicationOnGUI = null;
     public static ApplicationVoidCallback s_OnApplicationOnDrawGizmos = null;
     public static ApplicationVoidCallback s_OnApplicationLateUpdate = null;
+   
 
     void OnApplicationQuit()
     {
@@ -198,11 +198,11 @@ public class ApplicationManager : MonoBehaviour
         }
     }
 
-/*
- * 强制暂停时，先 OnApplicationPause，后 OnApplicationFocus
- * 重新“启动”游戏时，先OnApplicationFocus，后 OnApplicationPause
- */
-void OnApplicationPause(bool pauseStatus)
+    /*
+     * 强制暂停时，先 OnApplicationPause，后 OnApplicationFocus
+     * 重新“启动”游戏时，先OnApplicationFocus，后 OnApplicationPause
+     */
+    void OnApplicationPause(bool pauseStatus)
     {
         if (s_OnApplicationPause != null)
         {
@@ -240,7 +240,7 @@ void OnApplicationPause(bool pauseStatus)
 
     private void LateUpdate()
     {
-        if(s_OnApplicationLateUpdate != null)
+        if (s_OnApplicationLateUpdate != null)
         {
             s_OnApplicationLateUpdate();
         }
@@ -262,6 +262,10 @@ void OnApplicationPause(bool pauseStatus)
     {
         if (s_OnApplicationOnDrawGizmos != null)
             s_OnApplicationOnDrawGizmos();
+    }
+    private void OnDestroy()
+    {
+
     }
 
     #endregion
@@ -293,7 +297,8 @@ void OnApplicationPause(bool pauseStatus)
             GlobalLogicManager.InitLogic(m_globalLogic[i]);
         }
     }
-#endregion
+  
+    #endregion
 }
 
 public enum AppMode

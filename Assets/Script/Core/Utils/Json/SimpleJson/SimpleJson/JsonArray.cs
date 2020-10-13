@@ -3,7 +3,7 @@ using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.ComponentModel;
 
-namespace HDJ.Framework.Core
+namespace Framework
 {
 	[GeneratedCode("simple-json", "1.0.0"), EditorBrowsable(EditorBrowsableState.Never)]
 	internal class JsonArray : List<object>

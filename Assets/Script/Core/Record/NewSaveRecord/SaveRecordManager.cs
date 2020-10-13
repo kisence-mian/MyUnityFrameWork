@@ -18,6 +18,10 @@ public  class SaveRecordManager
     /// 自定义储存目录
     /// </summary>
     private  string customDirectory = "";
+    public SaveRecordManager()
+    {
+        persistentDataPath = Application.persistentDataPath;
+    }
     /// <summary>
     /// 设定自定义储存目录，如:Name或Name/PPP
     /// </summary>
@@ -47,7 +51,8 @@ public  class SaveRecordManager
         {
             if (!allRecords.TryGetValue(fileName, out fileContent))
             {
-                string text = GetFileTextData(fileName);
+                string md5 = null;
+                string text = GetFileTextData(fileName ,out md5);
                 fileContent = converter.String2Object<Dictionary<string, string>>(text);
                 if (fileContent == null)
                 {
@@ -89,8 +94,8 @@ public  class SaveRecordManager
         }
         else
         {
-            
-            string text = GetFileTextData(fileName);
+            string md51 = null;
+            string text = GetFileTextData(fileName,out md51);
             fileContent = converter.String2Object<Dictionary<string, string>>(text);
             if (fileContent == null)
             {
@@ -109,7 +114,16 @@ public  class SaveRecordManager
             fileContent.Add(key, valueStr);
         }
         string ss = converter.Object2String(fileContent);
-
+        Save2File(fileName, ss);
+    }
+    public void Save2File(string fileName,string ss)
+    {
+        byte[] dataByte = Encoding.GetEncoding("UTF-8").GetBytes(ss);
+        string md5 = MD5Utils.GetMD5Base64(dataByte);
+        //Debug.Log("Save2File:" + fileName + " md5:" + md5 + "\n" + ss);
+        string length = md5.Length.ToString().PadLeft(4, '0');
+        ss = length + md5 + ss;
+        //Debug.Log("Save File:" + fileName + " md5:" + md5 + "\n" + ss);
         FileUtils.CreateTextFile(GetFilePath(fileName), ss);
     }
     /// <summary>
@@ -146,24 +160,91 @@ public  class SaveRecordManager
     {
         return GetFileDir() + "/" + fileName + converter.GetFileExtend();
     }
+    private  string persistentDataPath ;
     private  string GetFileDir()
     {
-        string dir = Application.persistentDataPath + "/" + converter.GetSaveDirectoryName();
+        string dir = persistentDataPath + "/" + converter.GetSaveDirectoryName();
         if (!string.IsNullOrEmpty(customDirectory))
             dir += "/" + customDirectory;
         return dir;
     }
 
-    private  string GetFileTextData(string fileName)
+    private  string GetFileTextData(string fileName,out string md5)
     {
         string path = GetFilePath(fileName);
         string text = null;
+        md5 = null;
         if (File.Exists(path))
         {
              text = FileUtils.LoadTextFileByPath(path);
-
+            try
+            {
+                int length = int.Parse(text.Substring(0, 4));
+                md5 = text.Substring(4, length);
+                text = text.Substring(4 + length);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
         }
         return text;
+    }
+
+    /// <summary>
+    /// 检查保存文件的完整性
+    /// </summary>
+    /// <returns></returns>
+    public bool CheckSaveFileMD5()
+    {
+        Debug.Log("开始检查保存文件的完整性");
+        if (Directory.Exists(GetFileDir()))
+        {
+            string[] filePaths = PathUtils.GetDirectoryFilePath(GetFileDir());
+            foreach (var path in filePaths)
+            {
+                string fileName = Path.GetFileNameWithoutExtension(path);
+                string md5 = null;
+                string text = GetFileTextData(fileName, out md5);
+                //Debug.Log("fileName:" + fileName + " md5:" + md5 + "\n" + text);
+                Dictionary<string, string> fileContent = null;
+
+                if (allRecords.ContainsKey(fileName))
+                {
+                    fileContent = allRecords[fileName];
+                }
+                else
+                {
+                    fileContent = converter.String2Object<Dictionary<string, string>>(text);
+                    if (fileContent == null)
+                    {
+                        fileContent = new Dictionary<string, string>();
+                    }
+                    allRecords.Add(fileName, fileContent);
+                }
+                if (!string.IsNullOrEmpty(md5))
+                {
+                    byte[] dataByte = Encoding.GetEncoding("UTF-8").GetBytes(text);
+                    //Debug.Log("dataByte.lenth:" + dataByte.Length);
+                    string md5New = MD5Utils.GetMD5Base64(dataByte);
+                    // string md5New = MD5Utils.GetObjectMD5(text);
+                    if (md5New != md5)
+                    {
+                        Debug.LogError("文件：" + fileName + " md5不正确:" + md5 + " md5New:" + md5New + "\n" + text);
+                        return false;
+                    }
+                }
+                else
+                {
+                    if (text != null && text.Length < 3)
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 }
 

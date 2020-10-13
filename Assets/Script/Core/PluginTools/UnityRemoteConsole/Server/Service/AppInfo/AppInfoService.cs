@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
-using LiteNetLibManager;
+using SimpleNetManager;
 using System.Collections.Generic;
-using LiteNetLib.Utils;
 using UnityEngine.SceneManagement;
+using SimpleNetCore;
 
 namespace UnityRemoteConsole
 {
@@ -31,7 +31,7 @@ namespace UnityRemoteConsole
         {
 
         }
-        protected override void OnPlayerLogin(LiteNetLibManager.Player player)
+        protected override void OnPlayerLogin(SimpleNetManager.Player player)
         {
             foreach (var item in infoDatas)
             {
@@ -39,19 +39,19 @@ namespace UnityRemoteConsole
             }
         }
 
-        private static void Send2Client(LiteNetLibManager.Player player, ShowInfoData data)
+        private static void Send2Client(SimpleNetManager.Player player, ShowInfoData data)
         {
-            if (LitNetServer.NetManager != null)
+            if (NetServer.NetManager != null)
             {
                 AppInfoData2Client msg = new AppInfoData2Client();
                 msg.data = data;
 
-                LitNetServer.NetManager.Send(player, msg);
+                NetServer.NetManager.Send(player.session, msg);
             }
         }
         private static void Send2AllPlayer(ShowInfoData data)
         {
-            LiteNetLibManager.Player[] players = LiteNetLibManager.PlayerManager.GetAllPlayers();
+            SimpleNetManager.Player[] players = SimpleNetManager.PlayerManager.GetAllPlayers();
             foreach (var p in players)
             {
                 Send2Client(p, data);
@@ -86,7 +86,7 @@ namespace UnityRemoteConsole
                 }
                 if (value == null)
                 {
-                    Debug.LogError("value cant be null");
+                    Debug.LogError("value cant be null!" + " typeName:" + typeName + " label:" + label + " key:" + key);
                     return;
                 }
 

@@ -84,7 +84,6 @@ public class HotUpdateManager
             int s_bigVersion = 0;
             int s_smallVersion = 0;
             GetVersion(StreamPath, ref s_bigVersion, ref s_smallVersion);
-            GameInfoCollecter.AddAppInfoValue("Streaming Bundle Version", s_bigVersion + "." + s_smallVersion);
 
             string persistentPath = PathTool.GetAssetsBundlePersistentPath() + c_versionFileName;
             //判断沙盒路径是否存在
@@ -97,7 +96,6 @@ public class HotUpdateManager
             int p_bigVersion = 0;
             int p_smallVersion = 0;
             GetVersion(persistentPath, ref p_bigVersion, ref p_smallVersion);
-            GameInfoCollecter.AddAppInfoValue("Persistent Bundle Version", p_bigVersion + "." + p_smallVersion);
 
                 Debug.Log("largeVersionKey Streaming " + s_bigVersion + " 本地 " + p_bigVersion);
                 Debug.Log("smallVersonKey Streaming  " + s_smallVersion + " 本地 " + p_smallVersion);

@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using SimpleNetManager;
+using SimpleNetCore;
 using System;
 using System.Collections.Generic;
 

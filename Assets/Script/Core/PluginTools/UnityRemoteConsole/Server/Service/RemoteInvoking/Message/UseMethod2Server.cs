@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using SimpleNetManager;
+using SimpleNetCore;
 using System;
 using System.Collections.Generic;
 
@@ -31,10 +32,10 @@ namespace UnityRemoteConsole
             writer.Put(methodName);
             {
                 string[] keys = new List<string>(paramNameValues.Keys).ToArray();
-                writer.PutArray(keys);
+                writer.Put(keys);
 
                 string[] values = new List<string>(paramNameValues.Values).ToArray();
-                writer.PutArray(values);
+                writer.Put(values);
             }
 
 

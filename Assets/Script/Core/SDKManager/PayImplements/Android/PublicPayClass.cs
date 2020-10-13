@@ -26,16 +26,9 @@ public class PublicPayClass : PayInterface
     public override void Init()
     {
         m_SDKName = "PublicPayClass";
-        //storeName =(StoreName)Enum.Parse( typeof(StoreName),SDKManager.GetProperties(SDKInterfaceDefine.PropertiesKey_StoreName, "None"));
 
         GlobalEvent.AddTypeEvent<PrePay2Client>(OnPrePay);
-
-
-
-        //GlobalEvent.DispatchEvent("Fight",)
-
         GlobalEvent.DispatchTypeEvent<InputUIOnClickEvent>(null);
-
         GlobalEvent.AddTypeEvent<InputUIOnClickEvent>((e,objs)=> {
 
         });
@@ -54,7 +47,7 @@ public class PublicPayClass : PayInterface
         {
             if (productDefinitions[i].goodsID == info.goodsId)
             {
-                Debug.LogWarning("GetGoodsInfoFromSDK =====id:" + info.goodsId + "=====price:" + info.localizedPriceString);
+                //Debug.LogWarning("GetGoodsInfoFromSDK =====id:" + info.goodsId + "=====price:" + info.localizedPriceString);
                 productDefinitions[i].localizedPriceString = info.localizedPriceString;
                 return;
             }

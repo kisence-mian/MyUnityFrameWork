@@ -9,13 +9,42 @@ public class UnityWebRequestTool
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="uri">不加端口时默认80端口 如：http://192.168.1.185:8181/test?name=hdj&pw=jj5 或http://192.168.1.185/test?name=hdj&pw=jj5</param>
+    /// <param name="uri">不加端口时默认80端口 如：http://192.168.1.185:8181 或http://192.168.1.185</param>
     /// <param name="callBack">string：error， Dictionary<string,string> 返回的数据</param>
     public static void Get(string uri,CallBack<string, Dictionary<string,string>> callBack)
     {
         MonoBehaviourRuntime.Instance.StartCoroutine(AsyGet(uri, callBack));
     }
-   static  IEnumerator AsyGet(string uri, CallBack<string, Dictionary<string, string>> callBack)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="uri"></param>
+    /// <param name="callBack">string：error， string  返回的数据</param>
+    public static void Get(string uri, CallBack<string, string> callBack)
+    {
+        MonoBehaviourRuntime.Instance.StartCoroutine(AsyGet(uri, callBack));
+    }
+    static IEnumerator AsyGet(string uri, CallBack<string,string> callBack)
+    {
+        UnityWebRequest webRequest = UnityWebRequest.Get(uri);
+        webRequest.method = UnityWebRequest.kHttpVerbGET;
+        webRequest.timeout = 15;
+        //webRequest.chunkedTransfer = false;
+        //webRequest.redirectLimit = 0;
+        //webRequest.useHttpContinue = false;
+        yield return webRequest.SendWebRequest();
+        //异常处理，很多博文用了error!=null这是错误的，请看下文其他属性部分
+        string error = null;
+        if (webRequest.isHttpError || webRequest.isNetworkError)
+            error = webRequest.error;
+
+        if (callBack != null)
+        {
+            callBack(error, webRequest.downloadHandler.text);
+        }
+
+    }
+    static  IEnumerator AsyGet(string uri, CallBack<string, Dictionary<string, string>> callBack)
     {
         UnityWebRequest webRequest = UnityWebRequest.Get(uri);
         webRequest.method = UnityWebRequest.kHttpVerbGET;

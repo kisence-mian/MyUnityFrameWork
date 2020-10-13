@@ -542,7 +542,7 @@ namespace FrameWork.GuideSystem
                 Debug.LogError("Guide Window is null");
             }
         }
-      protected  void NextGuide()
+      public  void NextGuide()
         {
             Debug.Log("NextGuide m_currentGuideData " + m_currentGuideData.m_SingleDataKey + "");
 

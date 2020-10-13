@@ -142,10 +142,13 @@ namespace FrameWork.SDKManager
         public const string Other_ParameterName_TotalProgress = "TotalProgress";
         public const string Other_ParameterName_Size = "Size";
  
+        //Other -> 获取手机通讯录
+        public const string Other_FunctionName_GetPhoneNumberList = "GetPhoneNumberList";
+
         //Properties
-        public const string FileName_ChannelProperties = "Channel";
+        public const string FileName_ChannelProperties = "Channel";                  //文件名
         public const string PropertiesKey_IsLog = "IsLog";                           //是否输出日志
-        public const string PropertiesKey_SelectNetworkPath = "SelectNetworkPath";  //选服配置下载地址
+        public const string PropertiesKey_SelectNetworkPath = "SelectNetworkPath";   //选服配置下载地址
         public const string PropertiesKey_UpdateDownLoadPath = "UpdateDownLoadPath"; //热更新下载地址(最后没有斜线)
         public const string PropertiesKey_TestUpdateDownLoadPath = "TestUpdateDownLoadPath"; //热更新下载测试地址(最后没有斜线)
         public const string PropertiesKey_ChannelName = "ChannelName";               //渠道名称
@@ -166,6 +169,8 @@ namespace FrameWork.SDKManager
         public const string PropertiesKey_LogoShowTime = "LogoShowTime";              //显示下一组logo n 秒 ， 0 表示覆盖原本logo
         public const string PropertiesKey_CanPay = "CanPay";                          //允许支付
 
-        public const string PropertiesKey_SelectServerURL = "SelectServerURL";       //选服服务器地址(废弃)
+        public const string PropertiesKey_SelectServerURL = "SelectServerURL";       //选服服务器地址
+
+        public const string PropertiesKey_SelectServerOSSURL = "SelectServerOSSURL";       //选服服务器 OSS地址
     }
 }

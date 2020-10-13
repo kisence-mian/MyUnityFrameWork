@@ -1,7 +1,5 @@
-﻿using UnityEngine;
-using System.Collections;
-using LiteNetLib.Utils;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using SimpleNetCore;
 
 namespace UnityRemoteConsole
 {

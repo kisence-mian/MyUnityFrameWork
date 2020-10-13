@@ -30,7 +30,7 @@ public static class StorePayController
     /// </summary>
     public static CallBack<LocalizedGoodsInfo, PayPlatformInfo> OnSelectPayPlatformCallBack;
 
-    private static List<LocalizedGoodsInfo> productDefinitions;
+    public static List<LocalizedGoodsInfo> productDefinitions;
 
 
     [RuntimeInitializeOnLoadMethod]
@@ -56,6 +56,7 @@ public static class StorePayController
         SDKManager.ExtraInit(SDKType.Pay, null, JsonUtils.ToJson(productDefinitions));
         PayReSend.Instance.ReSendPay();
         OnSelectPayPlatformCallBack += OnOnSelectPayPlatform;
+        SDKManager.GoodsInfoCallBack += OnGoodsInfoCallBack;
     }
 
 
@@ -93,7 +94,7 @@ public static class StorePayController
     }
     public static LocalizedGoodsInfo GetGoodsInfo(string goodID)
     {
-        LocalizedGoodsInfo info = SDKManager.GetGoodsInfo(goodID);
+        LocalizedGoodsInfo info = null; // SDKManager.GetGoodsInfo(goodID);
         if (info == null)
         {
             foreach (var item in productDefinitions)
@@ -200,6 +201,25 @@ public static class StorePayController
 
 
     }
+
+
+    /// <summary>
+    /// 从SDK获取商品信息的回调
+    /// </summary>
+    /// <param name="info"></param>
+    private static void OnGoodsInfoCallBack(GoodsInfoFromSDK info)
+    {
+        for (int i = 0; i < productDefinitions.Count; i++)
+        {
+            if (productDefinitions[i].goodsID == info.goodsId)
+            {
+                Debug.LogWarning("GetGoodsInfoFromSDK =====id:" + info.goodsId + "=====price:" + info.localizedPriceString);
+                productDefinitions[i].localizedPriceString = info.localizedPriceString;
+                return;
+            }
+        }
+    }
+
 
     private static LocalizedGoodsInfo m_goodsInfo;
     private static PayPlatformInfo m_payPlatform;

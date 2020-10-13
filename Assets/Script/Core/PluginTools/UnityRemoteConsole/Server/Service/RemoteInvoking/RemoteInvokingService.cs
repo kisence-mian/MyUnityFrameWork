@@ -3,7 +3,8 @@ using System.Collections;
 using System.Reflection;
 using System;
 using System.Collections.Generic;
-using LiteNetLibManager;
+using SimpleNetManager;
+using SimpleNetCore;
 
 namespace UnityRemoteConsole
 {
@@ -40,10 +41,10 @@ namespace UnityRemoteConsole
 
             }
 
-            msgManager.RegisterMessage<UseMethod2Server>(OnRemoteInvokingEvent);
+            msgManager.RegisterMsgEvent<UseMethod2Server>(OnRemoteInvokingEvent);
         }
 
-        private void OnRemoteInvokingEvent(NetMessageHandler msgHandler)
+        private void OnRemoteInvokingEvent(NetMessageData msgHandler)
         {
             UseMethod2Server msg = msgHandler.GetMessage<UseMethod2Server>();
             //Debug.Log("Server接收到UseMethod2Server：" + JsonUtils.ToJson(msg));
@@ -95,7 +96,7 @@ namespace UnityRemoteConsole
             UseMethod2Client toMsg = new UseMethod2Client();
             toMsg.code = code;
             toMsg.error = error;
-            netManager.Send(msgHandler.player, toMsg);
+            netManager.Send(msgHandler.session, toMsg);
             //Debug.Log("发送UseMethod2Client：" + JsonUtils.ToJson(toMsg));
         }
 
@@ -140,7 +141,7 @@ namespace UnityRemoteConsole
             }
             return list;
         }
-        protected override void OnPlayerLogin(LiteNetLibManager.Player player)
+        protected override void OnPlayerLogin(SimpleNetManager.Player player)
         {
             foreach (var mData in invokeMothodsInfos)
             {
@@ -188,8 +189,8 @@ namespace UnityRemoteConsole
                         paramsData.selectItemValues = GetTypeSelectItemValues(p.ParameterType,paramsDescription);
                         msg.data.paramsDatas.Add(paramsData);
                     }
-                    Debug.Log("Send MethodData2Client:" + JsonUtility.ToJson(msg));
-                    netManager.Send(player, msg);
+                    //Debug.Log("Send MethodData2Client:" + JsonUtility.ToJson(msg));
+                    netManager.Send(player.session, msg);
                 }
             }
         }
@@ -223,7 +224,7 @@ namespace UnityRemoteConsole
             }
             if(value==null)
             {
-                Debug.Log("CreateDefultInstance Type:" + parameterType);
+                //Debug.Log("CreateDefultInstance Type:" + parameterType);
                 value = ReflectionTool.CreateDefultInstance(parameterType);
             }
 

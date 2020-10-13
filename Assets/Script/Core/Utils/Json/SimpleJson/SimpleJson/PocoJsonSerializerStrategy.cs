@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
 
-namespace HDJ.Framework.Core
+namespace Framework
 {
 	[GeneratedCode("simple-json", "1.0.0")]
 	public class PocoJsonSerializerStrategy : IJsonSerializerStrategy

@@ -12,7 +12,9 @@ public class IniConfigTool
     public IniConfigTool(string filePath)
     {
         configData = new Dictionary<string, string>();
-     
+
+        if (string.IsNullOrEmpty(filePath))
+            return;
         bool hasCfgFile = File.Exists(filePath);
         if (hasCfgFile == false)
         {
@@ -20,29 +22,55 @@ public class IniConfigTool
         }
         StreamReader reader = new StreamReader(filePath, Encoding.Default);
         string line;
-        int indx = 0;
+        int index = 0;
         while ((line = reader.ReadLine()) != null)
         {
-            try
-            {
-                if (line.StartsWith("#") || string.IsNullOrEmpty(line))
-                    configData.Add("#" + indx++, line);
-                else
-                {
-                    string[] key_value = line.Split('=');
-                    if (key_value.Length >= 2)
-                        configData.Add(key_value[0], key_value[1]);
-                    else
-                        configData.Add("#" + indx++, line);
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError(e);
-            }
-          
+
+            Parse(ref index, line);
         }
         reader.Close();
+    }
+
+    public void ReInit(string content)
+    {
+        if (string.IsNullOrEmpty(content))
+            return;
+        string[] lines = content.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
+        int index = 0;
+        foreach (var line in lines)
+        {
+            Parse(ref index, line);
+        }
+    }
+
+    private void Parse(ref int index, string line)
+    {
+        try
+        {
+            if (line.StartsWith("#") || string.IsNullOrEmpty(line))
+                configData.Add("#" + index++, line);
+            else
+            {
+                if (line.Contains("="))
+                {
+                    int i = line.IndexOf('=');
+                    string key = line.Substring(0, i);
+                    string value = line.Substring(i + 1);
+                    if (configData.ContainsKey(key))
+                    {
+                        Debug.LogError("已包含key:" + key);
+                        return;
+                    }
+                    configData.Add(key, value);
+                }
+                else
+                    configData.Add("#" + index++, line);
+            }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError(e);
+        }
     }
     private string Get(string key)
     {
@@ -54,7 +82,7 @@ public class IniConfigTool
             return null;
     }
 
-    public bool GetBool(string key,bool defaultValue)
+    public bool GetBool(string key, bool defaultValue)
     {
         return GetValue(key, defaultValue);
     }
@@ -78,7 +106,7 @@ public class IniConfigTool
         {
             try
             {
-                return (T)Convert.ChangeType(res,typeof(T));
+                return (T)Convert.ChangeType(res, typeof(T));
             }
             catch (System.Exception e)
             {

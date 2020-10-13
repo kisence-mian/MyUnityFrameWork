@@ -1,7 +1,7 @@
 using System;
 using System.CodeDom.Compiler;
 
-namespace HDJ.Framework.Core
+namespace Framework
 {
 	[GeneratedCode("simple-json", "1.0.0")]
 	public interface IJsonSerializerStrategy

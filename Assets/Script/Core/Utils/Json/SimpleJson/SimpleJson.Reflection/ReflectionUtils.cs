@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Reflection;
 using UnityEngine;
 
-namespace HDJ.Framework.Core
+namespace Framework
 {
 	[GeneratedCode("reflection-utils", "1.0.0")]
 	internal class ReflectionsUtils

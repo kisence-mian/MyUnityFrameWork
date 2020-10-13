@@ -49,7 +49,7 @@ using UnityEngine;
                 Debug.Log("path dont exists ! : " + path);
                 return "";
             }
-           return  File.ReadAllText(path);
+           return  File.ReadAllText(path, Encoding.UTF8);
 
         }
         public static byte[] LoadByteFileByPath(string path)
@@ -128,37 +128,39 @@ using UnityEngine;
 
             return CreateFile(path, dataByte);
         }
-        public static bool CreateFile(string path, byte[] _data)
+    public static bool CreateFile(string path, byte[] _data)
+    {
+        if (string.IsNullOrEmpty(path))
+            return false;
+        string temp = Path.GetDirectoryName(path);
+        if (!Directory.Exists(temp))
         {
-            if (string.IsNullOrEmpty(path))
-                return false;
-            string temp = Path.GetDirectoryName(path);
-            if (!Directory.Exists(temp))
-            {
-                Directory.CreateDirectory(temp);
-            }
-
-            try
-            {
-                if (File.Exists(path))
-                {
-                    File.Delete(path);
-                }
-
-                FileStream stream = new FileStream(path, FileMode.OpenOrCreate);
-                stream.Write(_data, 0, _data.Length);
-                stream.Close();
-
-                //Debug.Log("File written: " + path);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError("File written fail: " + path + "  ---:" + e);
-                return false;
-            }
-
-            return true;
+            Directory.CreateDirectory(temp);
         }
+
+        try
+        {
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            using (FileStream stream = new FileStream(path.ToString(), FileMode.OpenOrCreate))
+            {
+                stream.Write(_data, 0, _data.Length);
+                stream.Flush();
+                stream.Close();
+            }
+
+            //Debug.Log("File written: " + path);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("File written fail: " + path + "  ---:" + e);
+            return false;
+        }
+
+        return true;
+    }
 
         /// <summary>
         /// 获取文件MD5
@@ -175,7 +177,8 @@ using UnityEngine;
                     FileStream fs = new FileStream(filePath, FileMode.Open);
                     int len = (int)fs.Length;
                     byte[] data = new byte[len];
-                    fs.Close();
+                     fs.Read(data, 0, len);
+                fs.Close();
 
                   return  MD5Utils.GetMD5(data);
                    

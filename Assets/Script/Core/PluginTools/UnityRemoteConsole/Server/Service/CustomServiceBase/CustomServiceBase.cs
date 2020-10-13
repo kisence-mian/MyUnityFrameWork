@@ -1,14 +1,11 @@
-﻿using LiteNetLibManager;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using SimpleNetManager;
+using SimpleNetCore;
 
 namespace UnityRemoteConsole
 {
     public abstract class CustomServiceBase:ServiceBase
     {
-        private bool isOpenFunction=true;
+        protected bool isOpenFunction=true;
         public bool IsOpenFunction
         {
             get { return isOpenFunction; }
@@ -38,8 +35,8 @@ namespace UnityRemoteConsole
         protected abstract void OnFunctionOpen();
 
         public override abstract void OnStart();
-        protected virtual void OnPlayerLogin(LiteNetLibManager.Player player) { }
-        protected virtual void OnPlayerLoginAfter(LiteNetLibManager.Player player) { }
+        protected virtual void OnPlayerLogin(SimpleNetManager.Player player) { }
+        protected virtual void OnPlayerLoginAfter(SimpleNetManager.Player player) { }
 
         public override void OnInit()
         {
@@ -47,34 +44,34 @@ namespace UnityRemoteConsole
             loginService.OnPlayerLogin += OnPlayerLoginEvent;
             loginService.OnPlayerLoginAfter += OnPlayerLoginAfter;
 
-            msgManager.RegisterMessage<FunctionSwitch2Server>(OnMsgFunctionSwitch);
+            msgManager.RegisterMsgEvent<FunctionSwitch2Server>(OnMsgFunctionSwitch);
         }
 
-        private void OnPlayerLoginAfterEvent(LiteNetLibManager.Player player)
+        private void OnPlayerLoginAfterEvent(SimpleNetManager.Player player)
         {
             OnPlayerLoginAfter(player);
         }
 
-        private void OnMsgFunctionSwitch(NetMessageHandler msgHandler)
+        private void OnMsgFunctionSwitch(NetMessageData msgHandler)
         {
             FunctionSwitch2Server msg = msgHandler.GetMessage<FunctionSwitch2Server>();
             if (msg.functionName == FunctionName)
             {
                 IsOpenFunction = msg.isOpenFunction;
-
-                SendSwitchState2Client(msgHandler.player);
+                //Debug.Log("server 接受isOpenFunction:" + IsOpenFunction);
+                SendSwitchState2Client(msgHandler.session);
             }
         }
-        private void SendSwitchState2Client(LiteNetLibManager.Player player)
+        protected void SendSwitchState2Client(Session session)
         {
             FunctionSwitch2Client msg = new FunctionSwitch2Client();
             msg.functionName = FunctionName;
             msg.isOpenFunction = isOpenFunction;
-            netManager.Send(player, msg);
+            netManager.Send(session, msg);
         }
-        private void OnPlayerLoginEvent(LiteNetLibManager.Player player)
+        private void OnPlayerLoginEvent(SimpleNetManager.Player player)
         {
-            SendSwitchState2Client(player);
+            SendSwitchState2Client(player.session);
 
             OnPlayerLogin(player);
 

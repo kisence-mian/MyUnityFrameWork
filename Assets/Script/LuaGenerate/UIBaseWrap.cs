@@ -1227,8 +1227,10 @@ public class UIBaseWrap
 			string arg1 = ToLua.CheckString(L, 3);
 			string arg2 = ToLua.CheckString(L, 4);
 			object[] arg3 = ToLua.ToParamsObject(L, 5, count - 4);
-			obj.SetTextByLangeage(arg0, arg1, arg2, arg3);
-			return 0;
+#pragma warning disable CS0612 // 类型或成员已过时
+            obj.SetTextByLangeage(arg0, arg1, arg2, arg3);
+#pragma warning restore CS0612 // 类型或成员已过时
+            return 0;
 		}
 		catch(Exception e)
 		{

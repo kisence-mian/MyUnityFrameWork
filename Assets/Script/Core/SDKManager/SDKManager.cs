@@ -27,6 +27,7 @@ namespace FrameWork.SDKManager
         static List<PayInterface> s_payServiceList = null;
         static List<ADInterface> s_ADServiceList = null;
         static List<LogInterface> s_logServiceList = null;
+        static List<RealNameInterface> s_shareServiceList = null;
         static List<OtherSDKInterface> s_otherServiceList = null;
         static List<RealNameInterface> s_realNameServiceList = null;
         private static PayCallBack s_payCallBack;
@@ -560,9 +561,12 @@ namespace FrameWork.SDKManager
                 }
             }
 
-            PublicPayClass publicPayInterface = new PublicPayClass();
-            publicPayInterface.Init();
-            list.Add(publicPayInterface);
+            if(s_useNewSDKManager)
+            {
+                PublicPayClass publicPayInterface = new PublicPayClass();
+                publicPayInterface.Init();
+                list.Add(publicPayInterface);
+            }
         }
 
         /// <summary>
@@ -695,6 +699,7 @@ namespace FrameWork.SDKManager
 
         public static LocalizedGoodsInfo GetGoodsInfo(string goodsID, string tag = "")
         {
+
             try
             {
                 return GetPayService(0).GetGoodsInfo(goodsID);
@@ -708,13 +713,32 @@ namespace FrameWork.SDKManager
 
         public static LocalizedGoodsInfo GetGoodsInfo(string SDKName, string goodsID, string tag = "")
         {
-            try
+            //优先使用本地配置的SDK
+            if (GetHasSDKService(s_payServiceList, SDKName))
             {
-                return GetPayService(SDKName).GetGoodsInfo(goodsID);
+                try
+                {
+                    return GetPayService(SDKName).GetGoodsInfo(goodsID);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+                }
             }
-            catch (Exception e)
+            else if (s_useNewSDKManager)
             {
-                Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+                try
+                {
+                    GetPayService("PublicPayClass").GetGoodsInfo(goodsID);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("SDKManager GetGoodsInfo Exception: " + e.ToString());
+                }
+            }
+            else
+            {
+                Debug.LogError("支付SDK 没有配置！ ");
             }
 
             return null;
@@ -937,6 +961,7 @@ namespace FrameWork.SDKManager
         /// </summary>
         public static void PlayAD(string SDKName, ADType adType, string tag = "")
         {
+            Debug.LogWarning("======PlayAD==" + SDKName + "===adType==" + adType + "===" + tag);
             try
             {
                 if (string.IsNullOrEmpty(SDKName) && s_ADServiceList.Count > 0)
@@ -1431,6 +1456,34 @@ namespace FrameWork.SDKManager
 
         #endregion
 
+        #region 分享
+
+        static void InitShare(List<ShareInterface> list)
+        {
+            for (int i = 0; i < list.Count; i++)
+            {
+                try
+                {
+                    //list[i].m_SDKName = list[i].GetType().Name;
+                    list[i].Init();
+                    //s_loginCallBack += list[i].m_callBack;
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError("Init LoginInterface SDK Exception:\n" + e.ToString());
+                }
+            }
+        }
+
+        public static void Share(string SDKName,string content)
+        {
+            if(s_useNewSDKManager)
+            {
+                //SDKManagerNew
+            }
+        }
+
+        #endregion
 
         #region 其他SDK
 
@@ -1489,7 +1542,7 @@ namespace FrameWork.SDKManager
         public static string GetProperties(string properties, string key, string defaultValue)
         {
             //pc平台下读取 D:\UnityProjects\CardGame2018\Configs\{properties}.ini配置文件
-#if UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_WIN
+#if UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX || UNITY_STANDALONE_WIN||UNITY_EDITOR
             string path = Environment.CurrentDirectory + "/Configs/" + properties + ".ini";
             path = path.Replace('\\', '/');
            // Debug.Log("ConfigPath:" + path);
@@ -1524,6 +1577,24 @@ namespace FrameWork.SDKManager
             {
                 Application.Quit();
             }
+        }
+
+        public static bool IsSDKExist(string SDKName)
+        {
+            bool result = false;
+            if (s_useNewSDKManager)
+            {
+                SDKManagerNew.IsSDKExist(SDKName);
+            }
+
+            result |= GetHasSDKService(s_loginServiceList, SDKName);
+            result |= GetHasSDKService(s_ADServiceList, SDKName);
+            result |= GetHasSDKService(s_payServiceList, SDKName);
+            result |= GetHasSDKService(s_logServiceList, SDKName);
+            result |= GetHasSDKService(s_otherServiceList, SDKName);
+
+
+            return result;
         }
 
         #region 内部工具
@@ -1616,7 +1687,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 加载SDK设置
+        #region 加载SDK设置
 
                 /// <summary>
                 /// 读取当前游戏内的SDK配置
@@ -1721,7 +1792,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 初始化SDK
+        #region 初始化SDK
 
                 static void LoadService(SchemeData data)
                 {
@@ -1744,13 +1815,14 @@ namespace FrameWork.SDKManager
                     InitSDKList(s_logServiceList);
                     InitSDKList(s_otherServiceList);
                     InitSDKList(s_realNameServiceList);
+                    InitSDKList(s_shareServiceList);
 
                     //Debug.Log("s_loginServiceList: " + s_loginServiceList.Count);
                 }
 
 #endregion
 
-#region 功能函数
+        #region 功能函数
 
                 static T GetSDKService<T>(List<T> list, string name) where T : SDKInterfaceBase
                 {
@@ -1780,6 +1852,9 @@ namespace FrameWork.SDKManager
 
                 static void InitSDKList<T>(List<T> list) where T : SDKInterfaceBase
                 {
+
+            if (list == null)
+                return;
                     for (int i = 0; i < list.Count; i++)
                     {
                         try
@@ -1796,7 +1871,7 @@ namespace FrameWork.SDKManager
 
 #endregion
 
-#region 自动监听上报
+        #region 自动监听上报
 
                 /// <summary>
                 /// 自动上报监听初始化
@@ -1822,7 +1897,7 @@ namespace FrameWork.SDKManager
 #endregion
     }
 
-#region 声明
+        #region 声明
 
     public delegate void LoginCallBack(OnLoginInfo info);
     public delegate void PayCallBack(OnPayInfo info);

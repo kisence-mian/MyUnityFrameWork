@@ -6,12 +6,12 @@ using UnityRemoteConsole;
 using System.Text;
 using System.IO;
 using System;
-using LiteNetLibManager;
+using SimpleNetManager;
 
 public class UnityRemoteConsoleSettingEditorWindow : EditorWindow
 {
 
-    [MenuItem("Window/UnityRemoteConsole/Setting", priority = 1002)]
+    [MenuItem("Window/UnityRemoteConsole/SettingWindow", priority = 1002)]
     private static void OpenWindow()
     {
         UnityRemoteConsoleSettingEditorWindow win = GetWindow<UnityRemoteConsoleSettingEditorWindow>();
@@ -20,7 +20,7 @@ public class UnityRemoteConsoleSettingEditorWindow : EditorWindow
         EditorWindow.FocusWindowIfItsOpen<UnityRemoteConsoleSettingEditorWindow>();
         win.Init();
     }
-    private UnityRemoteConsoleSettingData config;
+    private URCSettingData config;
     private void OnEnable()
     {
         if (config == null)
@@ -28,18 +28,33 @@ public class UnityRemoteConsoleSettingEditorWindow : EditorWindow
     }
     private void Init()
     {
-        config = UnityRemoteConsoleSettingData.GetCofig();
+        config = URCSettingData.GetCofig();
 
         modifyPassword = false;
     }
     private void OnGUI()
     {
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        GUIStyle uIStyle = "AM HeaderStyle";
+        uIStyle.fontSize = 25;
+        GUILayout.Label("Unity Remote Console",uIStyle);
+        GUILayout.FlexibleSpace();
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.FlexibleSpace();
+        GUILayout.Label("Version:"+ServerVersionInfo.Version);
+        GUILayout.Space(5);
+        GUILayout.EndHorizontal();
+        GUILayout.Space(15);
+
         int port = EditorGUILayout.IntField("Connect Port(1024-65535)", config.netPort);
         if (port >= 1024 && port <= 65535)
             config.netPort = port;
 
         GUILayout.Space(8);
-        config.autoBoot = GUILayout.Toggle(config.autoBoot, "Auto Boot");
+        //config.autoBoot = GUILayout.Toggle(config.autoBoot, "Auto Boot");
 
         LoginAccountGUI();
 
@@ -134,7 +149,7 @@ public class UnityRemoteConsoleSettingEditorWindow : EditorWindow
                 ShowNotification(new GUIContent("Please save the password first!"));
                 return;
             }
-            UnityRemoteConsoleSettingData.SaveConfig(config);
+            URCSettingData.SaveConfig(config);
             AssetDatabase.Refresh();
 
             ShowNotification(new GUIContent("Save Success!"));

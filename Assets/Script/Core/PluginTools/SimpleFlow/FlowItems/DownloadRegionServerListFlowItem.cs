@@ -56,9 +56,6 @@ public class DownloadRegionServerListFlowItem : FlowItemBase
         if (detail.country_code == "CN")
             IsChinaIP = true;
         Debug.Log("IP地区：" + detail.ipv4 + " 国家:" + detail.country);
-        GameInfoCollecter.AddNetworkStateInfoValue("Device IP", detail.ipv4);
-        GameInfoCollecter.AddNetworkStateInfoValue("Device IP Country", detail.country);
-        GameInfoCollecter.AddNetworkStateInfoValue("Device IP Country Code", detail.country_code);
 
         flowManager.SetVariable(P_IPGeolocationDetail, detail);
 
@@ -136,7 +133,6 @@ public class DownloadRegionServerListFlowItem : FlowItemBase
                     if (ArrayContains(item.m_CountryCode, country_code))
                     {
                         Debug.Log("国家选定大区key：" + item.m_key);
-                        GameInfoCollecter.AddNetworkStateInfoValue("选定大区", item.m_key);
                         if (OnCompleted != null)
                         {
                             OnCompleted(null, item);
@@ -154,7 +150,6 @@ public class DownloadRegionServerListFlowItem : FlowItemBase
                     if (ArrayContains(item.m_ContinentName, continentName))
                     {
                         Debug.Log("根据大洲选定大区key：" + item.m_key);
-                        GameInfoCollecter.AddNetworkStateInfoValue("选定大区", item.m_key);
                         if (OnCompleted != null)
                         {
                             OnCompleted(null, item);

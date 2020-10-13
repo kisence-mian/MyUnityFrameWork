@@ -1,9 +1,8 @@
-﻿using LiteNetLibManager;
-using System;
+﻿using SimpleNetManager;
+using SimpleNetCore;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
+using System;
 
 namespace UnityRemoteConsole
 {
@@ -17,37 +16,52 @@ namespace UnityRemoteConsole
             }
         }
 
-        private List<LogData> logDatas = new List<LogData>();
+        private static List<LogData> logDatas = new List<LogData>();
 
-        public List<LogData> GetLogDatas()
+        public static List<LogData> GetLogDatas()
         {
             return logDatas;
         }
-        public override void OnStart()
+
+        private static Action<LogData> OnLogEvent;
+
+        [RuntimeInitializeOnLoadMethod( RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void LogEventRegister()
         {
             Application.logMessageReceivedThreaded += LogMessageReceived;
+        }
+        public override void OnStart()
+        {
+            OnLogEvent += SendAllPlayerLog;
 
-            IsOpenFunction = GetSaveDebugState();
-            msgManager.RegisterMessage<ClearLog2Server>(OnClearLogEvent);
+            isOpenFunction = GetSaveDebugState();
+            if (IsOpenFunction != GetUnityDebugSwitch())
+            {
+                SetUnityDebugSwitch(IsOpenFunction);
+            }
+            msgManager.RegisterMsgEvent<ClearLog2Server>(OnClearLogEvent);
         }
 
-        private void OnClearLogEvent(NetMessageHandler msgHandler)
+        private void OnClearLogEvent(NetMessageData msgHandler)
         {
             logDatas.Clear();
         }
 
         private static int indexCounter = 0;
-        private void LogMessageReceived(string condition, string stackTrace, LogType type)
+        private static void LogMessageReceived(string condition, string stackTrace, LogType type)
         {
             LogData data = new LogData(indexCounter,type, condition, stackTrace);
             logDatas.Add(data);
             indexCounter++;
 
-            SendAllPlayerLog(data);
+            if (OnLogEvent != null)
+            {
+                OnLogEvent(data);
+            }
             
         }
 
-        protected override void OnPlayerLoginAfter(LiteNetLibManager.Player player)
+        protected override void OnPlayerLoginAfter(SimpleNetManager.Player player)
         {
             List<LogData> list = new List<LogData>(logDatas);
             
@@ -68,20 +82,34 @@ namespace UnityRemoteConsole
             SetUnityDebugSwitch(true);
             SetSaveDebugState(true);
         }
+        internal override void OnUpdate(float deltaTime)
+        {
+            if(GetUnityDebugSwitch()!= IsOpenFunction)
+            {
+                isOpenFunction = GetUnityDebugSwitch();
+               
+                SimpleNetManager.Player[] players = PlayerManager.GetAllPlayers();
+                foreach (SimpleNetManager.Player player in players)
+                {
+                    SendSwitchState2Client(player.session);
+    ;
+                }
+            }
+        }
 
         private void SendAllPlayerLog(LogData data)
         {
-            LiteNetLibManager.Player[] players= PlayerManager.GetAllPlayers();
-            foreach(LiteNetLibManager.Player player in players)
+            SimpleNetManager.Player[] players= PlayerManager.GetAllPlayers();
+            foreach(SimpleNetManager.Player player in players)
             {
                 SendLog(player, data)
 ;            }
         }
-        private void SendLog(LiteNetLibManager.Player player, LogData data)
+        private void SendLog(SimpleNetManager.Player player, LogData data)
         {
             LogData2Client msg = new LogData2Client();
             msg.logData = data;
-            netManager.Send(player, msg);
+            netManager.Send(player.session, msg);
         }
         #region save debug switch
 

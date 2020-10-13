@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using System.Reflection;
-using HDJ.Framework.Core;
+using Framework;
 
 /// <summary>
 /// Json处理工具类

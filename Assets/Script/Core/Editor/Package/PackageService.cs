@@ -293,6 +293,9 @@ public static class PackageService
                 continue;
             else
             {
+                if (f.Contains(" "))
+                    Debug.LogError("文件路径里有空格:" + f);
+
                 string relativePath = FileTool.RemoveExpandName(f.Substring(direIndex));
                 string assetsPath = f.Substring(assetsIndex);
                 UnityEngine.Object obj = Resources.Load(relativePath);

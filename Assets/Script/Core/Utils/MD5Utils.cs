@@ -55,6 +55,17 @@ public static class MD5Utils
         }
 
         return fileMD5.ToString();
+
+      
+    }
+    public static string GetMD5Base64(byte[] data)
+    {
+        using (MD5 mi = MD5.Create())
+        {
+            //开始加密
+            byte[] newBuffer = mi.ComputeHash(data);
+            return Convert.ToBase64String(newBuffer);
+        }
     }
 
     public static int GetHashMD5(byte[] data)

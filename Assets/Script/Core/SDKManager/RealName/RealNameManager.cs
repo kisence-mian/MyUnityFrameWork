@@ -130,7 +130,7 @@ public class RealNameManager  {
 
     private void OnLoginEvent(UserLogin2Client t)
     {
-        Debug.LogError("RealNameManager OnLoginEvent" + t.code + t.reloginState);
+        Debug.Log("RealNameManager OnLoginEvent" + t.code + t.reloginState);
         if (t.code != 0||t.reloginState)
             return;
         SDKManager.RealNameLogin(t.user.userID);

@@ -24,16 +24,7 @@ public class JsonRecordConverter : IRecordConverter
     public T String2Object<T>(string content)
     {
         T t = default(T);
-       bool state= JsonUtils.TryFromJson(out t, content);
-        if (!state)
-            t = SimpleJsonUtil.FromJson<T>(content);
-        else
-        {
-            if(JsonUtils.ToJson(t)== "{}")
-            {
-                t = SimpleJsonUtil.FromJson<T>(content);
-            }
-        }
+        JsonUtils.TryFromJson(out t, content);
         //Debug.Log(state+ " old:" + content + "\n" + "new:" + JsonUtils.ToJson(t)+"\n def:"+JsonUtils.ToJson(default(T)));
         return t;
     }

@@ -41,4 +41,5 @@ public enum StoreName
     HuaWei4 = 30,//华为4.0
     OKJOY = 31,
     Play68,
+    MG,//微软-MG
 }

@@ -29,21 +29,24 @@ public class NetworkVerificationImplement : PaymentVerificationInterface
     {
         // GlobalEvent.AddTypeEvent<StoreBuyGoods2Client>(OnUserPaymentVerification);
         //Debug.Log(" 当前游戏服务器验证 .Init");
+        ResendMessageManager.ReceiveMsgCallBack += OnReceiveMsgCallBack;
     }
 
-   public static void SetBuyResendMessage(StoreBuyGoods2Server msg, bool noSend)
+    private void OnReceiveMsgCallBack(MessageClassInterface resMsg)
+    {
+        StoreBuyGoods2Client e = (StoreBuyGoods2Client)resMsg;
+
+        StoreName storeName = GetGoodsPayInfo(e.receipt).storeName;
+
+        Debug.LogWarning("NetworkVerificationImplement   StoreBuyGoods2Client=========" + e.id + " storeName:" + storeName);
+
+        PaymentVerificationManager.OnVerificationResult(e.code, e.id, e.repeatReceipt, e.receipt, null, storeName);
+    }
+
+    public static void SetBuyResendMessage(StoreBuyGoods2Server msg, bool noSend)
     {
         SaveGoodsPayInfo(msg.receipt, msg);
-        ResendMessageManager.AddResendMessage(msg, typeof(StoreBuyGoods2Client).Name, (resMsg) =>
-        {
-            StoreBuyGoods2Client e = (StoreBuyGoods2Client)resMsg;
-
-            StoreName storeName = GetGoodsPayInfo(e.receipt).storeName;
-
-            Debug.LogWarning("NetworkVerificationImplement   StoreBuyGoods2Client=========" + e.id + " storeName:" + storeName);
-            
-            PaymentVerificationManager.OnVerificationResult(e.code, e.id, e.repeatReceipt, e.receipt,null, storeName);
-        },noSend);
+        ResendMessageManager.AddResendMessage(msg, typeof(StoreBuyGoods2Client).Name, noSend);
     }
 
 

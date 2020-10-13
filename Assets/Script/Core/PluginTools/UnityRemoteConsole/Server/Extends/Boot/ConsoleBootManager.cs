@@ -1,17 +1,21 @@
 ﻿using UnityEngine;
 using System.Collections;
-using LiteNetLibManager;
+using SimpleNetManager;
 using System;
 using System.Collections.Generic;
+using SimpleNetCore;
 
 namespace UnityRemoteConsole
 {
+    /// <summary>
+    /// 控制工具启动方式
+    /// </summary>
     public class ConsoleBootManager
     {
 
         private static List<BootFunctionBase> bootFunctions = new List<BootFunctionBase>();
         // Use this for initialization
-      public static  void Init(UnityRemoteConsoleSettingData config,Action OnTriggerBoot)
+      public static  void Init(URCSettingData config,Action OnTriggerBoot)
         {
            Type[] types=  ReflectionTool.GetChildTypes(typeof(BootFunctionBase));
             Debug.Log("types.cout:" + types.Length);

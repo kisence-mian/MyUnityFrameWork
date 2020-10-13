@@ -8,9 +8,9 @@ namespace UnityRemoteConsole
     {
 
         private Action OnTriggerBoot;
-        private UnityRemoteConsoleSettingData config;
-
-        public void OnInit(UnityRemoteConsoleSettingData config, Action OnTriggerBoot)
+        private URCSettingData config;
+        public int tapCount;
+        public void OnInit(URCSettingData config, Action OnTriggerBoot)
         {
             this.config = config;
             this.OnTriggerBoot = OnTriggerBoot;
@@ -30,7 +30,7 @@ namespace UnityRemoteConsole
             {
                 Touch myTouch = Input.touches[0];
               //  touchPos = new Vector2(0, Screen.height - Screen.height / 3);
-                if (myTouch.tapCount >= config.tapCount &&
+                if (myTouch.tapCount >= tapCount &&
                     (myTouch.position.x>0&&myTouch.position.x<Screen.width/3)&&
                     (myTouch.position.y>(Screen.height - Screen.height / 3)&&myTouch.position.y<Screen.height)
                     )

@@ -1,17 +1,4 @@
 key	serverIP	description	port	androidVersion	iosVersion	channel	standaloneVersion
 type	String	String	Int	StringArray	StringArray	StringArray	StringArray[]
 note	服务器IP	描述	端口	支持前端Android的版本	支持的前端IOS的版本	包的渠道	包含Windows，mac，Linux
-default	114.215.131.149	描述	8000	null	null	GameCenter	null
-1	www.hdjgame.cn	贺冬俊				GameCenter|Google	
-2	192.168.1.107	高凯					
-3	ellrland.sghdservice.com	先行服	8001	1.4.3|1.4.4	1.4.3|1.4.4|1.4.5|1.4.1	GameCenter|EllrLand_First	
-4	ellrland.sghdservice.com	天涯服	8002				
-12	ellrlandtest.sghdservice.com	先行2服（中秋服）	8009	1.3.2|1.4.0|1.4.5|1.4.1	1.3.2|1.3.3|1.4.0	HaoYouKuaiBao	
-13	ellrland.sghdservice.com	天涯2服	8004	1.3.2|1.4.0		OPPO|XiaoMi|VIVO|4399|HuaWei|UC	
-14	service-us-01.sghdservice.com	美服	8001	1.4.0		HuaWei3	
-15	ellrland.sghdservice.com	商业服	8003	1.4.1|1.4.3		HLX|HaoYouKuaiBao|4399|UC|XiaoMi	
-16	ellrlandhmt.sghdservice.com	香港服	8001	1.4.1|1.4.5		Google	
-17	ellrlandhmt.sghdservice.com	香港测试服	8002		1.4.6		
-18	ellrland_steam.sghdservice.com	Steam服务器国内	8005			Steam	
-19	ellrland_steam_hk.sghdservice.com	Steam香港服	8005			Steam	
-20	ellrland_steam_us.sghdservice.com	Steam北美服	8005			Steam	1.4.6
+default	0.0.0.0	描述	8000	null	null	GameCenter	null

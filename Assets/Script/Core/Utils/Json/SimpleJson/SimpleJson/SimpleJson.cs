@@ -7,7 +7,7 @@ using System.Globalization;
 using System.Runtime.Serialization;
 using System.Text;
 
-namespace HDJ.Framework.Core
+namespace Framework
 {
     [GeneratedCode("simple-json", "1.0.0")]
     public static class SimpleJsonTool

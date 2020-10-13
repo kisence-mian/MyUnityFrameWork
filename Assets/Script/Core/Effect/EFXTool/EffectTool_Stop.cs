@@ -4,11 +4,22 @@ using UnityEngine;
 
 public class EffectTool_Stop : MonoBehaviour
 {
-    public ParticleSystem particleSystem;
+    public ParticleSystem particle;
+
+    private void Awake()
+    {
+        if (particle == null)
+        {
+            particle = GetComponentInChildren<ParticleSystem>();
+        }
+    }
+
 
     private void OnEnable()
     {
-        particleSystem.Play(true);
+
+
+        particle.Play(true);
     }
 
     private void OnDisable()
@@ -18,9 +29,9 @@ public class EffectTool_Stop : MonoBehaviour
 
     public void StopParticle()
     {
-        if (particleSystem != null)
+        if (particle != null)
         {
-            particleSystem.Stop(true);
+            particle.Stop(true);
         }
     }
 

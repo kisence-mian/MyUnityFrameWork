@@ -9,9 +9,9 @@ namespace UnityRemoteConsole
     {
 
         private Action OnTriggerBoot;
-        private UnityRemoteConsoleSettingData config;
+        private URCSettingData config;
 
-        public void OnInit(UnityRemoteConsoleSettingData config, Action OnTriggerBoot)
+        public void OnInit(URCSettingData config, Action OnTriggerBoot)
         {
             this.config = config;
             this.OnTriggerBoot = OnTriggerBoot;

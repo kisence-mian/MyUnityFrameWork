@@ -76,7 +76,9 @@ public class SelectSeverController  {
                         }
                     }else if(platform == RuntimePlatform.WindowsEditor|| platform== RuntimePlatform.WindowsPlayer
                         || platform== RuntimePlatform.OSXEditor||platform== RuntimePlatform.OSXPlayer
-                        ||platform== RuntimePlatform.LinuxEditor || platform == RuntimePlatform.LinuxPlayer)
+                        ||platform== RuntimePlatform.LinuxEditor || platform == RuntimePlatform.LinuxPlayer
+                        ||platform== RuntimePlatform.MetroPlayerX86||platform== RuntimePlatform.MetroPlayerX64||platform== RuntimePlatform.MetroPlayerARM
+                        ||platform == RuntimePlatform.WSAPlayerX86||platform == RuntimePlatform.WSAPlayerX64|| platform== RuntimePlatform.WSAPlayerARM)
                     {
                         if (StringArrayHaveItem(cc.m_standaloneVersion, version))
                         {

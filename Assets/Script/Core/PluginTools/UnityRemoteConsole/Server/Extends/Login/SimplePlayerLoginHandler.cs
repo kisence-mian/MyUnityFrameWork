@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using SimpleNetManager;
+using SimpleNetCore;
 using System;
 using UnityEngine;
 
@@ -8,9 +9,9 @@ namespace UnityRemoteConsole
 
     public class SimplePlayerLoginHandler : PlayerLoginHandlerBase
     {
-        public override uint LoginLogic(Login2Server msg, long connectId, out LiteNetLibManager.Player player)
+        public override uint LoginLogic(Login2Server msg, Session session, out SimpleNetManager.Player player)
         {
-            UnityRemoteConsoleSettingData config = UnityRemoteConsoleSettingData.GetCofig();
+            URCSettingData config = URCSettingData.GetCofig();
 
             string key = msg.key;
             string pw = msg.password;
@@ -18,7 +19,7 @@ namespace UnityRemoteConsole
 
             if(config.loginKey.Equals(key)&& config.loginPassword.Equals(pw))
             {
-                player = new LiteNetLibManager.Player(connectId);
+                player = new SimpleNetManager.Player(session);
                 player.playerID =Guid.NewGuid().ToString();
 
                 return 0;

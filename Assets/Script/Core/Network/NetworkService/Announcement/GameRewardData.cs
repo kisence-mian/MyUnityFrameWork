@@ -18,6 +18,9 @@ public class GameRewardData
     /// 数量
     /// </summary>
     public int number;
-  
+    /// <summary>
+    /// 发这个奖励的理由（选填）
+    /// </summary>
+    public string reason;
 }
 

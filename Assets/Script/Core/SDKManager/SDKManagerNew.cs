@@ -435,6 +435,10 @@ namespace FrameWork.SDKManager
 
         public static void Log(string eventID, string label, Dictionary<string, string> data = null)
         {
+            if (!isRePackage)
+            {
+                return;
+            }
             Dictionary<string, string> msg = new Dictionary<string, string>();
 
             msg.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
@@ -451,6 +455,10 @@ namespace FrameWork.SDKManager
 
         public static void LogLogin(string accountId, Dictionary<string, string> data = null)
         {
+            if (!isRePackage)
+            {
+                return;
+            }
             Dictionary<string, string> msg = new Dictionary<string, string>();
 
             msg.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
@@ -468,6 +476,10 @@ namespace FrameWork.SDKManager
 
         public static void LogLoginOut(string AccountId, Dictionary<string, string> data = null)
         {
+            if (!isRePackage)
+            {
+                return;
+            }
             Dictionary<string, string> msg = new Dictionary<string, string>();
             msg.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
             msg.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Log_FunctionName_LoginOut);
@@ -483,6 +495,10 @@ namespace FrameWork.SDKManager
 
         public static void LogPay(string orderID, string goodsID,int count, float price, string currency, string payment)
         {
+            if (!isRePackage)
+            {
+                return;
+            }
             Dictionary<string, string> msg = new Dictionary<string, string>();
             msg.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
             msg.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Log_FunctionName_LogPay);
@@ -499,6 +515,10 @@ namespace FrameWork.SDKManager
 
         public static void LogPaySuccess(string orderID)
         {
+            if (!isRePackage)
+            {
+                return;
+            }
             Dictionary<string, string> msg = new Dictionary<string, string>();
             msg.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
             msg.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Log_FunctionName_LogPaySuccess);
@@ -511,6 +531,10 @@ namespace FrameWork.SDKManager
         //以下三个配合使用，用于追踪虚拟物品的产出消耗
         public static void LogRewardVirtualCurrency(float count, string reason)
         {
+            if (!isRePackage)
+            {
+                return;
+            }
             Dictionary<string, string> msg = new Dictionary<string, string>();
             msg.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
             msg.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Log_FunctionName_RewardVirtualCurrency);
@@ -523,6 +547,11 @@ namespace FrameWork.SDKManager
 
         public static void LogPurchaseVirtualCurrency(string goodsID, int num, float price)
         {
+            if (!isRePackage)
+            {
+                return;
+            }
+
             Dictionary<string, string> msg = new Dictionary<string, string>();
             msg.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
             msg.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Log_FunctionName_PurchaseVirtualCurrency);
@@ -536,6 +565,10 @@ namespace FrameWork.SDKManager
 
         public static void LogUseItem(string goodsID, int num)
         {
+            if (!isRePackage)
+            {
+                return;
+            }
             Dictionary<string, string> msg = new Dictionary<string, string>();
             msg.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_Log);
             msg.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.Log_FunctionName_UseItem);
@@ -558,11 +591,8 @@ namespace FrameWork.SDKManager
         static public void RealNameOnLogin(string userID, string SDKName, string tag)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
-
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_OnLogin);
-
             data.Add(SDKInterfaceDefine.ParameterName_UserID, userID);
 
             if (SDKName != null)
@@ -581,9 +611,7 @@ namespace FrameWork.SDKManager
         static public void RealNameOnLogout(string SDKName, string tag)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
-
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_OnLogout);
 
             if (SDKName != null)
@@ -600,9 +628,7 @@ namespace FrameWork.SDKManager
         static public RealNameStatus GetRealNameType(string SDKName, string tag)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
-
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_GetRealNameType);
 
             if (SDKName != null)
@@ -631,9 +657,7 @@ namespace FrameWork.SDKManager
         static public bool IsAdult(string SDKName, string tag)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
-
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_IsAdult);
 
             if (SDKName != null)
@@ -653,9 +677,7 @@ namespace FrameWork.SDKManager
         static public int GetTodayOnlineTime(string SDKName, string tag)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
-
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_GetTodayOnlineTime);
 
             if (SDKName != null)
@@ -675,10 +697,9 @@ namespace FrameWork.SDKManager
         static public void StartRealNameAttestation(string SDKName,string tag)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
-
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_StartRealNameAttestation);
+
             if (SDKName != null)
             {
                 data.Add(SDKInterfaceDefine.SDKName, SDKName);
@@ -700,8 +721,8 @@ namespace FrameWork.SDKManager
             {
                 data.Add(SDKInterfaceDefine.SDKName, SDKName);
             }
-            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
 
+            data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_CheckPayLimit);
             data.Add(SDKInterfaceDefine.Tag, tag);
             data.Add(SDKInterfaceDefine.RealName_ParameterName_PayAmount, payAmount.ToString());
@@ -717,11 +738,8 @@ namespace FrameWork.SDKManager
         static public void LogPayAmount(string SDKName,int payAmount, string tag)
         {
             Dictionary<string, string> data = new Dictionary<string, string>();
-
             data.Add(SDKInterfaceDefine.ModuleName, SDKInterfaceDefine.ModuleName_RealName);
-
             data.Add(SDKInterfaceDefine.FunctionName, SDKInterfaceDefine.RealName_FunctionName_LogPayAmount);
-
             data.Add(SDKInterfaceDefine.RealName_ParameterName_PayAmount, payAmount.ToString());
 
             if (SDKName != null)
@@ -777,6 +795,28 @@ namespace FrameWork.SDKManager
             }
 
             Call(data);
+        }
+
+        public static bool IsSDKExist(string SDKName)
+        {
+#if UNITY_EDITOR
+            return false;
+
+#elif UNITY_ANDROID
+
+            if (androidInterface == null)
+            {
+                androidInterface = new AndroidJavaClass("sdkInterface.SdkInterface");
+            }
+
+            return androidInterface.CallStatic<bool>("IsSDKExist", SDKName);
+
+
+#elif UNITY_IOS
+             return false;
+#else
+             return false;
+#endif
         }
 
         #region 事件监听
@@ -882,7 +922,7 @@ namespace FrameWork.SDKManager
 
 #if UNITY_EDITOR
 
-        //static AndroidJavaClass androidInterface = null;
+        static AndroidJavaClass androidInterface = null;
 
 #elif UNITY_ANDROID
 
@@ -914,6 +954,8 @@ namespace FrameWork.SDKManager
 
 #elif UNITY_IOS
 
+#else
+
 #endif
             }
             catch (Exception e)
@@ -943,7 +985,7 @@ namespace FrameWork.SDKManager
             }
             return defaultValue;
 
-#elif UNITY_IOS
+#else
                 return defaultValue;
 #endif
             }
@@ -977,7 +1019,7 @@ namespace FrameWork.SDKManager
             return defaultValue;
 
 
-#elif UNITY_IOS
+#else
                 return defaultValue;
 #endif
             }
@@ -1009,7 +1051,7 @@ namespace FrameWork.SDKManager
                 return androidInterface.CallStatic<string>("UnityRequestFunctionString", content);
             }
             return defaultValue;
-#elif UNITY_IOS
+#else
                 return defaultValue;
 #endif
             }
@@ -1315,7 +1357,7 @@ namespace FrameWork.SDKManager
 
             if (!isRePackage)
             {
-                Debug.Log("isRePackage == false, return defaultValue: "+ defaultValue);
+                //Debug.Log("isRePackage == false, return defaultValue: "+ defaultValue);
                 return defaultValue;
             }
 
